@@ -1,0 +1,28 @@
+[package]
+name = "hyperphysics-verify"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+description = "Formal verification for HyperPhysics using Z3 and Lean 4"
+
+[dependencies]
+# Z3 SMT solver for runtime verification
+z3 = { version = "0.12", optional = true }
+
+# Core HyperPhysics dependencies
+hyperphysics-core = { path = "../hyperphysics-core" }
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+hyperphysics-thermo = { path = "../hyperphysics-thermo" }
+
+# Testing
+proptest = "1.0"
+approx = "0.5"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = []
+z3 = ["dep:z3"]
+lean = []  # Lean integration via FFI (future)
