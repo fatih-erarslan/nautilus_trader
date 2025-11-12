@@ -145,6 +145,32 @@ impl PBitLattice {
     pub fn positions(&self) -> Vec<PoincarePoint> {
         self.pbits.iter().map(|p| *p.position()).collect()
     }
+
+    /// Get coupling strengths for energy calculation (SIMD optimization)
+    ///
+    /// Returns flattened coupling matrix where coupling[i*N + j] = J_ij
+    /// Only includes non-zero couplings for efficiency
+    pub fn couplings(&self) -> Vec<f64> {
+        let n = self.pbits.len();
+        let mut couplings = Vec::with_capacity(n * n);
+
+        // Extract coupling strengths from each pBit
+        for pbit in &self.pbits {
+            let pbit_couplings = pbit.couplings();
+
+            // Build sparse row for this pBit
+            let mut row = vec![0.0; n];
+            for (&neighbor_idx, &strength) in pbit_couplings {
+                if neighbor_idx < n {
+                    row[neighbor_idx] = strength;
+                }
+            }
+
+            couplings.extend_from_slice(&row);
+        }
+
+        couplings
+    }
 }
 
 #[cfg(test)]

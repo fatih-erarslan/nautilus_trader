@@ -10,6 +10,7 @@ use rand::Rng;
 use crate::simd::engine::{
     entropy_from_probabilities_simd,
     magnetization_simd,
+    energy_simd,
 };
 
 /// Main HyperPhysics engine
@@ -136,9 +137,20 @@ impl HyperPhysicsEngine {
             }
         }
 
-        // Energy (keep scalar for now - SIMD requires coupling matrix extraction)
-        self.metrics.energy = HamiltonianCalculator::energy(lattice);
-        self.metrics.energy_per_pbit = HamiltonianCalculator::energy_per_pbit(lattice);
+        // Energy - SIMD accelerated when available
+        #[cfg(feature = "simd")]
+        {
+            let states = lattice.states();
+            let couplings = lattice.couplings();
+            self.metrics.energy = energy_simd(&states, &couplings);
+            self.metrics.energy_per_pbit = self.metrics.energy / lattice.size() as f64;
+        }
+
+        #[cfg(not(feature = "simd"))]
+        {
+            self.metrics.energy = HamiltonianCalculator::energy(lattice);
+            self.metrics.energy_per_pbit = HamiltonianCalculator::energy_per_pbit(lattice);
+        }
 
         // Entropy - SIMD accelerated when available
         #[cfg(feature = "simd")]
