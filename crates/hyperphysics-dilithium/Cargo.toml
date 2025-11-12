@@ -1,0 +1,75 @@
+[package]
+name = "hyperphysics-dilithium"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+description = "Post-quantum cryptographic signatures (CRYSTALS-Dilithium/ML-DSA) for HyperPhysics consciousness networks"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/hyperphysics/hyperphysics"
+keywords = ["post-quantum", "cryptography", "dilithium", "lattice", "consciousness"]
+categories = ["cryptography", "science"]
+
+[dependencies]
+# Core cryptography
+pqcrypto-dilithium = "0.5"
+pqcrypto-kyber = "0.8"
+pqcrypto-traits = "0.3"
+sha3 = "0.10"
+rand = "0.8"
+rand_core = "0.6"
+zeroize = { version = "1.6", features = ["derive"] }
+
+# AEAD encryption
+chacha20poly1305 = "0.10"
+hkdf = "0.12"
+sha2 = "0.10"
+
+# Zero-knowledge proofs
+bulletproofs = "4.0"
+curve25519-dalek = "4.1"
+merlin = "3.0"
+
+# HyperPhysics integration
+hyperphysics-core = { path = "../hyperphysics-core" }
+hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-gpu = { path = "../hyperphysics-gpu" }
+hyperphysics-verification = { path = "../hyperphysics-verification" }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Performance
+rayon = "1.7"
+tokio = { version = "1.35", features = ["full"] }
+
+# Logging
+log = "0.4"
+tracing = "0.1"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+proptest = "1.4"
+hex = "0.4"
+tempfile = "3.8"
+
+[features]
+default = ["std"]
+std = []
+gpu-acceleration = ["hyperphysics-gpu/cuda", "hyperphysics-gpu/metal"]
+side-channel-protection = []
+hybrid-mode = []  # Classical + PQ hybrid signatures
+
+[[bench]]
+name = "dilithium_benchmarks"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
