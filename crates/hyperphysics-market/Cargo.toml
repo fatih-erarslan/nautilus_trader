@@ -1,0 +1,36 @@
+[package]
+name = "hyperphysics-market"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json"] }
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Time handling
+chrono.workspace = true
+
+# Error handling
+thiserror.workspace = true
+
+# Logging
+tracing.workspace = true
+
+# Ordered float for orderbook
+ordered-float = { version = "4.2", features = ["serde"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.2"

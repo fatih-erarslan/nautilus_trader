@@ -1,0 +1,21 @@
+[package]
+name = "hyperphysics-consciousness"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+description = "Consciousness metrics: Integrated Information (Φ) and Resonance Complexity (CI)"
+
+[dependencies]
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+nalgebra.workspace = true
+ndarray = "0.15"
+rayon.workspace = true
+rand.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true

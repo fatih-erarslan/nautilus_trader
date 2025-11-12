@@ -1,0 +1,39 @@
+[package]
+name = "hyperphysics-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.hyperphysics-pbit]
+path = "../crates/hyperphysics-pbit"
+
+[dependencies.hyperphysics-core]
+path = "../crates/hyperphysics-core"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_gillespie"
+path = "fuzz_targets/fuzz_gillespie.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_metropolis"
+path = "fuzz_targets/fuzz_metropolis.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_lattice"
+path = "fuzz_targets/fuzz_lattice.rs"
+test = false
+doc = false

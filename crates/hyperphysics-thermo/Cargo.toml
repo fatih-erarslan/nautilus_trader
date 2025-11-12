@@ -1,0 +1,16 @@
+[package]
+name = "hyperphysics-thermo"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+description = "Thermodynamics engine with Landauer principle and entropy tracking"
+
+[dependencies]
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true

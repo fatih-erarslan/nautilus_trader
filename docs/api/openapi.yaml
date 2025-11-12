@@ -1,0 +1,909 @@
+openapi: 3.0.3
+info:
+  title: HyperPhysics Financial System API
+  description: |
+    Institution-grade financial system API integrating hyperbolic geometry,
+    thermodynamic risk management, and consciousness-based market regime detection.
+
+    ## Core Capabilities
+    - Real-time market data aggregation with hyperbolic topology mapping
+    - Thermodynamic risk metrics (entropy, free energy, Landauer costs)
+    - Event-driven backtesting with consciousness metrics (Φ, CI)
+    - Live trading execution with smart order routing
+
+    ## Scientific Foundation
+    - Correlation → Hyperbolic distance transformation
+    - Maximum entropy portfolio optimization
+    - Information-theoretic VaR bounds
+    - Regime-aware strategy adaptation
+  version: 1.0.0
+  contact:
+    name: HyperPhysics Team
+    email: team@hyperphysics.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://api.hyperphysics.io/v1
+    description: Production server
+  - url: https://sandbox.hyperphysics.io/v1
+    description: Sandbox environment
+  - url: http://localhost:8080/v1
+    description: Local development
+
+tags:
+  - name: market-data
+    description: Market data acquisition and topology mapping
+  - name: risk
+    description: Thermodynamic risk management
+  - name: backtest
+    description: Historical strategy backtesting
+  - name: trading
+    description: Live trading execution
+  - name: portfolio
+    description: Portfolio management
+  - name: metrics
+    description: Performance and consciousness metrics
+
+paths:
+  # ==================== MARKET DATA ====================
+  /market/topology:
+    post:
+      tags: [market-data]
+      summary: Generate market topology from correlation matrix
+      description: |
+        Transform asset correlation matrix into hyperbolic distance metric
+        and construct Poincaré disk embedding.
+      operationId: createMarketTopology
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopologyRequest'
+      responses:
+        '200':
+          description: Market topology created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketTopology'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /market/bars/{symbol}:
+    get:
+      tags: [market-data]
+      summary: Fetch historical OHLCV bars
+      operationId: getHistoricalBars
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: AAPL
+        - name: timeframe
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Timeframe'
+        - name: start
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Historical bars retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  symbol:
+                    type: string
+                  bars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Bar'
+
+  /market/realtime/subscribe:
+    post:
+      tags: [market-data]
+      summary: Subscribe to real-time market data
+      description: Create WebSocket subscription for tick data
+      operationId: subscribeRealtimeData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbols:
+                  type: array
+                  items:
+                    type: string
+                  example: ["AAPL", "MSFT", "GOOGL"]
+                data_type:
+                  type: string
+                  enum: [ticks, bars, orderbook]
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription_id:
+                    type: string
+                    format: uuid
+                  websocket_url:
+                    type: string
+                    format: uri
+
+  # ==================== RISK MANAGEMENT ====================
+  /risk/thermodynamic:
+    post:
+      tags: [risk]
+      summary: Calculate thermodynamic risk metrics
+      description: |
+        Compute entropy, free energy, Landauer cost, and negentropy flow
+        for a given portfolio state.
+      operationId: calculateThermodynamicRisk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+      responses:
+        '200':
+          description: Risk metrics calculated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThermodynamicRisk'
+
+  /risk/var:
+    post:
+      tags: [risk]
+      summary: Calculate Value at Risk with entropy bounds
+      operationId: calculateVaR
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                portfolio:
+                  $ref: '#/components/schemas/Portfolio'
+                confidence:
+                  type: number
+                  format: double
+                  minimum: 0
+                  maximum: 1
+                  example: 0.95
+                method:
+                  type: string
+                  enum: [historical, parametric, monte_carlo]
+                  default: historical
+                num_simulations:
+                  type: integer
+                  minimum: 1000
+                  maximum: 1000000
+                  description: For Monte Carlo method
+      responses:
+        '200':
+          description: VaR calculated with entropy bounds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntropyBoundedVaR'
+
+  /risk/max-entropy-portfolio:
+    post:
+      tags: [risk]
+      summary: Construct maximum entropy portfolio
+      description: |
+        Optimize portfolio weights to maximize entropy subject to
+        target return constraint.
+      operationId: maxEntropyPortfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assets:
+                  type: array
+                  items:
+                    type: string
+                expected_returns:
+                  type: array
+                  items:
+                    type: number
+                    format: double
+                target_return:
+                  type: number
+                  format: double
+      responses:
+        '200':
+          description: Optimal weights calculated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  weights:
+                    type: array
+                    items:
+                      type: number
+                      format: double
+                  entropy:
+                    type: number
+                    format: double
+
+  # ==================== BACKTESTING ====================
+  /backtest/run:
+    post:
+      tags: [backtest]
+      summary: Execute backtest simulation
+      operationId: runBacktest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BacktestRequest'
+      responses:
+        '202':
+          description: Backtest job submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    enum: [queued, running, completed, failed]
+
+  /backtest/results/{job_id}:
+    get:
+      tags: [backtest]
+      summary: Get backtest results
+      operationId: getBacktestResults
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Backtest results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BacktestResults'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== LIVE TRADING ====================
+  /trading/orders:
+    post:
+      tags: [trading]
+      summary: Submit trading order
+      operationId: submitOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Order submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Order rejected by pre-trade risk check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /trading/orders/{order_id}:
+    get:
+      tags: [trading]
+      summary: Get order status
+      operationId: getOrderStatus
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatus'
+
+    delete:
+      tags: [trading]
+      summary: Cancel order
+      operationId: cancelOrder
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Order cancelled successfully
+
+  /trading/session:
+    post:
+      tags: [trading]
+      summary: Start trading session
+      operationId: startTradingSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                strategy:
+                  type: string
+                  description: Strategy identifier
+                initial_capital:
+                  type: number
+                  format: double
+      responses:
+        '201':
+          description: Trading session started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                    format: uuid
+
+    delete:
+      tags: [trading]
+      summary: Stop trading session
+      operationId: stopTradingSession
+      responses:
+        '204':
+          description: Trading session stopped
+
+  # ==================== PORTFOLIO ====================
+  /portfolio:
+    get:
+      tags: [portfolio]
+      summary: Get current portfolio state
+      operationId: getPortfolio
+      responses:
+        '200':
+          description: Current portfolio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+
+  /portfolio/history:
+    get:
+      tags: [portfolio]
+      summary: Get portfolio value history
+      operationId: getPortfolioHistory
+      parameters:
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Portfolio history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    timestamp:
+                      type: string
+                      format: date-time
+                    total_value:
+                      type: number
+                      format: double
+                    entropy:
+                      type: number
+                      format: double
+
+  # ==================== METRICS ====================
+  /metrics/performance:
+    get:
+      tags: [metrics]
+      summary: Get performance metrics
+      operationId: getPerformanceMetrics
+      responses:
+        '200':
+          description: Performance metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_return:
+                    type: number
+                    format: double
+                  sharpe_ratio:
+                    type: number
+                    format: double
+                  sortino_ratio:
+                    type: number
+                    format: double
+                  max_drawdown:
+                    type: number
+                    format: double
+                  calmar_ratio:
+                    type: number
+                    format: double
+
+  /metrics/consciousness:
+    post:
+      tags: [metrics]
+      summary: Calculate consciousness metrics (Φ, CI)
+      operationId: calculateConsciousnessMetrics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timeseries:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Bar'
+      responses:
+        '200':
+          description: Consciousness metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  phi:
+                    type: number
+                    format: double
+                    description: Integrated information (Φ)
+                  ci:
+                    type: number
+                    format: double
+                    description: Causal influence
+                  regime:
+                    $ref: '#/components/schemas/MarketRegime'
+
+# ==================== COMPONENTS ====================
+components:
+  schemas:
+    # Market Data
+    TopologyRequest:
+      type: object
+      required:
+        - assets
+        - correlation_matrix
+      properties:
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        correlation_matrix:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: double
+
+    MarketTopology:
+      type: object
+      properties:
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        distances:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        coordinates:
+          type: object
+          description: Poincaré disk coordinates
+          additionalProperties:
+            type: object
+            properties:
+              x:
+                type: number
+                format: double
+              y:
+                type: number
+                format: double
+
+    Asset:
+      type: object
+      required:
+        - symbol
+        - asset_class
+        - exchange
+      properties:
+        symbol:
+          type: string
+          example: AAPL
+        asset_class:
+          $ref: '#/components/schemas/AssetClass'
+        exchange:
+          type: string
+          example: NASDAQ
+
+    AssetClass:
+      type: string
+      enum:
+        - Equity
+        - Option
+        - Future
+        - Crypto
+        - Forex
+        - Bond
+
+    Timeframe:
+      type: string
+      enum:
+        - 1min
+        - 5min
+        - 15min
+        - 1hour
+        - 1day
+        - 1week
+
+    Bar:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        open:
+          type: number
+          format: double
+        high:
+          type: number
+          format: double
+        low:
+          type: number
+          format: double
+        close:
+          type: number
+          format: double
+        volume:
+          type: number
+          format: double
+        vwap:
+          type: number
+          format: double
+
+    # Risk Management
+    Portfolio:
+      type: object
+      properties:
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+        cash:
+          type: number
+          format: double
+        total_value:
+          type: number
+          format: double
+        entropy:
+          type: number
+          format: double
+        temperature:
+          type: number
+          format: double
+        free_energy:
+          type: number
+          format: double
+
+    Position:
+      type: object
+      properties:
+        symbol:
+          type: string
+        quantity:
+          type: number
+          format: double
+        market_value:
+          type: number
+          format: double
+        cost_basis:
+          type: number
+          format: double
+        weight:
+          type: number
+          format: double
+        unrealized_pnl:
+          type: number
+          format: double
+
+    ThermodynamicRisk:
+      type: object
+      properties:
+        entropy:
+          type: number
+          format: double
+          description: Shannon entropy
+        free_energy:
+          type: number
+          format: double
+          description: Helmholtz free energy
+        landauer_cost:
+          type: number
+          format: double
+          description: Minimum transaction cost per trade
+        negentropy_flow:
+          type: number
+          format: double
+          description: Information gain rate
+        entropy_production:
+          type: number
+          format: double
+          description: Irreversible entropy generation
+        temperature:
+          type: number
+          format: double
+          description: Market volatility analog
+
+    EntropyBoundedVaR:
+      type: object
+      properties:
+        var:
+          type: number
+          format: double
+          description: Value at Risk estimate
+        lower_bound:
+          type: number
+          format: double
+          description: Information-theoretic lower bound
+        upper_bound:
+          type: number
+          format: double
+          description: Maximum entropy upper bound
+        confidence:
+          type: number
+          format: double
+        is_reliable:
+          type: boolean
+
+    # Backtesting
+    BacktestRequest:
+      type: object
+      required:
+        - strategy
+        - start_date
+        - end_date
+        - initial_capital
+      properties:
+        strategy:
+          type: string
+          description: Strategy identifier
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        initial_capital:
+          type: number
+          format: double
+        symbols:
+          type: array
+          items:
+            type: string
+        parameters:
+          type: object
+          additionalProperties: true
+
+    BacktestResults:
+      type: object
+      properties:
+        total_return:
+          type: number
+          format: double
+        sharpe_ratio:
+          type: number
+          format: double
+        sortino_ratio:
+          type: number
+          format: double
+        max_drawdown:
+          type: number
+          format: double
+        calmar_ratio:
+          type: number
+          format: double
+        trades:
+          type: integer
+        win_rate:
+          type: number
+          format: double
+        profit_factor:
+          type: number
+          format: double
+        entropy:
+          type: number
+          format: double
+        free_energy:
+          type: number
+          format: double
+
+    # Trading
+    OrderRequest:
+      type: object
+      required:
+        - symbol
+        - quantity
+        - direction
+        - order_type
+      properties:
+        symbol:
+          type: string
+        quantity:
+          type: number
+          format: double
+        direction:
+          $ref: '#/components/schemas/Direction'
+        order_type:
+          $ref: '#/components/schemas/OrderType'
+        limit_price:
+          type: number
+          format: double
+        execution_algo:
+          type: string
+          enum: [market, vwap, twap, iceberg]
+
+    OrderResponse:
+      type: object
+      properties:
+        order_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, submitted, rejected]
+        timestamp:
+          type: string
+          format: date-time
+
+    OrderStatus:
+      type: object
+      properties:
+        order_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, partially_filled, filled, cancelled, rejected]
+        filled_quantity:
+          type: number
+          format: double
+        remaining_quantity:
+          type: number
+          format: double
+        average_fill_price:
+          type: number
+          format: double
+
+    OrderType:
+      type: string
+      enum:
+        - Market
+        - Limit
+        - Stop
+        - StopLimit
+
+    Direction:
+      type: string
+      enum:
+        - Long
+        - Short
+
+    # Metrics
+    MarketRegime:
+      type: string
+      enum:
+        - Bull
+        - Bear
+        - Bubble
+        - Correction
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []

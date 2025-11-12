@@ -1,0 +1,20 @@
+[package]
+name = "hyperphysics-geometry"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+description = "Hyperbolic geometry engine (H³ manifold with K=-1 curvature)"
+repository = "https://github.com/hyperphysics/hyperphysics"
+
+[dependencies]
+nalgebra.workspace = true
+num-traits.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true

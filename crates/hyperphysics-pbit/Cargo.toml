@@ -1,0 +1,21 @@
+[package]
+name = "hyperphysics-pbit"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+description = "Probabilistic bit (pBit) dynamics simulator with stochastic algorithms"
+
+[dependencies]
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+nalgebra.workspace = true
+rand.workspace = true
+rand_distr.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true
+rand_chacha.workspace = true
