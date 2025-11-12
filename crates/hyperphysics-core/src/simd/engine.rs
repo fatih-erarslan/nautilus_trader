@@ -35,19 +35,36 @@ pub fn sigmoid_batch_simd(h_eff: &[f64], temperature: f64, output: &mut [f64]) {
 
 /// SIMD-accelerated energy calculation
 ///
-/// Computes E = -Σ J_ij s_i s_j using vectorized dot products.
+/// Computes E = -Σ_i Σ_j J_ij s_i s_j using vectorized operations.
+/// The coupling matrix is flattened as [J_00, J_01, ..., J_0N, J_10, ..., J_NN]
 /// Target: 4× speedup
 pub fn energy_simd(states: &[bool], couplings: &[f64]) -> f64 {
+    let n = states.len();
+    assert_eq!(couplings.len(), n * n, "Coupling matrix must be N×N");
+
     // Convert states to f32 (-1 or +1)
     let states_f32: Vec<f32> = states.iter()
         .map(|&s| if s { 1.0 } else { -1.0 })
         .collect();
 
-    // For pairwise interactions: E = -Σ J_ij s_i s_j
-    // Simplified: use dot product of coupling strengths
     let couplings_f32: Vec<f32> = couplings.iter().map(|&c| c as f32).collect();
 
-    -dot_product_vectorized(&states_f32, &couplings_f32) as f64
+    // Compute E = -Σ_i Σ_j J_ij s_i s_j
+    // Matrix-vector multiplication: for each row i, compute Σ_j J_ij * s_j, then multiply by s_i
+    let mut energy = 0.0f32;
+
+    for i in 0..n {
+        let s_i = states_f32[i];
+        let row_start = i * n;
+        let row = &couplings_f32[row_start..row_start + n];
+
+        // Compute row dot product with states
+        let row_sum = dot_product_vectorized(row, &states_f32);
+        energy += s_i * row_sum;
+    }
+
+    // Energy is negative and we double-counted (symmetric matrix), so divide by 2
+    (-energy / 2.0) as f64
 }
 
 /// SIMD-accelerated magnetization calculation
