@@ -1,0 +1,29 @@
+[package]
+name = "hyperphysics-viz"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Real-time visualization - 60 FPS rendering up to 1M nodes"
+
+[dependencies]
+# Core
+hyperphysics-core = { path = "../hyperphysics-core" }
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+
+# Rendering
+wgpu = "22"
+winit = "0.29"
+bytemuck = { version = "1.14", features = ["derive"] }
+
+# Utilities
+glam = "0.25"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = []

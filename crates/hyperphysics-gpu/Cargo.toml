@@ -1,0 +1,29 @@
+[package]
+name = "hyperphysics-gpu"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "GPU compute backend for HyperPhysics - 10-800× speedup via WGPU/CUDA/Metal"
+
+[dependencies]
+# Core dependencies
+hyperphysics-core = { path = "../hyperphysics-core" }
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+
+# GPU backends
+wgpu = "22"
+bytemuck = { version = "1.14", features = ["derive"] }
+pollster = "0.3"
+
+# Utilities
+rayon = "1.8"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = []

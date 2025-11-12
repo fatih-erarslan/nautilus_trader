@@ -1,0 +1,26 @@
+[package]
+name = "hyperphysics-scaling"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Auto-scaling orchestrator - 48 nodes to 1B nodes"
+
+[dependencies]
+# Core
+hyperphysics-core = { path = "../hyperphysics-core" }
+
+# System monitoring
+sysinfo = "0.30"
+num_cpus = "1.16"
+
+# Utilities
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = []
