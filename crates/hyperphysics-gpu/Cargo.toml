@@ -26,4 +26,5 @@ rayon = "1.8"
 criterion = "0.5"
 
 [features]
-default = []
+default = ["wgpu-backend"]
+wgpu-backend = []

@@ -14,8 +14,23 @@ pub use backend::{GPUBackend, BackendType, GPUCapabilities};
 ///
 /// Tries backends in order: WGPU → CPU fallback
 pub fn initialize_backend() -> Result<Box<dyn GPUBackend>> {
-    // TODO: Try WGPU backend first
-    // For now, return CPU fallback
+    #[cfg(feature = "wgpu-backend")]
+    {
+        // Try WGPU backend first
+        match backend::wgpu::WGPUBackend::new_blocking() {
+            Ok(wgpu_backend) => {
+                eprintln!("✓ GPU acceleration enabled: {}", wgpu_backend.device_name());
+                return Ok(Box::new(wgpu_backend));
+            }
+            Err(e) => {
+                eprintln!("⚠ WGPU backend unavailable: {}", e);
+                eprintln!("  Falling back to CPU...");
+            }
+        }
+    }
+
+    // Fallback to CPU backend
+    eprintln!("  Using CPU backend (no GPU acceleration)");
     Ok(Box::new(backend::cpu::CPUBackend::new()))
 }
 
