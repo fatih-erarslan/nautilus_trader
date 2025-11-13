@@ -32,6 +32,7 @@
 //! }
 //! ```
 
+pub mod arbitrage;
 pub mod data;
 pub mod error;
 pub mod providers;
@@ -41,4 +42,5 @@ pub mod topology;
 pub use data::{Bar, Tick, Timeframe};
 pub use data::tick::Quote;
 pub use error::MarketError;
-pub use providers::{AlpacaProvider, InteractiveBrokersProvider, MarketDataProvider};
+pub use providers::{AlpacaProvider, BinanceProvider, InteractiveBrokersProvider, OKXProvider, MarketDataProvider};
+pub use arbitrage::{ArbitrageDetector, ArbitrageOpportunity, ArbitrageType};

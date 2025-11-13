@@ -9,9 +9,12 @@ use crate::error::MarketResult;
 pub mod alpaca;
 pub mod binance;
 pub mod interactive_brokers;
+pub mod okx;
 
 pub use alpaca::AlpacaProvider;
+pub use binance::BinanceProvider;
 pub use interactive_brokers::InteractiveBrokersProvider;
+pub use okx::OKXProvider;
 
 /// Trait defining the interface for market data providers
 #[async_trait]
