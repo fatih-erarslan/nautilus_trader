@@ -81,25 +81,59 @@ impl PoincarePoint {
     ///
     /// Formula: d_H(p,q) = acosh(1 + 2||p-q||² / ((1-||p||²)(1-||q||²)))
     ///
-    /// Uses Taylor expansion for numerical stability when points are close.
+    /// Uses Taylor expansion for numerical stability when points are close,
+    /// and log1p for precision when argument is close to 1.
+    ///
+    /// # Mathematical Foundation
+    ///
+    /// For very small distances, uses Taylor series:
+    /// d_H ≈ 2||p-q|| / sqrt((1-||p||²)(1-||q||²))
+    ///
+    /// For argument close to 1, uses:
+    /// acosh(1 + ε) ≈ sqrt(2ε) for small ε
     pub fn hyperbolic_distance(&self, other: &Self) -> f64 {
         let p_norm_sq = self.norm_squared();
         let q_norm_sq = other.norm_squared();
         let diff = self.coords - other.coords;
         let diff_norm_sq = diff.norm_squared();
 
-        // Numerical stability: use Taylor expansion for small distances
-        if diff_norm_sq < EPSILON {
+        // Multi-precision handling for numerical stability
+        // Case 1: Identical or nearly identical points
+        if diff_norm_sq < EPSILON.sqrt() {
+            // Taylor expansion for very small distances
+            // d_H ≈ 2||p-q|| / sqrt((1-||p||²)(1-||q||²))
             return 2.0 * diff_norm_sq.sqrt()
                 / ((1.0 - p_norm_sq) * (1.0 - q_norm_sq)).sqrt();
         }
 
-        let numerator = 2.0 * diff_norm_sq;
+        // Case 2: Points near boundary require extra care
         let denominator = (1.0 - p_norm_sq) * (1.0 - q_norm_sq);
-        let argument = 1.0 + numerator / denominator;
+        if denominator < EPSILON {
+            // Near boundary: return large but finite distance
+            return 100.0; // Practical cutoff for numerical stability
+        }
+
+        let numerator = 2.0 * diff_norm_sq;
+        let ratio = numerator / denominator;
+
+        // Case 3: Small ratio (argument close to 1)
+        // Use acosh(1 + x) = sqrt(2x) + O(x^(3/2)) for better precision
+        if ratio < 0.01 {
+            return (2.0 * ratio).sqrt();
+        }
+
+        // Case 4: General case - use standard acosh
+        let argument = 1.0 + ratio;
 
         // acosh(x) = ln(x + sqrt(x² - 1))
-        argument.acosh()
+        // For x close to 1, use log1p for better precision
+        if (argument - 1.0).abs() < 0.1 {
+            // log1p(x) gives better precision than log(1 + x)
+            let sqrt_term = (argument * argument - 1.0).sqrt();
+            (argument + sqrt_term - 1.0).ln_1p()
+        } else {
+            argument.acosh()
+        }
     }
 
     /// Möbius addition (hyperbolic translation)

@@ -25,6 +25,7 @@ pub mod dynamics;
 pub mod gillespie;
 pub mod metropolis;
 pub mod coupling;
+pub mod sparse_matrix;
 pub mod simd;
 
 pub use pbit::PBit;
@@ -33,6 +34,7 @@ pub use dynamics::{PBitDynamics, Algorithm, DynamicsStatistics};
 pub use gillespie::GillespieSimulator;
 pub use metropolis::MetropolisSimulator;
 pub use coupling::CouplingNetwork;
+pub use sparse_matrix::{SparseCouplingMatrix, CouplingStatistics};
 
 use thiserror::Error;
 

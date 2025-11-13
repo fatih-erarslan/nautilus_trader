@@ -5,8 +5,13 @@ members = [
     "crates/hyperphysics-pbit",
     "crates/hyperphysics-thermo",
     "crates/hyperphysics-consciousness",
+    "crates/hyperphysics-syntergic",
     "crates/hyperphysics-market",
-    "crates/hyperphysics-risk", "crates/hyperphysics-verify", "crates/hyperphysics-gpu", "crates/hyperphysics-scaling", "crates/hyperphysics-viz",
+    "crates/hyperphysics-risk",
+    "crates/hyperphysics-verify",
+    "crates/hyperphysics-gpu",
+    "crates/hyperphysics-scaling",
+    "crates/hyperphysics-viz",
 ]
 resolver = "2"
 
