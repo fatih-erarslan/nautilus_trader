@@ -1610,6 +1610,7 @@ dependencies = [
 name = "hyperphysics-pbit"
 version = "0.1.0"
 dependencies = [
+ "approx 0.5.1",
  "criterion",
  "hyperphysics-geometry",
  "nalgebra 0.32.6",
