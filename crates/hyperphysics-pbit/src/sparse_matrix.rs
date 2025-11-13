@@ -10,7 +10,6 @@
 use crate::{PBitLattice, Result, PBitError};
 use hyperphysics_geometry::PoincarePoint;
 use sprs::{CsMat, TriMat};
-use ndarray::Array1;
 use rayon::prelude::*;
 
 /// Sparse coupling matrix in CSR format
@@ -165,11 +164,15 @@ impl SparseCouplingMatrix {
         let spins: Vec<f64> = states.iter().map(|&s| if s { 1.0 } else { -1.0 }).collect();
 
         // Perform sparse matrix-vector multiplication: h = J * s
-        // Note: sprs matrix-vector multiplication returns Array1
-        let spins_array = Array1::from_vec(spins);
-        let fields_array: Array1<f64> = &self.csr * &spins_array;
+        // Manual multiplication for compatibility with sprs 0.11
+        let mut fields = vec![0.0; self.size()];
+        for (row_idx, row) in self.csr.outer_iterator().enumerate() {
+            for (col_idx, &coupling) in row.iter() {
+                fields[row_idx] += coupling * spins[col_idx];
+            }
+        }
 
-        Ok(fields_array.to_vec())
+        Ok(fields)
     }
 
     /// Calculate total energy of configuration

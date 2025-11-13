@@ -3,6 +3,7 @@
 //! Integrates with hyperphysics-gpu to detect available GPUs and their capabilities.
 
 use crate::GPUInfo;
+use hyperphysics_gpu::{GPUBackend, backend::wgpu::WGPUBackend};
 
 /// Detect all available GPUs on the system
 ///
