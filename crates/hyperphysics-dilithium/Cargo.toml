@@ -71,6 +71,3 @@ hybrid-mode = []  # Classical + PQ hybrid signatures
 # [[bench]]
 # name = "dilithium_benchmarks"
 # harness = false
-gpu-acceleration = []  # Disabled until hyperphysics-gpu compiles
-side-channel-protection = []
-hybrid-mode = []  # Classical + PQ hybrid signatures
