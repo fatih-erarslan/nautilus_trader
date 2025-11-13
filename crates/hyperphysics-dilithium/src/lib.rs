@@ -138,7 +138,7 @@ pub enum DilithiumError {
 impl From<DilithiumError> for EngineError {
     fn from(err: DilithiumError) -> Self {
         // Map to appropriate EngineError variant
-        EngineError::Internal {
+        EngineError::Simulation {
             message: format!("Dilithium cryptography error: {}", err),
         }
     }
