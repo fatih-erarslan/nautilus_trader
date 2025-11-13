@@ -1,4 +1,5 @@
 use thiserror::Error;
+use hyperphysics_thermo::ThermoError;
 
 #[derive(Error, Debug)]
 pub enum RiskError {
@@ -16,6 +17,9 @@ pub enum RiskError {
 
     #[error("Calculation error: {0}")]
     CalculationError(String),
+
+    #[error("Thermodynamics error: {0}")]
+    ThermoError(#[from] ThermoError),
 }
 
 pub type Result<T> = std::result::Result<T, RiskError>;

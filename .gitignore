@@ -33,6 +33,7 @@ hive-mind-prompt-*.txt
 # Rust build artifacts
 target/
 Cargo.lock
+*.proptest-regressions
 
 # Rust compiler crash reports
 rustc-ice-*.txt

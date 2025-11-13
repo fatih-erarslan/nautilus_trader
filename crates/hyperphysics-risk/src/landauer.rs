@@ -21,6 +21,7 @@ impl TransactionCostModel {
             .map_err(|e| RiskError::InvalidTemperature(format!("Landauer enforcer error: {}", e)))?;
         
         Ok(Self {
+            enforcer: LandauerEnforcer::new(temperature)?,
             enforcer,
         })
     }

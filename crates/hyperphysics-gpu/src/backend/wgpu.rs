@@ -12,7 +12,7 @@
 use crate::{GPUBackend, GPUCapabilities, BackendType};
 use hyperphysics_core::Result;
 use wgpu::{
-    util::DeviceExt, Adapter, BindGroup, BindGroupLayout, Buffer, ComputePipeline, Device, Queue,
+    util::DeviceExt, BindGroupLayout, Buffer, ComputePipeline, Device, Queue,
 };
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
@@ -268,7 +268,7 @@ impl WGPUBackend {
                 label: Some("PBit Update Pipeline"),
                 layout: Some(&pipeline_layout),
                 module: &shader,
-                entry_point: Some("main"),
+                entry_point: "main",
                 compilation_options: Default::default(),
                 cache: None,
             });
@@ -686,7 +686,7 @@ impl GPUBackend for WGPUBackend {
             label: Some("Dynamic Compute Pipeline"),
             layout: None,
             module: &shader_module,
-            entry_point: Some("main"),
+            entry_point: "main",
             compilation_options: Default::default(),
             cache: None,
         });

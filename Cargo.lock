@@ -132,6 +132,15 @@ dependencies = [
 
 [[package]]
 name = "approx"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f0e60b75072ecd4168020818c0107f2857bb6c4e64252d8d3983f6263b40a5c3"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
+name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cab112f0a86d568ea0e627cc1d6be74a1e9cd55214684db5561995f6dad897c6"
@@ -1253,6 +1262,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "futures-intrusive"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d930c203dd0b6ff06e0201a4a2fe9149b43c684fd4420555b26d21b1a02956f"
+dependencies = [
+ "futures-core",
+ "lock_api",
+ "parking_lot",
+]
+
+[[package]]
 name = "futures-io"
 version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1776,6 +1796,7 @@ dependencies = [
  "hyperphysics-pbit",
  "nalgebra 0.32.6",
  "ndarray",
+ "proptest",
  "rand 0.8.5",
  "rayon",
  "serde",
@@ -1798,10 +1819,13 @@ dependencies = [
  "hyperphysics-pbit",
  "hyperphysics-thermo",
  "pollster",
+ "proptest",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "serde",
+ "serde_bytes",
  "serde_json",
+ "sha3",
  "thiserror",
  "tokio",
  "wgpu 0.19.4",
@@ -1863,6 +1887,7 @@ dependencies = [
  "cocoa",
  "core-graphics-types 0.2.0",
  "criterion",
+ "futures-intrusive",
  "cudarc",
  "dashmap",
  "futures",
@@ -1908,6 +1933,7 @@ dependencies = [
 name = "hyperphysics-pbit"
 version = "0.1.0"
 dependencies = [
+ "approx 0.5.1",
  "criterion",
  "hyperphysics-geometry",
  "nalgebra 0.32.6",
@@ -1945,6 +1971,21 @@ dependencies = [
  "serde",
  "sysinfo",
  "tokio",
+]
+
+[[package]]
+name = "hyperphysics-syntergic"
+version = "0.1.0"
+dependencies = [
+ "approx 0.5.1",
+ "criterion",
+ "hyperphysics-geometry",
+ "hyperphysics-pbit",
+ "nalgebra 0.32.6",
+ "ndarray",
+ "rayon",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]
@@ -3558,6 +3599,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_bytes"
+version = "0.11.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5d440709e79d88e51ac01c4b72fc6cb7314017bb7da9eeff678aa94c10e3ea8"
+dependencies = [
+ "serde",
+ "serde_core",
+]
+
+[[package]]
 name = "serde_core"
 version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3642,6 +3693,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
  "lazy_static",
+]
+
+[[package]]
+name = "sha3"
+version = "0.10.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75872d278a8f37ef87fa0ddbda7802605cb18344497949862c0d4dcb291eba60"
+dependencies = [
+ "digest",
+ "keccak",
 ]
 
 [[package]]

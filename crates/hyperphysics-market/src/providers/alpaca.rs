@@ -41,6 +41,10 @@
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use reqwest::{Client, header};
+use serde::Deserialize;
+use std::time::Duration;
+use tracing::{debug, warn};
 use reqwest::{Client, header, StatusCode};
 use serde::Deserialize;
 use std::sync::Arc;
@@ -463,6 +467,7 @@ impl AlpacaBar {
     /// Convert Alpaca bar to unified Bar structure
     fn to_bar(&self, symbol: String) -> MarketResult<Bar> {
         let timestamp = DateTime::parse_from_rfc3339(&self.timestamp)
+            .map_err(|e| MarketError::DateTimeParseError(e.to_string()))?
             .map_err(|e| MarketError::ApiError(format!("Invalid timestamp: {}", e)))?
             .with_timezone(&Utc);
 
