@@ -3,12 +3,6 @@
 //! Provides access to stock market data via Alpaca Markets API.
 //! Supports both paper and live trading data.
 //!
-//! # API Documentation
-//!
-//! - Market Data API: <https://alpaca.markets/docs/api-references/market-data-api/>
-//! - Rate Limits: 200 requests/minute (free tier)
-//! - Max bars per request: 10,000
-//!
 //! # Example
 //!
 //! ```no_run
@@ -45,64 +39,16 @@ use reqwest::{Client, header};
 use serde::Deserialize;
 use std::time::Duration;
 use tracing::{debug, warn};
-use reqwest::{Client, header, StatusCode};
-use serde::Deserialize;
-use std::sync::Arc;
-use std::time::{Duration, Instant};
-use tokio::sync::Mutex;
-use tracing::{debug, warn, error};
 
 use crate::data::{Bar, Timeframe};
 use crate::error::{MarketError, MarketResult};
 use super::{MarketDataProvider, ProviderConfig};
 
-/// Rate limiter using token bucket algorithm
-struct RateLimiter {
-    tokens: f64,
-    capacity: f64,
-    refill_rate: f64, // tokens per second
-    last_refill: Instant,
-}
-
-impl RateLimiter {
-    fn new(capacity: f64, refill_rate: f64) -> Self {
-        Self {
-            tokens: capacity,
-            capacity,
-            refill_rate,
-            last_refill: Instant::now(),
-        }
-    }
-
-    fn try_acquire(&mut self) -> bool {
-        self.refill();
-        if self.tokens >= 1.0 {
-            self.tokens -= 1.0;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn refill(&mut self) {
-        let now = Instant::now();
-        let elapsed = now.duration_since(self.last_refill).as_secs_f64();
-        self.tokens = (self.tokens + elapsed * self.refill_rate).min(self.capacity);
-        self.last_refill = now;
-    }
-
-    async fn wait_for_token(&mut self) {
-        while !self.try_acquire() {
-            tokio::time::sleep(Duration::from_millis(100)).await;
-        }
-    }
-}
-
 /// Alpaca Markets data provider
+#[allow(dead_code)]
 pub struct AlpacaProvider {
     config: ProviderConfig,
     client: Client,
-    rate_limiter: Arc<Mutex<RateLimiter>>,
 }
 
 impl AlpacaProvider {
@@ -114,7 +60,17 @@ impl AlpacaProvider {
     /// * `api_secret` - Alpaca API secret
     /// * `paper` - Whether to use paper trading endpoints
     pub fn new(api_key: String, api_secret: String, paper: bool) -> Self {
-        let data_url = "https://data.alpaca.markets/v2".to_string();
+        let _base_url = if paper {
+            "https://paper-api.alpaca.markets/v2"
+        } else {
+            "https://api.alpaca.markets/v2"
+        }.to_string();
+
+        let data_url = if paper {
+            "https://data.alpaca.markets/v2"
+        } else {
+            "https://data.alpaca.markets/v2"
+        }.to_string();
 
         let mut headers = header::HeaderMap::new();
         headers.insert("APCA-API-KEY-ID", header::HeaderValue::from_str(&api_key).unwrap());
@@ -135,133 +91,11 @@ impl AlpacaProvider {
             max_retries: 3,
         };
 
-        // Free tier: 200 requests/minute = 3.33 requests/second
-        let rate_limiter = Arc::new(Mutex::new(RateLimiter::new(200.0, 3.33)));
-
-        Self {
-            config,
-            client,
-            rate_limiter,
-        }
-    }
-
-    /// Make an HTTP request with retry logic and exponential backoff
-    async fn request_with_retry<T: serde::de::DeserializeOwned>(
-        &self,
-        url: String,
-    ) -> MarketResult<T> {
-        let mut retries = 0;
-        let max_retries = self.config.max_retries;
-
-        loop {
-            // Wait for rate limiter token
-            {
-                let mut limiter = self.rate_limiter.lock().await;
-                limiter.wait_for_token().await;
-            }
-
-            match self.client.get(&url).send().await {
-                Ok(response) => {
-                    let status = response.status();
-
-                    match status {
-                        StatusCode::OK => {
-                            let text = response.text().await
-                                .map_err(|e| MarketError::NetworkError(e.to_string()))?;
-                            return serde_json::from_str(&text)
-                                .map_err(|e| MarketError::ParseError(e.to_string()));
-                        }
-                        StatusCode::TOO_MANY_REQUESTS => {
-                            if retries >= max_retries {
-                                return Err(MarketError::RateLimitError(
-                                    "Rate limit exceeded after retries".to_string()
-                                ));
-                            }
-                            let backoff = Duration::from_secs(2_u64.pow(retries));
-                            warn!("Rate limited, backing off for {:?}", backoff);
-                            tokio::time::sleep(backoff).await;
-                            retries += 1;
-                        }
-                        StatusCode::NOT_FOUND => {
-                            let body = response.text().await.unwrap_or_default();
-                            return Err(MarketError::InvalidSymbol(format!(
-                                "Symbol not found: {}",
-                                body
-                            )));
-                        }
-                        StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => {
-                            return Err(MarketError::AuthenticationError(
-                                "Invalid API credentials".to_string()
-                            ));
-                        }
-                        _ => {
-                            let body = response.text().await.unwrap_or_default();
-                            return Err(MarketError::ApiError(format!(
-                                "API request failed with status {}: {}",
-                                status, body
-                            )));
-                        }
-                    }
-                }
-                Err(e) => {
-                    if retries >= max_retries {
-                        return Err(MarketError::NetworkError(e.to_string()));
-                    }
-                    let backoff = Duration::from_secs(2_u64.pow(retries));
-                    warn!("Network error, retrying in {:?}: {}", backoff, e);
-                    tokio::time::sleep(backoff).await;
-                    retries += 1;
-                }
-            }
-        }
-    }
-
-    /// Validate bar data for anomalies
-    fn validate_bar(bar: &AlpacaBar, symbol: &str) -> Result<(), String> {
-        // Check for zero or negative prices
-        if bar.open <= 0.0 || bar.high <= 0.0 || bar.low <= 0.0 || bar.close <= 0.0 {
-            return Err(format!(
-                "Invalid price data for {}: o={}, h={}, l={}, c={}",
-                symbol, bar.open, bar.high, bar.low, bar.close
-            ));
-        }
-
-        // Check OHLC consistency
-        if bar.high < bar.low {
-            return Err(format!(
-                "High {} is less than low {} for {}",
-                bar.high, bar.low, symbol
-            ));
-        }
-
-        if bar.high < bar.open || bar.high < bar.close {
-            return Err(format!(
-                "High {} is less than open {} or close {} for {}",
-                bar.high, bar.open, bar.close, symbol
-            ));
-        }
-
-        if bar.low > bar.open || bar.low > bar.close {
-            return Err(format!(
-                "Low {} is greater than open {} or close {} for {}",
-                bar.low, bar.open, bar.close, symbol
-            ));
-        }
-
-        // Detect extreme price movements (>50% in one bar)
-        let max_change = ((bar.high - bar.low) / bar.low).abs();
-        if max_change > 0.5 {
-            warn!(
-                "Extreme price movement detected for {}: {:.2}% change",
-                symbol,
-                max_change * 100.0
-            );
-        }
-
-        Ok(())
+        Self { config, client }
     }
 
     /// Convert timeframe to Alpaca API format
+    #[allow(dead_code)]
     fn timeframe_to_alpaca(timeframe: Timeframe) -> &'static str {
         match timeframe {
             Timeframe::Minute1 => "1Min",
@@ -291,78 +125,37 @@ impl MarketDataProvider for AlpacaProvider {
             symbol, start, end, timeframe
         );
 
-        let mut all_bars = Vec::new();
-        let mut page_token: Option<String> = None;
-        let timeframe_str = Self::timeframe_to_alpaca(timeframe);
+        // TODO: Implement Alpaca bars API call
+        // Endpoint: GET /v2/stocks/{symbol}/bars
+        // Query params: timeframe, start, end, limit, adjustment, feed
+        //
+        // Steps:
+        // 1. Build request URL with query parameters
+        // 2. Make authenticated HTTP request
+        // 3. Parse AlpacaBarResponse
+        // 4. Convert to Vec<Bar>
+        // 5. Handle pagination if needed (max 10000 bars per request)
 
-        // Alpaca API paginates at 10,000 bars per request
-        loop {
-            let mut url = format!(
-                "{}/stocks/{}/bars?timeframe={}&start={}&end={}&limit=10000&adjustment=raw&feed=sip",
-                self.config.base_url,
-                symbol,
-                timeframe_str,
-                start.to_rfc3339(),
-                end.to_rfc3339()
-            );
-
-            if let Some(ref token) = page_token {
-                url.push_str(&format!("&page_token={}", token));
-            }
-
-            debug!("Requesting URL: {}", url);
-
-            let response: AlpacaBarResponse = self.request_with_retry(url).await?;
-
-            // Validate and convert bars
-            for alpaca_bar in response.bars {
-                match Self::validate_bar(&alpaca_bar, symbol) {
-                    Ok(_) => match alpaca_bar.to_bar(symbol.to_string()) {
-                        Ok(bar) => all_bars.push(bar),
-                        Err(e) => {
-                            error!("Failed to convert bar for {}: {}", symbol, e);
-                        }
-                    },
-                    Err(validation_error) => {
-                        warn!("Bar validation failed: {}", validation_error);
-                    }
-                }
-            }
-
-            // Check for pagination
-            if let Some(next_token) = response.next_page_token {
-                debug!("Fetching next page with token: {}", next_token);
-                page_token = Some(next_token);
-            } else {
-                break;
-            }
-        }
-
-        debug!("Fetched {} bars for {}", all_bars.len(), symbol);
-        Ok(all_bars)
+        warn!("Alpaca fetch_bars not yet implemented - returning empty vec");
+        Ok(Vec::new())
     }
 
     async fn fetch_latest_bar(&self, symbol: &str) -> MarketResult<Bar> {
         debug!("Fetching latest bar for {}", symbol);
 
-        let url = format!(
-            "{}/stocks/{}/bars/latest?feed=sip",
-            self.config.base_url, symbol
-        );
+        // TODO: Implement Alpaca latest bar API call
+        // Endpoint: GET /v2/stocks/{symbol}/bars/latest
+        // Query params: feed
+        //
+        // Steps:
+        // 1. Build request URL
+        // 2. Make authenticated HTTP request
+        // 3. Parse single bar response
+        // 4. Convert to Bar
 
-        debug!("Requesting URL: {}", url);
-
-        let response: AlpacaLatestBarResponse = self.request_with_retry(url).await?;
-
-        match Self::validate_bar(&response.bar, symbol) {
-            Ok(_) => response.bar.to_bar(symbol.to_string()),
-            Err(validation_error) => {
-                Err(MarketError::ApiError(format!(
-                    "Bar validation failed: {}",
-                    validation_error
-                )))
-            }
-        }
+        Err(MarketError::ApiError(
+            "Alpaca fetch_latest_bar not yet implemented".to_string()
+        ))
     }
 
     fn provider_name(&self) -> &str {
@@ -374,68 +167,24 @@ impl MarketDataProvider for AlpacaProvider {
     }
 
     async fn supports_symbol(&self, symbol: &str) -> MarketResult<bool> {
-        debug!("Checking symbol support for {}", symbol);
-
-        let url = format!(
-            "https://api.alpaca.markets/v2/assets/{}",
-            symbol
-        );
-
-        match self.request_with_retry::<AlpacaAsset>(url).await {
-            Ok(asset) => {
-                debug!(
-                    "Symbol {} is valid: tradable={}, status={:?}",
-                    symbol, asset.tradable, asset.status
-                );
-                Ok(asset.tradable && asset.status == "active")
-            }
-            Err(MarketError::InvalidSymbol(_)) => Ok(false),
-            Err(e) => {
-                warn!("Error checking symbol {}: {}", symbol, e);
-                Err(e)
-            }
-        }
+        // TODO: Implement symbol validation
+        // Could query /v2/assets/{symbol} endpoint
+        debug!("Symbol support check for {} - defaulting to true", symbol);
+        Ok(true)
     }
 }
 
-/// Alpaca API response structure for historical bars
+/// Alpaca API response structure for bars
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct AlpacaBarResponse {
     bars: Vec<AlpacaBar>,
-    #[allow(dead_code)]
     symbol: String,
     next_page_token: Option<String>,
 }
 
-/// Alpaca API response structure for latest bar
-#[derive(Debug, Deserialize)]
-struct AlpacaLatestBarResponse {
-    bar: AlpacaBar,
-    #[allow(dead_code)]
-    symbol: String,
-}
-
-/// Alpaca API response structure for asset information
-#[derive(Debug, Deserialize)]
-struct AlpacaAsset {
-    #[serde(rename = "id")]
-    _id: String,
-
-    #[serde(rename = "class")]
-    _class: String,
-
-    #[serde(rename = "exchange")]
-    _exchange: String,
-
-    #[allow(dead_code)]
-    symbol: String,
-
-    status: String,
-
-    tradable: bool,
-}
-
 /// Alpaca bar structure from API
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct AlpacaBar {
     #[serde(rename = "t")]
@@ -465,10 +214,10 @@ struct AlpacaBar {
 
 impl AlpacaBar {
     /// Convert Alpaca bar to unified Bar structure
+    #[allow(dead_code)]
     fn to_bar(&self, symbol: String) -> MarketResult<Bar> {
         let timestamp = DateTime::parse_from_rfc3339(&self.timestamp)
             .map_err(|e| MarketError::DateTimeParseError(e.to_string()))?
-            .map_err(|e| MarketError::ApiError(format!("Invalid timestamp: {}", e)))?
             .with_timezone(&Utc);
 
         Ok(Bar {

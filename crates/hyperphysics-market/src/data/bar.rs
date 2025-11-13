@@ -148,6 +148,7 @@ impl Timeframe {
 mod tests {
     use super::*;
     use chrono::Utc;
+    use approx::assert_relative_eq;
 
     #[test]
     fn test_bar_creation() {
@@ -178,9 +179,9 @@ mod tests {
             5000,
         );
 
-        // Typical price = (high + low + close) / 3.0 = (110 + 95 + 105) / 3 = 103.333...
-        assert!((bar.typical_price() - 103.33333333333333).abs() < 1e-10);
-        assert_eq!(bar.range(), 15.0);
+        // Typical price = (high + low + close) / 3 = (110 + 95 + 105) / 3 = 103.333...
+        assert_relative_eq!(bar.typical_price(), 103.33333333333333, epsilon = 1e-10);
+        assert_relative_eq!(bar.range(), 15.0, epsilon = 1e-10);
         assert!(bar.is_bullish());
         assert!(!bar.is_bearish());
     }

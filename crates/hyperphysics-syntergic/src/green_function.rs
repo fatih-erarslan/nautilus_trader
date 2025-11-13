@@ -180,7 +180,9 @@ impl Default for HyperbolicGreenFunction {
 #[derive(Debug, Clone)]
 pub struct FastMultipoleMethod {
     green: HyperbolicGreenFunction,
+    #[allow(dead_code)]
     max_particles_per_cell: usize,
+    #[allow(dead_code)]
     max_tree_depth: usize,
 }
 

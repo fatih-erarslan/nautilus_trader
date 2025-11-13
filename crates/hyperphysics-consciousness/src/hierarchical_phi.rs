@@ -117,7 +117,7 @@ impl HierarchicalPhiCalculator {
 
     /// Calculate hierarchical Φ with spatial clustering
     pub fn calculate(&self, lattice: &PBitLattice) -> Result<HierarchicalPhi> {
-        let n = lattice.size();
+        let _n = lattice.size();
 
         // Generate spatial scales
         let scales = self.generate_scales(lattice);

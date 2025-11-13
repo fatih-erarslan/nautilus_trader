@@ -74,6 +74,7 @@ impl Quote {
 mod tests {
     use super::*;
     use chrono::Utc;
+    use approx::assert_relative_eq;
 
     #[test]
     fn test_quote_calculations() {
@@ -87,9 +88,8 @@ mod tests {
             exchange: None,
         };
 
-        // Use approximate comparisons for floating-point values
-        assert!((quote.spread() - 0.10).abs() < 1e-10);
-        assert!((quote.mid_price() - 150.05).abs() < 1e-10);
-        assert!((quote.spread_percentage() - 0.06663).abs() < 0.0001);
+        assert_relative_eq!(quote.spread(), 0.10, epsilon = 1e-10);
+        assert_relative_eq!(quote.mid_price(), 150.05, epsilon = 1e-10);
+        assert_relative_eq!(quote.spread_percentage(), 0.06663, epsilon = 0.0001);
     }
 }

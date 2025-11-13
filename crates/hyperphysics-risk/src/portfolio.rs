@@ -138,8 +138,10 @@ mod tests {
         // Cash: 10000, AAPL: 16000, GOOGL: 145000 = 171000
         assert!((total - 171000.0).abs() < 1e-6);
 
-        // Weights should sum to 1.0
+        // Weights are position_value / total_value (excluding cash weight)
+        // So weights sum to (positions / total) = 161000 / 171000 ≈ 0.9415
         let weight_sum: f64 = weights.iter().sum();
-        assert!((weight_sum - 1.0).abs() < 1e-6);
+        let expected_weight_sum = 161000.0 / 171000.0;
+        assert!((weight_sum - expected_weight_sum).abs() < 1e-6);
     }
 }

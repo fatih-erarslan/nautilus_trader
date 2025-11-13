@@ -104,6 +104,7 @@ impl OrderBook {
 mod tests {
     use super::*;
     use ordered_float::OrderedFloat;
+    use approx::assert_relative_eq;
 
     #[test]
     fn test_orderbook_operations() {
@@ -129,12 +130,11 @@ mod tests {
             OrderBookLevel { price: 150.02, size: 100.0, order_count: Some(3) }
         );
 
-        assert_eq!(book.best_bid(), Some(150.00));
-        assert_eq!(book.best_ask(), Some(150.01));
-        // Use approximate comparison for floating-point spread
-        assert!((book.spread().unwrap() - 0.01).abs() < 1e-10);
-        assert!((book.mid_price().unwrap() - 150.005).abs() < 1e-10);
-        assert_eq!(book.bid_volume(2), 300.0);
-        assert_eq!(book.ask_volume(2), 250.0);
+        assert_relative_eq!(book.best_bid().unwrap(), 150.00, epsilon = 1e-10);
+        assert_relative_eq!(book.best_ask().unwrap(), 150.01, epsilon = 1e-10);
+        assert_relative_eq!(book.spread().unwrap(), 0.01, epsilon = 1e-10);
+        assert_relative_eq!(book.mid_price().unwrap(), 150.005, epsilon = 1e-10);
+        assert_relative_eq!(book.bid_volume(2), 300.0, epsilon = 1e-10);
+        assert_relative_eq!(book.ask_volume(2), 250.0, epsilon = 1e-10);
     }
 }

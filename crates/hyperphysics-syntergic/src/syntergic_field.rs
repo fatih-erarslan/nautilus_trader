@@ -3,7 +3,7 @@
 //! Combines Green's function, neuronal field, and non-local correlations.
 
 use crate::{
-    HyperbolicGreenFunction, NeuronalField, Result, SyntergicError, SYNTERGIC_SPEED,
+    HyperbolicGreenFunction, NeuronalField, Result, SYNTERGIC_SPEED,
 };
 use hyperphysics_geometry::PoincarePoint;
 use hyperphysics_pbit::PBitLattice;
@@ -24,6 +24,7 @@ pub struct SyntergicField {
     field_values: Vec<f64>,
 
     /// Field propagation speed
+    #[allow(dead_code)]
     speed: f64,
 
     /// Time elapsed
