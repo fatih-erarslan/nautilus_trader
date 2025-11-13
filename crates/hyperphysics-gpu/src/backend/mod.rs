@@ -112,6 +112,7 @@ pub enum BufferUsage {
 pub trait GPUBuffer: Send + Sync {
     fn size(&self) -> u64;
     fn usage(&self) -> BufferUsage;
+    fn as_any(&self) -> &dyn std::any::Any;
 }
 
 /// Memory usage statistics

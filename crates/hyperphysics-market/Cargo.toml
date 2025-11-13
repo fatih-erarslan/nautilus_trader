@@ -35,3 +35,4 @@ ordered-float = { version = "4.2", features = ["serde"] }
 tokio-test = "0.4"
 mockito = "1.2"
 approx = "0.5"
+tracing-subscriber = "0.3"
