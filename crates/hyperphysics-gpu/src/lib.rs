@@ -21,6 +21,25 @@ pub use rng::{GPURng, RNGState, RNGParams};
 
 /// Initialize GPU backend with automatic device selection
 ///
+/// Tries backends in order: WGPU → CPU fallback
+pub fn initialize_backend() -> Result<Box<dyn GPUBackend>> {
+    #[cfg(feature = "wgpu-backend")]
+    {
+        // Try WGPU backend first
+        match backend::wgpu::WGPUBackend::new_blocking() {
+            Ok(wgpu_backend) => {
+                eprintln!("✓ GPU acceleration enabled: {}", wgpu_backend.device_name());
+                return Ok(Box::new(wgpu_backend));
+            }
+            Err(e) => {
+                eprintln!("⚠ WGPU backend unavailable: {}", e);
+                eprintln!("  Falling back to CPU...");
+            }
+        }
+    }
+
+    // Fallback to CPU backend
+    eprintln!("  Using CPU backend (no GPU acceleration)");
 /// Tries backends in order: CUDA → WGPU → CPU fallback
 pub async fn initialize_backend() -> Result<Box<dyn GPUBackend>> {
     // Try CUDA backend first (highest performance)
