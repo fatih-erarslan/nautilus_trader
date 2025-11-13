@@ -33,7 +33,7 @@ merlin = "3.0"
 hyperphysics-core = { path = "../hyperphysics-core" }
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
 hyperphysics-gpu = { path = "../hyperphysics-gpu" }
-hyperphysics-verification = { path = "../hyperphysics-verification" }
+hyperphysics-verify = { path = "../hyperphysics-verify" }
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -61,15 +61,10 @@ tempfile = "3.8"
 [features]
 default = ["std"]
 std = []
-gpu-acceleration = ["hyperphysics-gpu/cuda", "hyperphysics-gpu/metal"]
+gpu-acceleration = []
 side-channel-protection = []
 hybrid-mode = []  # Classical + PQ hybrid signatures
 
-[[bench]]
-name = "dilithium_benchmarks"
-harness = false
-
-[profile.release]
-opt-level = 3
-lto = "fat"
-codegen-units = 1
+# [[bench]]
+# name = "dilithium_benchmarks"
+# harness = false

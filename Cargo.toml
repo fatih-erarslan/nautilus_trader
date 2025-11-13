@@ -6,6 +6,7 @@ members = [
     "crates/hyperphysics-thermo",
     "crates/hyperphysics-consciousness",
     "crates/hyperphysics-syntergic",
+    # "crates/hyperphysics-dilithium",  # Temporarily disabled - dependency fixes needed
     "crates/hyperphysics-market",
     "crates/hyperphysics-risk",
     "crates/hyperphysics-verify",
