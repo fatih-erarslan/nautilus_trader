@@ -29,3 +29,7 @@ coordination/orchestration/*
 claude-flow
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
+
+# Rust build artifacts
+target/
+Cargo.lock
