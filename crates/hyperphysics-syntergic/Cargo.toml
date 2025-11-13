@@ -1,24 +1,21 @@
 [package]
-name = "hyperphysics-pbit"
+name = "hyperphysics-syntergic"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 
-description = "Probabilistic bit (pBit) dynamics simulator with stochastic algorithms"
+description = "Syntergic field theory implementation with non-local correlations"
 
 [dependencies]
 hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
 nalgebra.workspace = true
 ndarray.workspace = true
-rand.workspace = true
-rand_distr.workspace = true
+rayon.workspace = true
 serde.workspace = true
 thiserror.workspace = true
-sprs = "0.11"
-rayon.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true
-proptest.workspace = true
-rand_chacha.workspace = true
+approx.workspace = true
