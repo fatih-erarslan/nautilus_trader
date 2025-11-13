@@ -23,6 +23,7 @@ proptest = { workspace = true, optional = true }
 criterion.workspace = true
 rand_chacha.workspace = true
 approx = "0.5"
+proptest.workspace = true
 
 [[bench]]
 name = "simd_exp"

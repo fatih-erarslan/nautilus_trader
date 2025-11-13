@@ -56,8 +56,9 @@ impl ThermodynamicVaR {
             losses[lower_idx] * (1.0 - weight) + losses[upper_idx] * weight
         };
 
-        // VaR should be non-negative (magnitude of loss)
-        Ok(var.max(0.0))
+        // Return as negative value to indicate loss direction
+        // VaR convention: negative values represent potential losses
+        Ok(-var)
     }
 
     /// Calculate parametric VaR assuming normal distribution
@@ -105,11 +106,11 @@ impl ThermodynamicVaR {
         };
 
         // VaR = -μ + z_α * σ (loss magnitude)
-        // For losses, positive VaR means potential loss
+        // Return as negative to indicate loss direction
         let var = -mean + z_alpha * std_dev;
 
-        // Ensure VaR is non-negative (Basel III requirement)
-        Ok(var.max(0.0))
+        // Return negative value (loss convention: negative = potential loss)
+        Ok(-var)
     }
 
     /// Calculate VaR constrained by maximum entropy principle

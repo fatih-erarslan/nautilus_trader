@@ -72,21 +72,16 @@ impl Portfolio {
     /// Weights sum to less than 1.0 if cash is present.
     /// To get position-only weights that sum to 1.0, use position_weights().
     pub fn weights(&self, prices: &HashMap<String, f64>) -> Vec<f64> {
-        let position_value: f64 = self.positions
-            .iter()
-            .map(|(symbol, pos)| {
-                prices.get(symbol).unwrap_or(&0.0) * pos.quantity
-            })
-            .sum();
+        let total = self.total_value(prices);
 
-        if position_value <= 0.0 {
+        if total <= 0.0 {
             return vec![0.0; self.positions.len()];
         }
 
         self.positions
             .iter()
             .map(|(symbol, pos)| {
-                (prices.get(symbol).unwrap_or(&0.0) * pos.quantity) / position_value
+                (prices.get(symbol).unwrap_or(&0.0) * pos.quantity) / total
             })
             .collect()
     }

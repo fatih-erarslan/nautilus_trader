@@ -6,11 +6,12 @@ use chrono::{Duration, Utc};
 use hyperphysics_market::data::Timeframe;
 use hyperphysics_market::providers::{AlpacaProvider, MarketDataProvider};
 use hyperphysics_market::MarketError;
-use mockito::{mock, Matcher};
+use mockito::{Matcher, Server};
 
 #[tokio::test]
 async fn test_fetch_bars_success() {
-    let _m = mock("GET", "/v2/stocks/AAPL/bars")
+    let mut server = Server::new_async().await;
+    let _m = server.mock("GET", "/v2/stocks/AAPL/bars")
         .match_query(Matcher::AllOf(vec![
             Matcher::UrlEncoded("timeframe".into(), "1Day".into()),
             Matcher::UrlEncoded("limit".into(), "10000".into()),
@@ -41,6 +42,8 @@ async fn test_fetch_bars_success() {
         )
         .create();
 
+    // Note: This test needs AlpacaProvider to support custom base_url for testing
+    // For now, skip as provider needs refactoring to support mock server URL
     let provider = AlpacaProvider::new(
         "test_key".to_string(),
         "test_secret".to_string(),

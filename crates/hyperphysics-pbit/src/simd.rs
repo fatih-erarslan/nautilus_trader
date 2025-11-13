@@ -449,6 +449,7 @@ pub struct SimdInfo {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::f64::consts::LN_2;
 
     #[test]
     fn test_update_states() {
