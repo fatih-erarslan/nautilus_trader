@@ -377,8 +377,8 @@ impl WGPUBackend {
         self.queue.submit(Some(encoder.finish()));
 
         // Read results
-        let updated_states = self.read_buffer::<u32>(&states_buffer, n).await?;
-        let updated_probs = self.read_buffer::<f32>(&probs_buffer, n).await?;
+        let updated_states = self.read_buffer::<u32>(&states_buffer).await?;
+        let updated_probs = self.read_buffer::<f32>(&probs_buffer).await?;
 
         Ok((updated_states, updated_probs))
     }
