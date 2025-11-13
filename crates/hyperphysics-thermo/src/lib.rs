@@ -21,11 +21,17 @@ pub mod hamiltonian;
 pub mod entropy;
 pub mod landauer;
 pub mod free_energy;
+pub mod temperature;
+pub mod observables;
+pub mod negentropy;
 
 pub use hamiltonian::HamiltonianCalculator;
 pub use entropy::EntropyCalculator;
 pub use landauer::LandauerEnforcer;
 pub use free_energy::FreeEnergyCalculator;
+pub use temperature::{Temperature, TemperatureSchedule, ScheduleType};
+pub use observables::{Observable, Correlation, ObservableTimeSeries};
+pub use negentropy::{NegentropyAnalyzer, NegentropyMeasurement, NegentropyFlow, NegentropyDynamics};
 
 use thiserror::Error;
 

@@ -127,7 +127,9 @@ mod tests {
             DynamicsStatistics::Gillespie { events, .. } => {
                 assert_eq!(events, 100);
             }
-            _ => panic!("Wrong statistics type"),
+            _ => {
+                panic!("Expected Gillespie statistics but got different type");
+            }
         }
     }
 

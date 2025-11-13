@@ -22,7 +22,11 @@ impl ThermodynamicVaR {
 
     /// Calculate historical VaR from return data
     ///
-    /// Returns the (1 - confidence_level) quantile of losses
+    /// Returns the confidence_level quantile of losses (negative returns).
+    /// For 95% VaR, returns the loss exceeded by 5% of worst returns.
+    ///
+    /// Basel III: VaR is the loss level that will not be exceeded with probability α
+    /// For 95% VaR: There's 5% chance the loss will exceed VaR
     pub fn calculate_historical(&self, returns: &[f64]) -> Result<f64> {
         if returns.is_empty() {
             return Err(RiskError::InsufficientData(
@@ -34,18 +38,35 @@ impl ThermodynamicVaR {
         let mut losses: Vec<f64> = returns.iter().map(|&r| -r).collect();
         losses.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
-        // Find quantile index
-        let alpha = 1.0 - self.confidence_level;
-        let index = ((losses.len() as f64) * alpha).ceil() as usize;
-        let index = index.min(losses.len() - 1);
+        // For confidence_level α (e.g., 0.95), we want the α quantile of losses
+        // This is the (100×α)th percentile of the loss distribution
+        // After sorting losses in ascending order, we want the index at α position
+        let n = losses.len();
 
-        Ok(losses[index])
+        // Use linear interpolation for quantile calculation
+        // For 95% confidence, we want 95th percentile = rank at 0.95 * (n-1)
+        let rank = self.confidence_level * (n as f64 - 1.0);
+        let lower_idx = rank.floor() as usize;
+        let upper_idx = (rank.ceil() as usize).min(n - 1);
+        let weight = rank - lower_idx as f64;
+
+        let var = if lower_idx == upper_idx {
+            losses[lower_idx]
+        } else {
+            losses[lower_idx] * (1.0 - weight) + losses[upper_idx] * weight
+        };
+
+        // VaR should be non-negative (magnitude of loss)
+        Ok(var.max(0.0))
     }
 
     /// Calculate parametric VaR assuming normal distribution
     ///
-    /// VaR = μ + σ * z_α
-    /// where z_α is the α-quantile of standard normal
+    /// VaR_α = -(μ - z_α * σ)
+    /// where z_α is the α-quantile of standard normal (negative for left tail)
+    ///
+    /// For returns R ~ N(μ, σ²), the loss L = -R ~ N(-μ, σ²)
+    /// VaR_α = quantile_α(L) = -μ + z_α * σ, where z_α > 0 for confidence > 0.5
     pub fn calculate_parametric(&self, returns: &[f64]) -> Result<f64> {
         if returns.is_empty() {
             return Err(RiskError::InsufficientData(
@@ -63,20 +84,32 @@ impl ThermodynamicVaR {
 
         let std_dev = variance.sqrt();
 
-        // Approximate z-score for common confidence levels
+        // Z-score for confidence level (e.g., 1.645 for 95%, 2.326 for 99%)
+        // These are positive values for the left tail of the return distribution
+        // which corresponds to the right tail of the loss distribution
         let z_alpha = match self.confidence_level {
             x if (x - 0.95).abs() < 1e-6 => 1.645,
             x if (x - 0.99).abs() < 1e-6 => 2.326,
+            x if (x - 0.999).abs() < 1e-6 => 3.090,
             _ => {
                 // For other levels, use rough approximation
-                // In production, would use proper inverse normal CDF
+                // For α in (0.5, 1), we want positive z-score
                 let alpha = 1.0 - self.confidence_level;
-                -(-2.0 * alpha.ln()).sqrt()
+                // Rough inverse normal approximation
+                if alpha < 0.5 {
+                    (-2.0 * alpha.ln()).sqrt()
+                } else {
+                    0.0 // Should not happen for typical confidence levels
+                }
             }
         };
 
-        // VaR is negative of (mean + z*sigma) since we want loss magnitude
-        Ok(-(mean + z_alpha * std_dev))
+        // VaR = -μ + z_α * σ (loss magnitude)
+        // For losses, positive VaR means potential loss
+        let var = -mean + z_alpha * std_dev;
+
+        // Ensure VaR is non-negative (Basel III requirement)
+        Ok(var.max(0.0))
     }
 
     /// Calculate VaR constrained by maximum entropy principle

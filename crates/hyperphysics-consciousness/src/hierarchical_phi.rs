@@ -168,7 +168,7 @@ impl HierarchicalPhiCalculator {
             }
         }
 
-        distances.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        distances.sort_unstable_by(|a, b| a.total_cmp(b));
         let median_distance = distances[distances.len() / 2];
 
         // Generate scales geometrically
