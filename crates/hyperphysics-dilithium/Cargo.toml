@@ -33,6 +33,8 @@ merlin = "3.0"
 # HyperPhysics integration
 hyperphysics-core = { path = "../hyperphysics-core" }
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-gpu = { path = "../hyperphysics-gpu" }
+hyperphysics-verify = { path = "../hyperphysics-verify" }
 # hyperphysics-gpu = { path = "../hyperphysics-gpu" }  # Disabled - compilation errors
 # hyperphysics-verification = { path = "../hyperphysics-verification" }  # Disabled - compilation errors
 
@@ -62,6 +64,13 @@ tempfile = "3.8"
 [features]
 default = ["std"]
 std = []
+gpu-acceleration = []
+side-channel-protection = []
+hybrid-mode = []  # Classical + PQ hybrid signatures
+
+# [[bench]]
+# name = "dilithium_benchmarks"
+# harness = false
 gpu-acceleration = []  # Disabled until hyperphysics-gpu compiles
 side-channel-protection = []
 hybrid-mode = []  # Classical + PQ hybrid signatures

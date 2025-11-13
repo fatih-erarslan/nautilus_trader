@@ -15,11 +15,13 @@ hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
 
 serde.workspace = true
 serde_json = "1.0"
+serde_bytes = "0.11"
 thiserror.workspace = true
 rand.workspace = true
 ed25519-dalek = "2.1"
 hex = "0.4"
 chrono = { version = "0.4", features = ["serde"] }
+sha3 = "0.10"
 
 # GPU acceleration (optional)
 wgpu = { version = "0.19", optional = true }
