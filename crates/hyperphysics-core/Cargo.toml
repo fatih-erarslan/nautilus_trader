@@ -36,6 +36,7 @@ approx = "0.5"
 criterion.workspace = true
 rand_chacha.workspace = true
 tokio = { version = "1.35", features = ["full"] }
+proptest = "1.4"
 
 [features]
 default = []

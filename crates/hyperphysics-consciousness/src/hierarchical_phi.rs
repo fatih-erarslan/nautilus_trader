@@ -184,7 +184,7 @@ impl HierarchicalPhiCalculator {
     }
 
     /// Cluster pBits at given spatial scale
-    fn cluster_at_scale(
+    pub fn cluster_at_scale(
         &self,
         lattice: &PBitLattice,
         scale: f64,
