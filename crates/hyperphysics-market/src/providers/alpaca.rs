@@ -36,7 +36,7 @@
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use reqwest::{Client, header};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::time::Duration;
 use tracing::{debug, warn};
 
@@ -212,7 +212,7 @@ impl AlpacaBar {
     /// Convert Alpaca bar to unified Bar structure
     fn to_bar(&self, symbol: String) -> MarketResult<Bar> {
         let timestamp = DateTime::parse_from_rfc3339(&self.timestamp)
-            .map_err(|e| MarketError::ParseError(e.into()))?
+            .map_err(|e| MarketError::DateTimeParseError(e.to_string()))?
             .with_timezone(&Utc);
 
         Ok(Bar {

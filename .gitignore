@@ -33,3 +33,4 @@ hive-mind-prompt-*.txt
 # Rust build artifacts
 target/
 Cargo.lock
+*.proptest-regressions

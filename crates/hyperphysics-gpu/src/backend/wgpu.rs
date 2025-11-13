@@ -12,7 +12,7 @@
 use crate::{GPUBackend, GPUCapabilities, BackendType};
 use hyperphysics_core::Result;
 use wgpu::{
-    util::DeviceExt, Adapter, BindGroup, BindGroupLayout, Buffer, ComputePipeline, Device, Queue,
+    util::DeviceExt, BindGroupLayout, Buffer, ComputePipeline, Device, Queue,
 };
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
@@ -204,7 +204,7 @@ impl WGPUBackend {
                 label: Some("PBit Update Pipeline"),
                 layout: Some(&pipeline_layout),
                 module: &shader,
-                entry_point: Some("main"),
+                entry_point: "main",
                 compilation_options: Default::default(),
                 cache: None,
             });
@@ -384,61 +384,6 @@ impl WGPUBackend {
     }
 }
 
-impl GPUBackend for WGPUBackend {
-    fn capabilities(&self) -> &GPUCapabilities {
-        &self.capabilities
-    }
-
-    fn execute_compute(&self, shader: &str, workgroups: [u32; 3]) -> Result<()> {
-        let shader_module = self
-            .device
-            .create_shader_module(wgpu::ShaderModuleDescriptor {
-                label: Some("Custom Compute Shader"),
-                source: wgpu::ShaderSource::Wgsl(shader.into()),
-            });
-
-        let pipeline_layout =
-            self.device
-                .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                    label: Some("Custom Pipeline Layout"),
-                    bind_group_layouts: &[],
-                    push_constant_ranges: &[],
-                });
-
-        let pipeline = self
-            .device
-            .create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-                label: Some("Custom Compute Pipeline"),
-                layout: Some(&pipeline_layout),
-                module: &shader_module,
-                entry_point: Some("main"),
-                compilation_options: Default::default(),
-                cache: None,
-            });
-
-        let mut encoder = self
-            .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                label: Some("Custom Compute Encoder"),
-            });
-
-        {
-            let mut compute_pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                label: Some("Custom Compute Pass"),
-                timestamp_writes: None,
-            });
-
-            compute_pass.set_pipeline(&pipeline);
-            compute_pass.dispatch_workgroups(workgroups[0], workgroups[1], workgroups[2]);
-        }
-
-        self.queue.submit(Some(encoder.finish()));
-        self.device.poll(wgpu::Maintain::Wait);
-
-        Ok(())
-    }
-}
-
 /// WGSL compute shader for pBit state updates
 ///
 /// Implements parallel Metropolis-Hastings updates with sparse coupling matrix
@@ -541,7 +486,7 @@ impl GPUBackend for WGPUBackend {
             label: Some("Dynamic Compute Pipeline"),
             layout: None,
             module: &shader_module,
-            entry_point: Some("main"),
+            entry_point: "main",
             compilation_options: Default::default(),
             cache: None,
         });

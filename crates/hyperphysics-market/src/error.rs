@@ -21,6 +21,10 @@ pub enum MarketError {
     #[error("Parse error: {0}")]
     ParseError(#[from] serde_json::Error),
 
+    /// DateTime parsing errors
+    #[error("DateTime parse error: {0}")]
+    DateTimeParseError(String),
+
     /// Authentication errors
     #[error("Authentication failed: {0}")]
     AuthenticationError(String),

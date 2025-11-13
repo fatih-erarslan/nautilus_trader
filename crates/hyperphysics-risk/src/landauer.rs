@@ -18,7 +18,7 @@ impl TransactionCostModel {
         }
 
         Ok(Self {
-            enforcer: LandauerEnforcer::new(temperature),
+            enforcer: LandauerEnforcer::new(temperature)?,
         })
     }
 
