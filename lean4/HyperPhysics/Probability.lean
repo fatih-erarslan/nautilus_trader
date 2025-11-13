@@ -11,7 +11,25 @@ noncomputable def sigmoid (h : ℝ) (T : Temperature) : ℝ :=
 /-- Sigmoid is bounded between 0 and 1 -/
 theorem sigmoid_bounds (h : ℝ) (T : Temperature) :
     0 < sigmoid h T ∧ sigmoid h T < 1 := by
-  sorry
+  constructor
+  · -- Prove 0 < sigmoid h T
+    unfold sigmoid
+    simp only [one_div]
+    apply div_pos
+    · norm_num
+    · apply add_pos
+      · norm_num
+      · apply Real.exp_pos
+  · -- Prove sigmoid h T < 1
+    unfold sigmoid
+    simp only [one_div]
+    rw [div_lt_iff]
+    · ring_nf
+      simp only [lt_add_iff_pos_right]
+      apply Real.exp_pos
+    · apply add_pos
+      · norm_num
+      · apply Real.exp_pos
 
 /-- Sigmoid approaches 1 as h → ∞ -/
 theorem sigmoid_limit_pos_inf (T : Temperature) :

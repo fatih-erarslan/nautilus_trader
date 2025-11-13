@@ -34,3 +34,11 @@ hive-mind-prompt-*.txt
 target/
 Cargo.lock
 *.proptest-regressions
+
+# Rust compiler crash reports
+rustc-ice-*.txt
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride

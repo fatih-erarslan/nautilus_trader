@@ -357,17 +357,9 @@ impl SecureGPUChannel {
             return Err(DilithiumError::InvalidChannel);
         }
         
-        // Verify Dilithium signature
-        let keypair = DilithiumKeypair {
-            public_key: peer_dilithium_pk.clone(),
-            secret_key: crate::keypair::SecretKey {
-                bytes: vec![],  // Not needed for verification
-                security_level: peer_dilithium_pk.security_level,
-            },
-            security_level: peer_dilithium_pk.security_level,
-        };
-        
-        if !keypair.verify(&message.ciphertext, &message.signature)? {
+        // Verify Dilithium signature using the signature's verification method
+        let mlwe = crate::lattice::module_lwe::ModuleLWE::new(peer_dilithium_pk.security_level);
+        if !message.signature.verify_with_key(&message.ciphertext, peer_dilithium_pk, &mlwe)? {
             return Err(DilithiumError::InvalidSignature);
         }
         

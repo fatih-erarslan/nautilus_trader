@@ -61,6 +61,9 @@ pub struct CryptographicPBit {
     /// Dilithium keypair for signing
     keypair: DilithiumKeypair,
     
+    /// Module-LWE engine for verification
+    mlwe: ModuleLWE,
+    
     /// Current state signature
     state_signature: Option<DilithiumSignature>,
     
@@ -116,11 +119,13 @@ impl CryptographicPBit {
         }
         
         let keypair = DilithiumKeypair::generate(security_level)?;
+        let mlwe = ModuleLWE::new(security_level);
         let now = SystemTime::now();
         
         let mut crypto_pbit = Self {
             probability: initial_probability,
             keypair,
+            mlwe,
             state_signature: None,
             position,
             generation: 0,
@@ -309,6 +314,7 @@ impl CryptographicPBit {
             signature: self.state_signature.clone()
                 .ok_or(DilithiumError::MissingSignature)?,
             updated_at: self.updated_at,
+            mlwe: Some(self.mlwe.clone()),
         })
     }
 }
@@ -331,6 +337,8 @@ pub struct SignedPBitState {
     pub public_key: crate::keypair::PublicKey,
     pub signature: DilithiumSignature,
     pub updated_at: SystemTime,
+    #[serde(skip)]
+    mlwe: Option<ModuleLWE>,
 }
 
 impl SignedPBitState {
@@ -349,17 +357,13 @@ impl SignedPBitState {
         let state_bytes = bincode::serialize(&state)
             .map_err(|e| DilithiumError::SerializationError(e.to_string()))?;
         
-        // Create temporary keypair with public key for verification
-        let keypair = DilithiumKeypair {
-            public_key: self.public_key.clone(),
-            secret_key: crate::keypair::SecretKey {
-                bytes: vec![],  // Not needed for verification
-                security_level: self.public_key.security_level,
-            },
-            security_level: self.public_key.security_level,
-        };
+        // Initialize mlwe if not present (for deserialized states)
+        let mlwe = self.mlwe.as_ref()
+            .map(|m| m.clone())
+            .unwrap_or_else(|| ModuleLWE::new(self.public_key.security_level));
         
-        keypair.verify(&state_bytes, &self.signature)
+        // Verify signature directly using the public key
+        self.signature.verify_with_key(&state_bytes, &self.public_key, &mlwe)
     }
 }
 

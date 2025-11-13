@@ -38,6 +38,7 @@ pub mod providers;
 pub mod topology;
 
 // Re-export commonly used types
-pub use data::{Bar, Timeframe};
+pub use data::{Bar, Tick, Timeframe};
+pub use data::tick::Quote;
 pub use error::MarketError;
-pub use providers::{AlpacaProvider, MarketDataProvider};
+pub use providers::{AlpacaProvider, InteractiveBrokersProvider, MarketDataProvider};

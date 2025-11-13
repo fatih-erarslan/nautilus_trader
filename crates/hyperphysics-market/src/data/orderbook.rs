@@ -131,8 +131,9 @@ mod tests {
 
         assert_eq!(book.best_bid(), Some(150.00));
         assert_eq!(book.best_ask(), Some(150.01));
-        assert_eq!(book.spread(), Some(0.01));
-        assert_eq!(book.mid_price(), Some(150.005));
+        // Use approximate comparison for floating-point spread
+        assert!((book.spread().unwrap() - 0.01).abs() < 1e-10);
+        assert!((book.mid_price().unwrap() - 150.005).abs() < 1e-10);
         assert_eq!(book.bid_volume(2), 300.0);
         assert_eq!(book.ask_volume(2), 250.0);
     }

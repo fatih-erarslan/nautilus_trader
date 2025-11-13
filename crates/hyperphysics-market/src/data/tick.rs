@@ -87,8 +87,9 @@ mod tests {
             exchange: None,
         };
 
-        assert_eq!(quote.spread(), 0.10);
-        assert_eq!(quote.mid_price(), 150.05);
+        // Use approximate comparisons for floating-point values
+        assert!((quote.spread() - 0.10).abs() < 1e-10);
+        assert!((quote.mid_price() - 150.05).abs() < 1e-10);
         assert!((quote.spread_percentage() - 0.06663).abs() < 0.0001);
     }
 }
