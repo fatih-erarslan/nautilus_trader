@@ -9,13 +9,40 @@
 //! - Parallel state updates: O(N) on GPU vs O(N) on CPU, but 100-1000× faster per operation
 //! - Coupling field calculations: O(nnz) where nnz = number of non-zero couplings
 
-use crate::{GPUBackend, GPUCapabilities, BackendType};
+use crate::{GPUBackend, GPUCapabilities, BackendType, GPUBuffer, BufferUsage, MemoryStats};
 use hyperphysics_core::Result;
 use wgpu::{
     util::DeviceExt, BindGroupLayout, Buffer, ComputePipeline, Device, Queue,
 };
 use bytemuck::{Pod, Zeroable};
 use std::sync::Arc;
+
+/// WGPU buffer wrapper
+pub struct WGPUBuffer {
+    buffer: Buffer,
+    size: u64,
+    usage: BufferUsage,
+}
+
+impl GPUBuffer for WGPUBuffer {
+    fn size(&self) -> u64 {
+        self.size
+    }
+
+    fn usage(&self) -> BufferUsage {
+        self.usage
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl WGPUBuffer {
+    pub(crate) fn buffer(&self) -> &Buffer {
+        &self.buffer
+    }
+}
 
 /// WGPU compute backend
 pub struct WGPUBackend {
@@ -468,6 +495,33 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 }
 "#;
 
+impl WGPUBackend {
+    /// Get reference to WGPU device
+    pub fn device(&self) -> &Arc<Device> {
+        &self.device
+    }
+
+    /// Get reference to WGPU queue
+    pub fn queue(&self) -> &Arc<Queue> {
+        &self.queue
+    }
+
+    /// Execute compute shader with custom bind groups (legacy method)
+    ///
+    /// TODO: Refactor executor to use new buffer-based API
+    pub fn execute_compute_with_bindings(
+        &self,
+        _shader: &str,
+        _workgroups: [u32; 3],
+        _bind_group_layout_entries: &[wgpu::BindGroupLayoutEntry],
+        _bind_group_entries: &[wgpu::BindGroupEntry],
+    ) -> Result<()> {
+        Err(hyperphysics_core::EngineError::Configuration {
+            message: "execute_compute_with_bindings is deprecated - use new buffer API".to_string(),
+        })
+    }
+}
+
 /// Implement GPUBackend trait for WGPUBackend
 impl GPUBackend for WGPUBackend {
     fn capabilities(&self) -> &GPUCapabilities {
@@ -510,6 +564,95 @@ impl GPUBackend for WGPUBackend {
         self.queue.submit(Some(encoder.finish()));
 
         Ok(())
+    }
+
+    fn create_buffer(&self, size: u64, usage: BufferUsage) -> Result<Box<dyn GPUBuffer>> {
+        let wgpu_usage = match usage {
+            BufferUsage::Storage => wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::COPY_SRC,
+            BufferUsage::Uniform => wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            BufferUsage::Vertex => wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            BufferUsage::Index => wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
+            BufferUsage::CopySrc => wgpu::BufferUsages::COPY_SRC,
+            BufferUsage::CopyDst => wgpu::BufferUsages::COPY_DST,
+        };
+
+        let buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("GPUBuffer"),
+            size,
+            usage: wgpu_usage,
+            mapped_at_creation: false,
+        });
+
+        Ok(Box::new(WGPUBuffer {
+            buffer,
+            size,
+            usage,
+        }))
+    }
+
+    fn write_buffer(&self, buffer: &mut dyn GPUBuffer, data: &[u8]) -> Result<()> {
+        let wgpu_buffer = buffer.as_any().downcast_ref::<WGPUBuffer>()
+            .ok_or_else(|| hyperphysics_core::EngineError::Configuration {
+                message: "Buffer is not a WGPUBuffer".to_string(),
+            })?;
+
+        self.queue.write_buffer(&wgpu_buffer.buffer, 0, data);
+        Ok(())
+    }
+
+    fn read_buffer(&self, buffer: &dyn GPUBuffer) -> Result<Vec<u8>> {
+        let wgpu_buffer = buffer.as_any().downcast_ref::<WGPUBuffer>()
+            .ok_or_else(|| hyperphysics_core::EngineError::Configuration {
+                message: "Buffer is not a WGPUBuffer".to_string(),
+            })?;
+
+        // Create staging buffer
+        let staging_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("Staging Buffer"),
+            size: buffer.size(),
+            usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
+            mapped_at_creation: false,
+        });
+
+        // Copy data to staging buffer
+        let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: Some("Read Buffer Encoder"),
+        });
+
+        encoder.copy_buffer_to_buffer(&wgpu_buffer.buffer, 0, &staging_buffer, 0, buffer.size());
+        self.queue.submit(Some(encoder.finish()));
+
+        // Map and read
+        let buffer_slice = staging_buffer.slice(..);
+        let (sender, receiver) = std::sync::mpsc::channel();
+        buffer_slice.map_async(wgpu::MapMode::Read, move |result| {
+            sender.send(result).ok();
+        });
+
+        self.device.poll(wgpu::Maintain::Wait);
+        receiver.recv().unwrap().map_err(|e| hyperphysics_core::EngineError::Configuration {
+            message: format!("Failed to map buffer: {:?}", e),
+        })?;
+
+        let data = buffer_slice.get_mapped_range().to_vec();
+        staging_buffer.unmap();
+
+        Ok(data)
+    }
+
+    fn synchronize(&self) -> Result<()> {
+        self.device.poll(wgpu::Maintain::Wait);
+        Ok(())
+    }
+
+    fn memory_stats(&self) -> MemoryStats {
+        // WGPU doesn't expose detailed memory stats, return defaults
+        MemoryStats {
+            total_memory: 0,
+            used_memory: 0,
+            free_memory: 0,
+            buffer_count: 0,
+        }
     }
 }
 

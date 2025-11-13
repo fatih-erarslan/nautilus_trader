@@ -74,30 +74,30 @@ impl NTT {
             n_inv,
         }
     }
+}
 
-    /// Forward NTT: a(X) → â(X) in NTT domain
-//! Enterprise-grade implementation of NTT for polynomial operations in Z_q[X]/(X^n + 1).
-//!
-//! # Security Properties
-//!
-//! - Constant-time operations (no secret-dependent branches)
-//! - Barrett reduction for modular arithmetic
-//! - Bit-reversal permutation for Cooley-Tukey algorithm
-//! - Montgomery multiplication for efficiency
-//!
-//! # Mathematical Foundation
-//!
-//! NTT is the number-theoretic analogue of FFT, operating in Z_q instead of C.
-//! For Dilithium, we use:
-//! - q = 8380417 (prime modulus)
-//! - n = 256 (polynomial degree)
-//! - ω = 1753 (primitive 512-th root of unity mod q)
-//!
-//! # References
-//!
-//! - FIPS 204: Module-Lattice-Based Digital Signature Standard
-//! - Cooley-Tukey (1965): "An algorithm for the machine calculation of complex Fourier series"
-//! - Barrett (1986): "Implementing the Rivest Shamir and Adleman Public Key Encryption Algorithm"
+// Enterprise-grade implementation of NTT for polynomial operations in Z_q[X]/(X^n + 1).
+//
+// # Security Properties
+//
+// - Constant-time operations (no secret-dependent branches)
+// - Barrett reduction for modular arithmetic
+// - Bit-reversal permutation for Cooley-Tukey algorithm
+// - Montgomery multiplication for efficiency
+//
+// # Mathematical Foundation
+//
+// NTT is the number-theoretic analogue of FFT, operating in Z_q instead of C.
+// For Dilithium, we use:
+// - q = 8380417 (prime modulus)
+// - n = 256 (polynomial degree)
+// - ω = 1753 (primitive 512-th root of unity mod q)
+//
+// # References
+//
+// - FIPS 204: Module-Lattice-Based Digital Signature Standard
+// - Cooley-Tukey (1965): "An algorithm for the machine calculation of complex Fourier series"
+// - Barrett (1986): "Implementing the Rivest Shamir and Adleman Public Key Encryption Algorithm"
 
 use std::ops::{Add, Sub, Mul};
 
@@ -343,6 +343,9 @@ impl NTT {
         for i in 0..N {
             result[i] = barrett_reduce(a[i] - b[i]);
         }
+    }
+
+    /// Pointwise multiplication in NTT domain
     ///
     /// # Returns
     ///
@@ -552,6 +555,8 @@ fn mod_inverse(a: i32, m: i32) -> i32 {
     }
 
     t as i32
+}
+
 /// Barrett reduction: reduce x mod q
 ///
 /// Computes x mod q using Barrett's algorithm for constant-time modular reduction.
@@ -1012,6 +1017,10 @@ mod tests {
         // All results should be in valid range
         for &coeff in &c {
             assert!(coeff >= 0 && coeff < Q);
+        }
+    }
+
+    #[test]
     fn test_barrett_reduce() {
         assert_eq!(barrett_reduce(0), 0);
         assert_eq!(barrett_reduce(DILITHIUM_Q), 0);
@@ -1187,6 +1196,10 @@ mod tests {
 
         for &coeff in &c {
             assert_eq!(coeff, 300);
+        }
+    }
+
+    #[test]
     fn test_ntt_convolution_theorem() {
         // Property: INTT(NTT(a) * NTT(b)) = a * b (polynomial multiplication)
         let ntt = NTT::new();
@@ -1237,6 +1250,10 @@ mod tests {
 
         for &coeff in &c {
             assert_eq!(coeff, 300);
+        }
+    }
+
+    #[test]
     fn test_barrett_reduction_bounds() {
         // Verify Barrett reduction keeps values in [0, q)
         let test_values = vec![
@@ -1311,6 +1328,9 @@ mod tests {
             let diff = (sum_ntt[i] - expected_sum[i]).abs();
             assert!(diff == 0 || diff == Q);
         }
+    }
+
+    #[test]
     fn test_ntt_deterministic() {
         // Property: Same input always produces same output (no randomness)
         let ntt = NTT::new();

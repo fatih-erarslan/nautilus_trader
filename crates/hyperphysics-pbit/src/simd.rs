@@ -20,13 +20,10 @@
 //! - Remez algorithm: Minimax polynomial approximation
 //! - Intel Vector Math Library (VML) design principles
 
-#[cfg(target_arch = "x86_64")]
-use std::arch::x86_64::*;
 
 #[cfg(target_arch = "aarch64")]
 use std::arch::aarch64::*;
 
-use std::f64::consts::LN_2;
 
 /// Remez polynomial coefficients for exp(x) on [-ln(2)/2, ln(2)/2]
 /// 6th order minimax approximation, achieves relative error < 2e-7 in practice

@@ -32,9 +32,13 @@ impl GPUBuffer for CPUBuffer {
     fn size(&self) -> u64 {
         self.data.len() as u64
     }
-    
+
     fn usage(&self) -> BufferUsage {
         self.usage
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }
 
