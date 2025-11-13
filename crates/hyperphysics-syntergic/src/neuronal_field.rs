@@ -113,10 +113,10 @@ impl NeuronalField {
     ///
     /// Returns approximate gradient using finite differences
     pub fn activity_gradient(&self, point: &PoincarePoint) -> Result<[f64; 3]> {
-        use nalgebra::Vector3;
+        
 
         let epsilon = 1e-6;
-        let f_0 = self.activity_at(point);
+        let _f_0 = self.activity_at(point);
 
         let coords = point.coords();
 

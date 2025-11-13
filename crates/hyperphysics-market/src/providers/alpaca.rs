@@ -45,6 +45,7 @@ use crate::error::{MarketError, MarketResult};
 use super::{MarketDataProvider, ProviderConfig};
 
 /// Alpaca Markets data provider
+#[allow(dead_code)]
 pub struct AlpacaProvider {
     config: ProviderConfig,
     client: Client,
@@ -59,7 +60,7 @@ impl AlpacaProvider {
     /// * `api_secret` - Alpaca API secret
     /// * `paper` - Whether to use paper trading endpoints
     pub fn new(api_key: String, api_secret: String, paper: bool) -> Self {
-        let base_url = if paper {
+        let _base_url = if paper {
             "https://paper-api.alpaca.markets/v2"
         } else {
             "https://api.alpaca.markets/v2"
@@ -94,6 +95,7 @@ impl AlpacaProvider {
     }
 
     /// Convert timeframe to Alpaca API format
+    #[allow(dead_code)]
     fn timeframe_to_alpaca(timeframe: Timeframe) -> &'static str {
         match timeframe {
             Timeframe::Minute1 => "1Min",
@@ -173,6 +175,7 @@ impl MarketDataProvider for AlpacaProvider {
 }
 
 /// Alpaca API response structure for bars
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct AlpacaBarResponse {
     bars: Vec<AlpacaBar>,
@@ -181,6 +184,7 @@ struct AlpacaBarResponse {
 }
 
 /// Alpaca bar structure from API
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct AlpacaBar {
     #[serde(rename = "t")]
@@ -210,6 +214,7 @@ struct AlpacaBar {
 
 impl AlpacaBar {
     /// Convert Alpaca bar to unified Bar structure
+    #[allow(dead_code)]
     fn to_bar(&self, symbol: String) -> MarketResult<Bar> {
         let timestamp = DateTime::parse_from_rfc3339(&self.timestamp)
             .map_err(|e| MarketError::DateTimeParseError(e.to_string()))?

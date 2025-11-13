@@ -34,3 +34,4 @@ ordered-float = { version = "4.2", features = ["serde"] }
 [dev-dependencies]
 tokio-test = "0.4"
 mockito = "1.2"
+approx = "0.5"

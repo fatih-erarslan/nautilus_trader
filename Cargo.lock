@@ -1604,6 +1604,7 @@ dependencies = [
 name = "hyperphysics-market"
 version = "0.1.0"
 dependencies = [
+ "approx 0.5.1",
  "async-trait",
  "chrono",
  "hyperphysics-geometry",
