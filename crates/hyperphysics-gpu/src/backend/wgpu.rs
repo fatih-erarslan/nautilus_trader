@@ -236,7 +236,7 @@ impl WGPUBackend {
     }
 
     /// Read buffer data back to CPU
-    pub async fn read_buffer<T: Pod + Zeroable>(&self, buffer: &Buffer, size: usize) -> Result<Vec<T>> {
+    pub async fn read_buffer<T: Pod + Zeroable>(&self, buffer: &Buffer) -> Result<Vec<T>> {
         let slice = buffer.slice(..);
         let (sender, receiver) = futures_intrusive::channel::shared::oneshot_channel();
 
