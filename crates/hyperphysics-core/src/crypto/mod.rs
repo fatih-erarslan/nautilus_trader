@@ -73,8 +73,12 @@
 pub mod identity;
 pub mod mandate;
 pub mod consensus;
+pub mod signed_state;
 
 // Re-export key types
 pub use identity::AgentIdentity;
 pub use mandate::{PaymentMandate, Period, MandateKind, SignedMandate};
 pub use consensus::{ByzantineConsensus, Vote, ConsensusResult, ConsensusTracker};
+pub use signed_state::{
+    AuditRecord, ConsciousnessMetrics, SignedConsciousnessState, StateMetadata,
+};
