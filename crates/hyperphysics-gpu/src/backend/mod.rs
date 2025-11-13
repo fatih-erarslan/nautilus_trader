@@ -7,15 +7,39 @@ pub mod cpu;
 #[cfg(feature = "wgpu-backend")]
 pub mod wgpu;
 
+#[cfg(feature = "cuda-backend")]
+pub mod cuda;
+
+#[cfg(feature = "cuda-backend")]
+pub mod cuda_real;
+
+#[cfg(feature = "metal-backend")]
+pub mod metal;
+
+#[cfg(feature = "rocm-backend")]
+pub mod rocm;
+
+#[cfg(feature = "webgpu-backend")]
+pub mod webgpu;
+
+#[cfg(feature = "vulkan-backend")]
+pub mod vulkan;
+
 /// GPU backend type identifier
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BackendType {
     /// WGPU cross-platform backend (Vulkan/Metal/DX12)
     WGPU,
-    /// NVIDIA CUDA (future support)
+    /// NVIDIA CUDA
     CUDA,
-    /// Apple Metal (future support)
+    /// Apple Metal
     Metal,
+    /// AMD ROCm
+    ROCm,
+    /// WebGPU (browser compatibility)
+    WebGPU,
+    /// Vulkan compute (Linux fallback)
+    Vulkan,
     /// CPU fallback (no GPU)
     CPU,
 }
@@ -56,4 +80,45 @@ pub trait GPUBackend: Send + Sync {
     /// * `shader` - WGSL shader source code
     /// * `workgroups` - Workgroup dimensions [x, y, z]
     fn execute_compute(&self, shader: &str, workgroups: [u32; 3]) -> Result<()>;
+    
+    /// Create buffer for GPU computation
+    fn create_buffer(&self, size: u64, usage: BufferUsage) -> Result<Box<dyn GPUBuffer>>;
+    
+    /// Copy data to GPU buffer
+    fn write_buffer(&self, buffer: &mut dyn GPUBuffer, data: &[u8]) -> Result<()>;
+    
+    /// Read data from GPU buffer
+    fn read_buffer(&self, buffer: &dyn GPUBuffer) -> Result<Vec<u8>>;
+    
+    /// Synchronize GPU operations
+    fn synchronize(&self) -> Result<()>;
+    
+    /// Get memory usage statistics
+    fn memory_stats(&self) -> MemoryStats;
+}
+
+/// GPU buffer usage flags
+#[derive(Debug, Clone, Copy)]
+pub enum BufferUsage {
+    Storage,
+    Uniform,
+    Vertex,
+    Index,
+    CopySrc,
+    CopyDst,
+}
+
+/// GPU buffer trait
+pub trait GPUBuffer: Send + Sync {
+    fn size(&self) -> u64;
+    fn usage(&self) -> BufferUsage;
+}
+
+/// Memory usage statistics
+#[derive(Debug, Clone)]
+pub struct MemoryStats {
+    pub total_memory: u64,
+    pub used_memory: u64,
+    pub free_memory: u64,
+    pub buffer_count: u32,
 }

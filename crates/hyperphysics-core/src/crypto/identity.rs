@@ -4,7 +4,6 @@
 //! Each agent maintains a keypair for signing payment mandates and messages.
 
 use ed25519_dalek::{Signer, Verifier, SigningKey, VerifyingKey, Signature};
-use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 
 /// Agent cryptographic identity with Ed25519 keypair

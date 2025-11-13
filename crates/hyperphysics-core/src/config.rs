@@ -99,6 +99,51 @@ impl EngineConfig {
         }
     }
 
+    /// Configuration for 128×128 lattice (16,384 nodes)
+    pub fn roi_128x128(temperature: f64) -> Self {
+        Self {
+            scale: Scale::Small,
+            temperature,
+            coupling_j0: 0.8,
+            coupling_lambda: 1.2,
+            coupling_min: 1e-7,
+            algorithm: hyperphysics_pbit::Algorithm::Metropolis,
+            calculate_phi: false, // Use approximation
+            calculate_ci: true,
+            verify_thermodynamics: true,
+        }
+    }
+
+    /// Configuration for 1024×1024 lattice (1M nodes)
+    pub fn roi_1024x1024(temperature: f64) -> Self {
+        Self {
+            scale: Scale::Medium,
+            temperature,
+            coupling_j0: 0.6,
+            coupling_lambda: 1.5,
+            coupling_min: 1e-8,
+            algorithm: hyperphysics_pbit::Algorithm::Metropolis,
+            calculate_phi: false, // Use hierarchical approximation
+            calculate_ci: true,
+            verify_thermodynamics: false, // Too expensive
+        }
+    }
+
+    /// Configuration for 32K×32K lattice (1B nodes)
+    pub fn roi_32kx32k(temperature: f64) -> Self {
+        Self {
+            scale: Scale::Large,
+            temperature,
+            coupling_j0: 0.4,
+            coupling_lambda: 2.0,
+            coupling_min: 1e-9,
+            algorithm: hyperphysics_pbit::Algorithm::Metropolis,
+            calculate_phi: false, // Use hierarchical approximation only
+            calculate_ci: false,  // Too expensive for 1B nodes
+            verify_thermodynamics: false,
+        }
+    }
+
     /// Fast configuration (minimal metrics)
     pub fn fast(scale: Scale, temperature: f64) -> Self {
         Self {

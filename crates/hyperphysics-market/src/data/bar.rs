@@ -178,7 +178,8 @@ mod tests {
             5000,
         );
 
-        assert_eq!(bar.typical_price(), 106.66666666666667);
+        // Typical price = (high + low + close) / 3.0 = (110 + 95 + 105) / 3 = 103.333...
+        assert!((bar.typical_price() - 103.33333333333333).abs() < 1e-10);
         assert_eq!(bar.range(), 15.0);
         assert!(bar.is_bullish());
         assert!(!bar.is_bearish());

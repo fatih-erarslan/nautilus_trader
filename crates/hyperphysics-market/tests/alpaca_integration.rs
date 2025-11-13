@@ -1,0 +1,378 @@
+//! Integration tests for Alpaca Markets API provider
+//!
+//! These tests use mockito to simulate Alpaca API responses without making real HTTP requests.
+
+use chrono::{Duration, Utc};
+use hyperphysics_market::data::Timeframe;
+use hyperphysics_market::providers::{AlpacaProvider, MarketDataProvider};
+use hyperphysics_market::MarketError;
+use mockito::{mock, Matcher};
+
+#[tokio::test]
+async fn test_fetch_bars_success() {
+    let _m = mock("GET", "/v2/stocks/AAPL/bars")
+        .match_query(Matcher::AllOf(vec![
+            Matcher::UrlEncoded("timeframe".into(), "1Day".into()),
+            Matcher::UrlEncoded("limit".into(), "10000".into()),
+            Matcher::UrlEncoded("adjustment".into(), "raw".into()),
+            Matcher::UrlEncoded("feed".into(), "sip".into()),
+        ]))
+        .match_header("APCA-API-KEY-ID", "test_key")
+        .match_header("APCA-API-SECRET-KEY", "test_secret")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"{
+                "bars": [
+                    {
+                        "t": "2025-01-10T05:00:00Z",
+                        "o": 150.0,
+                        "h": 155.0,
+                        "l": 149.0,
+                        "c": 154.0,
+                        "v": 1000000,
+                        "n": 5000,
+                        "vw": 152.5
+                    }
+                ],
+                "symbol": "AAPL",
+                "next_page_token": null
+            }"#,
+        )
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let end = Utc::now();
+    let start = end - Duration::days(1);
+
+    let bars = provider
+        .fetch_bars("AAPL", Timeframe::Day1, start, end)
+        .await
+        .expect("Failed to fetch bars");
+
+    assert_eq!(bars.len(), 1);
+    assert_eq!(bars[0].symbol, "AAPL");
+    assert_eq!(bars[0].open, 150.0);
+    assert_eq!(bars[0].high, 155.0);
+    assert_eq!(bars[0].low, 149.0);
+    assert_eq!(bars[0].close, 154.0);
+    assert_eq!(bars[0].volume, 1000000);
+}
+
+#[tokio::test]
+async fn test_fetch_bars_pagination() {
+    // First page
+    let _m1 = mock("GET", "/v2/stocks/SPY/bars")
+        .match_query(Matcher::AllOf(vec![
+            Matcher::UrlEncoded("timeframe".into(), "1Min".into()),
+            Matcher::UrlEncoded("limit".into(), "10000".into()),
+        ]))
+        .with_status(200)
+        .with_body(
+            r#"{
+                "bars": [
+                    {
+                        "t": "2025-01-10T09:30:00Z",
+                        "o": 450.0,
+                        "h": 451.0,
+                        "l": 449.5,
+                        "c": 450.5,
+                        "v": 100000
+                    }
+                ],
+                "symbol": "SPY",
+                "next_page_token": "page2token"
+            }"#,
+        )
+        .create();
+
+    // Second page
+    let _m2 = mock("GET", "/v2/stocks/SPY/bars")
+        .match_query(Matcher::AllOf(vec![
+            Matcher::UrlEncoded("page_token".into(), "page2token".into()),
+        ]))
+        .with_status(200)
+        .with_body(
+            r#"{
+                "bars": [
+                    {
+                        "t": "2025-01-10T09:31:00Z",
+                        "o": 450.5,
+                        "h": 452.0,
+                        "l": 450.0,
+                        "c": 451.5,
+                        "v": 95000
+                    }
+                ],
+                "symbol": "SPY",
+                "next_page_token": null
+            }"#,
+        )
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let end = Utc::now();
+    let start = end - Duration::hours(1);
+
+    let bars = provider
+        .fetch_bars("SPY", Timeframe::Minute1, start, end)
+        .await
+        .expect("Failed to fetch bars");
+
+    assert_eq!(bars.len(), 2);
+    assert_eq!(bars[0].close, 450.5);
+    assert_eq!(bars[1].close, 451.5);
+}
+
+#[tokio::test]
+async fn test_fetch_latest_bar_success() {
+    let _m = mock("GET", "/v2/stocks/TSLA/bars/latest")
+        .match_query(Matcher::UrlEncoded("feed".into(), "sip".into()))
+        .with_status(200)
+        .with_body(
+            r#"{
+                "bar": {
+                    "t": "2025-01-10T16:00:00Z",
+                    "o": 250.0,
+                    "h": 255.0,
+                    "l": 249.0,
+                    "c": 253.0,
+                    "v": 5000000
+                },
+                "symbol": "TSLA"
+            }"#,
+        )
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let bar = provider
+        .fetch_latest_bar("TSLA")
+        .await
+        .expect("Failed to fetch latest bar");
+
+    assert_eq!(bar.symbol, "TSLA");
+    assert_eq!(bar.close, 253.0);
+}
+
+#[tokio::test]
+async fn test_rate_limit_handling() {
+    // First request returns 429
+    let _m1 = mock("GET", "/v2/stocks/AAPL/bars")
+        .with_status(429)
+        .with_body("Rate limit exceeded")
+        .expect(1)
+        .create();
+
+    // Second request succeeds
+    let _m2 = mock("GET", "/v2/stocks/AAPL/bars")
+        .with_status(200)
+        .with_body(
+            r#"{
+                "bars": [],
+                "symbol": "AAPL",
+                "next_page_token": null
+            }"#,
+        )
+        .expect(1)
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let end = Utc::now();
+    let start = end - Duration::days(1);
+
+    let result = provider.fetch_bars("AAPL", Timeframe::Day1, start, end).await;
+
+    assert!(result.is_ok());
+}
+
+#[tokio::test]
+async fn test_invalid_symbol() {
+    let _m = mock("GET", "/v2/stocks/INVALID/bars")
+        .with_status(404)
+        .with_body("Symbol not found")
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let end = Utc::now();
+    let start = end - Duration::days(1);
+
+    let result = provider
+        .fetch_bars("INVALID", Timeframe::Day1, start, end)
+        .await;
+
+    assert!(matches!(result, Err(MarketError::InvalidSymbol(_))));
+}
+
+#[tokio::test]
+async fn test_authentication_error() {
+    let _m = mock("GET", "/v2/stocks/AAPL/bars")
+        .with_status(401)
+        .with_body("Unauthorized")
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "invalid_key".to_string(),
+        "invalid_secret".to_string(),
+        true,
+    );
+
+    let end = Utc::now();
+    let start = end - Duration::days(1);
+
+    let result = provider.fetch_bars("AAPL", Timeframe::Day1, start, end).await;
+
+    assert!(matches!(result, Err(MarketError::AuthenticationError(_))));
+}
+
+#[tokio::test]
+async fn test_supports_symbol_valid() {
+    let _m = mock("GET", "/v2/assets/AAPL")
+        .with_status(200)
+        .with_body(
+            r#"{
+                "id": "b0b6dd9d-8b9b-48a9-ba46-b9d54906e415",
+                "class": "us_equity",
+                "exchange": "NASDAQ",
+                "symbol": "AAPL",
+                "status": "active",
+                "tradable": true
+            }"#,
+        )
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let supported = provider
+        .supports_symbol("AAPL")
+        .await
+        .expect("Failed to check symbol");
+
+    assert!(supported);
+}
+
+#[tokio::test]
+async fn test_supports_symbol_invalid() {
+    let _m = mock("GET", "/v2/assets/INVALID")
+        .with_status(404)
+        .with_body("Asset not found")
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let supported = provider.supports_symbol("INVALID").await;
+
+    assert!(matches!(supported, Ok(false)));
+}
+
+#[tokio::test]
+async fn test_bar_validation_rejects_invalid_prices() {
+    let _m = mock("GET", "/v2/stocks/TEST/bars")
+        .with_status(200)
+        .with_body(
+            r#"{
+                "bars": [
+                    {
+                        "t": "2025-01-10T09:30:00Z",
+                        "o": 0.0,
+                        "h": 100.0,
+                        "l": 95.0,
+                        "c": 98.0,
+                        "v": 1000
+                    }
+                ],
+                "symbol": "TEST",
+                "next_page_token": null
+            }"#,
+        )
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let end = Utc::now();
+    let start = end - Duration::days(1);
+
+    let bars = provider
+        .fetch_bars("TEST", Timeframe::Day1, start, end)
+        .await
+        .expect("Failed to fetch bars");
+
+    // Bar with zero open price should be filtered out
+    assert_eq!(bars.len(), 0);
+}
+
+#[tokio::test]
+async fn test_bar_validation_rejects_inconsistent_ohlc() {
+    let _m = mock("GET", "/v2/stocks/TEST/bars")
+        .with_status(200)
+        .with_body(
+            r#"{
+                "bars": [
+                    {
+                        "t": "2025-01-10T09:30:00Z",
+                        "o": 100.0,
+                        "h": 95.0,
+                        "l": 98.0,
+                        "c": 97.0,
+                        "v": 1000
+                    }
+                ],
+                "symbol": "TEST",
+                "next_page_token": null
+            }"#,
+        )
+        .create();
+
+    let provider = AlpacaProvider::new(
+        "test_key".to_string(),
+        "test_secret".to_string(),
+        true,
+    );
+
+    let end = Utc::now();
+    let start = end - Duration::days(1);
+
+    let bars = provider
+        .fetch_bars("TEST", Timeframe::Day1, start, end)
+        .await
+        .expect("Failed to fetch bars");
+
+    // Bar with high < low should be filtered out
+    assert_eq!(bars.len(), 0);
+}
