@@ -11,6 +11,8 @@ description = "Thermodynamics engine with Landauer principle and entropy trackin
 hyperphysics-pbit = { path = "../hyperphysics-pbit" }
 serde.workspace = true
 thiserror.workspace = true
+rand.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true
+rand_chacha.workspace = true

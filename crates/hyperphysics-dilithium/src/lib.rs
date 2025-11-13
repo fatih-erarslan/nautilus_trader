@@ -35,10 +35,6 @@
 //! # }
 //! ```
 
-use std::time::SystemTime;
-use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
-use zeroize::Zeroize;
 
 pub use hyperphysics_core::{Result, EngineError};
 pub use hyperphysics_consciousness::{EmergenceEvent, HierarchicalResult};
@@ -78,8 +74,11 @@ pub enum DilithiumError {
     #[error("Signature generation failed: {0}")]
     SignatureFailed(String),
     
-    #[error("Signature verification failed")]
-    VerificationFailed,
+    #[error("Signature verification failed: {0}")]
+    VerificationFailed(String),
+    
+    #[error("Invalid signature")]
+    InvalidSignature,
     
     #[error("Invalid security level")]
     InvalidSecurityLevel,
@@ -138,8 +137,9 @@ pub enum DilithiumError {
 
 impl From<DilithiumError> for EngineError {
     fn from(err: DilithiumError) -> Self {
-        EngineError::Cryptography {
-            message: err.to_string(),
+        // Map to appropriate EngineError variant
+        EngineError::Internal {
+            message: format!("Dilithium cryptography error: {}", err),
         }
     }
 }

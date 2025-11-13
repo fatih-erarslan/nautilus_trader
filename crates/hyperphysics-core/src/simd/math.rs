@@ -123,19 +123,21 @@ pub fn shannon_entropy_vectorized(probabilities: &[f32]) -> f32 {
         let mask = p.simd_gt(epsilon);
 
         // -p * ln(p)
+        // For 0 < p < 1: ln(p) is negative, so p * ln(p) is negative
+        // We need -[p * ln(p)] = -p * ln(p) which is positive
         let log_p = p.ln();
-        let contribution = p * log_p;
+        let contribution = -(p * log_p);  // Negate here to get positive contribution
 
         // Apply mask and accumulate
         let masked = mask.select(contribution, zero);
-        entropy -= masked.reduce_sum();
+        entropy += masked.reduce_sum();  // Add positive contributions
     }
 
     // Handle remainder
     for i in (chunks * 8)..probabilities.len() {
         let p = probabilities[i];
         if p > 1e-10 {
-            entropy -= p * p.ln();
+            entropy -= p * p.ln();  // p * ln(p) is negative, so -= makes it positive
         }
     }
 

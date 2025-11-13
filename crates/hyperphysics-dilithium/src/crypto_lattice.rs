@@ -395,7 +395,7 @@ impl SignedLatticeState {
     pub fn verify_all(&self) -> DilithiumResult<()> {
         let mut invalid_count = 0;
         
-        for (pos, signed_state) in &self.states {
+        for (_pos, signed_state) in &self.states {
             if !signed_state.verify()? {
                 invalid_count += 1;
             }
@@ -480,7 +480,7 @@ mod tests {
             .expect("Failed to create lattice");
         
         // Tamper with a pBit
-        if let Some(pbit) = lattice.get_pbit_mut((0, 0)) {
+        if let Some(_pbit) = lattice.get_pbit_mut((0, 0)) {
             // Direct field access would require making fields pub
             // For now, this test validates the API prevents tampering
         }
