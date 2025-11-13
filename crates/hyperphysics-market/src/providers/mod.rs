@@ -11,6 +11,7 @@ pub mod binance;
 pub mod interactive_brokers;
 
 pub use alpaca::AlpacaProvider;
+pub use interactive_brokers::InteractiveBrokersProvider;
 
 /// Trait defining the interface for market data providers
 #[async_trait]

@@ -17,8 +17,16 @@ serde.workspace = true
 thiserror.workspace = true
 sprs = "0.11"
 rayon.workspace = true
+proptest = { workspace = true, optional = true }
 
 [dev-dependencies]
 criterion.workspace = true
-proptest.workspace = true
 rand_chacha.workspace = true
+
+[[bench]]
+name = "simd_exp"
+harness = false
+
+[features]
+default = []
+proptest = ["dep:proptest"]

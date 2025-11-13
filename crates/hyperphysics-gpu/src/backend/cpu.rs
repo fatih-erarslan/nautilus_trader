@@ -1,7 +1,7 @@
 //! CPU fallback backend (no GPU acceleration)
 
-use crate::{GPUBackend, GPUCapabilities, BackendType};
-use hyperphysics_core::Result;
+use super::{GPUBackend, GPUCapabilities, BackendType, GPUBuffer, BufferUsage, MemoryStats};
+use hyperphysics_core::{Result, EngineError};
 
 /// CPU-only backend (fallback when no GPU available)
 pub struct CPUBackend {
@@ -22,15 +22,66 @@ impl CPUBackend {
     }
 }
 
+/// CPU buffer implementation (uses system memory)
+struct CPUBuffer {
+    data: Vec<u8>,
+    usage: BufferUsage,
+}
+
+impl GPUBuffer for CPUBuffer {
+    fn size(&self) -> u64 {
+        self.data.len() as u64
+    }
+    
+    fn usage(&self) -> BufferUsage {
+        self.usage
+    }
+}
+
 impl GPUBackend for CPUBackend {
     fn capabilities(&self) -> &GPUCapabilities {
         &self.capabilities
     }
 
     fn execute_compute(&self, _shader: &str, _workgroups: [u32; 3]) -> Result<()> {
-        Err(hyperphysics_core::EngineError::Configuration {
-            message: "CPU backend does not support compute shaders".to_string(),
+        Err(EngineError::Simulation {
+            message: format!("CPU backend does not support compute shaders"),
         })
+    }
+    
+    fn create_buffer(&self, size: u64, usage: BufferUsage) -> Result<Box<dyn GPUBuffer>> {
+        Ok(Box::new(CPUBuffer {
+            data: vec![0u8; size as usize],
+            usage,
+        }))
+    }
+    
+    fn write_buffer(&self, buffer: &mut dyn GPUBuffer, data: &[u8]) -> Result<()> {
+        // This is a simplified implementation - real version would need proper downcasting
+        Err(EngineError::Simulation {
+            message: format!("CPU backend buffer write operation not fully implemented for buffer of size {} and data of size {}", buffer.size(), data.len()),
+        })
+    }
+    
+    fn read_buffer(&self, buffer: &dyn GPUBuffer) -> Result<Vec<u8>> {
+        // This is a simplified implementation - real version would need proper downcasting
+        Err(EngineError::Simulation {
+            message: format!("CPU backend buffer read operation not fully implemented for buffer of size {}", buffer.size()),
+        })
+    }
+    
+    fn synchronize(&self) -> Result<()> {
+        // CPU operations are synchronous by nature
+        Ok(())
+    }
+    
+    fn memory_stats(&self) -> MemoryStats {
+        MemoryStats {
+            total_memory: 0, // Would query system memory
+            used_memory: 0,
+            free_memory: 0,
+            buffer_count: 0,
+        }
     }
 }
 

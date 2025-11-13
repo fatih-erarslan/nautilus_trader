@@ -27,10 +27,12 @@
 pub mod phi;
 pub mod ci;
 pub mod causal_density;
+pub mod emergence;
 
 pub use phi::{IntegratedInformation, PhiCalculator, PhiApproximation};
 pub use ci::{ResonanceComplexity, CICalculator};
 pub use causal_density::CausalDensityEstimator;
+pub use emergence::{EmergenceEvent, EmergenceLevel, HierarchicalResult};
 
 use thiserror::Error;
 
