@@ -36,7 +36,7 @@
 
 use crate::{DilithiumResult, DilithiumError};
 use bulletproofs::{BulletproofGens, PedersenGens, RangeProof};
-use curve25519_dalek::scalar::Scalar;
+use curve25519_dalek_ng::scalar::Scalar;
 use merlin::Transcript;
 use serde::{Serialize, Deserialize};
 
@@ -52,7 +52,7 @@ pub struct PhiProof {
     
     /// Pedersen commitment to (Φ - threshold)
     #[serde(with = "serde_commitment")]
-    commitment: curve25519_dalek::ristretto::CompressedRistretto,
+    commitment: curve25519_dalek_ng::ristretto::CompressedRistretto,
     
     /// Threshold value (public)
     threshold: f64,
@@ -125,7 +125,7 @@ impl PhiProof {
         
         Ok(Self {
             proof,
-            commitment: committed_value.compress(),
+            commitment: committed_value,
             threshold,
         })
     }
@@ -330,7 +330,7 @@ mod serde_commitment {
     use serde::{Deserializer, Serializer};
     
     pub fn serialize<S>(
-        commitment: &curve25519_dalek::ristretto::CompressedRistretto,
+        commitment: &curve25519_dalek_ng::ristretto::CompressedRistretto,
         serializer: S,
     ) -> Result<S::Ok, S::Error>
     where
@@ -341,7 +341,7 @@ mod serde_commitment {
     
     pub fn deserialize<'de, D>(
         deserializer: D,
-    ) -> Result<curve25519_dalek::ristretto::CompressedRistretto, D::Error>
+    ) -> Result<curve25519_dalek_ng::ristretto::CompressedRistretto, D::Error>
     where
         D: Deserializer<'de>,
     {
@@ -351,7 +351,7 @@ mod serde_commitment {
         }
         let mut arr = [0u8; 32];
         arr.copy_from_slice(&bytes);
-        Ok(curve25519_dalek::ristretto::CompressedRistretto(arr))
+        Ok(curve25519_dalek_ng::ristretto::CompressedRistretto(arr))
     }
 }
 

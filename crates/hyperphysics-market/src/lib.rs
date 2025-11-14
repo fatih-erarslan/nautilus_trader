@@ -33,14 +33,49 @@
 //! ```
 
 pub mod arbitrage;
+pub mod backtest;
 pub mod data;
 pub mod error;
 pub mod providers;
+pub mod risk;
 pub mod topology;
 
 // Re-export commonly used types
 pub use data::{Bar, Tick, Timeframe};
 pub use data::tick::Quote;
 pub use error::MarketError;
-pub use providers::{AlpacaProvider, BinanceProvider, InteractiveBrokersProvider, OKXProvider, MarketDataProvider};
+pub use providers::{
+    AlpacaProvider,
+    BinanceProvider,
+    BybitProvider,
+    CoinbaseProvider,
+    InteractiveBrokersProvider,
+    KrakenProvider,
+    OKXProvider,
+    MarketDataProvider
+};
 pub use arbitrage::{ArbitrageDetector, ArbitrageOpportunity, ArbitrageType};
+pub use backtest::{
+    Strategy,
+    BacktestEngine,
+    BacktestConfig,
+    BacktestResult,
+    PerformanceMetrics,
+    Portfolio,
+    Position,
+    Signal,
+    Trade,
+    Side,
+    Commission,
+    Slippage,
+};
+pub use risk::{
+    RiskManager,
+    RiskConfig,
+    RiskLimits,
+    PositionSizingStrategy,
+    StopLossType,
+    Position as RiskPosition,
+    PortfolioMetrics,
+    RiskViolation,
+};
