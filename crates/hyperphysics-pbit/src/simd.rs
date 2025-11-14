@@ -21,6 +21,9 @@
 //! - Intel Vector Math Library (VML) design principles
 
 
+#[cfg(target_arch = "x86_64")]
+use std::arch::x86_64::*;
+
 #[cfg(target_arch = "aarch64")]
 use std::arch::aarch64::*;
 
