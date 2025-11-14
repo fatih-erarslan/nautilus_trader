@@ -49,6 +49,7 @@ hyperphysics-risk = { path = "crates/hyperphysics-risk" }
 # For examples
 rand.workspace = true
 rand_chacha.workspace = true
+chrono.workspace = true
 
 [features]
 default = ["simd"]

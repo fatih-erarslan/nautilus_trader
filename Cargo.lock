@@ -1770,6 +1770,7 @@ name = "hyperphysics"
 version = "0.1.0"
 dependencies = [
  "bytemuck",
+ "chrono",
  "hyperphysics-consciousness",
  "hyperphysics-core",
  "hyperphysics-geometry",
@@ -1914,6 +1915,7 @@ version = "0.1.0"
 dependencies = [
  "approx 0.5.1",
  "async-trait",
+ "base64",
  "chrono",
  "futures",
  "futures-util",
