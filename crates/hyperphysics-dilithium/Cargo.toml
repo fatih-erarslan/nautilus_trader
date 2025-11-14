@@ -33,7 +33,7 @@ merlin = "3.0"
 # HyperPhysics integration
 hyperphysics-core = { path = "../hyperphysics-core" }
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
-hyperphysics-gpu = { path = "../hyperphysics-gpu" }
+# hyperphysics-gpu = { path = "../hyperphysics-gpu" }
 hyperphysics-verify = { path = "../hyperphysics-verify" }
 # hyperphysics-gpu = { path = "../hyperphysics-gpu" }  # Disabled - compilation errors
 # hyperphysics-verification = { path = "../hyperphysics-verification" }  # Disabled - compilation errors
