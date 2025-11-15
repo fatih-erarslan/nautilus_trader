@@ -400,7 +400,7 @@ impl ModuleLWE {
     ///
     /// (r1, r0) tuple
     pub fn power2round(&self, r: i32, d: u32) -> (i32, i32) {
-        let r_mod = barrett_reduce(r);
+        let r_mod = barrett_reduce(r as i64);
         let r0 = r_mod & ((1 << d) - 1);
         let r0 = if r0 > (1 << (d - 1)) {
             r0 - (1 << d)
@@ -430,7 +430,7 @@ impl ModuleLWE {
     ///
     /// Used in signature compression.
     pub fn high_bits(&self, r: i32, alpha: i32) -> i32 {
-        let r_mod = barrett_reduce(r);
+        let r_mod = barrett_reduce(r as i64);
         let r1 = (r_mod + 127) >> 7;
         
         if r1 > (self.q - 1) / (2 * alpha) {
@@ -442,7 +442,7 @@ impl ModuleLWE {
     
     /// LowBits: extract low bits of r
     pub fn low_bits(&self, r: i32, alpha: i32) -> i32 {
-        let r_mod = barrett_reduce(r);
+        let r_mod = barrett_reduce(r as i64);
         let r1 = self.high_bits(r, alpha);
         r_mod - r1 * alpha
     }

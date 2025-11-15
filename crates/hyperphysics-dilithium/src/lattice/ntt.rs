@@ -113,8 +113,8 @@ impl NTT {
                 for j in start..(start + len) {
                     // Butterfly operation
                     let t = montgomery_reduce(zeta as i64 * result[j + len] as i64);
-                    result[j + len] = barrett_reduce(result[j] - t);
-                    result[j] = barrett_reduce(result[j] + t);
+                    result[j + len] = barrett_reduce(result[j] as i64 - t as i64);
+                    result[j] = barrett_reduce(result[j] as i64 + t as i64);
                 }
             }
 
@@ -152,8 +152,10 @@ impl NTT {
                 for j in start..(start + len) {
                     // Inverse butterfly
                     let t = result[j];
-                    result[j] = barrett_reduce(t + result[j + len]);
-                    result[j + len] = t - result[j + len];
+                    // Use i64 to prevent overflow in addition
+                    result[j] = barrett_reduce(t as i64 + result[j + len] as i64);
+                    // Use i64 to prevent overflow in subtraction
+                    result[j + len] = (t as i64 - result[j + len] as i64) as i32;
                     result[j + len] = montgomery_reduce(zeta as i64 * result[j + len] as i64);
                 }
             }
@@ -200,7 +202,7 @@ impl NTT {
 
         a.iter()
             .zip(b.iter())
-            .map(|(&ai, &bi)| barrett_reduce(ai + bi))
+            .map(|(&ai, &bi)| barrett_reduce(ai as i64 + bi as i64))
             .collect()
     }
 
@@ -255,13 +257,14 @@ pub fn montgomery_reduce(a: i64) -> i32 {
 ///
 /// Constant-time implementation
 #[inline]
-pub fn barrett_reduce(a: i32) -> i32 {
+pub fn barrett_reduce(a: i64) -> i32 {
     // Compute t ≈ a / Q using precomputed multiplier
-    let t = ((a as i64 * BARRETT_MULTIPLIER) >> 44) as i32;
+    // Use i128 to prevent overflow in multiplication
+    let t = ((a as i128 * BARRETT_MULTIPLIER as i128) >> 44) as i32;
 
     // a - t * Q is in range [-Q, 2Q]
     // Use i64 to prevent overflow in multiplication
-    let result = (a as i64 - (t as i64 * Q as i64)) as i32;
+    let result = (a - (t as i64 * Q as i64)) as i32;
 
     // Constant-time conditional reduction to [0, Q)
     // Use i64 for all arithmetic to prevent overflows
@@ -548,7 +551,7 @@ pub fn poly_add(a: &[i32], b: &[i32]) -> Vec<i32> {
     assert_eq!(a.len(), b.len(), "Polynomials must have same length");
     a.iter()
         .zip(b.iter())
-        .map(|(&ai, &bi)| barrett_reduce(ai + bi))
+        .map(|(&ai, &bi)| barrett_reduce(ai as i64 + bi as i64))
         .collect()
 }
 
@@ -559,7 +562,7 @@ pub fn poly_sub(a: &[i32], b: &[i32]) -> Vec<i32> {
     assert_eq!(a.len(), b.len(), "Polynomials must have same length");
     a.iter()
         .zip(b.iter())
-        .map(|(&ai, &bi)| barrett_reduce(ai - bi))
+        .map(|(&ai, &bi)| barrett_reduce(ai as i64 - bi as i64))
         .collect()
 }
 
