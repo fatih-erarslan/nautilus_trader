@@ -69,4 +69,6 @@ mod tests {
 }
 
 pub mod moebius;
+pub mod fuchsian;
 pub use moebius::{MoebiusTransform, TransformType};
+pub use fuchsian::FuchsianGroup as FuchsianGroupAlgebraic;
