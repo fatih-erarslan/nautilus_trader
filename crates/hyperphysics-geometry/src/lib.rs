@@ -21,6 +21,7 @@ pub mod geodesic;
 pub mod distance;
 pub mod tessellation;
 pub mod tessellation_73;
+pub mod crypto_substrate;
 pub mod curvature;
 
 pub use poincare::PoincarePoint;
@@ -28,6 +29,7 @@ pub use geodesic::Geodesic;
 pub use distance::HyperbolicDistance;
 pub use tessellation::HyperbolicTessellation;
 pub use tessellation_73::{HeptagonalTessellation, HeptagonalTile, TessellationVertex, FuchsianGroup, TileId, VertexId};
+pub use crypto_substrate::{CryptoSubstrate, TileCryptoState, SubstrateStats};
 pub use curvature::CurvatureTensor;
 
 use thiserror::Error;
