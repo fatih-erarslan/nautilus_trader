@@ -1,13 +1,12 @@
 //! ML-DSA parameter sets and security levels
 
 use serde::{Serialize, Deserialize};
-use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// ML-DSA security level
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(zeroize::Zeroize)]
 pub enum SecurityLevel {
     /// ML-DSA-44: 128-bit quantum security
-    #[default]
     Standard,
     /// ML-DSA-65: 192-bit quantum security (recommended)
     High,

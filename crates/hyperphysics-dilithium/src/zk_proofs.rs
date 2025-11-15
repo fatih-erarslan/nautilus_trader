@@ -113,9 +113,9 @@ impl PhiProof {
         
         // Generate random blinding factor
         let mut rng = rand::thread_rng();
-        let mut bytes = [0u8; 64];
-        rng.fill_bytes(&mut bytes);
-        let blinding = Scalar::from_bytes_mod_order_wide(&bytes);
+        let mut blinding_bytes = [0u8; 32];
+        rng.fill_bytes(&mut blinding_bytes);
+        let blinding = Scalar::from_bytes_mod_order(blinding_bytes);
         
         // Generate range proof: delta ∈ [0, 2^64)
         let (proof, committed_value) = RangeProof::prove_single(
@@ -342,7 +342,7 @@ mod serde_commitment {
     {
         serializer.serialize_bytes(commitment.as_bytes())
     }
-    
+
     pub fn deserialize<'de, D>(
         deserializer: D,
     ) -> Result<curve25519_dalek_ng::ristretto::CompressedRistretto, D::Error>

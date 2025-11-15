@@ -89,7 +89,7 @@ impl CryptoLattice {
         // Initialize all pBits with cryptographic security
         for (&pos, _) in &adjacency {
             let position = HyperbolicPoint::new(pos.0 as f64, pos.1 as f64);
-            let pbit = CryptographicPBit::new(position, 0.5, security_level.clone())?;
+            let pbit = CryptographicPBit::new(position, 0.5, security_level)?;
             pbits.insert(pos, pbit);
         }
         
@@ -135,27 +135,27 @@ impl CryptoLattice {
         position: (i64, i64),
         new_probability: f64,
     ) -> DilithiumResult<()> {
-        // Verify neighborhood consistency before getting mutable reference
+        // Verify neighborhood consistency first (immutable borrow)
         let neighbors = self.get_neighbors(position);
         if !self.verify_neighborhood_consistency(&neighbors)? {
             return Err(DilithiumError::NeighborhoodInconsistent { position });
         }
 
-        // Get pBit
+        // Now get mutable reference to pBit
         let pbit = self.pbits.get_mut(&position)
             .ok_or(DilithiumError::InvalidPosition { position })?;
-        
+
         // Verify current signature
         if !pbit.verify_signature()? {
             return Err(DilithiumError::InvalidSignature);
         }
-        
+
         // Update pBit (automatically signs new state)
         pbit.update(new_probability)?;
-        
-        // Update global generation
+
+        // Update global generation (mutable reference to pbit dropped here)
         self.global_generation += 1;
-        
+
         Ok(())
     }
     
@@ -315,7 +315,7 @@ impl CryptoLattice {
         Ok(SignedLatticeState {
             states: states?,
             global_generation: self.global_generation,
-            security_level: self.security_level.clone(),
+            security_level: self.security_level,
             created_at: self.created_at,
             exported_at: SystemTime::now(),
         })
@@ -343,7 +343,7 @@ impl CryptoLattice {
     
     /// Get security level
     pub fn security_level(&self) -> SecurityLevel {
-        self.security_level.clone()
+        self.security_level
     }
     
     /// Batch verify multiple pBits

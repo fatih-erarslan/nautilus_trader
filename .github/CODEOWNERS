@@ -1,0 +1,27 @@
+# CODEOWNERS file
+# These owners will be the default owners for everything in the repo
+# Unless a later match takes precedence
+
+# Global owners
+* @fatih-erarslan
+
+# Cryptography and security
+/crates/hyperphysics-dilithium/ @fatih-erarslan
+/crates/hyperphysics-syntergic/ @fatih-erarslan
+
+# Market data and trading
+/crates/hyperphysics-market/ @fatih-erarslan
+
+# Core pBit implementation
+/crates/hyperphysics-pbit/ @fatih-erarslan
+
+# Geometry and mathematical foundations
+/crates/hyperphysics-geometry/ @fatih-erarslan
+
+# CI/CD and infrastructure
+/.github/ @fatih-erarslan
+/Cargo.toml @fatih-erarslan
+
+# Documentation
+/docs/ @fatih-erarslan
+/*.md @fatih-erarslan

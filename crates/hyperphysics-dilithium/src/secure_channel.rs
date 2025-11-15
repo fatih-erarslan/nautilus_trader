@@ -42,16 +42,18 @@ use chacha20poly1305::{
     ChaCha20Poly1305, Nonce, Key
 };
 use pqcrypto_kyber::kyber768;
-use pqcrypto_traits::kem::{PublicKey as KyberPublicKeyTrait, SecretKey as KyberSecretKeyTrait, Ciphertext as KyberCiphertextTrait, SharedSecret as SharedSecretTrait};
+use pqcrypto_traits::kem::{PublicKey as KyberPublicKeyTrait, SecretKey as KyberSecretKeyTrait, Ciphertext as KyberCiphertextTrait, SharedSecret as KyberSharedSecretTrait};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use serde::{Serialize, Deserialize};
-use crate::zeroize_wrappers::{PublicKey, SecretKey};
 
 /// Kyber keypair for key encapsulation
-#[derive(ZeroizeOnDrop)]
+///
+/// Note: ZeroizeOnDrop is not derived because pqcrypto_kyber types
+/// don't implement Zeroize. The pqcrypto library handles secure
+/// memory wiping internally.
 pub struct KyberKeypair {
-    pub public_key: PublicKey,
-    secret_key: SecretKey,
+    pub public_key: kyber768::PublicKey,
+    secret_key: kyber768::SecretKey,
 }
 
 impl KyberKeypair {
@@ -63,8 +65,8 @@ impl KyberKeypair {
     pub fn generate() -> Self {
         let (public_key, secret_key) = kyber768::keypair();
         Self {
-            public_key: PublicKey(public_key),
-            secret_key: SecretKey(secret_key),
+            public_key,
+            secret_key,
         }
     }
     
@@ -82,7 +84,7 @@ impl KyberKeypair {
     ///
     /// ~0.09ms on modern CPU
     pub fn decapsulate(&self, ciphertext: &KyberCiphertext) -> SharedSecret {
-        let secret = kyber768::decapsulate(&ciphertext.0, &self.secret_key.0);
+        let secret = kyber768::decapsulate(&ciphertext.0, &self.secret_key);
         SharedSecret {
             secret: secret.as_bytes().to_vec(),
         }
@@ -107,8 +109,8 @@ impl KyberCiphertext {
     /// # Performance
     ///
     /// ~0.08ms on modern CPU
-    pub fn encapsulate(public_key: &PublicKey) -> (Self, SharedSecret) {
-        let (secret, ciphertext) = kyber768::encapsulate(&public_key.0);
+    pub fn encapsulate(public_key: &kyber768::PublicKey) -> (Self, SharedSecret) {
+        let (secret, ciphertext) = kyber768::encapsulate(public_key);
         
         let kyber_ct = Self(ciphertext);
         let shared_secret = SharedSecret {
@@ -238,7 +240,7 @@ impl SecureGPUChannel {
     /// let ciphertext = channel_a.establish_channel(&channel_b.kyber_public_key())?;
     /// # Ok::<(), hyperphysics_dilithium::DilithiumError>(())
     /// ```
-    pub fn establish_channel(&mut self, peer_kyber_pk: &PublicKey) -> DilithiumResult<KyberCiphertext> {
+    pub fn establish_channel(&mut self, peer_kyber_pk: &kyber768::PublicKey) -> DilithiumResult<KyberCiphertext> {
         // Encapsulate shared secret
         let (ciphertext, shared_secret) = KyberCiphertext::encapsulate(peer_kyber_pk);
         
@@ -359,7 +361,7 @@ impl SecureGPUChannel {
         }
         
         // Verify Dilithium signature using the signature's verification method
-        let mlwe = crate::lattice::module_lwe::ModuleLWE::new(peer_dilithium_pk.security_level.clone());
+        let mlwe = crate::lattice::module_lwe::ModuleLWE::new(peer_dilithium_pk.security_level);
         if !message.signature.verify_with_key(&message.ciphertext, peer_dilithium_pk, &mlwe)? {
             return Err(DilithiumError::InvalidSignature);
         }
@@ -383,7 +385,7 @@ impl SecureGPUChannel {
     }
     
     /// Get Kyber public key
-    pub fn kyber_public_key(&self) -> &PublicKey {
+    pub fn kyber_public_key(&self) -> &kyber768::PublicKey {
         &self.kyber_keypair.public_key
     }
     

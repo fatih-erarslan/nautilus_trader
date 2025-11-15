@@ -136,6 +136,15 @@ impl PoincarePoint {
         }
     }
 
+    /// Euclidean distance to another point (chord distance)
+    ///
+    /// This is the straight-line distance in the embedding 3D space,
+    /// not the hyperbolic distance along geodesics.
+    #[inline]
+    pub fn distance(&self, other: &Self) -> f64 {
+        (self.coords - other.coords).norm()
+    }
+
     /// Möbius addition (hyperbolic translation)
     ///
     /// Research: Ungar (2001) "Hyperbolic Trigonometry and Its Application"
