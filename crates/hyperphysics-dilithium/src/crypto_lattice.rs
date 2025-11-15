@@ -135,27 +135,27 @@ impl CryptoLattice {
         position: (i64, i64),
         new_probability: f64,
     ) -> DilithiumResult<()> {
-        // Get pBit
-        let pbit = self.pbits.get_mut(&position)
-            .ok_or(DilithiumError::InvalidPosition { position })?;
-        
-        // Verify current signature
-        if !pbit.verify_signature()? {
-            return Err(DilithiumError::InvalidSignature);
-        }
-        
-        // Verify neighborhood consistency
+        // Verify neighborhood consistency first (immutable borrow)
         let neighbors = self.get_neighbors(position);
         if !self.verify_neighborhood_consistency(&neighbors)? {
             return Err(DilithiumError::NeighborhoodInconsistent { position });
         }
-        
+
+        // Now get mutable reference to pBit
+        let pbit = self.pbits.get_mut(&position)
+            .ok_or(DilithiumError::InvalidPosition { position })?;
+
+        // Verify current signature
+        if !pbit.verify_signature()? {
+            return Err(DilithiumError::InvalidSignature);
+        }
+
         // Update pBit (automatically signs new state)
         pbit.update(new_probability)?;
-        
-        // Update global generation
+
+        // Update global generation (mutable reference to pbit dropped here)
         self.global_generation += 1;
-        
+
         Ok(())
     }
     

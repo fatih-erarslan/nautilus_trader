@@ -49,7 +49,7 @@ use crate::lattice::module_lwe::{ModuleLWE, Polynomial, PolyVec, POLY_DEGREE, SE
 use crate::lattice::ntt::NTT;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use serde::{Serialize, Deserialize};
-use sha3::{Shake256, Sha3_256, digest::{ExtendableOutput, XofReader}};
+use sha3::{Shake256, Sha3_256, digest::{ExtendableOutput, XofReader, Update}};
 use sha3::Digest as Sha3Digest;
 use rand::RngCore;
 
@@ -70,7 +70,7 @@ pub struct PublicKey {
 }
 
 /// Dilithium secret key (zeroized on drop)
-#[derive(Zeroize, ZeroizeOnDrop)]
+#[derive(Clone, Zeroize, ZeroizeOnDrop)]
 pub struct SecretKey {
     /// Seed ρ for matrix A expansion
     pub(crate) rho: [u8; SEED_BYTES],
@@ -391,11 +391,11 @@ impl DilithiumKeypair {
         for coeff in poly.iter_mut() {
             loop {
                 reader.read(&mut buf);
-                let val = ((buf[0] as i32)
-                    | ((buf[1] as i32) << 8)
-                    | ((buf[2] as i32) << 16)
-                    | ((buf[3] as i32) << 24)
-                    | ((buf[4] as i32) << 32)) & 0xFFFFF;
+                let val = (((buf[0] as i64)
+                    | ((buf[1] as i64) << 8)
+                    | ((buf[2] as i64) << 16)
+                    | ((buf[3] as i64) << 24)
+                    | ((buf[4] as i64) << 32)) & 0xFFFFF) as i32;
                 
                 if val <= 2 * gamma1 {
                     *coeff = val - gamma1;

@@ -27,7 +27,7 @@ sha2 = "0.10"
 
 # Zero-knowledge proofs
 bulletproofs = "4.0"
-curve25519-dalek = "4.1"
+curve25519-dalek-ng = "4.1"
 merlin = "3.0"
 
 # HyperPhysics integration

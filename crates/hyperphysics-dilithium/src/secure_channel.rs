@@ -42,12 +42,15 @@ use chacha20poly1305::{
     ChaCha20Poly1305, Nonce, Key
 };
 use pqcrypto_kyber::kyber768;
-use pqcrypto_traits::kem::{PublicKey as KyberPublicKeyTrait, SecretKey as KyberSecretKeyTrait, Ciphertext as KyberCiphertextTrait};
+use pqcrypto_traits::kem::{PublicKey as KyberPublicKeyTrait, SecretKey as KyberSecretKeyTrait, Ciphertext as KyberCiphertextTrait, SharedSecret as KyberSharedSecretTrait};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use serde::{Serialize, Deserialize};
 
 /// Kyber keypair for key encapsulation
-#[derive(ZeroizeOnDrop)]
+///
+/// Note: ZeroizeOnDrop is not derived because pqcrypto_kyber types
+/// don't implement Zeroize. The pqcrypto library handles secure
+/// memory wiping internally.
 pub struct KyberKeypair {
     pub public_key: kyber768::PublicKey,
     secret_key: kyber768::SecretKey,

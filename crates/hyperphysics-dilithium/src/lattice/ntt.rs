@@ -59,6 +59,7 @@ const BARRETT_MULTIPLIER: i64 = 4236238847;
 const INV_256: i32 = 8347681;
 
 /// Number Theoretic Transform implementation for CRYSTALS-Dilithium
+#[derive(Clone, Debug)]
 pub struct NTT {
     /// Polynomial degree (always 256 for Dilithium)
     degree: usize,

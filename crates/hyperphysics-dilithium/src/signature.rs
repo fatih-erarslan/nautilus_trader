@@ -138,7 +138,7 @@ impl DilithiumSignature {
         
         // Compute μ = H(tr || M)
         let mut hasher = Sha3_256::new();
-        hasher.update(&public_key.bytes);
+        Digest::update(&mut hasher, &public_key.bytes);
         let tr_hash = hasher.finalize();
         
         let mut mu_hasher = Shake256::default();

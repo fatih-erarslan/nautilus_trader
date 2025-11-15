@@ -60,22 +60,23 @@ pub type PolyMatrix = Vec<PolyVec>;
 /// - Rejection sampling for small coefficients
 /// - Uniform sampling from seed (expandA)
 /// - Challenge polynomial generation
+#[derive(Clone, Debug)]
 pub struct ModuleLWE {
     /// Security level
     security_level: SecurityLevel,
-    
+
     /// Dimension k (rows in A)
     k: usize,
-    
+
     /// Dimension l (columns in A)
     l: usize,
-    
+
     /// Modulus
     q: i32,
-    
+
     /// Small coefficient bound η
     eta: i32,
-    
+
     /// NTT engine
     ntt: NTT,
 }
@@ -325,7 +326,7 @@ impl ModuleLWE {
                 let s_ntt = self.ntt.forward(&vector[j]);
                 
                 // Pointwise multiplication
-                let product_ntt = self.ntt.pointwise_multiply(&a_ntt, &s_ntt);
+                let product_ntt = self.ntt.pointwise_mul(&a_ntt, &s_ntt);
                 
                 // Convert back and accumulate
                 let product = self.ntt.inverse(&product_ntt);

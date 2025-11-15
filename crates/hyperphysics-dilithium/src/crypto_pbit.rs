@@ -34,6 +34,7 @@
 //! Based on pbRTCA v3.1 Cryptographic Architecture
 
 use crate::{DilithiumKeypair, DilithiumSignature, DilithiumResult, DilithiumError, SecurityLevel};
+use crate::lattice::ModuleLWE;
 use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
 
