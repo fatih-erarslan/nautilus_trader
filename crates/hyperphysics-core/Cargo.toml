@@ -24,13 +24,13 @@ chrono = { version = "0.4", features = ["serde"] }
 sha3 = "0.10"
 
 # GPU acceleration (optional)
-wgpu = { version = "0.19", optional = true }
 bytemuck = { version = "1.14", features = ["derive"], optional = true }
 pollster = { version = "0.3", optional = true }
 futures = { version = "0.3", optional = true }
 
 # SIMD acceleration (optional)
 approx = "0.5"
+
 
 [dev-dependencies]
 criterion.workspace = true
@@ -41,4 +41,3 @@ proptest = "1.4"
 [features]
 default = []
 simd = []
-gpu = ["wgpu", "bytemuck", "pollster", "futures"]

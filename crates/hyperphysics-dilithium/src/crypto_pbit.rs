@@ -33,9 +33,10 @@
 //!
 //! Based on pbRTCA v3.1 Cryptographic Architecture
 
-use crate::{DilithiumKeypair, DilithiumSignature, DilithiumResult, DilithiumError, SecurityLevel};
+use crate::{DilithiumKeypair, DilithiumSignature, DilithiumResult, DilithiumError, SecurityLevel, lattice::module_lwe::ModuleLWE};
 use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
+use sha3::Digest;
 
 /// Hyperbolic lattice position
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -118,7 +119,7 @@ impl CryptographicPBit {
             });
         }
         
-        let keypair = DilithiumKeypair::generate(security_level)?;
+        let keypair = DilithiumKeypair::generate(security_level.clone())?;
         let mlwe = ModuleLWE::new(security_level);
         let now = SystemTime::now();
         
@@ -360,7 +361,7 @@ impl SignedPBitState {
         // Initialize mlwe if not present (for deserialized states)
         let mlwe = self.mlwe.as_ref()
             .map(|m| m.clone())
-            .unwrap_or_else(|| ModuleLWE::new(self.public_key.security_level));
+            .unwrap_or_else(|| ModuleLWE::new(self.public_key.security_level.clone()));
         
         // Verify signature directly using the public key
         self.signature.verify_with_key(&state_bytes, &self.public_key, &mlwe)

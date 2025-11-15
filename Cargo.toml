@@ -46,6 +46,8 @@ hyperphysics-consciousness = { path = "crates/hyperphysics-consciousness" }
 hyperphysics-market = { path = "crates/hyperphysics-market" }
 hyperphysics-risk = { path = "crates/hyperphysics-risk" }
 
+[target.'cfg(target_os = "macos")'.dependencies]
+
 # For examples
 rand.workspace = true
 rand_chacha.workspace = true

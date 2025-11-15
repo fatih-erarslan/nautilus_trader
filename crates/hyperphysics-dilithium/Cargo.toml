@@ -18,7 +18,7 @@ sha3 = "0.10"
 rand = "0.8"
 rand_core = "0.6"
 rand_chacha = "0.3"
-zeroize = { version = "1.6", features = ["derive"] }
+zeroize = { version = "1.6", features = ["derive", "zeroize_derive"] }
 
 # AEAD encryption
 chacha20poly1305 = "0.10"
@@ -27,7 +27,7 @@ sha2 = "0.10"
 
 # Zero-knowledge proofs
 bulletproofs = "4.0"
-curve25519-dalek = "4.1"
+curve25519-dalek-ng = { version = "4.1.1" }
 merlin = "3.0"
 
 # HyperPhysics integration
@@ -35,8 +35,6 @@ hyperphysics-core = { path = "../hyperphysics-core" }
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
 # hyperphysics-gpu = { path = "../hyperphysics-gpu" }
 hyperphysics-verify = { path = "../hyperphysics-verify" }
-# hyperphysics-gpu = { path = "../hyperphysics-gpu" }  # Disabled - compilation errors
-# hyperphysics-verification = { path = "../hyperphysics-verification" }  # Disabled - compilation errors
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -64,7 +62,6 @@ tempfile = "3.8"
 [features]
 default = ["std"]
 std = []
-gpu-acceleration = []
 side-channel-protection = []
 hybrid-mode = []  # Classical + PQ hybrid signatures
 
