@@ -38,6 +38,7 @@ use crate::{DilithiumResult, DilithiumError};
 use bulletproofs::{BulletproofGens, PedersenGens, RangeProof};
 use curve25519_dalek_ng::scalar::Scalar;
 use merlin::Transcript;
+use rand::RngCore;
 use serde::{Serialize, Deserialize};
 
 /// Zero-knowledge proof that Φ (integrated information) > threshold
@@ -111,7 +112,10 @@ impl PhiProof {
         transcript.append_message(b"threshold", &threshold.to_le_bytes());
         
         // Generate random blinding factor
-        let blinding = Scalar::random(&mut rand::thread_rng());
+        let mut rng = rand::thread_rng();
+        let mut bytes = [0u8; 64];
+        rng.fill_bytes(&mut bytes);
+        let blinding = Scalar::from_bytes_mod_order_wide(&bytes);
         
         // Generate range proof: delta ∈ [0, 2^64)
         let (proof, committed_value) = RangeProof::prove_single(

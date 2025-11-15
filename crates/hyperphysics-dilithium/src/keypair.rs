@@ -46,11 +46,10 @@
 
 use crate::{DilithiumResult, SecurityLevel, DilithiumSignature};
 use crate::lattice::module_lwe::{ModuleLWE, Polynomial, PolyVec, POLY_DEGREE, SEED_BYTES};
-use crate::lattice::ntt::NTT;
+use crate::lattice::ntt::{NTT, DILITHIUM_Q};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use serde::{Serialize, Deserialize};
-use sha3::{Shake256, Sha3_256, digest::{ExtendableOutput, XofReader}};
-use sha3::Digest as Sha3Digest;
+use sha3::{Shake256, Sha3_256, digest::{ExtendableOutput, XofReader, Update, Digest}};
 use rand::RngCore;
 
 /// Dilithium public key
@@ -70,7 +69,7 @@ pub struct PublicKey {
 }
 
 /// Dilithium secret key (zeroized on drop)
-#[derive(Zeroize, ZeroizeOnDrop)]
+#[derive(Clone, Zeroize, ZeroizeOnDrop)]
 pub struct SecretKey {
     /// Seed ρ for matrix A expansion
     pub(crate) rho: [u8; SEED_BYTES],
@@ -143,7 +142,7 @@ impl DilithiumKeypair {
     /// # Ok::<(), DilithiumError>(())
     /// ```
     pub fn generate(level: SecurityLevel) -> DilithiumResult<Self> {
-        let mlwe = ModuleLWE::new(level);
+        let mlwe = ModuleLWE::new(level.clone());
         let ntt = NTT::new();
         let (k, l, eta) = mlwe.params();
         
@@ -185,23 +184,23 @@ impl DilithiumKeypair {
         }
         
         // Encode public key
-        let pk_bytes = Self::encode_public_key(&rho, &t1, level);
+        let pk_bytes = Self::encode_public_key(&rho, &t1, level.clone());
         
         // Compute tr = H(pk)
         let mut hasher = Sha3_256::new();
-        Sha3Digest::update(&mut hasher, &pk_bytes);
+        Digest::update(&mut hasher, &pk_bytes);
         let tr_hash = hasher.finalize();
         let mut tr = [0u8; SEED_BYTES];
         tr[..32].copy_from_slice(&tr_hash);
         
         // Encode secret key
-        let sk_bytes = Self::encode_secret_key(&rho, &key, &tr, &s1, &s2, &t0, level);
+        let sk_bytes = Self::encode_secret_key(&rho, &key, &tr, &s1, &s2, &t0, level.clone());
         
         Ok(Self {
             public_key: PublicKey {
                 rho,
                 t1: t1.clone(),
-                security_level: level,
+                security_level: level.clone(),
                 bytes: pk_bytes,
             },
             secret_key: SecretKey {
@@ -211,10 +210,10 @@ impl DilithiumKeypair {
                 s1,
                 s2,
                 t0,
-                security_level: level,
+                security_level: level.clone(),
                 bytes: sk_bytes,
             },
-            security_level: level,
+            security_level: level.clone(),
             mlwe,
             ntt,
         })
@@ -352,7 +351,7 @@ impl DilithiumKeypair {
                 c,
                 z,
                 h,
-                self.security_level,
+                self.security_level.clone(),
             );
         }
     }
@@ -391,14 +390,13 @@ impl DilithiumKeypair {
         for coeff in poly.iter_mut() {
             loop {
                 reader.read(&mut buf);
-                let val = ((buf[0] as i32)
-                    | ((buf[1] as i32) << 8)
-                    | ((buf[2] as i32) << 16)
-                    | ((buf[3] as i32) << 24)
-                    | ((buf[4] as i32) << 32)) & 0xFFFFF;
+                let val = ((buf[0] as i64)
+                    | ((buf[1] as i64) << 8)
+                    | ((buf[2] as i64) << 16)
+                    | ((buf[3] as i64) << 24)) & 0xFFFFF;
                 
-                if val <= 2 * gamma1 {
-                    *coeff = val - gamma1;
+                if val <= 2 * gamma1 as i64 {
+                    *coeff = (val - gamma1 as i64) as i32;
                     break;
                 }
             }
@@ -478,7 +476,7 @@ impl DilithiumKeypair {
     
     /// Get security level
     pub fn security_level(&self) -> SecurityLevel {
-        self.security_level
+        self.security_level.clone()
     }
     
     /// Get public key bytes
@@ -495,7 +493,7 @@ impl DilithiumKeypair {
 impl PublicKey {
     /// Get security level
     pub fn security_level(&self) -> SecurityLevel {
-        self.security_level
+        self.security_level.clone()
     }
     
     /// Get public key bytes
@@ -507,7 +505,7 @@ impl PublicKey {
 impl SecretKey {
     /// Get security level
     pub fn security_level(&self) -> SecurityLevel {
-        self.security_level
+        self.security_level.clone()
     }
 }
 
@@ -561,7 +559,7 @@ mod tests {
     #[test]
     fn test_all_security_levels() {
         for level in [SecurityLevel::Standard, SecurityLevel::High, SecurityLevel::Maximum] {
-            let keypair = DilithiumKeypair::generate(level)
+            let keypair = DilithiumKeypair::generate(level.clone())
                 .expect("Failed to generate keypair");
             
             let message = b"Test message";

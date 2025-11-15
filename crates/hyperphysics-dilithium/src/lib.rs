@@ -48,9 +48,10 @@ pub mod crypto_pbit;
 pub mod crypto_lattice;
 pub mod secure_channel;
 pub mod zk_proofs;
+mod zeroize_wrappers;
+mod zeroize_polyvec;
+mod zeroize_polynomial;
 
-#[cfg(feature = "gpu-acceleration")]
-pub mod gpu;
 
 #[cfg(feature = "hybrid-mode")]
 pub mod hybrid;
