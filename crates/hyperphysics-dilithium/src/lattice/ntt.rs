@@ -141,7 +141,7 @@ impl NTT {
         let mut result = coeffs.to_vec();
         let zetas_inv = precompute_zetas_inv();
         let mut len = 1;
-        let mut k = N / 2 - 1;
+        let mut k = N - 2;  // Start at 254 for 256-point NTT
 
         // Inverse Cooley-Tukey
         while len < N {
@@ -260,13 +260,16 @@ pub fn barrett_reduce(a: i32) -> i32 {
     let t = ((a as i64 * BARRETT_MULTIPLIER) >> 44) as i32;
 
     // a - t * Q is in range [-Q, 2Q]
-    let result = a - t * Q;
+    // Use i64 to prevent overflow in multiplication
+    let result = (a as i64 - (t as i64 * Q as i64)) as i32;
 
     // Constant-time conditional reduction to [0, Q)
-    let mask_high = (result >> 31) as i32;
-    let mask_overflow = ((Q - 1 - result) >> 31) as i32;
+    // Use i64 for all arithmetic to prevent overflows
+    let mask_high = ((result as i64) >> 31) as i32;
+    let mask_overflow = (((Q as i64 - 1 - result as i64) >> 31)) as i32;
 
-    result + (Q & mask_high) - (Q & mask_overflow)
+    let final_result = result as i64 + (Q as i64 & mask_high as i64) - (Q as i64 & mask_overflow as i64);
+    final_result as i32
 }
 
 /// Bit-reverse an 8-bit integer
