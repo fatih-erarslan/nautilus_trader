@@ -36,7 +36,7 @@ use super::ntt::{NTT, DILITHIUM_Q, barrett_reduce, montgomery_reduce, poly_add, 
 use crate::{DilithiumResult, DilithiumError, SecurityLevel};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use sha3::{Shake128, Shake256, digest::{Update, ExtendableOutput, XofReader}};
+use sha3::{Shake128, Shake256, Digest, digest::{Update, ExtendableOutput, XofReader}};
 
 /// Polynomial degree (always 256 for Dilithium)
 pub const POLY_DEGREE: usize = 256;
@@ -60,6 +60,7 @@ pub type PolyMatrix = Vec<PolyVec>;
 /// - Rejection sampling for small coefficients
 /// - Uniform sampling from seed (expandA)
 /// - Challenge polynomial generation
+#[derive(Clone)]
 pub struct ModuleLWE {
     /// Security level
     security_level: SecurityLevel,
@@ -321,15 +322,18 @@ impl ModuleLWE {
         for i in 0..matrix.len() {
             for j in 0..vector.len() {
                 // Convert to NTT domain
-                let a_ntt = self.ntt.forward(&matrix[i][j]);
-                let s_ntt = self.ntt.forward(&vector[j]);
+                let mut a_ntt = matrix[i][j].clone();
+                self.ntt.forward(&mut a_ntt);
+                let mut s_ntt = vector[j].clone();
+                self.ntt.forward(&mut s_ntt);
                 
                 // Pointwise multiplication
-                let product_ntt = self.ntt.pointwise_multiply(&a_ntt, &s_ntt);
+                let mut product_ntt = vec![0; POLY_DEGREE];
+                self.ntt.pointwise_mul(&a_ntt, &s_ntt, &mut product_ntt);
                 
                 // Convert back and accumulate
-                let product = self.ntt.inverse(&product_ntt);
-                result[i] = poly_add(&result[i], &product);
+                self.ntt.inverse(&mut product_ntt);
+                result[i] = poly_add(&result[i], &product_ntt);
             }
         }
         

@@ -30,8 +30,6 @@ pub mod config;
 pub mod metrics;
 pub mod crypto;
 
-#[cfg(feature = "gpu")]
-pub mod gpu;
 
 #[cfg(feature = "simd")]
 pub mod simd;

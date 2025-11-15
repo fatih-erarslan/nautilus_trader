@@ -22,7 +22,7 @@
 use crate::DilithiumResult;
 
 /// Dilithium prime modulus: q = 8,380,417 = 2^23 - 2^13 + 1
-pub const Q: i32 = 8_380_417;
+pub const DILITHIUM_Q: i32 = 8_380_417;
 
 /// Polynomial degree: n = 256
 pub const N: usize = 256;
@@ -40,7 +40,11 @@ const R_INV: i64 = 58728449;
 /// ⌊2^44 / Q⌋ for Barrett reduction
 const BARRETT_MULTIPLIER: i64 = 4236238847;
 
+const ZETAS: [i32; 256] = precompute_zetas();
+const ZETAS_INV: [i32; 256] = precompute_zetas_inv();
+
 /// Number Theoretic Transform implementation for CRYSTALS-Dilithium
+#[derive(Clone)]
 pub struct NTT {
     /// Precomputed twiddle factors: ζ^bit_reverse(i) mod Q
     zetas: Vec<i32>,
@@ -50,85 +54,6 @@ pub struct NTT {
 
     /// n^(-1) mod Q for normalization after inverse NTT
     n_inv: i32,
-}
-
-impl NTT {
-    /// Create new NTT instance with precomputed twiddle factors
-    pub fn new() -> Self {
-        let mut zetas = vec![0; N];
-        let mut zetas_inv = vec![0; N];
-
-        // Precompute zetas[i] = ζ^bit_reverse(i) mod Q
-        for i in 0..N {
-            let exp = bit_reverse_8bit(i);
-            zetas[i] = mod_pow(ROOT, exp as u32, Q);
-            zetas_inv[i] = mod_inverse(zetas[i], Q);
-        }
-
-        // Compute n^(-1) mod Q
-        let n_inv = mod_inverse(N as i32, Q);
-
-        Self {
-            zetas,
-            zetas_inv,
-            n_inv,
-        }
-    }
-}
-
-// Enterprise-grade implementation of NTT for polynomial operations in Z_q[X]/(X^n + 1).
-//
-// # Security Properties
-//
-// - Constant-time operations (no secret-dependent branches)
-// - Barrett reduction for modular arithmetic
-// - Bit-reversal permutation for Cooley-Tukey algorithm
-// - Montgomery multiplication for efficiency
-//
-// # Mathematical Foundation
-//
-// NTT is the number-theoretic analogue of FFT, operating in Z_q instead of C.
-// For Dilithium, we use:
-// - q = 8380417 (prime modulus)
-// - n = 256 (polynomial degree)
-// - ω = 1753 (primitive 512-th root of unity mod q)
-//
-// # References
-//
-// - FIPS 204: Module-Lattice-Based Digital Signature Standard
-// - Cooley-Tukey (1965): "An algorithm for the machine calculation of complex Fourier series"
-// - Barrett (1986): "Implementing the Rivest Shamir and Adleman Public Key Encryption Algorithm"
-
-use std::ops::{Add, Sub, Mul};
-
-/// Dilithium modulus q = 8380417
-pub const DILITHIUM_Q: i32 = 8380417;
-
-/// Primitive 512-th root of unity modulo q
-const ROOT_OF_UNITY: i32 = 1753;
-
-/// Inverse of 256 modulo q (for inverse NTT)
-const INV_256: i32 = 8347681;
-
-/// Barrett reduction constant: floor(2^32 / q)
-const BARRETT_MULTIPLIER: i64 = 512;
-
-/// Precomputed powers of ω for forward NTT
-static ZETAS: [i32; 256] = precompute_zetas();
-
-/// Precomputed powers of ω^(-1) for inverse NTT
-static ZETAS_INV: [i32; 256] = precompute_zetas_inv();
-
-/// Number Theoretic Transform engine
-///
-/// Provides constant-time polynomial multiplication in Z_q[X]/(X^n + 1)
-/// using Cooley-Tukey FFT algorithm adapted for finite fields.
-pub struct NTT {
-    /// Polynomial degree (always 256 for Dilithium)
-    degree: usize,
-    
-    /// Modulus
-    modulus: i32,
 }
 
 impl NTT {
@@ -142,9 +67,14 @@ impl NTT {
     /// let ntt = NTT::new();
     /// ```
     pub fn new() -> Self {
+        let zetas = precompute_zetas();
+        let zetas_inv = precompute_zetas_inv();
+        let n_inv = mod_inverse(N as i32, DILITHIUM_Q);
+
         Self {
-            degree: 256,
-            modulus: DILITHIUM_Q,
+            zetas: zetas.to_vec(),
+            zetas_inv: zetas_inv.to_vec(),
+            n_inv,
         }
     }
     
@@ -234,66 +164,6 @@ impl NTT {
     ///
     /// Polynomial in NTT domain
     ///
-    /// # Panics
-    ///
-    /// Panics if input length is not 256
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use hyperphysics_dilithium::lattice::ntt::NTT;
-    /// let ntt = NTT::new();
-    /// let poly = vec![1i32; 256];
-    /// let ntt_poly = ntt.forward(&poly);
-    /// ```
-    pub fn forward(&self, poly: &[i32]) -> Vec<i32> {
-        assert_eq!(poly.len(), 256, "Polynomial must have degree 256");
-        
-        let mut result = poly.to_vec();
-        
-        // Cooley-Tukey decimation-in-time FFT
-        self.ntt_forward_cooley_tukey(&mut result);
-        
-        result
-    }
-    
-    /// Inverse NTT transform (frequency domain → time domain)
-    ///
-    /// Transforms polynomial from NTT representation back to coefficient form.
-    ///
-    /// # Arguments
-    ///
-    /// * `poly` - Polynomial in NTT domain (length must be 256)
-    ///
-    /// # Returns
-    ///
-    /// Polynomial coefficients in time domain
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use hyperphysics_dilithium::lattice::ntt::NTT;
-    /// let ntt = NTT::new();
-    /// let poly = vec![1i32; 256];
-    /// let ntt_poly = ntt.forward(&poly);
-    /// let recovered = ntt.inverse(&ntt_poly);
-    /// assert_eq!(poly, recovered);
-    /// ```
-    pub fn inverse(&self, poly: &[i32]) -> Vec<i32> {
-        assert_eq!(poly.len(), 256, "Polynomial must have degree 256");
-        
-        let mut result = poly.to_vec();
-        
-        // Inverse Cooley-Tukey
-        self.ntt_inverse_cooley_tukey(&mut result);
-        
-        // Multiply by 1/n
-        for coeff in result.iter_mut() {
-            *coeff = montgomery_reduce((*coeff as i64) * (INV_256 as i64));
-        }
-        
-        result
-    }
     
     /// Pointwise multiplication in NTT domain
     ///
@@ -450,12 +320,12 @@ impl Default for NTT {
 ///
 /// Given a = x * y where x, y ∈ Z_q, compute a * R^(-1) mod Q in constant time.
 #[inline]
-fn montgomery_reduce(a: i64) -> i32 {
+pub(crate) fn montgomery_reduce(a: i64) -> i32 {
     // t = (a * R^(-1)) mod R
     let t = (a.wrapping_mul(R_INV)) & 0xFFFF_FFFF;
 
     // u = (a - t * Q) / R
-    let u = (a - t.wrapping_mul(Q as i64)) >> 32;
+    let u = (a - t.wrapping_mul(DILITHIUM_Q as i64)) >> 32;
 
     // Reduce to [0, Q)
     let result = u as i32;
@@ -463,9 +333,9 @@ fn montgomery_reduce(a: i64) -> i32 {
     // Constant-time conditional reduction
     // If result >= Q, subtract Q; if result < 0, add Q
     let mask_high = (result >> 31) as i32; // -1 if negative, 0 otherwise
-    let mask_overflow = ((Q - 1 - result) >> 31) as i32; // -1 if result >= Q
+    let mask_overflow = ((DILITHIUM_Q - 1 - result) >> 31) as i32; // -1 if result >= Q
 
-    result + (Q & mask_high) - (Q & mask_overflow)
+    result + (DILITHIUM_Q & mask_high) - (DILITHIUM_Q & mask_overflow)
 }
 
 /// Barrett reduction: Compute a mod Q
@@ -478,18 +348,18 @@ fn montgomery_reduce(a: i64) -> i32 {
 ///
 /// Barrett reduction for modular reduction without division.
 #[inline]
-fn barrett_reduce(a: i32) -> i32 {
+pub(crate) fn barrett_reduce(a: i32) -> i32 {
     // Compute t ≈ a / Q using precomputed multiplier
     let t = ((a as i64 * BARRETT_MULTIPLIER) >> 44) as i32;
 
     // a - t * Q is in range [-Q, 2Q]
-    let result = a - t * Q;
+    let result = a - t * DILITHIUM_Q;
 
     // Constant-time conditional reduction to [0, Q)
     let mask_high = (result >> 31) as i32;
-    let mask_overflow = ((Q - 1 - result) >> 31) as i32;
+    let mask_overflow = ((DILITHIUM_Q - 1 - result) >> 31) as i32;
 
-    result + (Q & mask_high) - (Q & mask_overflow)
+    result + (DILITHIUM_Q & mask_high) - (DILITHIUM_Q & mask_overflow)
 }
 
 /// Bit-reverse an 8-bit integer
@@ -570,55 +440,6 @@ fn mod_inverse(a: i32, m: i32) -> i32 {
 /// x mod q in range [0, q)
 ///
 /// # Security
-///
-/// Constant-time operation (no secret-dependent branches)
-#[inline(always)]
-pub fn barrett_reduce(x: i32) -> i32 {
-    let q = DILITHIUM_Q;
-    
-    // Compute quotient approximation
-    let t = ((x as i64) * BARRETT_MULTIPLIER) >> 32;
-    let t = t as i32;
-    
-    // Compute remainder
-    let mut r = x - t * q;
-    
-    // Conditional correction (constant-time)
-    let mask = (r >> 31) as i32;  // -1 if r < 0, 0 otherwise
-    r += q & mask;
-    
-    let mask = ((q - 1 - r) >> 31) as i32;  // -1 if r >= q, 0 otherwise
-    r -= q & mask;
-    
-    r
-}
-
-/// Montgomery reduction
-///
-/// Computes (a * R^(-1)) mod q where R = 2^32.
-/// Used for efficient modular multiplication.
-///
-/// # Arguments
-///
-/// * `a` - Value to reduce
-///
-/// # Returns
-///
-/// (a * R^(-1)) mod q
-///
-/// # Security
-///
-/// Constant-time operation
-#[inline(always)]
-pub fn montgomery_reduce(a: i64) -> i32 {
-    const Q: i64 = DILITHIUM_Q as i64;
-    const QINV: i64 = 58728449; // q^(-1) mod 2^32
-    
-    let t = (a * QINV) & 0xFFFFFFFF;
-    let t = (a - t * Q) >> 32;
-    
-    t as i32
-}
 
 /// Modular exponentiation: base^exp mod q
 ///
@@ -885,14 +706,18 @@ pub fn poly_multiply(a: &[i32], b: &[i32]) -> Vec<i32> {
     let ntt = NTT::new();
     
     // Transform to NTT domain
-    let a_ntt = ntt.forward(a);
-    let b_ntt = ntt.forward(b);
+    let mut a_ntt = a.to_vec();
+    ntt.forward(&mut a_ntt);
+    let mut b_ntt = b.to_vec();
+    ntt.forward(&mut b_ntt);
     
     // Pointwise multiplication
-    let product_ntt = ntt.pointwise_multiply(&a_ntt, &b_ntt);
+    let mut product_ntt = vec![0; N];
+    ntt.pointwise_mul(&a_ntt, &b_ntt, &mut product_ntt);
     
     // Transform back
-    ntt.inverse(&product_ntt)
+    ntt.inverse(&mut product_ntt);
+    product_ntt
 }
 
 /// Constant-time comparison
@@ -911,7 +736,7 @@ pub fn poly_multiply(a: &[i32], b: &[i32]) -> Vec<i32> {
 /// # Security
 ///
 /// Constant-time operation (no early exit)
-pub fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
+pub(crate) fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
     if a.len() != b.len() {
         return false;
     }
@@ -1033,8 +858,10 @@ mod tests {
         let ntt = NTT::new();
         let poly: Vec<i32> = (0..256).map(|i| i % 100).collect();
 
-        let ntt_poly = ntt.forward(&poly);
-        let recovered = ntt.inverse(&ntt_poly);
+        let mut ntt_poly = poly.clone();
+        ntt.forward(&mut ntt_poly);
+        let mut recovered = ntt_poly.clone();
+        ntt.inverse(&mut recovered);
 
         for (a, b) in poly.iter().zip(recovered.iter()) {
             assert_eq!(barrett_reduce(*a), barrett_reduce(*b));
@@ -1151,8 +978,10 @@ mod tests {
         ];
 
         for poly in test_cases {
-            let ntt_poly = ntt.forward(&poly);
-            let recovered = ntt.inverse(&ntt_poly);
+            let mut ntt_poly = poly.clone();
+            ntt.forward(&mut ntt_poly);
+            let mut recovered = ntt_poly.clone();
+            ntt.inverse(&mut recovered);
 
             for (original, result) in poly.iter().zip(recovered.iter()) {
                 let diff = (original - result).abs();
@@ -1168,17 +997,18 @@ mod tests {
         // Property: NTT(a + b) = NTT(a) + NTT(b)
         let ntt = NTT::new();
 
-        let a: Vec<i32> = (0..256).map(|i| (i * 3) as i32 % 1000).collect();
-        let b: Vec<i32> = (0..256).map(|i| (i * 7) as i32 % 1000).collect();
+        let mut a: Vec<i32> = (0..256).map(|i| (i * 3) as i32 % 1000).collect();
+        let mut b: Vec<i32> = (0..256).map(|i| (i * 7) as i32 % 1000).collect();
 
-        let sum = poly_add(&a, &b);
+        let mut sum = poly_add(&a, &b);
 
-        let ntt_a = ntt.forward(&a);
-        let ntt_b = ntt.forward(&b);
-        let ntt_sum = ntt.forward(&sum);
-        let ntt_ab = poly_add(&ntt_a, &ntt_b);
+        ntt.forward(&mut a);
+        ntt.forward(&mut b);
+        ntt.forward(&mut sum);
+        let mut ntt_ab = vec![0; 256];
+        ntt.pointwise_add(&a, &b, &mut ntt_ab);
 
-        for (x, y) in ntt_sum.iter().zip(ntt_ab.iter()) {
+        for (x, y) in sum.iter().zip(ntt_ab.iter()) {
             let diff = barrett_reduce(x - y).abs();
             assert!(diff < 10, "NTT linearity failed: diff={}", diff);
         }
@@ -1205,13 +1035,15 @@ mod tests {
         let ntt = NTT::new();
 
         // Simple test case: multiply by constant polynomial
-        let a = vec![1i32; 256];
-        let b = vec![2i32; 256];
+        let mut a = vec![1i32; 256];
+        let mut b = vec![2i32; 256];
 
-        let a_ntt = ntt.forward(&a);
-        let b_ntt = ntt.forward(&b);
-        let product_ntt = ntt.pointwise_multiply(&a_ntt, &b_ntt);
-        let product = ntt.inverse(&product_ntt);
+        ntt.forward(&mut a);
+        ntt.forward(&mut b);
+        let mut product_ntt = vec![0; 256];
+        ntt.pointwise_mul(&a, &b, &mut product_ntt);
+        let mut product = product_ntt.clone();
+        ntt.inverse(&mut product);
 
         // Expected: first coefficient = sum of all products = 2 * 256 = 512
         assert_eq!(product[0], 512,
@@ -1282,14 +1114,16 @@ mod tests {
         // Property: a * b = b * a (pointwise multiplication is commutative)
         let ntt = NTT::new();
 
-        let a: Vec<i32> = (0..256).map(|i| (i * 5) as i32 % 1000).collect();
-        let b: Vec<i32> = (0..256).map(|i| (i * 11) as i32 % 1000).collect();
+        let mut a: Vec<i32> = (0..256).map(|i| (i * 5) as i32 % 1000).collect();
+        let mut b: Vec<i32> = (0..256).map(|i| (i * 11) as i32 % 1000).collect();
 
-        let a_ntt = ntt.forward(&a);
-        let b_ntt = ntt.forward(&b);
+        ntt.forward(&mut a);
+        ntt.forward(&mut b);
 
-        let ab = ntt.pointwise_multiply(&a_ntt, &b_ntt);
-        let ba = ntt.pointwise_multiply(&b_ntt, &a_ntt);
+        let mut ab = vec![0; 256];
+        ntt.pointwise_mul(&a, &b, &mut ab);
+        let mut ba = vec![0; 256];
+        ntt.pointwise_mul(&b, &a, &mut ba);
 
         for (x, y) in ab.iter().zip(ba.iter()) {
             assert_eq!(
@@ -1336,8 +1170,10 @@ mod tests {
         let ntt = NTT::new();
         let poly: Vec<i32> = (0..256).map(|i| (i * 13) as i32 % 1000).collect();
 
-        let result1 = ntt.forward(&poly);
-        let result2 = ntt.forward(&poly);
+        let mut result1 = poly.clone();
+        ntt.forward(&mut result1);
+        let mut result2 = poly.clone();
+        ntt.forward(&mut result2);
 
         assert_eq!(result1, result2, "NTT must be deterministic");
     }

@@ -21,10 +21,11 @@ if command -v rustc &> /dev/null; then
     echo -e "${GREEN}✓${NC} Rust already installed: $(rustc --version)"
 else
     echo -e "${YELLOW}⏳${NC} Installing Rust..."
-    curl --proto='=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    curl --proto='=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly -y
     source "$HOME/.cargo/env"
     echo -e "${GREEN}✓${NC} Rust installed: $(rustc --version)"
 fi
+rustup default nightly
 
 # Check if Lean 4 is installed
 if command -v lean &> /dev/null; then
@@ -34,6 +35,15 @@ else
     curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
     source "$HOME/.elan/env"
     echo -e "${GREEN}✓${NC} Lean 4 installed: $(lean --version)"
+fi
+
+# Check if Z3 is installed
+if command -v z3 &> /dev/null; then
+    echo -e "${GREEN}✓${NC} Z3 already installed: $(z3 --version)"
+else
+    echo -e "${YELLOW}⏳${NC} Installing Z3..."
+    sudo apt-get update && sudo apt-get install -y z3 libz3-dev
+    echo -e "${GREEN}✓${NC} Z3 installed: $(z3 --version)"
 fi
 
 # Install development tools
