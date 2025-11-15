@@ -83,7 +83,7 @@ impl DilithiumSignature {
         security_level: SecurityLevel,
     ) -> DilithiumResult<Self> {
         // Serialize signature
-        let sig_bytes = Self::encode_signature(&c, &z, &h, security_level);
+        let sig_bytes = Self::encode_signature(&c, &z, &h, security_level.clone());
         
         Ok(Self {
             c,
@@ -227,7 +227,7 @@ impl DilithiumSignature {
         level: SecurityLevel,
     ) -> Vec<u8> {
         let mut bytes = Vec::new();
-        let mlwe = ModuleLWE::new(level);
+        let mlwe = ModuleLWE::new(level.clone());
         
         // Encode challenge c
         let c_encoded = mlwe.poly_encode(c, 8);
@@ -263,7 +263,7 @@ impl DilithiumSignature {
     
     /// Decode signature from bytes
     pub fn decode(bytes: &[u8], level: SecurityLevel) -> DilithiumResult<Self> {
-        let mlwe = ModuleLWE::new(level);
+        let mlwe = ModuleLWE::new(level.clone());
         let (k, l, _) = mlwe.params();
         
         let mut offset = 0;
@@ -343,7 +343,7 @@ impl DilithiumSignature {
     
     /// Get security level
     pub fn security_level(&self) -> SecurityLevel {
-        self.security_level
+        self.security_level.clone()
     }
     
     /// Get timestamp

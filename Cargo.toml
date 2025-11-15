@@ -10,9 +10,9 @@ members = [
     "crates/hyperphysics-market",
     "crates/hyperphysics-risk",
     "crates/hyperphysics-verify",
-    "crates/hyperphysics-gpu",
-    "crates/hyperphysics-scaling",
-    "crates/hyperphysics-viz",
+    # "crates/hyperphysics-gpu",
+    # "crates/hyperphysics-scaling",
+    # "crates/hyperphysics-viz",
     "crates/hyperphysics-dilithium",
 ]
 resolver = "2"
@@ -55,7 +55,7 @@ authors.workspace = true
 
 [dependencies]
 # Core HyperPhysics modules
-hyperphysics-core = { path = "crates/hyperphysics-core" }
+hyperphysics-core = { path = "crates/hyperphysics-core", default-features = false }
 hyperphysics-geometry = { path = "crates/hyperphysics-geometry" }
 hyperphysics-pbit = { path = "crates/hyperphysics-pbit" }
 hyperphysics-thermo = { path = "crates/hyperphysics-thermo" }
@@ -63,9 +63,11 @@ hyperphysics-consciousness = { path = "crates/hyperphysics-consciousness" }
 
 # Enterprise verification and scaling
 # hyperphysics-verification = { path = "crates/hyperphysics-verification" }  # Temporarily disabled - compilation errors
-hyperphysics-scaling = { path = "crates/hyperphysics-scaling" }
+# hyperphysics-scaling = { path = "crates/hyperphysics-scaling" }
 hyperphysics-market = { path = "crates/hyperphysics-market" }
 hyperphysics-risk = { path = "crates/hyperphysics-risk" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
 
 # For examples
 rand.workspace = true
