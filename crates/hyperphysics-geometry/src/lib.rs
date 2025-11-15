@@ -67,3 +67,6 @@ mod tests {
         assert_eq!(CURVATURE, -1.0, "H³ must have K = -1");
     }
 }
+
+pub mod moebius;
+pub use moebius::{MoebiusTransform, TransformType};

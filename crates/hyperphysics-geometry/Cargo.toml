@@ -11,6 +11,7 @@ repository = "https://github.com/hyperphysics/hyperphysics"
 
 [dependencies]
 nalgebra.workspace = true
+num-complex = "0.4"
 num-traits.workspace = true
 serde.workspace = true
 thiserror.workspace = true
