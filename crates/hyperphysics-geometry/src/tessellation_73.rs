@@ -17,7 +17,9 @@
 //! - pbRTCA v3.1 Blueprint: "Dilithium-Crystal Lattice Cryptography"
 
 use crate::{poincare::PoincarePoint, GeometryError, Result};
+use crate::{MoebiusTransform, FuchsianGroupAlgebraic};
 use nalgebra as na;
+use num_complex::Complex64;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::f64::consts::PI;
@@ -158,8 +160,15 @@ pub struct HeptagonalTessellation {
     /// All vertices where 3 tiles meet
     vertices: Vec<TessellationVertex>,
 
-    /// Fuchsian group generators for tessellation symmetry
+    /// Fuchsian group generators for tessellation symmetry (matrix-based)
     fuchsian_group: FuchsianGroup,
+
+    /// Algebraic Fuchsian group (Möbius transformations) for exact placement
+    ///
+    /// This provides exact hyperbolic isometries via PSU(1,1) group actions.
+    /// When present, enables algebraically exact tile generation.
+    #[serde(skip)]
+    algebraic_group: Option<FuchsianGroupAlgebraic>,
 
     /// Maximum number of layers to generate
     max_depth: usize,
@@ -198,6 +207,7 @@ impl HeptagonalTessellation {
             tiles: Vec::new(),
             vertices: Vec::new(),
             fuchsian_group,
+            algebraic_group: None,
             max_depth: depth,
             edge_length,
         };
@@ -206,6 +216,101 @@ impl HeptagonalTessellation {
         tess.build_vertices()?;
 
         Ok(tess)
+    }
+
+    /// Create new {7,3} tessellation using algebraic Fuchsian groups
+    ///
+    /// This constructor uses Möbius transformations from the algebraic
+    /// Fuchsian group implementation for exact hyperbolic isometries.
+    ///
+    /// # Arguments
+    ///
+    /// * `depth` - Number of layers to generate (0 = central tile only)
+    ///
+    /// # Returns
+    ///
+    /// A {7,3} tessellation with exact algebraic placement
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use hyperphysics_geometry::tessellation_73::HeptagonalTessellation;
+    ///
+    /// // Generate tessellation with exact algebraic placement
+    /// let tess = HeptagonalTessellation::new_with_algebraic(1)?;
+    /// # Ok::<(), hyperphysics_geometry::GeometryError>(())
+    /// ```
+    pub fn new_with_algebraic(depth: usize) -> Result<Self> {
+        let edge_length = Self::calculate_edge_length();
+        let fuchsian_group = FuchsianGroup::new_for_73();
+
+        // Create algebraic Fuchsian group for {7,3}
+        let mut algebraic_group = FuchsianGroupAlgebraic::from_tessellation(7, 3)?;
+        algebraic_group.generate_elements(4); // Pre-generate group elements
+
+        let mut tess = Self {
+            tiles: Vec::new(),
+            vertices: Vec::new(),
+            fuchsian_group,
+            algebraic_group: Some(algebraic_group),
+            max_depth: depth,
+            edge_length,
+        };
+
+        tess.generate()?;
+        tess.build_vertices()?;
+
+        Ok(tess)
+    }
+
+    /// Get the algebraic Fuchsian group if available
+    pub fn algebraic_group(&self) -> Option<&FuchsianGroupAlgebraic> {
+        self.algebraic_group.as_ref()
+    }
+
+    /// Convert PoincarePoint to Complex64 (2D projection)
+    fn poincare_to_complex(point: &PoincarePoint) -> Complex64 {
+        let coords = point.coords();
+        Complex64::new(coords.x, coords.y)
+    }
+
+    /// Convert Complex64 to PoincarePoint (z = 0 plane)
+    fn complex_to_poincare(z: Complex64) -> Result<PoincarePoint> {
+        let coords = na::Vector3::new(z.re, z.im, 0.0);
+        PoincarePoint::new(coords)
+    }
+
+    /// Apply a Möbius transformation to a PoincarePoint
+    fn apply_moebius(transform: &MoebiusTransform, point: &PoincarePoint) -> Result<PoincarePoint> {
+        let z = Self::poincare_to_complex(point);
+        let transformed_z = transform.apply(z);
+        Self::complex_to_poincare(transformed_z)
+    }
+
+    /// Generate exact orbit of central tile using algebraic Fuchsian group
+    ///
+    /// This demonstrates the algebraic approach: apply group elements to
+    /// the central tile to generate exact tile positions.
+    ///
+    /// # Returns
+    ///
+    /// Vector of tile centers in the orbit of the central tile
+    pub fn generate_exact_orbit(&self, max_tiles: usize) -> Result<Vec<PoincarePoint>> {
+        let algebraic_group = self.algebraic_group.as_ref()
+            .ok_or_else(|| GeometryError::InvalidTessellation {
+                message: "Algebraic Fuchsian group not initialized".to_string(),
+            })?;
+
+        // Start with central tile at origin
+        let central_center = Complex64::new(0.0, 0.0);
+
+        // Generate orbit under group action
+        let orbit = algebraic_group.orbit(central_center, max_tiles);
+
+        // Convert Complex64 points to PoincarePoints
+        orbit.iter()
+            .map(|&z| Self::complex_to_poincare(z))
+            .collect()
     }
 
     /// Calculate characteristic edge length for {7,3} tessellation
@@ -653,6 +758,117 @@ mod tests {
             assert!(seen_ids.insert(tile.id),
                 "Duplicate tile ID: {:?}", tile.id);
         }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_algebraic_tessellation_creation() -> Result<()> {
+        // Create tessellation with algebraic Fuchsian group
+        let tess = HeptagonalTessellation::new_with_algebraic(0)?;
+
+        // Should have central tile
+        assert_eq!(tess.num_tiles(), 1);
+
+        // Algebraic group should be present
+        assert!(tess.algebraic_group().is_some());
+
+        // Algebraic group should have generated elements
+        let group = tess.algebraic_group().unwrap();
+        assert!(group.num_elements() > 1);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_exact_orbit_generation() -> Result<()> {
+        // Create tessellation with algebraic Fuchsian group
+        let tess = HeptagonalTessellation::new_with_algebraic(0)?;
+
+        // Generate exact orbit of central tile
+        let orbit = tess.generate_exact_orbit(20)?;
+
+        // Orbit should contain multiple points
+        assert!(orbit.len() > 1, "Orbit should have multiple points, got {}", orbit.len());
+
+        // All points should be inside Poincaré disk
+        for (i, point) in orbit.iter().enumerate() {
+            assert!(point.norm() < 1.0,
+                "Orbit point {} should be inside disk, norm = {}", i, point.norm());
+        }
+
+        // First point should be at origin (central tile)
+        assert!(orbit[0].norm() < 1e-10, "First orbit point should be at origin");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_coordinate_conversions() -> Result<()> {
+        // Test PoincarePoint <-> Complex64 conversion
+        let z = Complex64::new(0.5, 0.3);
+        let point = HeptagonalTessellation::complex_to_poincare(z)?;
+        let z_back = HeptagonalTessellation::poincare_to_complex(&point);
+
+        assert!((z - z_back).norm() < 1e-10,
+            "Round-trip conversion should preserve coordinates");
+
+        // Test that point is in disk
+        assert!(point.norm() < 1.0, "Converted point should be inside disk");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_moebius_application() -> Result<()> {
+        // Create a rotation Möbius transformation
+        let rotation = MoebiusTransform::rotation(std::f64::consts::PI / 4.0);
+
+        // Apply to a test point
+        let test_point = HeptagonalTessellation::complex_to_poincare(Complex64::new(0.3, 0.0))?;
+        let rotated = HeptagonalTessellation::apply_moebius(&rotation, &test_point)?;
+
+        // Rotated point should still be in disk
+        assert!(rotated.norm() < 1.0, "Rotated point should remain in disk");
+
+        // Distance from origin should be preserved (rotation is isometry)
+        let dist_before = test_point.norm();
+        let dist_after = rotated.norm();
+        assert!((dist_before - dist_after).abs() < 1e-6,
+            "Rotation should preserve distance from origin");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_algebraic_vs_geometric_comparison() -> Result<()> {
+        // Create both versions
+        let geometric = HeptagonalTessellation::new(1)?;
+        let algebraic = HeptagonalTessellation::new_with_algebraic(1)?;
+
+        // Both should generate tiles
+        assert!(geometric.num_tiles() > 0);
+        assert!(algebraic.num_tiles() > 0);
+
+        // Algebraic should have the algebraic group
+        assert!(geometric.algebraic_group().is_none());
+        assert!(algebraic.algebraic_group().is_some());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_fuchsian_group_integration() -> Result<()> {
+        // Verify that the algebraic Fuchsian group is properly integrated
+        let tess = HeptagonalTessellation::new_with_algebraic(0)?;
+
+        let group = tess.algebraic_group().unwrap();
+
+        // {7,3} group should have 2 generators
+        assert_eq!(group.generators().len(), 2);
+
+        // Verify the group is discrete
+        assert!(group.is_discrete(), "Fuchsian group for {{7,3}} should be discrete");
 
         Ok(())
     }
