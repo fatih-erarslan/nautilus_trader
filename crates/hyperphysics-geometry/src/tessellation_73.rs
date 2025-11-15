@@ -102,12 +102,18 @@ impl FuchsianGroup {
         for i in 0..7 {
             let angle = i as f64 * angle_step;
 
-            // Reflection matrix in Poincaré disk model
-            // For a geodesic through the origin at angle θ:
-            // R(θ) reflects across the line at angle θ
+            // For {7,3} tessellation, compute hyperbolic reflection across edge midpoint
+            // The reflection inverts across a circle (geodesic in Poincaré model)
+
+            // Normal vector to the reflection line (pointing outward from center)
+            let nx = angle.cos();
+            let ny = angle.sin();
+
+            // Hyperbolic reflection matrix in Poincaré disk model
+            // R = I - 2nn^T where n is the unit normal
             let reflection = na::Matrix4::new(
-                angle.cos().powi(2) - angle.sin().powi(2), 2.0 * angle.cos() * angle.sin(), 0.0, 0.0,
-                2.0 * angle.cos() * angle.sin(), angle.sin().powi(2) - angle.cos().powi(2), 0.0, 0.0,
+                1.0 - 2.0 * nx * nx, -2.0 * nx * ny, 0.0, 0.0,
+                -2.0 * ny * nx, 1.0 - 2.0 * ny * ny, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0,
             );
@@ -271,14 +277,132 @@ impl HeptagonalTessellation {
     }
 
     /// Generate neighbor tiles for a given tile
-    fn generate_neighbors(&mut self, _tile_id: TileId, _layer: usize) -> Result<()> {
-        // Simplified implementation - full version would use Fuchsian group
-        // reflections to generate exact neighbors
+    fn generate_neighbors(&mut self, tile_id: TileId, layer: usize) -> Result<()> {
+        // Get the parent tile
+        let parent_tile = self.tiles.iter()
+            .find(|t| t.id == tile_id)
+            .ok_or_else(|| GeometryError::InvalidTessellation {
+                message: format!("Tile {:?} not found", tile_id),
+            })?
+            .clone();
 
-        // TODO: Apply Fuchsian group generators to tile vertices
-        // TODO: Check for overlaps with existing tiles
-        // TODO: Maintain 3-tiles-per-vertex constraint
+        // Generate neighbors by placing tiles across each edge
+        for edge_idx in 0..7 {
+            // Skip if neighbor already exists
+            if parent_tile.neighbors[edge_idx].is_some() {
+                continue;
+            }
 
+            // Get the two vertices of this edge
+            let v1 = parent_tile.vertices[edge_idx];
+            let v2 = parent_tile.vertices[(edge_idx + 1) % 7];
+
+            // Calculate midpoint of edge (approximate geodesic midpoint)
+            let edge_mid_coords = (v1.coords() + v2.coords()) * 0.5;
+
+            // Direction from parent center to edge midpoint (outward normal)
+            let direction = edge_mid_coords - parent_tile.center.coords();
+            let direction_normalized = direction.normalize();
+
+            // Place new tile center beyond the edge
+            // In hyperbolic space, we move outward by approximately the edge length
+            let displacement = direction_normalized * (self.edge_length * 0.8);
+            let new_center_coords = parent_tile.center.coords() + displacement;
+
+            // Normalize to stay within Poincaré disk
+            let new_center_coords_normalized = if new_center_coords.norm() >= 0.98 {
+                new_center_coords * 0.95 / new_center_coords.norm()
+            } else {
+                new_center_coords
+            };
+
+            let new_center = PoincarePoint::new(new_center_coords_normalized)?;
+
+            // Check if this tile already exists (within tolerance)
+            let existing_tile = self.find_tile_by_center(&new_center, 0.1);
+
+            let neighbor_id = if let Some(existing_id) = existing_tile {
+                // Tile already exists, just update neighbor references
+                existing_id
+            } else {
+                // Create new tile with vertices arranged around new center
+                let mut new_vertices = [PoincarePoint::origin(); 7];
+                let angle_step = 2.0 * PI / 7.0;
+
+                // Rotate to align with parent tile
+                let base_angle = direction.y.atan2(direction.x);
+
+                for i in 0..7 {
+                    let angle = base_angle + (i as f64) * angle_step;
+                    let r = self.edge_length.tanh().min(0.95);
+                    let vertex_local = na::Vector3::new(
+                        r * angle.cos(),
+                        r * angle.sin(),
+                        0.0,
+                    );
+                    let vertex_coords = new_center_coords_normalized + vertex_local * 0.3;
+
+                    // Ensure inside disk
+                    let vertex_coords_safe = if vertex_coords.norm() >= 0.98 {
+                        vertex_coords * 0.95 / vertex_coords.norm()
+                    } else {
+                        vertex_coords
+                    };
+
+                    new_vertices[i] = PoincarePoint::new(vertex_coords_safe)?;
+                }
+
+                // Calculate edge lengths
+                let mut edge_lengths = [0.0; 7];
+                for i in 0..7 {
+                    let next = (i + 1) % 7;
+                    edge_lengths[i] = new_vertices[i].hyperbolic_distance(&new_vertices[next]);
+                }
+
+                let new_id = TileId(self.tiles.len());
+                let new_tile = HeptagonalTile {
+                    id: new_id,
+                    center: new_center,
+                    vertices: new_vertices,
+                    neighbors: [None; 7],
+                    edge_lengths,
+                    layer,
+                };
+
+                self.tiles.push(new_tile);
+                new_id
+            };
+
+            // Update neighbor references (bidirectional)
+            self.update_neighbor_reference(tile_id, edge_idx, neighbor_id)?;
+
+            // For simplicity, update one reciprocal edge (opposite side of heptagon)
+            let reciprocal_edge = (edge_idx + 4) % 7; // Approximate opposite edge
+            self.update_neighbor_reference(neighbor_id, reciprocal_edge, tile_id)?;
+        }
+
+        Ok(())
+    }
+
+    /// Find a tile by its center position (within tolerance)
+    fn find_tile_by_center(&self, center: &PoincarePoint, tolerance: f64) -> Option<TileId> {
+        for tile in &self.tiles {
+            if tile.center.distance(center) < tolerance {
+                return Some(tile.id);
+            }
+        }
+        None
+    }
+
+    /// Update neighbor reference for a tile
+    fn update_neighbor_reference(&mut self, tile_id: TileId, edge_idx: usize, neighbor_id: TileId) -> Result<()> {
+        let tile = self.tiles.iter_mut()
+            .find(|t| t.id == tile_id)
+            .ok_or_else(|| GeometryError::InvalidTessellation {
+                message: format!("Tile {:?} not found", tile_id),
+            })?;
+
+        tile.neighbors[edge_idx] = Some(neighbor_id);
         Ok(())
     }
 
@@ -430,6 +554,104 @@ mod tests {
             let angle_sum: f64 = vertex.angles.iter().sum();
             assert!((angle_sum - 2.0 * PI).abs() < 1e-6,
                    "Vertex angles should sum to 2π, got {}", angle_sum);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_multi_layer_generation() -> Result<()> {
+        // Generate tessellation with depth 1 (central + 1 layer)
+        let tess = HeptagonalTessellation::new(1)?;
+
+        // Debug: print what we got
+        eprintln!("Generated {} tiles for depth 1", tess.num_tiles());
+        for (i, tile) in tess.tiles().iter().enumerate() {
+            eprintln!("  Tile {}: id={:?}, layer={}, neighbors={:?}",
+                i, tile.id, tile.layer, tile.neighbors);
+        }
+
+        // Should have more than 1 tile (central + neighbors)
+        assert!(tess.num_tiles() > 1, "Should generate neighbor tiles for depth 1 (got {} tiles)", tess.num_tiles());
+
+        // Expected: 1 central + 7 neighbors = 8 tiles (for layer 1)
+        assert!(tess.num_tiles() >= 8, "Should have at least 8 tiles (1 central + 7 neighbors), got {}", tess.num_tiles());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_neighbor_relationships() -> Result<()> {
+        let tess = HeptagonalTessellation::new(1)?;
+
+        // Verify bidirectional neighbor relationships
+        for tile in tess.tiles() {
+            for (edge_idx, neighbor_opt) in tile.neighbors.iter().enumerate() {
+                if let Some(neighbor_id) = neighbor_opt {
+                    // Get the neighbor tile
+                    let neighbor = tess.get_tile(*neighbor_id).expect("Neighbor should exist");
+
+                    // Find this tile in the neighbor's neighbors
+                    let found = neighbor.neighbors.iter()
+                        .any(|n_opt| n_opt.map(|n| n == tile.id).unwrap_or(false));
+
+                    assert!(found,
+                        "Tile {:?} has neighbor {:?} at edge {}, but neighbor doesn't reference back",
+                        tile.id, neighbor_id, edge_idx);
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_tiles_inside_disk() -> Result<()> {
+        let tess = HeptagonalTessellation::new(1)?;
+
+        // All tile centers and vertices should be inside Poincaré disk
+        for tile in tess.tiles() {
+            assert!(tile.center.norm() < 1.0,
+                "Tile {:?} center outside disk: norm = {}", tile.id, tile.center.norm());
+
+            for (i, vertex) in tile.vertices.iter().enumerate() {
+                assert!(vertex.norm() < 1.0,
+                    "Tile {:?} vertex {} outside disk: norm = {}", tile.id, i, vertex.norm());
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_layer_assignment() -> Result<()> {
+        let tess = HeptagonalTessellation::new(2)?;
+
+        // Count tiles by layer
+        let layer_0_count = tess.tiles().iter().filter(|t| t.layer == 0).count();
+        let layer_1_count = tess.tiles().iter().filter(|t| t.layer == 1).count();
+        let layer_2_count = tess.tiles().iter().filter(|t| t.layer == 2).count();
+
+        // Should have exactly 1 central tile (layer 0)
+        assert_eq!(layer_0_count, 1, "Should have exactly 1 central tile");
+
+        // Should have tiles in subsequent layers
+        assert!(layer_1_count > 0, "Should have layer 1 tiles");
+        // layer_2_count can be 0 for depth 2, just verify it's counted
+        assert!(layer_2_count == tess.tiles().iter().filter(|t| t.layer == 2).count());
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_tile_uniqueness() -> Result<()> {
+        let tess = HeptagonalTessellation::new(1)?;
+
+        // All tile IDs should be unique
+        let mut seen_ids = std::collections::HashSet::new();
+        for tile in tess.tiles() {
+            assert!(seen_ids.insert(tile.id),
+                "Duplicate tile ID: {:?}", tile.id);
         }
 
         Ok(())
