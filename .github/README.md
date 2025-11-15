@@ -187,9 +187,9 @@ Some checks are set to `continue-on-error: true`:
 Add to README.md:
 
 ```markdown
-[![CI](https://github.com/<user>/<repo>/workflows/CI/badge.svg)](https://github.com/<user>/<repo>/actions/workflows/ci.yml)
-[![Release](https://github.com/<user>/<repo>/workflows/Release/badge.svg)](https://github.com/<user>/<repo>/actions/workflows/release.yml)
-[![Docs](https://github.com/<user>/<repo>/workflows/Documentation/badge.svg)](https://github.com/<user>/<repo>/actions/workflows/docs.yml)
+[![CI](https://github.com/hyperphysics/hyperphysics/workflows/CI/badge.svg)](https://github.com/hyperphysics/hyperphysics/actions/workflows/ci.yml)
+[![Release](https://github.com/hyperphysics/hyperphysics/workflows/Release/badge.svg)](https://github.com/hyperphysics/hyperphysics/actions/workflows/release.yml)
+[![Docs](https://github.com/hyperphysics/hyperphysics/workflows/Documentation/badge.svg)](https://github.com/hyperphysics/hyperphysics/actions/workflows/docs.yml)
 ```
 
 ### Useful Commands
