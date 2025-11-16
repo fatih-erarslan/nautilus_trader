@@ -1,0 +1,43 @@
+[package]
+name = "hyperphysics-homomorphic"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.56.0"
+authors = ["HyperPhysics Team"]
+description = "Homomorphic encryption for privacy-preserving consciousness metrics"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Homomorphic encryption (Pure Rust BFV implementation)
+fhe = "0.1.0-beta.8"
+fhe-traits = "0.1.0-beta.8"
+
+# Random number generation
+rand.workspace = true
+
+# Error handling
+thiserror.workspace = true
+
+# Serialization
+serde.workspace = true
+
+# Logging
+log = { workspace = true, optional = true }
+
+# Mathematics
+num-traits.workspace = true
+
+[dev-dependencies]
+# Testing utilities
+approx = "0.5"
+criterion = "0.5"
+
+[features]
+default = []
+# Enable logging
+logging = ["dep:log"]
+
+# Benchmarks (disabled until implemented)
+# [[bench]]
+# name = "encrypted_phi"
+# harness = false

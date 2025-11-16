@@ -67,3 +67,8 @@ mod tests {
         assert_eq!(CURVATURE, -1.0, "H³ must have K = -1");
     }
 }
+
+pub mod moebius;
+pub mod fuchsian;
+pub use moebius::{MoebiusTransform, TransformType};
+pub use fuchsian::FuchsianGroup as FuchsianGroupAlgebraic;
