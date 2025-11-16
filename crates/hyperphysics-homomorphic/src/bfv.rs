@@ -47,6 +47,7 @@ impl BfvContext {
     }
 
     /// Get the fhe.rs parameters (low-level access)
+    #[allow(dead_code)]
     pub(crate) fn fhe_parameters(&self) -> &Arc<FheBfvParameters> {
         &self.fhe_params
     }

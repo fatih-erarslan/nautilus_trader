@@ -56,11 +56,13 @@
 
 pub mod bfv;
 pub mod encrypted_phi;
+pub mod encrypted_pbit;
 pub mod keys;
 pub mod parameters;
 
 pub use bfv::BfvContext;
 pub use encrypted_phi::{EncryptedPhi, EncryptedState};
+pub use encrypted_pbit::{EncryptedPBitState, EncryptedPBitOps};
 pub use keys::{PublicKey, SecretKey, KeySet};
 pub use parameters::BfvParameters;
 

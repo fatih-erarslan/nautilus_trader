@@ -219,7 +219,7 @@ mod tests {
     fn test_multiplication_depth_estimation() -> Result<()> {
         let params = BfvParameters::default_128bit_security()?;
         let depth = params.estimate_multiplication_depth();
-        assert!(depth >= 0, "Should support at least 0 multiplications");
+        assert!(depth <= 100, "Depth should be reasonable");
         Ok(())
     }
 
