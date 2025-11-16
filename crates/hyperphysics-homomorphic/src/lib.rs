@@ -61,7 +61,7 @@ pub mod parameters;
 
 pub use bfv::BfvContext;
 pub use encrypted_phi::{EncryptedPhi, EncryptedState};
-pub use keys::{PublicKey, SecretKey, RelinearizationKeys};
+pub use keys::{PublicKey, SecretKey, KeySet};
 pub use parameters::BfvParameters;
 
 use thiserror::Error;

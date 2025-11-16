@@ -12,6 +12,9 @@ license = "MIT OR Apache-2.0"
 fhe = "0.1.0-beta.8"
 fhe-traits = "0.1.0-beta.8"
 
+# Random number generation
+rand.workspace = true
+
 # Error handling
 thiserror.workspace = true
 

@@ -1,24 +1,27 @@
 //! BFV Context and Operations
 //!
-//! This module provides a high-level wrapper around the SEAL BFV implementation,
+//! This module provides a high-level wrapper around the fhe.rs BFV implementation,
 //! managing the encryption context and providing convenient operations.
 
 use crate::{
     BfvParameters, HomomorphicError, Result,
-    PublicKey, SecretKey, RelinearizationKeys, KeySet,
+    PublicKey, SecretKey, KeySet,
 };
-use seal_fhe::{
-    Context, KeyGenerator, Encryptor, Decryptor, BFVEvaluator,
-    Plaintext, Ciphertext, BFVEncoder,
+use fhe::bfv::{
+    BfvParameters as FheBfvParameters, Ciphertext, Encoding, Plaintext,
+    PublicKey as FhePublicKey, SecretKey as FheSecretKey,
 };
+use fhe_traits::{FheEncoder, FheEncrypter, FheDecrypter, FheDecoder};
+use std::sync::Arc;
+use rand::thread_rng;
 
 /// BFV encryption context
 ///
 /// Manages all the state needed for BFV operations including
-/// parameters, keys, and crypto primitives.
+/// parameters and crypto primitives.
 pub struct BfvContext {
     params: BfvParameters,
-    context: Context,
+    fhe_params: Arc<FheBfvParameters>,
 }
 
 impl BfvContext {
@@ -34,8 +37,8 @@ impl BfvContext {
     /// # Ok::<(), hyperphysics_homomorphic::HomomorphicError>(())
     /// ```
     pub fn new(params: BfvParameters) -> Result<Self> {
-        let context = params.build_context()?;
-        Ok(Self { params, context })
+        let fhe_params = params.build()?;
+        Ok(Self { params, fhe_params })
     }
 
     /// Get the encryption parameters
@@ -43,9 +46,9 @@ impl BfvContext {
         &self.params
     }
 
-    /// Get the SEAL context (low-level access)
-    pub(crate) fn seal_context(&self) -> &Context {
-        &self.context
+    /// Get the fhe.rs parameters (low-level access)
+    pub(crate) fn fhe_parameters(&self) -> &Arc<FheBfvParameters> {
+        &self.fhe_params
     }
 
     /// Generate a fresh key set
@@ -53,7 +56,6 @@ impl BfvContext {
     /// This generates:
     /// - Public key (for encryption)
     /// - Secret key (for decryption)
-    /// - Relinearization keys (for ciphertext size reduction)
     ///
     /// # Examples
     ///
@@ -66,23 +68,15 @@ impl BfvContext {
     /// # Ok::<(), hyperphysics_homomorphic::HomomorphicError>(())
     /// ```
     pub fn generate_keys(&self) -> Result<KeySet> {
-        let keygen = KeyGenerator::new(&self.context)
-            .map_err(|e| HomomorphicError::KeyGenerationError {
-                message: format!("Failed to create key generator: {:?}", e),
-            })?;
+        let mut rng = thread_rng();
 
-        let secret_key = SecretKey::new(keygen.secret_key());
-        let public_key = PublicKey::new(keygen.create_public_key()
-            .map_err(|e| HomomorphicError::KeyGenerationError {
-                message: format!("Failed to create public key: {:?}", e),
-            })?);
+        let secret_key = FheSecretKey::random(&self.fhe_params, &mut rng);
+        let public_key = FhePublicKey::new(&secret_key, &mut rng);
 
-        let relin_keys = Some(RelinearizationKeys::new(keygen.create_relin_keys()
-            .map_err(|e| HomomorphicError::KeyGenerationError {
-                message: format!("Failed to create relinearization keys: {:?}", e),
-            })?));
-
-        Ok(KeySet::new(public_key, secret_key, relin_keys, None))
+        Ok(KeySet::new(
+            PublicKey::new(public_key),
+            SecretKey::new(secret_key),
+        ))
     }
 
     /// Encrypt a plaintext value
@@ -96,26 +90,16 @@ impl BfvContext {
     ///
     /// An encrypted ciphertext
     pub fn encrypt(&self, value: i64, public_key: &PublicKey) -> Result<Ciphertext> {
-        // Create encoder
-        let encoder = BFVEncoder::new(&self.context)
-            .map_err(|e| HomomorphicError::EncryptionFailure {
-                message: format!("Failed to create encoder: {:?}", e),
-            })?;
+        let mut rng = thread_rng();
 
-        // Encode the value
-        let plaintext = encoder.encode_signed(value)
-            .map_err(|e| HomomorphicError::InvalidPlaintext {
+        // Encode the value as a plaintext
+        let plaintext = Plaintext::try_encode(&[value], Encoding::poly(), &self.fhe_params)
+            .map_err(|e| HomomorphicError::EncryptionFailure {
                 message: format!("Failed to encode value {}: {:?}", value, e),
             })?;
 
-        // Create encryptor
-        let encryptor = Encryptor::with_public_key(&self.context, public_key.inner())
-            .map_err(|e| HomomorphicError::EncryptionFailure {
-                message: format!("Failed to create encryptor: {:?}", e),
-            })?;
-
-        // Encrypt
-        let ciphertext = encryptor.encrypt(&plaintext)
+        // Encrypt using the public key
+        let ciphertext = public_key.inner().try_encrypt(&plaintext, &mut rng)
             .map_err(|e| HomomorphicError::EncryptionFailure {
                 message: format!("Failed to encrypt: {:?}", e),
             })?;
@@ -134,48 +118,56 @@ impl BfvContext {
     ///
     /// The decrypted integer value
     pub fn decrypt(&self, ciphertext: &Ciphertext, secret_key: &SecretKey) -> Result<i64> {
-        // Create decryptor
-        let decryptor = Decryptor::new(&self.context, secret_key.inner())
-            .map_err(|e| HomomorphicError::DecryptionFailure {
-                message: format!("Failed to create decryptor: {:?}", e),
-            })?;
-
         // Decrypt
-        let plaintext = decryptor.decrypt(ciphertext)
+        let plaintext = secret_key.inner().try_decrypt(ciphertext)
             .map_err(|e| HomomorphicError::DecryptionFailure {
                 message: format!("Failed to decrypt: {:?}", e),
             })?;
 
         // Decode
-        let encoder = BFVEncoder::new(&self.context)
-            .map_err(|e| HomomorphicError::DecryptionFailure {
-                message: format!("Failed to create encoder: {:?}", e),
-            })?;
-
-        let value = encoder.decode_signed(&plaintext)
+        let values = Vec::<i64>::try_decode(&plaintext, Encoding::poly())
             .map_err(|e| HomomorphicError::DecryptionFailure {
                 message: format!("Failed to decode plaintext: {:?}", e),
             })?;
 
-        Ok(value)
+        values.get(0).copied().ok_or_else(|| HomomorphicError::DecryptionFailure {
+            message: "Decrypted plaintext is empty".to_string(),
+        })
     }
 
-    /// Check remaining noise budget in a ciphertext
+    /// Add two ciphertexts homomorphically
     ///
-    /// Returns the number of bits of noise budget remaining.
-    /// When this reaches 0, the ciphertext can no longer be decrypted correctly.
-    pub fn noise_budget(&self, ciphertext: &Ciphertext, secret_key: &SecretKey) -> Result<i32> {
-        let decryptor = Decryptor::new(&self.context, secret_key.inner())
-            .map_err(|e| HomomorphicError::DecryptionFailure {
-                message: format!("Failed to create decryptor: {:?}", e),
-            })?;
+    /// Computes Enc(a + b) from Enc(a) and Enc(b)
+    pub fn add(&self, a: &Ciphertext, b: &Ciphertext) -> Result<Ciphertext> {
+        Ok(a + b)
+    }
 
-        let budget = decryptor.invariant_noise_budget(ciphertext)
+    /// Subtract two ciphertexts homomorphically
+    ///
+    /// Computes Enc(a - b) from Enc(a) and Enc(b)
+    pub fn sub(&self, a: &Ciphertext, b: &Ciphertext) -> Result<Ciphertext> {
+        Ok(a - b)
+    }
+
+    /// Multiply two ciphertexts homomorphically
+    ///
+    /// Computes Enc(a * b) from Enc(a) and Enc(b)
+    pub fn mul(&self, a: &Ciphertext, b: &Ciphertext) -> Result<Ciphertext> {
+        Ok(a * b)
+    }
+
+    /// Multiply a ciphertext by a plaintext scalar
+    ///
+    /// Computes Enc(a * scalar) from Enc(a) and scalar
+    pub fn mul_plain(&self, ciphertext: &Ciphertext, scalar: i64) -> Result<Ciphertext> {
+        // Encode the scalar
+        let plaintext = Plaintext::try_encode(&[scalar], Encoding::poly(), &self.fhe_params)
             .map_err(|e| HomomorphicError::OperationFailure {
-                operation: format!("noise budget check: {:?}", e),
+                operation: format!("encoding scalar {}: {:?}", scalar, e),
             })?;
 
-        Ok(budget)
+        // Multiply
+        Ok(ciphertext * &plaintext)
     }
 }
 
@@ -194,9 +186,7 @@ mod tests {
     fn test_key_generation() -> Result<()> {
         let params = BfvParameters::default_128bit_security()?;
         let ctx = BfvContext::new(params)?;
-        let keys = ctx.generate_keys()?;
-
-        assert!(keys.has_relin_keys());
+        let _keys = ctx.generate_keys()?;
         Ok(())
     }
 
@@ -215,15 +205,96 @@ mod tests {
     }
 
     #[test]
-    fn test_noise_budget() -> Result<()> {
+    fn test_homomorphic_addition() -> Result<()> {
         let params = BfvParameters::default_128bit_security()?;
         let ctx = BfvContext::new(params)?;
         let keys = ctx.generate_keys()?;
 
-        let ciphertext = ctx.encrypt(10, &keys.public_key)?;
-        let budget = ctx.noise_budget(&ciphertext, &keys.secret_key)?;
+        let a = 10i64;
+        let b = 32i64;
 
-        assert!(budget > 100, "Fresh ciphertext should have substantial noise budget");
+        let enc_a = ctx.encrypt(a, &keys.public_key)?;
+        let enc_b = ctx.encrypt(b, &keys.public_key)?;
+
+        let enc_sum = ctx.add(&enc_a, &enc_b)?;
+        let decrypted_sum = ctx.decrypt(&enc_sum, &keys.secret_key)?;
+
+        assert_eq!(a + b, decrypted_sum);
+        Ok(())
+    }
+
+    #[test]
+    fn test_homomorphic_subtraction() -> Result<()> {
+        let params = BfvParameters::default_128bit_security()?;
+        let ctx = BfvContext::new(params)?;
+        let keys = ctx.generate_keys()?;
+
+        let a = 50i64;
+        let b = 8i64;
+
+        let enc_a = ctx.encrypt(a, &keys.public_key)?;
+        let enc_b = ctx.encrypt(b, &keys.public_key)?;
+
+        let enc_diff = ctx.sub(&enc_a, &enc_b)?;
+        let decrypted_diff = ctx.decrypt(&enc_diff, &keys.secret_key)?;
+
+        assert_eq!(a - b, decrypted_diff);
+        Ok(())
+    }
+
+    #[test]
+    fn test_homomorphic_multiplication() -> Result<()> {
+        let params = BfvParameters::default_128bit_security()?;
+        let ctx = BfvContext::new(params)?;
+        let keys = ctx.generate_keys()?;
+
+        let a = 20i64;
+        let b = -7i64;
+
+        let enc_a = ctx.encrypt(a, &keys.public_key)?;
+        let enc_b = ctx.encrypt(b, &keys.public_key)?;
+
+        let enc_product = ctx.mul(&enc_a, &enc_b)?;
+        let decrypted_product = ctx.decrypt(&enc_product, &keys.secret_key)?;
+
+        assert_eq!(a * b, decrypted_product);
+        Ok(())
+    }
+
+    #[test]
+    fn test_mul_plain() -> Result<()> {
+        let params = BfvParameters::default_128bit_security()?;
+        let ctx = BfvContext::new(params)?;
+        let keys = ctx.generate_keys()?;
+
+        let value = 15i64;
+        let scalar = 3i64;
+
+        let enc_value = ctx.encrypt(value, &keys.public_key)?;
+        let enc_result = ctx.mul_plain(&enc_value, scalar)?;
+        let decrypted_result = ctx.decrypt(&enc_result, &keys.secret_key)?;
+
+        assert_eq!(value * scalar, decrypted_result);
+        Ok(())
+    }
+
+    #[test]
+    fn test_multiple_operations() -> Result<()> {
+        let params = BfvParameters::default_128bit_security()?;
+        let ctx = BfvContext::new(params)?;
+        let keys = ctx.generate_keys()?;
+
+        // Compute (10 + 5) * 3 = 45
+        let enc_10 = ctx.encrypt(10, &keys.public_key)?;
+        let enc_5 = ctx.encrypt(5, &keys.public_key)?;
+        let enc_3 = ctx.encrypt(3, &keys.public_key)?;
+
+        let enc_sum = ctx.add(&enc_10, &enc_5)?;
+        let enc_result = ctx.mul(&enc_sum, &enc_3)?;
+
+        let result = ctx.decrypt(&enc_result, &keys.secret_key)?;
+        assert_eq!(45, result);
+
         Ok(())
     }
 }
