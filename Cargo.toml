@@ -10,11 +10,22 @@ members = [
     "crates/hyperphysics-market",
     "crates/hyperphysics-risk",
     "crates/hyperphysics-verify",
-    # "crates/hyperphysics-gpu",
-    # "crates/hyperphysics-scaling",
-    # "crates/hyperphysics-viz",
+    "crates/hyperphysics-verification",
+    "crates/hyperphysics-gpu",
+    "crates/hyperphysics-scaling",
+    "crates/hyperphysics-viz",
     "crates/hyperphysics-dilithium",
     "crates/hyperphysics-homomorphic",
+    "crates/hyperphysics-finance",
+    "crates/hyperphysics-hft-ecosystem",
+    "crates/physics-engines/rapier-hyperphysics",
+    "crates/physics-engines/jolt-hyperphysics",
+    # Hyper-Future Architecture (Phase 5)
+    "crates/physics-engines/warp-hyperphysics",
+    "crates/active-inference-agent",
+    "crates/holographic-embeddings",
+    "crates/gpu-marl",
+    "crates/ising-optimizer",
 ]
 resolver = "2"
 
@@ -67,6 +78,17 @@ hyperphysics-consciousness = { path = "crates/hyperphysics-consciousness" }
 # hyperphysics-scaling = { path = "crates/hyperphysics-scaling" }
 hyperphysics-market = { path = "crates/hyperphysics-market" }
 hyperphysics-risk = { path = "crates/hyperphysics-risk" }
+hyperphysics-finance = { path = "crates/hyperphysics-finance" }
+
+[dev-dependencies]
+criterion = { workspace = true }
+# Test dependencies for workspace-level integration tests
+ndarray = { workspace = true }
+approx = { workspace = true }
+ed25519-dalek = "2.1"
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = "0.4"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 
@@ -119,7 +141,7 @@ harness = false
 [workspace.dependencies]
 # Mathematical libraries
 ndarray = { version = "0.15", features = ["rayon", "serde"] }
-nalgebra = { version = "0.32", features = ["serde-serialize"] }
+nalgebra = { version = "0.33", features = ["serde-serialize", "rayon"] }
 num-traits = "0.2"
 num-complex = "0.4"
 approx = "0.5"
@@ -146,6 +168,12 @@ anyhow = "1.0"
 # Logging
 tracing = "0.1"
 log = "0.4"
+
+# Concurrency
+dashmap = "6.1"
+
+# Statistics
+statrs = "0.16"
 
 # Benchmarking
 criterion = "0.5"

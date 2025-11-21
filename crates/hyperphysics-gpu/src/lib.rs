@@ -6,7 +6,6 @@
 pub mod backend;
 pub mod kernels;
 pub mod executor;
-pub mod cpu_executor;
 pub mod scheduler;
 pub mod monitoring;
 pub mod rng;
@@ -16,7 +15,6 @@ use hyperphysics_core::Result;
 // Re-export types from backend module
 pub use backend::{GPUBackend, BackendType, GPUCapabilities, GPUBuffer, BufferUsage, MemoryStats};
 pub use executor::GPUExecutor;
-pub use cpu_executor::CPUExecutor;
 pub use scheduler::GPUScheduler;
 pub use monitoring::{PerformanceMonitor, OperationMetrics, ScopedTimer};
 pub use rng::{GPURng, RNGState, RNGParams};

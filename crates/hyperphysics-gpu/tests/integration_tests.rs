@@ -2,7 +2,7 @@
 //!
 //! Tests GPU executor, shaders, and buffer management against CPU reference implementations.
 
-use hyperphysics_gpu::{GPUExecutor, GPUBackend, backend::{wgpu::WGPUBackend, BackendType}, initialize_backend};
+use hyperphysics_gpu::{GPUExecutor, GPUBackend, backend::wgpu::WGPUBackend};
 use hyperphysics_core::Result;
 
 /// Small test lattice for quick validation
@@ -56,9 +56,8 @@ fn cpu_compute_entropy(states: &[u32]) -> f64 {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_executor_initialization() -> Result<()> {
-    // Test that GPU executor can be created (requires GPU hardware)
+    // Test that GPU executor can be created
     let couplings = create_test_couplings();
     let executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await;
 
@@ -69,34 +68,26 @@ async fn test_gpu_executor_initialization() -> Result<()> {
 
 #[tokio::test]
 async fn test_wgpu_backend_initialization() -> Result<()> {
-    // Test that backend can be initialized (GPU or CPU fallback)
-    let backend = initialize_backend().await;
+    // Test that WGPU backend can be initialized
+    let backend = WGPUBackend::new().await;
 
-    assert!(backend.is_ok(), "Backend initialization failed");
+    assert!(backend.is_ok(), "WGPU backend initialization failed");
 
     if let Ok(backend) = backend {
         let caps = backend.capabilities();
-        println!("Backend: {:?}", caps.backend);
-        println!("Device: {}", caps.device_name);
+        assert!(caps.supports_compute, "GPU must support compute shaders");
+        assert!(caps.max_buffer_size >= 1024 * 1024, "GPU buffer too small");
+        assert!(caps.max_workgroup_size >= 256, "Workgroup size too small");
 
-        // If GPU is available, validate capabilities
-        if caps.backend == BackendType::WGPU {
-            assert!(caps.supports_compute, "GPU must support compute shaders");
-            assert!(caps.max_buffer_size >= 1024 * 1024, "GPU buffer too small");
-            assert!(caps.max_workgroup_size >= 256, "Workgroup size too small");
-            println!("Max buffer: {} MB", caps.max_buffer_size / 1_000_000);
-            println!("Max workgroup: {}", caps.max_workgroup_size);
-        } else {
-            // CPU fallback is fine for CI/development
-            println!("Using CPU fallback (no GPU available)");
-        }
+        println!("GPU: {}", caps.device_name);
+        println!("Max buffer: {} MB", caps.max_buffer_size / 1_000_000);
+        println!("Max workgroup: {}", caps.max_workgroup_size);
     }
 
     Ok(())
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_energy_vs_cpu() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -124,7 +115,6 @@ async fn test_gpu_energy_vs_cpu() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_entropy_vs_cpu() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -152,7 +142,6 @@ async fn test_gpu_entropy_vs_cpu() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_state_update() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -182,7 +171,6 @@ async fn test_gpu_state_update() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_double_buffering() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -203,7 +191,6 @@ async fn test_gpu_double_buffering() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_bias_update() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -235,7 +222,6 @@ async fn test_gpu_bias_update() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_ferromagnetic_ordering() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -276,7 +262,6 @@ async fn test_gpu_ferromagnetic_ordering() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_energy_conservation() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -305,7 +290,6 @@ async fn test_gpu_energy_conservation() -> Result<()> {
 }
 
 #[tokio::test]
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_async_readback() -> Result<()> {
     let couplings = create_test_couplings();
     let mut executor = GPUExecutor::new(TEST_LATTICE_SIZE, &couplings).await?;
@@ -330,7 +314,6 @@ async fn test_gpu_async_readback() -> Result<()> {
 
 #[tokio::test]
 #[ignore] // Only run for performance profiling
-#[ignore = "Requires GPU hardware - use 'cargo test -- --ignored' with GPU"]
 async fn test_gpu_large_lattice() -> Result<()> {
     // Test with larger lattice to verify GPU advantage
     const LARGE_SIZE: usize = 10_000;
