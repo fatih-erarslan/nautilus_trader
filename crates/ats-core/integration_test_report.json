@@ -1,0 +1,140 @@
+{
+  "timestamp": "2025-08-27T11:45:41.769471",
+  "total_tests": 14,
+  "passed": 5,
+  "failed": 7,
+  "warnings": 2,
+  "overall_status": "FAILED",
+  "production_ready": false,
+  "results": [
+    {
+      "component": "Backend",
+      "test_name": "Health Check",
+      "status": "FAILED",
+      "duration_ms": 5.522489547729492,
+      "error_message": "Cannot connect to host localhost:8080 ssl:default [Connect call failed ('127.0.0.1', 8080)]",
+      "metrics": null
+    },
+    {
+      "component": "Backend",
+      "test_name": "Conformal Prediction API",
+      "status": "FAILED",
+      "duration_ms": 1.0530948638916016,
+      "error_message": "Cannot connect to host localhost:8080 ssl:default [Connect call failed ('127.0.0.1', 8080)]",
+      "metrics": null
+    },
+    {
+      "component": "Backend",
+      "test_name": "Mathematical Accuracy",
+      "status": "WARNING",
+      "duration_ms": 4.047870635986328,
+      "error_message": "Some ATS-CP variants failed",
+      "metrics": null
+    },
+    {
+      "component": "Backend",
+      "test_name": "Performance Benchmarks",
+      "status": "FAILED",
+      "duration_ms": 0.8788108825683594,
+      "error_message": "Cannot connect to host localhost:8080 ssl:default [Connect call failed ('127.0.0.1', 8080)]",
+      "metrics": null
+    },
+    {
+      "component": "Frontend",
+      "test_name": "Build Validation",
+      "status": "FAILED",
+      "duration_ms": 0.021696090698242188,
+      "error_message": "Build directory not found: /home/kutlu/Tengri/frontend/dist",
+      "metrics": null
+    },
+    {
+      "component": "Frontend",
+      "test_name": "API Client",
+      "status": "PASSED",
+      "duration_ms": 100.738525390625,
+      "error_message": null,
+      "metrics": {
+        "client_validated": true
+      }
+    },
+    {
+      "component": "Frontend",
+      "test_name": "MultiOutputConformalChart",
+      "status": "PASSED",
+      "duration_ms": 0.07271766662597656,
+      "error_message": null,
+      "metrics": {
+        "component_path": "/home/kutlu/Tengri/frontend/src/components/conformal/MultiOutputConformalChart.tsx"
+      }
+    },
+    {
+      "component": "Integration",
+      "test_name": "WebSocket Connection",
+      "status": "PASSED",
+      "duration_ms": 100.57973861694336,
+      "error_message": null,
+      "metrics": {
+        "connection_tested": true
+      }
+    },
+    {
+      "component": "Integration",
+      "test_name": "Real-time Data Flow",
+      "status": "PASSED",
+      "duration_ms": 200.51002502441406,
+      "error_message": null,
+      "metrics": {
+        "data_flow_tested": true
+      }
+    },
+    {
+      "component": "Integration",
+      "test_name": "End-to-End Pipeline",
+      "status": "FAILED",
+      "duration_ms": 2.0279884338378906,
+      "error_message": "Cannot connect to host localhost:8080 ssl:default [Connect call failed ('127.0.0.1', 8080)]",
+      "metrics": null
+    },
+    {
+      "component": "Security",
+      "test_name": "API Security",
+      "status": "FAILED",
+      "duration_ms": 1.840353012084961,
+      "error_message": "Cannot connect to host localhost:8080 ssl:default [Connect call failed ('127.0.0.1', 8080)]",
+      "metrics": null
+    },
+    {
+      "component": "Security",
+      "test_name": "Data Validation",
+      "status": "PASSED",
+      "duration_ms": 7.650136947631836,
+      "error_message": null,
+      "metrics": {
+        "validation_tests": 4,
+        "passed": 4
+      }
+    },
+    {
+      "component": "Performance",
+      "test_name": "Concurrent Predictions",
+      "status": "WARNING",
+      "duration_ms": 22.008180618286133,
+      "error_message": "Low success rate: 0/20",
+      "metrics": null
+    },
+    {
+      "component": "Performance",
+      "test_name": "Stress Conditions",
+      "status": "FAILED",
+      "duration_ms": 5.55729866027832,
+      "error_message": "Cannot connect to host localhost:8080 ssl:default [Connect call failed ('127.0.0.1', 8080)]",
+      "metrics": null
+    }
+  ],
+  "recommendations": [
+    "Address critical failures before production deployment",
+    "Implement comprehensive monitoring and alerting",
+    "Establish automated testing pipeline",
+    "Regular performance and security audits"
+  ]
+}
