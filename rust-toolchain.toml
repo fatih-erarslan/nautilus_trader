@@ -1,0 +1,5 @@
+[toolchain]
+channel = "stable"
+
+[env]
+RUST_MIN_STACK = "134217728"
