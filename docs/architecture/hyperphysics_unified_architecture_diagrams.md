@@ -870,3 +870,346 @@ The pBit-LSH Cortical Bus is the central innovation - it provides:
 - **Hierarchical locality** (local fast, global when needed)
 - **Probabilistic computing** (energy-efficient, fault-tolerant)
 - **Learning substrate** (LSH buckets encode problem-solution associations)
+
+---
+
+## APPENDIX A: Implemented Crate Architecture
+
+The following diagrams show the actual implemented architecture of the `hyperphysics-reasoning-router` and `hyperphysics-reasoning-backends` crates.
+
+### A.1 Reasoning Router Crate Structure
+
+```mermaid
+classDiagram
+    class ReasoningRouter {
+        -backends: Vec~Arc~dyn ReasoningBackend~~
+        -lsh_index: LSHIndex
+        -selector: BackendSelector
+        -synthesizer: ResultSynthesizer
+        -config: RouterConfig
+        +register_backend(backend)
+        +solve(problem) RouterResult~ReasoningResult~
+        +route_problem(signature) Vec~BackendId~
+    }
+
+    class Problem {
+        +id: String
+        +signature: ProblemSignature
+        +data: ProblemData
+        +objective: Option~ObjectiveSpec~
+        +constraints: Vec~ConstraintSpec~
+    }
+
+    class ProblemSignature {
+        +problem_type: ProblemType
+        +domain: ProblemDomain
+        +dimensionality: u32
+        +sparsity: f32
+        +latency_budget: LatencyTier
+        +structure: StructureType
+        +is_stochastic: bool
+        +needs_gradients: bool
+        +to_feature_vector() [f32; 16]
+        +similarity(other) f32
+    }
+
+    class LSHIndex {
+        -config: LSHConfig
+        -hash_functions: Vec~HashFunction~
+        -buckets: HashMap~u64, Vec~Entry~~
+        +insert(signature, backend_id)
+        +query(signature, k) Vec~BackendId~
+    }
+
+    class BackendSelector {
+        -strategy: SelectionStrategy
+        -thompson_sampler: ThompsonSampler
+        -performance_stats: HashMap~BackendId, Stats~
+        +select(candidates, signature) BackendId
+        +update(backend_id, success, quality)
+    }
+
+    class ResultSynthesizer {
+        -strategy: SynthesisStrategy
+        +synthesize(results) ReasoningResult
+    }
+
+    ReasoningRouter --> Problem : solves
+    ReasoningRouter --> LSHIndex : routes via
+    ReasoningRouter --> BackendSelector : selects with
+    ReasoningRouter --> ResultSynthesizer : combines with
+    Problem --> ProblemSignature : has
+```
+
+### A.2 ReasoningBackend Trait Implementation
+
+```mermaid
+classDiagram
+    class ReasoningBackend {
+        <<trait>>
+        +id() BackendId
+        +name() str
+        +pool() BackendPool
+        +supported_domains() [ProblemDomain]
+        +capabilities() HashSet~BackendCapability~
+        +latency_tier() LatencyTier
+        +can_handle(signature) bool
+        +estimate_latency(signature) Duration
+        +execute(problem) RouterResult~ReasoningResult~
+        +metrics() BackendMetrics
+    }
+
+    class PhysicsBackendAdapter {
+        -id: BackendId
+        -config: PhysicsAdapterConfig
+        -gpu_accelerated: bool
+        -differentiable: bool
+        +rapier() Self
+        +jolt() Self
+        +warp() Self
+        +taichi() Self
+        +mujoco() Self
+        +genesis() Self
+        +avian() Self
+        +chrono() Self
+    }
+
+    class PSOBackend {
+        -id: BackendId
+        -config: PSOConfig
+        +optimize(objective, dim, bounds)
+    }
+
+    class GeneticAlgorithmBackend {
+        -id: BackendId
+        -config: GAConfig
+        +evolve(fitness, dim, bounds)
+    }
+
+    class MonteCarloBackend {
+        -id: BackendId
+        -config: MonteCarloConfig
+        +simulate(sampler) MonteCarloStats
+        +estimate_expectation(f, dim)
+    }
+
+    class BayesianBackend {
+        -id: BackendId
+        -config: BayesianConfig
+        +sample_posterior(log_likelihood, prior)
+    }
+
+    class Z3Backend {
+        -id: BackendId
+        -config: Z3Config
+        +check_sat(constraints)
+        +verify_property(property)
+    }
+
+    ReasoningBackend <|.. PhysicsBackendAdapter
+    ReasoningBackend <|.. PSOBackend
+    ReasoningBackend <|.. GeneticAlgorithmBackend
+    ReasoningBackend <|.. MonteCarloBackend
+    ReasoningBackend <|.. BayesianBackend
+    ReasoningBackend <|.. Z3Backend
+```
+
+### A.3 Backend Pool Organization
+
+```mermaid
+flowchart TB
+    subgraph PHYSICS_POOL["Physics Pool (BackendPool::Physics)"]
+        direction LR
+        RAPIER["PhysicsBackendAdapter::rapier()<br/>Rust Native, CPU"]
+        JOLT["PhysicsBackendAdapter::jolt()<br/>C++ FFI, CPU"]
+        WARP["PhysicsBackendAdapter::warp()<br/>GPU, Differentiable"]
+        TAICHI["PhysicsBackendAdapter::taichi()<br/>GPU, Differentiable"]
+        MUJOCO["PhysicsBackendAdapter::mujoco()<br/>Robotics, Differentiable"]
+        GENESIS["PhysicsBackendAdapter::genesis()<br/>GPU, Differentiable"]
+        AVIAN["PhysicsBackendAdapter::avian()<br/>Bevy ECS, CPU"]
+        CHRONO["PhysicsBackendAdapter::chrono()<br/>Multibody, CPU"]
+    end
+
+    subgraph OPT_POOL["Optimization Pool (BackendPool::Optimization)"]
+        direction LR
+        PSO["PSOBackend<br/>Swarm: 50 particles<br/>Iterations: 1000"]
+        GA["GeneticAlgorithmBackend<br/>Pop: 100<br/>Generations: 500"]
+    end
+
+    subgraph STAT_POOL["Statistical Pool (BackendPool::Statistical)"]
+        direction LR
+        MC["MonteCarloBackend<br/>Samples: 10000<br/>Antithetic Variates"]
+        BAYES["BayesianBackend<br/>MCMC Samples: 5000<br/>Burn-in: 1000"]
+    end
+
+    subgraph FORMAL_POOL["Formal Pool (BackendPool::Formal)"]
+        direction LR
+        Z3["Z3Backend<br/>SMT Solver<br/>Timeout: 10s"]
+        PROP["PropertyVerifier<br/>Assertion Checking"]
+    end
+
+    style PHYSICS_POOL fill:#0d7377,stroke:#14ffec,stroke-width:2px
+    style OPT_POOL fill:#4a235a,stroke:#af7ac5,stroke-width:2px
+    style STAT_POOL fill:#1a5276,stroke:#5dade2,stroke-width:2px
+    style FORMAL_POOL fill:#7b241c,stroke:#f1948a,stroke-width:2px
+```
+
+### A.4 Problem Type to Backend Mapping
+
+```mermaid
+flowchart LR
+    subgraph PROBLEM_TYPES["ProblemType Enum (13 variants)"]
+        PT_OPT[Optimization]
+        PT_SIM[Simulation]
+        PT_PRED[Prediction]
+        PT_CLASS[Classification]
+        PT_VER[Verification]
+        PT_CTRL[Control]
+        PT_EST[Estimation]
+        PT_RISK[RiskAssessment]
+        PT_INF[Inference]
+        PT_PARAM[ParameterTuning]
+        PT_DYN[Dynamics]
+        PT_CSP[ConstraintSatisfaction]
+        PT_GEN[General]
+    end
+
+    subgraph DOMAINS["ProblemDomain Enum (8 variants)"]
+        PD_PHY[Physics]
+        PD_OPT[Optimization]
+        PD_STAT[Statistical]
+        PD_VER[Verification]
+        PD_FIN[Financial]
+        PD_CTRL[Control]
+        PD_ENG[Engineering]
+        PD_GEN[General]
+    end
+
+    subgraph ROUTING["can_handle() Routing"]
+        R_PHYS["Physics Backends<br/>Simulation + Dynamics<br/>→ Physics/Engineering"]
+        R_OPT["Optimization Backends<br/>Optimization + ParameterTuning<br/>→ Any Domain"]
+        R_STAT["Statistical Backends<br/>RiskAssessment + Inference + Estimation<br/>→ Financial/Statistical"]
+        R_FORMAL["Formal Backends<br/>Verification + ConstraintSatisfaction<br/>→ Verification"]
+    end
+
+    PT_SIM & PT_DYN --> R_PHYS
+    PT_OPT & PT_PARAM --> R_OPT
+    PT_RISK & PT_INF & PT_EST --> R_STAT
+    PT_VER & PT_CSP --> R_FORMAL
+
+    PD_PHY & PD_ENG --> R_PHYS
+    PD_FIN --> R_STAT
+    PD_VER --> R_FORMAL
+```
+
+### A.5 Latency Tier Hierarchy
+
+```mermaid
+flowchart TB
+    subgraph LATENCY_TIERS["LatencyTier Enum (Ord implemented)"]
+        direction TB
+        T_ULTRA["UltraFast < 10μs<br/>Lookup tables, SIMD only"]
+        T_FAST["Fast < 1ms<br/>Rapier, Jolt, Mini-PSO"]
+        T_MED["Medium < 10ms<br/>Full PSO, Monte Carlo"]
+        T_SLOW["Slow < 100ms<br/>GA, Bayesian MCMC"]
+        T_DEEP["Deep > 100ms<br/>Z3 Verification, GP"]
+    end
+
+    T_ULTRA --> T_FAST --> T_MED --> T_SLOW --> T_DEEP
+
+    subgraph BACKEND_ASSIGNMENT["Backend Latency Assignment"]
+        B_PHY_CPU["Rapier/Jolt/Avian → Fast"]
+        B_PHY_GPU["Warp/Taichi/Genesis → Fast (GPU)"]
+        B_OPT["PSO/GA → Medium to Slow"]
+        B_STAT["Monte Carlo → Medium<br/>Bayesian → Slow"]
+        B_FORMAL["Z3 → Deep"]
+    end
+
+    T_FAST --- B_PHY_CPU
+    T_FAST --- B_PHY_GPU
+    T_MED --- B_OPT
+    T_MED --- B_STAT
+    T_DEEP --- B_FORMAL
+
+    style T_ULTRA fill:#00ff00,stroke:#000
+    style T_FAST fill:#7fff00,stroke:#000
+    style T_MED fill:#ffff00,stroke:#000
+    style T_SLOW fill:#ffa500,stroke:#000
+    style T_DEEP fill:#ff4500,stroke:#000
+```
+
+### A.6 Result Synthesis Strategies
+
+```mermaid
+flowchart TB
+    subgraph RESULTS["Multiple Backend Results"]
+        R1["Result 1<br/>confidence: 0.95<br/>quality: 0.9<br/>latency: 5ms"]
+        R2["Result 2<br/>confidence: 0.85<br/>quality: 0.95<br/>latency: 50ms"]
+        R3["Result 3<br/>confidence: 0.90<br/>quality: 0.85<br/>latency: 100ms"]
+    end
+
+    subgraph STRATEGIES["SynthesisStrategy Enum"]
+        S_FIRST["FirstValid<br/>Return first successful result"]
+        S_FAST["Fastest<br/>Lowest latency result"]
+        S_CONF["HighestConfidence<br/>Select by confidence score"]
+        S_QUAL["HighestQuality<br/>Select by quality metric"]
+        S_MED["Median<br/>Middle value for numerics"]
+        S_AVG["WeightedAverage<br/>Combine by confidence weights"]
+        S_ENS["Ensemble<br/>Vote across all backends"]
+    end
+
+    R1 & R2 & R3 --> STRATEGIES
+
+    STRATEGIES --> FINAL["Final ReasoningResult<br/>value + confidence + quality + latency"]
+
+    style S_FIRST fill:#65c2ff
+    style S_FAST fill:#00ff9d
+    style S_CONF fill:#ffd700
+    style S_QUAL fill:#ff6b9d
+    style S_ENS fill:#c061ff
+```
+
+### A.7 LSH-Based Problem Routing
+
+```mermaid
+flowchart TB
+    subgraph SIGNATURE["ProblemSignature.to_feature_vector()"]
+        F0["[0] problem_type / 12"]
+        F7["[7] domain / 7"]
+        F8["[8] log10(dim) / 6"]
+        F9["[9] sparsity"]
+        F10["[10] latency_tier / 4"]
+        F11["[11] structure / 5"]
+        F12["[12] is_stochastic"]
+        F13["[13] needs_gradients"]
+        F14["[14] is_multi_objective"]
+        F15["[15] complexity_estimate"]
+    end
+
+    subgraph LSH["LSHIndex"]
+        HASH["Random Hyperplane<br/>Hash Functions"]
+        BUCKET["Hash Buckets<br/>HashMap<u64, Vec<Entry>>"]
+        QUERY["k-NN Query<br/>Similarity Threshold"]
+    end
+
+    subgraph RESULT["Routing Result"]
+        CAND["Candidate Backends<br/>Historically successful<br/>for similar problems"]
+    end
+
+    SIGNATURE --> |"16-dim vector"| HASH
+    HASH --> |"WTA hashing"| BUCKET
+    BUCKET --> |"collision lookup"| QUERY
+    QUERY --> CAND
+
+    style LSH fill:#1a1a2e,stroke:#e94560,stroke-width:2px
+```
+
+---
+
+## Test Coverage Summary
+
+| Crate | Tests | Status |
+|-------|-------|--------|
+| hyperphysics-reasoning-router | 28 | ✅ All passing |
+| hyperphysics-reasoning-backends | 18 | ✅ All passing |
+| **Total** | **46** | **✅ All passing** |
