@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hive-mind-service-account
+  namespace: hive-mind-production
+  labels:
+    app: hive-mind-rust
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::ACCOUNT:role/HiveMindServiceRole"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: hive-mind-production
+  name: hive-mind-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/log", "pods/status"]
+  verbs: ["get"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: hive-mind-role-binding
+  namespace: hive-mind-production
+subjects:
+- kind: ServiceAccount
+  name: hive-mind-service-account
+  namespace: hive-mind-production
+roleRef:
+  kind: Role
+  name: hive-mind-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hive-mind-service-account-token
+  namespace: hive-mind-production
+  annotations:
+    kubernetes.io/service-account.name: hive-mind-service-account
+type: kubernetes.io/service-account-token

@@ -1,0 +1,115 @@
+[workspace]
+members = ["core", "wasm", "parasitic", "tests"]
+resolver = "2"
+
+[workspace.package]
+version = "2.0.0"
+edition = "2021"
+authors = ["CWTS Ultra Team"]
+license = "MIT"
+
+[workspace.dependencies]
+# Core dependencies with unified versions
+crossbeam = "0.8"
+parking_lot = "0.12"
+tokio = { version = "1.40", features = ["full", "macros", "rt-multi-thread"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
+protobuf = "3.7.2"
+thiserror = "1.0"
+anyhow = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.10", features = ["v4", "serde"] }
+dashmap = "6.1"
+
+# SIMD and math libraries with unified versions
+wide = "0.7"
+ndarray = { version = "0.15", features = ["serde"] }
+nalgebra.workspace = true
+rayon = "1.10"
+
+# Random number generation - unified to rand 0.8 to avoid conflicts
+rand = { version = "0.8", features = ["small_rng"] }
+rand_distr = "0.4"
+fastrand = "2.0"
+
+# Neural network dependencies - downgraded to compatible version
+# Force exact version to avoid rand conflicts
+candle-core = { version = "=0.6.0" }
+candle-nn = { version = "=0.6.0" }
+
+# Async utilities
+async-trait = "0.1"
+futures = "0.3"
+futures-util = "0.3"
+
+# Web and networking
+axum = { version = "0.7", features = ["ws"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors"] }
+hyper = { version = "1.0", features = ["full"] }
+tokio-tungstenite = "0.24"
+tungstenite = "0.24"
+regex = "1.10"
+
+# Memory and system
+bytes = "1.7"
+memmap2 = "0.9"
+once_cell = "1.20"
+num_cpus = "1.16"
+jemallocator = "0.5"
+
+# Crypto
+sha2 = "0.10"
+
+# CLI and configuration
+clap = { version = "4.5", features = ["derive"] }
+toml = "0.8"
+
+# Complex numbers
+num-complex = { version = "0.4", features = ["serde"] }
+
+# System info
+sys-info = "0.9"
+
+# Testing
+proptest = "1.5"
+
+# Quantum simulation
+qip = "0.8"
+
+# Additional missing dependencies
+log = "0.4"
+rust_decimal = { version = "1.33", features = ["serde"] }
+crossbeam-channel = "0.5"
+
+# Monitoring and profiling - upgraded to fix CVE-2024-0437 (protobuf < 3.7.2)
+prometheus = "0.14"
+pprof = "0.15"
+
+[profile.dev]
+opt-level = 0
+lto = "off"
+codegen-units = 16
+panic = "unwind"
+overflow-checks = true
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+debug = false
+
+[profile.bench]
+inherits = "release"
+
+[profile.test]
+inherits = "dev"
+
+[profile.profiling]
+inherits = "release"

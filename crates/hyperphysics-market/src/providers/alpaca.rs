@@ -38,7 +38,7 @@ use chrono::{DateTime, Utc};
 use reqwest::{Client, header};
 use serde::Deserialize;
 use std::time::Duration;
-use tracing::{debug, warn};
+use tracing::debug;
 
 use crate::data::{Bar, Timeframe};
 use crate::error::{MarketError, MarketResult};
@@ -52,6 +52,12 @@ pub struct AlpacaProvider {
 }
 
 impl AlpacaProvider {
+    /// Maximum retries for API requests with transient failures
+    const MAX_RETRIES: u32 = 3;
+
+    /// Initial retry delay in milliseconds
+    const INITIAL_RETRY_DELAY_MS: u64 = 100;
+
     /// Create a new Alpaca provider instance
     ///
     /// # Arguments
@@ -109,6 +115,92 @@ impl AlpacaProvider {
             Timeframe::Month1 => "1Month",
         }
     }
+
+    /// Retry request with exponential backoff
+    async fn retry_with_backoff<F, Fut, T>(
+        &self,
+        mut operation: F,
+    ) -> MarketResult<T>
+    where
+        F: FnMut() -> Fut,
+        Fut: std::future::Future<Output = MarketResult<T>>,
+    {
+        let mut retry_count = 0;
+        let mut delay_ms = Self::INITIAL_RETRY_DELAY_MS;
+
+        loop {
+            match operation().await {
+                Ok(result) => return Ok(result),
+                Err(e) => {
+                    // Only retry on transient errors
+                    let should_retry = matches!(
+                        e,
+                        MarketError::NetworkError(_)
+                            | MarketError::TimeoutError(_)
+                            | MarketError::ConnectionError(_)
+                    );
+
+                    if !should_retry || retry_count >= Self::MAX_RETRIES {
+                        return Err(e);
+                    }
+
+                    retry_count += 1;
+                    debug!(
+                        "Retrying request (attempt {}/{}), waiting {}ms",
+                        retry_count, Self::MAX_RETRIES, delay_ms
+                    );
+
+                    tokio::time::sleep(Duration::from_millis(delay_ms)).await;
+                    delay_ms *= 2; // Exponential backoff
+                }
+            }
+        }
+    }
+
+    /// Validate OHLC data integrity
+    fn validate_bar(bar: &AlpacaBar) -> MarketResult<()> {
+        // Check for non-positive prices
+        if bar.open <= 0.0 || bar.high <= 0.0 || bar.low <= 0.0 || bar.close <= 0.0 {
+            return Err(MarketError::DataIntegrityError(
+                "Bar contains non-positive prices".to_string(),
+            ));
+        }
+
+        // Validate OHLC relationships: high >= max(open, close) and low <= min(open, close)
+        let max_price = bar.open.max(bar.close);
+        let min_price = bar.open.min(bar.close);
+
+        if bar.high < max_price {
+            return Err(MarketError::DataIntegrityError(format!(
+                "High price {} is less than max(open, close) {}",
+                bar.high, max_price
+            )));
+        }
+
+        if bar.low > min_price {
+            return Err(MarketError::DataIntegrityError(format!(
+                "Low price {} is greater than min(open, close) {}",
+                bar.low, min_price
+            )));
+        }
+
+        // Additional sanity check: high must be >= low
+        if bar.high < bar.low {
+            return Err(MarketError::DataIntegrityError(format!(
+                "High price {} is less than low price {}",
+                bar.high, bar.low
+            )));
+        }
+
+        // Validate volume is non-negative
+        if bar.volume == 0 {
+            return Err(MarketError::DataIntegrityError(
+                "Bar has zero volume".to_string(),
+            ));
+        }
+
+        Ok(())
+    }
 }
 
 #[async_trait]
@@ -125,37 +217,110 @@ impl MarketDataProvider for AlpacaProvider {
             symbol, start, end, timeframe
         );
 
-        // TODO: Implement Alpaca bars API call
-        // Endpoint: GET /v2/stocks/{symbol}/bars
-        // Query params: timeframe, start, end, limit, adjustment, feed
-        //
-        // Steps:
-        // 1. Build request URL with query parameters
-        // 2. Make authenticated HTTP request
-        // 3. Parse AlpacaBarResponse
-        // 4. Convert to Vec<Bar>
-        // 5. Handle pagination if needed (max 10000 bars per request)
+        // Implementation based on Alpaca Market Data API v2
+        // Reference: https://docs.alpaca.markets/reference/stockbars
+        let url = format!("{}/stocks/{}/bars", self.config.base_url, symbol);
+        let timeframe_str = Self::timeframe_to_alpaca(timeframe);
 
-        warn!("Alpaca fetch_bars not yet implemented - returning empty vec");
-        Ok(Vec::new())
+        // RFC3339 format required by Alpaca API
+        let start_str = start.to_rfc3339();
+        let end_str = end.to_rfc3339();
+
+        let response = self.client
+            .get(&url)
+            .query(&[
+                ("timeframe", timeframe_str),
+                ("start", &start_str),
+                ("end", &end_str),
+                ("limit", "10000"), // Max limit per request
+                ("adjustment", "raw"), // No corporate action adjustments
+                ("feed", "iex"), // IEX feed for free tier
+            ])
+            .send()
+            .await
+            .map_err(|e| MarketError::NetworkError(e.to_string()))?;
+
+        let status = response.status();
+        if !status.is_success() {
+            let error_text = response.text().await.unwrap_or_default();
+            return Err(MarketError::ApiError(format!(
+                "Alpaca API error: {} - {}",
+                status,
+                error_text
+            )));
+        }
+
+        let api_response: AlpacaBarResponse = response
+            .json()
+            .await
+            .map_err(|e| MarketError::ParseError(e.to_string()))?;
+
+        // Convert Alpaca bars to unified Bar format with validation
+        let bars: MarketResult<Vec<Bar>> = api_response
+            .bars
+            .into_iter()
+            .filter_map(|alpaca_bar| {
+                // Validate bar data integrity
+                match Self::validate_bar(&alpaca_bar) {
+                    Ok(()) => Some(alpaca_bar.to_bar(symbol.to_string())),
+                    Err(e) => {
+                        debug!("Skipping invalid bar: {}", e);
+                        None
+                    }
+                }
+            })
+            .collect();
+
+        // Handle pagination if next_page_token exists
+        // TODO: Implement recursive pagination for large datasets
+        if api_response.next_page_token.is_some() {
+            debug!("More data available via pagination token (not implemented)");
+        }
+
+        bars
     }
 
     async fn fetch_latest_bar(&self, symbol: &str) -> MarketResult<Bar> {
         debug!("Fetching latest bar for {}", symbol);
 
-        // TODO: Implement Alpaca latest bar API call
-        // Endpoint: GET /v2/stocks/{symbol}/bars/latest
-        // Query params: feed
-        //
-        // Steps:
-        // 1. Build request URL
-        // 2. Make authenticated HTTP request
-        // 3. Parse single bar response
-        // 4. Convert to Bar
+        // Implementation based on Alpaca Market Data API v2
+        // Reference: https://docs.alpaca.markets/reference/stocklatestbar
+        let url = format!("{}/stocks/{}/bars/latest", self.config.base_url, symbol);
 
-        Err(MarketError::ApiError(
-            "Alpaca fetch_latest_bar not yet implemented".to_string()
-        ))
+        let response = self.client
+            .get(&url)
+            .query(&[("feed", "iex")]) // IEX feed for free tier
+            .send()
+            .await
+            .map_err(|e| MarketError::NetworkError(e.to_string()))?;
+
+        let status = response.status();
+        if !status.is_success() {
+            let error_text = response.text().await.unwrap_or_default();
+            return Err(MarketError::ApiError(format!(
+                "Alpaca API error: {} - {}",
+                status,
+                error_text
+            )));
+        }
+
+        // Parse response which contains a single bar under "bar" key
+        let json: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|e| MarketError::ParseError(e.to_string()))?;
+
+        let bar_value = json.get("bar").ok_or_else(|| {
+            MarketError::ParseError("Missing 'bar' field in latest bar response".to_string())
+        })?;
+
+        let alpaca_bar: AlpacaBar = serde_json::from_value(bar_value.clone())
+            .map_err(|e| MarketError::ParseError(e.to_string()))?;
+
+        // Validate bar data integrity
+        Self::validate_bar(&alpaca_bar)?;
+
+        alpaca_bar.to_bar(symbol.to_string())
     }
 
     fn provider_name(&self) -> &str {
@@ -167,10 +332,53 @@ impl MarketDataProvider for AlpacaProvider {
     }
 
     async fn supports_symbol(&self, symbol: &str) -> MarketResult<bool> {
-        // TODO: Implement symbol validation
-        // Could query /v2/assets/{symbol} endpoint
-        debug!("Symbol support check for {} - defaulting to true", symbol);
-        Ok(true)
+        // Implementation based on Alpaca Assets API
+        // Reference: https://docs.alpaca.markets/reference/get-v2-assets-symbol
+        debug!("Checking symbol support for {}", symbol);
+
+        let url = format!(
+            "https://api.alpaca.markets/v2/assets/{}",
+            symbol.to_uppercase()
+        );
+
+        let response = self.client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| MarketError::NetworkError(e.to_string()))?;
+
+        // 200 = asset exists and is valid
+        // 404 = asset not found
+        match response.status().as_u16() {
+            200 => {
+                // Verify asset is tradable
+                let asset: serde_json::Value = response
+                    .json()
+                    .await
+                    .map_err(|e| MarketError::ParseError(e.to_string()))?;
+
+                let tradable = asset
+                    .get("tradable")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
+
+                let active = asset
+                    .get("status")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s == "active")
+                    .unwrap_or(false);
+
+                Ok(tradable && active)
+            }
+            404 => Ok(false),
+            _ => {
+                let error_text = response.text().await.unwrap_or_default();
+                Err(MarketError::ApiError(format!(
+                    "Alpaca asset check error: {}",
+                    error_text
+                )))
+            }
+        }
     }
 }
 

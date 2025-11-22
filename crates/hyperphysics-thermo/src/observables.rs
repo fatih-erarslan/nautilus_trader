@@ -300,7 +300,7 @@ impl Default for ObservableTimeSeries {
 
 /// Spin correlation functions
 pub mod spin {
-    use super::Observable;
+    
 
     /// Compute spin-spin correlation ⟨s_i s_j⟩
     pub fn spin_correlation(states: &[u32]) -> Vec<f64> {

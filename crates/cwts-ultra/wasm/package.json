@@ -1,0 +1,13 @@
+{
+  "name": "cwts-ultra-wasm",
+  "version": "2.0.0",
+  "description": "CWTS Ultra Trading System WASM Module",
+  "main": "index.js",
+  "scripts": {
+    "build": "wasm-pack build --target web --out-dir pkg",
+    "optimize": "wasm-opt -O4 --enable-simd pkg/cwts_ultra_wasm_bg.wasm -o pkg/cwts_ultra_wasm_bg_opt.wasm"
+  },
+  "devDependencies": {
+    "wasm-pack": "^0.12.0"
+  }
+}

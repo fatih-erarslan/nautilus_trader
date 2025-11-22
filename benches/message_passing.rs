@@ -1,7 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
 use std::sync::mpsc;
 use std::thread;
-use std::time::Duration;
 
 /// Benchmark message passing latency between threads
 fn bench_message_passing(c: &mut Criterion) {

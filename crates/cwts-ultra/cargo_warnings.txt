@@ -1,0 +1,2825 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/kutlu/CWTS/cwts-ultra/core/Cargo.toml
+workspace: /home/kutlu/CWTS/cwts-ultra/Cargo.toml
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/kutlu/CWTS/cwts-ultra/wasm/Cargo.toml
+workspace: /home/kutlu/CWTS/cwts-ultra/Cargo.toml
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/kutlu/CWTS/cwts-ultra/parasitic/Cargo.toml
+workspace: /home/kutlu/CWTS/cwts-ultra/Cargo.toml
+warning: unused variable: `side`
+   --> core/src/algorithms/slippage_calculator.rs:300:9
+    |
+300 |         side: &TradeSide,
+    |         ^^^^ help: if this is intentional, prefix it with an underscore: `_side`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `side`
+   --> core/src/algorithms/slippage_calculator.rs:453:9
+    |
+453 |         side: TradeSide,
+    |         ^^^^ help: if this is intentional, prefix it with an underscore: `_side`
+
+warning: unused variable: `guard`
+  --> core/src/execution/atomic_orders.rs:95:13
+   |
+95 |         let guard = &epoch::pin();
+   |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_guard`
+
+warning: fields `execution_tx`, `execution_rx`, `max_order_age_ns`, and `max_slippage_bps` are never read
+   --> core/src/execution/smart_order_routing.rs:417:5
+    |
+407 | pub struct SmartOrderRouter {
+    |            ---------------- fields in this struct
+...
+417 |     execution_tx: Sender<ExecutionRequest>,
+    |     ^^^^^^^^^^^^
+418 |     execution_rx: Receiver<ExecutionRequest>,
+    |     ^^^^^^^^^^^^
+...
+421 |     max_order_age_ns: u64,
+    |     ^^^^^^^^^^^^^^^^
+...
+424 |     max_slippage_bps: u32,
+    |     ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: multiple fields are never read
+   --> core/src/execution/smart_order_routing.rs:438:5
+    |
+437 | struct ExecutionRequest {
+    |        ---------------- fields in this struct
+438 |     order_id: u64,
+    |     ^^^^^^^^
+439 |     symbol: String,
+    |     ^^^^^^
+440 |     side: OrderSide,
+    |     ^^^^
+441 |     quantity: u64,
+    |     ^^^^^^^^
+442 |     price: Option<u64>, // None for market orders
+    |     ^^^^^
+443 |     order_type: OrderType,
+    |     ^^^^^^^^^^
+444 |     max_slippage_bps: Option<u32>,
+    |     ^^^^^^^^^^^^^^^^
+445 |     timeout_ns: u64,
+    |     ^^^^^^^^^^
+    |
+    = note: `ExecutionRequest` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: method `clone` is never used
+   --> core/src/execution/smart_order_routing.rs:460:12
+    |
+458 | impl ExecutionStats {
+    | ------------------- method in this implementation
+459 |     /// Manual clone implementation since atomic types cannot be cloned
+460 |     pub fn clone(&self) -> Self {
+    |            ^^^^^
+
+warning: fields `slice_execution_rx`, `max_concurrent_executions`, `max_retry_count`, `average_completion_rate`, and `average_slippage_bps` are never read
+   --> core/src/execution/twap_vwap.rs:529:5
+    |
+517 | pub struct ExecutionEngine {
+    |            --------------- fields in this struct
+...
+529 |     slice_execution_rx: Receiver<ExecutionSlice>,
+    |     ^^^^^^^^^^^^^^^^^^
+...
+534 |     max_concurrent_executions: u32,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+535 |     slice_timeout_ns: u64,
+536 |     max_retry_count: u32,
+    |     ^^^^^^^^^^^^^^^
+...
+542 |     average_completion_rate: AtomicU32, // As percentage * 100
+    |     ^^^^^^^^^^^^^^^^^^^^^^^
+543 |     average_slippage_bps: AtomicU32,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: field `next_execution_time` is never read
+   --> core/src/execution/twap_vwap.rs:552:5
+    |
+547 | struct StrategyExecution {
+    |        ----------------- field in this struct
+...
+552 |     next_execution_time: AtomicU64,
+    |     ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `StrategyExecution` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `timing_offset`, `price_offset`, and `behavior_type` are never read
+  --> core/src/execution/iceberg_orders.rs:97:5
+   |
+95 | pub struct StealthParameters {
+   |            ----------------- fields in this struct
+96 |     size_modifier: f32,     // -0.2 to 0.2 (size adjustment)
+97 |     timing_offset: i64,     // -500ms to +500ms offset
+   |     ^^^^^^^^^^^^^
+98 |     price_offset: i64,      // Price adjustment in micropips
+   |     ^^^^^^^^^^^^
+99 |     behavior_type: u32,     // 0=aggressive, 1=passive, 2=adaptive
+   |     ^^^^^^^^^^^^^
+   |
+   = note: `StealthParameters` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `slippage_tracking` is never read
+   --> core/src/execution/iceberg_orders.rs:242:5
+    |
+214 | pub struct IcebergOrder {
+    |            ------------ field in this struct
+...
+242 |     slippage_tracking: RwLock<Vec<i64>>,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: fields `router` and `average_stealth_score` are never read
+   --> core/src/execution/iceberg_orders.rs:807:5
+    |
+805 | pub struct IcebergOrderManager {
+    |            ------------------- fields in this struct
+806 |     orders: RwLock<HashMap<u64, Arc<IcebergOrder>>>,
+807 |     router: Arc<SmartOrderRouter>,
+    |     ^^^^^^
+...
+821 |     average_stealth_score: AtomicU32, // Fixed point (x100)
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DateTime` and `Utc`
+ --> parasitic/src/organisms/cuckoo.rs:6:14
+  |
+6 | use chrono::{DateTime, Utc};
+  |              ^^^^^^^^  ^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `rand::Rng`
+    --> parasitic/src/organisms/cordyceps.rs:1193:13
+     |
+1193 |         use rand::Rng;
+     |             ^^^^^^^^^
+
+warning: unused import: `warn`
+  --> parasitic/src/organisms/vampire_bat.rs:11:21
+   |
+11 | use tracing::{info, warn, debug};
+   |                     ^^^^
+
+warning: unused import: `warn`
+  --> parasitic/src/organisms/lancet_liver_fluke.rs:12:21
+   |
+12 | use tracing::{info, warn, debug};
+   |                     ^^^^
+
+warning: unused import: `DVector`
+  --> parasitic/src/organisms/lancet_liver_fluke.rs:13:16
+   |
+13 | use nalgebra::{DVector, DMatrix};
+   |                ^^^^^^^
+
+warning: unused import: `MarketConditions`
+  --> parasitic/src/organisms/lancet_liver_fluke.rs:18:55
+   |
+18 |     OrganismError, OrganismGenetics, ResourceMetrics, MarketConditions
+   |                                                       ^^^^^^^^^^^^^^^^
+
+warning: unused import: `warn`
+  --> parasitic/src/organisms/toxoplasma.rs:12:21
+   |
+12 | use tracing::{info, warn, debug};
+   |                     ^^^^
+
+warning: unused import: `nalgebra::DVector`
+  --> parasitic/src/organisms/toxoplasma.rs:13:5
+   |
+13 | use nalgebra::DVector;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> parasitic/src/organisms/toxoplasma.rs:14:5
+   |
+14 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused import: `nalgebra::DVector`
+  --> parasitic/src/organisms/mycelial_network.rs:13:5
+   |
+13 | use nalgebra::DVector;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `MarketConditions`
+  --> parasitic/src/organisms/mycelial_network.rs:19:55
+   |
+19 |     OrganismError, OrganismGenetics, ResourceMetrics, MarketConditions
+   |                                                       ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `HashSet` and `VecDeque`
+  --> parasitic/src/organisms/anglerfish.rs:25:33
+   |
+25 | use std::collections::{HashMap, HashSet, VecDeque};
+   |                                 ^^^^^^^  ^^^^^^^^
+
+warning: unused import: `super::anglerfish_lure::*`
+  --> parasitic/src/organisms/anglerfish_lure_test.rs:4:5
+   |
+4  | use super::anglerfish_lure::*;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+  --> parasitic/src/organisms/mod.rs:18:1
+   |
+18 | pub mod anglerfish_lure_test;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Instant`
+  --> parasitic/src/organisms/anglerfish_lure_test.rs:5:5
+   |
+5  | use std::time::Instant;
+   |     ^^^^^^^^^^^^^^^^^^
+   |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+  --> parasitic/src/organisms/mod.rs:18:1
+   |
+18 | pub mod anglerfish_lure_test;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `MarketConditions`
+  --> parasitic/src/organisms/komodo_dragon.rs:20:51
+   |
+20 |     BaseOrganism, ResourceMetrics, OrganismError, MarketConditions
+   |                                                   ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `BTreeMap` and `HashSet`
+  --> parasitic/src/organisms/komodo_dragon.rs:26:33
+   |
+26 | use std::collections::{HashMap, HashSet, VecDeque, BTreeMap};
+   |                                 ^^^^^^^            ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> parasitic/src/organisms/tardigrade.rs:27:33
+   |
+27 | use std::collections::{HashMap, HashSet, VecDeque};
+   |                                 ^^^^^^^
+
+warning: variant `Rapidly_Increasing` should have an upper camel case name
+   --> parasitic/src/organisms/tardigrade.rs:401:5
+    |
+401 |     Rapidly_Increasing,
+    |     ^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `RapidlyIncreasing`
+    |
+    = note: `#[warn(non_camel_case_types)]` on by default
+
+warning: unnecessary parentheses around block return value
+    --> parasitic/src/organisms/tardigrade.rs:1105:9
+     |
+1105 |         (volatility_score * 0.3 + volume_score * 0.25 + stability_score * 0.25 + spread_score * 0.2)
+     |         ^                                                                                          ^
+     |
+     = note: `#[warn(unused_parens)]` on by default
+help: remove these parentheses
+     |
+1105 -         (volatility_score * 0.3 + volume_score * 0.25 + stability_score * 0.25 + spread_score * 0.2)
+1105 +         volatility_score * 0.3 + volume_score * 0.25 + stability_score * 0.25 + spread_score * 0.2
+     |
+
+warning: unused import: `QuantumMode`
+  --> parasitic/src/organisms/electric_eel.rs:21:29
+   |
+21 |     quantum::{QuantumState, QuantumMode}
+   |                             ^^^^^^^^^^^
+
+warning: unused import: `QuantumMode`
+  --> parasitic/src/organisms/platypus.rs:22:29
+   |
+22 |     quantum::{QuantumState, QuantumMode}
+   |                             ^^^^^^^^^^^
+
+warning: unused import: `Error`
+ --> parasitic/src/organisms/octopus.rs:5:21
+  |
+5 | use crate::{Result, Error};
+  |                     ^^^^^
+
+warning: unused imports: `AdaptationFeedback`, `BaseOrganism`, `InfectionResult`, `MarketConditions`, `OrganismError`, `OrganismGenetics`, `ParasiticOrganism`, and `ResourceMetrics`
+ --> parasitic/src/organisms/octopus.rs:7:5
+  |
+7 |     ParasiticOrganism, InfectionResult, AdaptationFeedback, MarketConditions, 
+  |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^
+8 |     OrganismGenetics, ResourceMetrics, OrganismError, BaseOrganism
+  |     ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^
+
+warning: unused imports: `DateTime` and `Utc`
+  --> parasitic/src/organisms/octopus.rs:16:14
+   |
+16 | use chrono::{DateTime, Utc};
+   |              ^^^^^^^^  ^^^
+
+warning: unused import: `uuid::Uuid`
+  --> parasitic/src/organisms/octopus.rs:19:5
+   |
+19 | use uuid::Uuid;
+   |     ^^^^^^^^^^
+
+warning: unnecessary parentheses around assigned value
+   --> parasitic/src/organisms/mod.rs:306:30
+    |
+306 |         let genetic_factor = (self.genetics.aggression * 0.3 + 
+    |                              ^
+...
+309 |                              self.genetics.risk_tolerance * 0.3);
+    |                                                                ^
+    |
+help: remove these parentheses
+    |
+306 ~         let genetic_factor = self.genetics.aggression * 0.3 + 
+307 |                              self.genetics.efficiency * 0.2 + 
+308 |                              self.genetics.reaction_speed * 0.2 +
+309 ~                              self.genetics.risk_tolerance * 0.3;
+    |
+
+warning: unused import: `CqgsEvent`
+ --> parasitic/src/analytics/performance/mod.rs:7:19
+  |
+7 | use crate::cqgs::{CqgsEvent, ViolationSeverity};
+  |                   ^^^^^^^^^
+
+warning: unused import: `HashMap`
+  --> parasitic/src/analytics/performance/mod.rs:11:34
+   |
+11 | use std::collections::{VecDeque, HashMap};
+   |                                  ^^^^^^^
+
+warning: unused import: `SystemTime`
+  --> parasitic/src/analytics/performance/mod.rs:13:36
+   |
+13 | use std::time::{Duration, Instant, SystemTime};
+   |                                    ^^^^^^^^^^
+
+warning: unused import: `AnalyticsError`
+ --> parasitic/src/analytics/metrics/mod.rs:6:75
+  |
+6 | use crate::analytics::{OrganismPerformanceData, OrganismAnalyticsSummary, AnalyticsError};
+  |                                                                           ^^^^^^^^^^^^^^
+
+warning: unused import: `AnalyticsError`
+ --> parasitic/src/analytics/health/mod.rs:6:69
+  |
+6 | use crate::analytics::{OrganismPerformanceData, SystemHealthStatus, AnalyticsError};
+  |                                                                     ^^^^^^^^^^^^^^
+
+warning: unused imports: `CqgsEvent`, `ViolationSeverity`, and `get_cqgs`
+ --> parasitic/src/analytics/health/mod.rs:7:19
+  |
+7 | use crate::cqgs::{CqgsEvent, ViolationSeverity, get_cqgs};
+  |                   ^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `AnalyticsError`
+ --> parasitic/src/analytics/emergence/mod.rs:5:49
+  |
+5 | use crate::analytics::{OrganismPerformanceData, AnalyticsError};
+  |                                                 ^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+ --> parasitic/src/analytics/emergence/mod.rs:8:5
+  |
+8 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `AnalyticsError`
+ --> parasitic/src/analytics/dashboard/mod.rs:5:49
+  |
+5 | use crate::analytics::{OrganismPerformanceData, AnalyticsError};
+  |                                                 ^^^^^^^^^^^^^^
+
+warning: unused import: `AnalyticsError`
+ --> parasitic/src/analytics/compliance/mod.rs:6:49
+  |
+6 | use crate::analytics::{OrganismPerformanceData, AnalyticsError};
+  |                                                 ^^^^^^^^^^^^^^
+
+warning: unused imports: `CqgsEvent` and `get_cqgs`
+ --> parasitic/src/analytics/compliance/mod.rs:7:59
+  |
+7 | use crate::cqgs::{ViolationSeverity, QualityGateDecision, CqgsEvent, get_cqgs};
+  |                                                           ^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `Duration as ChronoDuration`
+ --> parasitic/src/analytics/compliance/mod.rs:8:29
+  |
+8 | use chrono::{DateTime, Utc, Duration as ChronoDuration};
+  |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::TestUtils`
+ --> parasitic/src/analytics/tests/performance_analytics_tests.rs:5:5
+  |
+5 | use super::TestUtils;
+  |     ^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:6:1
+  |
+6 | pub mod performance_analytics_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::analytics::performance::PerformanceAnalytics`
+ --> parasitic/src/analytics/tests/performance_analytics_tests.rs:6:5
+  |
+6 | use crate::analytics::performance::PerformanceAnalytics;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:6:1
+  |
+6 | pub mod performance_analytics_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `MetricAggregation` and `PerformanceMetric`
+ --> parasitic/src/analytics/tests/performance_analytics_tests.rs:7:24
+  |
+7 | use crate::analytics::{PerformanceMetric, MetricAggregation};
+  |                        ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:6:1
+  |
+6 | pub mod performance_analytics_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration` and `Instant`
+ --> parasitic/src/analytics/tests/performance_analytics_tests.rs:8:17
+  |
+8 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^  ^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:6:1
+  |
+6 | pub mod performance_analytics_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio::time::sleep`
+ --> parasitic/src/analytics/tests/performance_analytics_tests.rs:9:5
+  |
+9 | use tokio::time::sleep;
+  |     ^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:6:1
+  |
+6 | pub mod performance_analytics_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::TestUtils`
+ --> parasitic/src/analytics/tests/organism_metrics_tests.rs:5:5
+  |
+5 | use super::TestUtils;
+  |     ^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:7:1
+  |
+7 | pub mod organism_metrics_tests; 
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::analytics::metrics::OrganismMetrics`
+ --> parasitic/src/analytics/tests/organism_metrics_tests.rs:6:5
+  |
+6 | use crate::analytics::metrics::OrganismMetrics;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:7:1
+  |
+7 | pub mod organism_metrics_tests; 
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `OrganismAnalyticsSummary` and `OrganismPerformanceData`
+ --> parasitic/src/analytics/tests/organism_metrics_tests.rs:7:24
+  |
+7 | use crate::analytics::{OrganismPerformanceData, OrganismAnalyticsSummary};
+  |                        ^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:7:1
+  |
+7 | pub mod organism_metrics_tests; 
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `OrganismFactory` and `ParasiticOrganism`
+ --> parasitic/src/analytics/tests/organism_metrics_tests.rs:8:24
+  |
+8 | use crate::organisms::{OrganismFactory, ParasiticOrganism};
+  |                        ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:7:1
+  |
+7 | pub mod organism_metrics_tests; 
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+ --> parasitic/src/analytics/tests/organism_metrics_tests.rs:9:5
+  |
+9 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:7:1
+  |
+7 | pub mod organism_metrics_tests; 
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::TestUtils`
+ --> parasitic/src/analytics/tests/system_health_tests.rs:5:5
+  |
+5 | use super::TestUtils;
+  |     ^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:8:1
+  |
+8 | pub mod system_health_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::analytics::health::SystemHealthMonitor`
+ --> parasitic/src/analytics/tests/system_health_tests.rs:6:5
+  |
+6 | use crate::analytics::health::SystemHealthMonitor;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:8:1
+  |
+8 | pub mod system_health_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `OrganismPerformanceData` and `SystemHealthStatus`
+ --> parasitic/src/analytics/tests/system_health_tests.rs:7:24
+  |
+7 | use crate::analytics::{SystemHealthStatus, OrganismPerformanceData};
+  |                        ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:8:1
+  |
+8 | pub mod system_health_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration` and `Instant`
+ --> parasitic/src/analytics/tests/system_health_tests.rs:8:17
+  |
+8 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^  ^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:8:1
+  |
+8 | pub mod system_health_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio::time::sleep`
+ --> parasitic/src/analytics/tests/system_health_tests.rs:9:5
+  |
+9 | use tokio::time::sleep;
+  |     ^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:8:1
+  |
+8 | pub mod system_health_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::TestUtils`
+ --> parasitic/src/analytics/tests/cqgs_compliance_tests.rs:5:5
+  |
+5 | use super::TestUtils;
+  |     ^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:9:1
+  |
+9 | pub mod cqgs_compliance_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::analytics::compliance::CqgsComplianceTracker`
+ --> parasitic/src/analytics/tests/cqgs_compliance_tests.rs:6:5
+  |
+6 | use crate::analytics::compliance::CqgsComplianceTracker;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:9:1
+  |
+9 | pub mod cqgs_compliance_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `OrganismPerformanceData`
+ --> parasitic/src/analytics/tests/cqgs_compliance_tests.rs:7:24
+  |
+7 | use crate::analytics::{OrganismPerformanceData};
+  |                        ^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:9:1
+  |
+9 | pub mod cqgs_compliance_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `QualityGateDecision` and `ViolationSeverity`
+ --> parasitic/src/analytics/tests/cqgs_compliance_tests.rs:8:19
+  |
+8 | use crate::cqgs::{ViolationSeverity, QualityGateDecision};
+  |                   ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+  |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+ --> parasitic/src/analytics/tests/mod.rs:9:1
+  |
+9 | pub mod cqgs_compliance_tests;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::TestUtils`
+  --> parasitic/src/analytics/tests/integration_tests.rs:5:5
+   |
+5  | use super::TestUtils;
+   |     ^^^^^^^^^^^^^^^^
+   |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+  --> parasitic/src/analytics/tests/mod.rs:10:1
+   |
+10 | pub mod integration_tests;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::analytics::AnalyticsEngine`
+  --> parasitic/src/analytics/tests/integration_tests.rs:6:5
+   |
+6  | use crate::analytics::AnalyticsEngine;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+  --> parasitic/src/analytics/tests/mod.rs:10:1
+   |
+10 | pub mod integration_tests;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration` and `sleep`
+  --> parasitic/src/analytics/tests/integration_tests.rs:7:19
+   |
+7  | use tokio::time::{sleep, Duration};
+   |                   ^^^^^  ^^^^^^^^
+   |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+  --> parasitic/src/analytics/tests/mod.rs:10:1
+   |
+10 | pub mod integration_tests;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::TestUtils`
+ --> parasitic/src/analytics/tests/performance_benchmarks.rs:5:5
+  |
+5 | use super::TestUtils;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AnalyticsEngine` and `PerformanceAnalytics`
+ --> parasitic/src/analytics/tests/performance_benchmarks.rs:6:24
+  |
+6 | use crate::analytics::{AnalyticsEngine, PerformanceAnalytics};
+  |                        ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration` and `Instant`
+ --> parasitic/src/analytics/tests/performance_benchmarks.rs:7:17
+  |
+7 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^  ^^^^^^^
+
+warning: unused imports: `debug`, `error`, `instrument`, and `warn`
+  --> parasitic/src/cqgs/sentinels.rs:11:15
+   |
+11 | use tracing::{debug, error, info, warn, instrument};
+   |               ^^^^^  ^^^^^        ^^^^  ^^^^^^^^^^
+
+warning: unused import: `CqgsEvent`
+  --> parasitic/src/cqgs/coordination.rs:15:42
+   |
+15 | use crate::cqgs::{HyperbolicCoordinates, CqgsEvent};
+   |                                          ^^^^^^^^^
+
+warning: unused import: `post`
+  --> parasitic/src/cqgs/dashboard.rs:12:20
+   |
+12 |     routing::{get, post},
+   |                    ^^^^
+
+warning: unused imports: `QualityGateDecision` and `ViolationSeverity`
+  --> parasitic/src/cqgs/dashboard.rs:26:23
+   |
+26 |     QualityViolation, ViolationSeverity, QualityGateDecision,
+   |                       ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `SentinelType`
+  --> parasitic/src/cqgs/dashboard.rs:28:42
+   |
+28 | use crate::cqgs::sentinels::{SentinelId, SentinelType};
+   |                                          ^^^^^^^^^^^^
+
+warning: unused import: `crate::cqgs::SentinelStatus`
+  --> parasitic/src/cqgs/dashboard.rs:29:5
+   |
+29 | use crate::cqgs::SentinelStatus;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `ConsensusSession`
+  --> parasitic/src/cqgs/dashboard.rs:30:48
+   |
+30 | use crate::cqgs::consensus::{ConsensusMetrics, ConsensusSession, ConsensusResult};
+   |                                                ^^^^^^^^^^^^^^^^
+
+warning: unused import: `StreamExt`
+   --> parasitic/src/cqgs/dashboard.rs:332:33
+    |
+332 |     use futures_util::{SinkExt, StreamExt};
+    |                                 ^^^^^^^^^
+
+warning: unused import: `timeout`
+  --> parasitic/src/cqgs/remediation.rs:12:29
+   |
+12 | use tokio::time::{interval, timeout};
+   |                             ^^^^^^^
+
+warning: unused import: `CqgsEvent`
+  --> parasitic/src/cqgs/remediation.rs:16:56
+   |
+16 | use crate::cqgs::{QualityViolation, ViolationSeverity, CqgsEvent};
+   |                                                        ^^^^^^^^^
+
+warning: unused import: `SentinelType`
+  --> parasitic/src/cqgs/remediation.rs:17:42
+   |
+17 | use crate::cqgs::sentinels::{SentinelId, SentinelType};
+   |                                          ^^^^^^^^^^^^
+
+warning: unused import: `error`
+  --> parasitic/src/cqgs/validation.rs:14:22
+   |
+14 | use tracing::{debug, error, info, warn, instrument};
+   |                      ^^^^^
+
+warning: unused import: `std::f64::consts::PI`
+ --> parasitic/src/cqgs/hyperbolic.rs:6:5
+  |
+6 | use std::f64::consts::PI;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `HashSet`
+ --> parasitic/src/cqgs/consensus.rs:6:33
+  |
+6 | use std::collections::{HashMap, HashSet};
+  |                                 ^^^^^^^
+
+warning: unused import: `CqgsEvent`
+  --> parasitic/src/cqgs/neural.rs:12:56
+   |
+12 | use crate::cqgs::{QualityViolation, ViolationSeverity, CqgsEvent};
+   |                                                        ^^^^^^^^^
+
+warning: unused import: `std::ffi::CString`
+  --> parasitic/src/gpu/cuda_backend.rs:10:5
+   |
+10 | use std::ffi::CString;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::*`
+ --> parasitic/src/gpu/organism_vector.rs:6:5
+  |
+6 | use super::*;
+  |     ^^^^^^^^
+
+warning: private item shadows public glob re-export
+   --> parasitic/src/gpu/mod.rs:547:1
+    |
+547 | / async fn detect_gpu_devices() -> Result<GpuDeviceInfo, CorrelationError> {
+548 | |     // Simulate GPU detection - in real implementation would use CUDA/OpenCL
+549 | |     tokio::task::spawn_blocking(|| {
+550 | |         if std::env::var("CUDA_VISIBLE_DEVICES").is_ok() {
+...   |
+561 | |     .map_err(|e| CorrelationError::GpuError(format!("Detection failed: {}", e)))?
+562 | | }
+    | |_^
+    |
+note: the name `detect_gpu_devices` in the value namespace is supposed to be publicly re-exported here
+   --> parasitic/src/gpu/mod.rs:37:9
+    |
+37  | pub use cuda_backend::*;
+    |         ^^^^^^^^^^^^^^^
+note: but the private item here shadows it
+   --> parasitic/src/gpu/mod.rs:547:1
+    |
+547 | / async fn detect_gpu_devices() -> Result<GpuDeviceInfo, CorrelationError> {
+548 | |     // Simulate GPU detection - in real implementation would use CUDA/OpenCL
+549 | |     tokio::task::spawn_blocking(|| {
+550 | |         if std::env::var("CUDA_VISIBLE_DEVICES").is_ok() {
+...   |
+561 | |     .map_err(|e| CorrelationError::GpuError(format!("Detection failed: {}", e)))?
+562 | | }
+    | |_^
+    = note: `#[warn(hidden_glob_reexports)]` on by default
+
+warning: unused import: `VecDeque`
+ --> parasitic/src/consensus/voting_engine.rs:6:33
+  |
+6 | use std::collections::{HashMap, VecDeque};
+  |                                 ^^^^^^^^
+
+warning: unused import: `RwLock`
+ --> parasitic/src/consensus/voting_engine.rs:9:19
+  |
+9 | use tokio::sync::{RwLock, mpsc, oneshot};
+  |                   ^^^^^^
+
+warning: unused import: `error`
+  --> parasitic/src/consensus/voting_engine.rs:13:22
+   |
+13 | use tracing::{debug, error, info, warn, instrument};
+   |                      ^^^^^
+
+warning: unused import: `CqgsEvent`
+  --> parasitic/src/consensus/voting_engine.rs:23:19
+   |
+23 | use crate::cqgs::{CqgsEvent, QualityGateDecision};
+   |                   ^^^^^^^^^
+
+warning: unused import: `PerformanceScore`
+  --> parasitic/src/consensus/organism_selector.rs:13:33
+   |
+13 | use super::{ConsensusSessionId, PerformanceScore, VotingWeight};
+   |                                 ^^^^^^^^^^^^^^^^
+
+warning: unnecessary parentheses around assigned value
+   --> parasitic/src/consensus/organism_selector.rs:359:27
+    |
+359 |           let suitability = (
+    |  ___________________________^
+360 | |             volatility_match * 0.25 +
+    | |____________^
+...
+364 |               noise_match * 0.15
+    |  _______________________________^
+365 | |         );
+    | |_________^
+    |
+help: remove these parentheses
+    |
+359 ~         let suitability = volatility_match * 0.25 +
+360 |             volume_match * 0.20 +
+361 |             spread_match * 0.20 +
+362 |             trend_match * 0.20 +
+363 ~             noise_match * 0.15;
+    |
+
+warning: unnecessary parentheses around assigned value
+   --> parasitic/src/consensus/organism_selector.rs:401:19
+    |
+401 |           weight += (
+    |  ___________________^
+402 | |             performance_metrics.profit_ratio * 0.15 +
+    | |____________^
+...
+405 |               performance_metrics.risk_adjusted_return * 0.10
+    |  ____________________________________________________________^
+406 | |         );
+    | |_________^
+    |
+help: remove these parentheses
+    |
+401 ~         weight += performance_metrics.profit_ratio * 0.15 +
+402 |             performance_metrics.success_rate * 0.10 +
+403 |             performance_metrics.resource_efficiency * 0.05 +
+404 ~             performance_metrics.risk_adjusted_return * 0.10;
+    |
+
+warning: unnecessary parentheses around assigned value
+   --> parasitic/src/consensus/organism_selector.rs:424:19
+    |
+424 |         weight *= (1.0 + self.market_adaptivity * market_suitability);
+    |                   ^                                                 ^
+    |
+help: remove these parentheses
+    |
+424 -         weight *= (1.0 + self.market_adaptivity * market_suitability);
+424 +         weight *= 1.0 + self.market_adaptivity * market_suitability;
+    |
+
+warning: unused import: `Duration`
+ --> parasitic/src/consensus/emergence_detector.rs:7:29
+  |
+7 | use std::time::{SystemTime, Duration, Instant};
+  |                             ^^^^^^^^
+
+warning: unused import: `warn`
+  --> parasitic/src/consensus/emergence_detector.rs:10:34
+   |
+10 | use tracing::{debug, instrument, warn};
+   |                                  ^^^^
+
+warning: unused import: `HashSet`
+ --> parasitic/src/consensus/byzantine_tolerance.rs:6:33
+  |
+6 | use std::collections::{HashMap, HashSet, VecDeque};
+  |                                 ^^^^^^^
+
+warning: unused import: `error`
+  --> parasitic/src/consensus/byzantine_tolerance.rs:10:28
+   |
+10 | use tracing::{debug, warn, error, instrument};
+   |                            ^^^^^
+
+warning: unused imports: `BYZANTINE_THRESHOLD` and `MIN_CONSENSUS_PARTICIPANTS`
+  --> parasitic/src/consensus/byzantine_tolerance.rs:14:13
+   |
+14 | use super::{BYZANTINE_THRESHOLD, MIN_CONSENSUS_PARTICIPANTS};
+   |             ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> parasitic/src/consensus/mod.rs:22:5
+   |
+22 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `CqgsEvent`
+  --> parasitic/src/consensus/mod.rs:26:19
+   |
+26 | use crate::cqgs::{CqgsEvent, QualityGateDecision};
+   |                   ^^^^^^^^^
+
+warning: unused variable: `pattern_name`
+   --> parasitic/src/organisms/cordyceps.rs:561:14
+    |
+561 |         for (pattern_name, pattern) in &neural_control.control_patterns {
+    |              ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pattern_name`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `radius`
+   --> parasitic/src/organisms/cordyceps.rs:737:59
+    |
+737 |     async fn find_related_pairs(&self, origin_pair: &str, radius: f64) -> Result<Vec<String>, OrganismError> {
+    |                                                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_radius`
+
+warning: unused variable: `false_memories`
+    --> parasitic/src/organisms/cordyceps.rs:1340:13
+     |
+1340 |         let false_memories = vec![
+     |             ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_false_memories`
+
+warning: variable does not need to be mutable
+   --> parasitic/src/organisms/mycelial_network.rs:465:13
+    |
+465 |         let mut packets = self.packet_queue.drain(0..packets_to_process).collect::<Vec<_>>();
+    |             ----^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: unused variable: `target_pair`
+   --> parasitic/src/organisms/anglerfish.rs:679:46
+    |
+679 |     pub async fn process_luminescence(&self, target_pair: &str) -> Result<Vec<f64>, OrganismError> {
+    |                                              ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_target_pair`
+
+warning: unused variable: `target`
+    --> parasitic/src/organisms/komodo_dragon.rs:1434:71
+     |
+1434 |     async fn calculate_venom_distribution(&self, venom: &KomodoVenom, target: &str) -> Result<Vec<f64>, OrganismError> {
+     |                                                                       ^^^^^^ help: if this is intentional, prefix it with an underscore: `_target`
+
+warning: unused variable: `prey_id`
+    --> parasitic/src/organisms/komodo_dragon.rs:1238:49
+     |
+1238 |     async fn deploy_surveillance_network(&self, prey_id: &str) -> Result<(), OrganismError> {
+     |                                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_prey_id`
+
+warning: unused variable: `state_id`
+    --> parasitic/src/organisms/tardigrade.rs:1844:54
+     |
+1844 |     async fn complete_cryptobiosis_transition(&self, state_id: Uuid) -> Result<(), OrganismError> {
+     |                                                      ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_state_id`
+
+warning: unused variable: `severity`
+    --> parasitic/src/organisms/tardigrade.rs:1596:50
+     |
+1596 |     async fn generate_survival_parameters(&self, severity: f64) -> Result<SurvivalParameters, OrganismError> {
+     |                                                  ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_severity`
+
+warning: unused variable: `preserver`
+    --> parasitic/src/organisms/tardigrade.rs:1646:17
+     |
+1646 |             let preserver = quantum_preserver.read();
+     |                 ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_preserver`
+
+warning: unused variable: `initial_voltage`
+   --> parasitic/src/organisms/electric_eel.rs:358:13
+    |
+358 |         let initial_voltage = status.current_voltage;
+    |             ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_initial_voltage`
+
+warning: unused variable: `target`
+   --> parasitic/src/organisms/electric_eel.rs:631:52
+    |
+631 |     async fn calculate_environmental_factor(&self, target: &ShockTarget) -> Result<f64, OrganismError> {
+    |                                                    ^^^^^^ help: if this is intentional, prefix it with an underscore: `_target`
+
+warning: unused variable: `source_pair`
+   --> parasitic/src/organisms/electric_eel.rs:680:9
+    |
+680 |         source_pair: &str, 
+    |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_source_pair`
+
+warning: variable `best_voltage` is assigned to, but never used
+   --> parasitic/src/organisms/electric_eel.rs:835:17
+    |
+835 |         let mut best_voltage = self.config.min_discharge_voltage;
+    |                 ^^^^^^^^^^^^
+    |
+    = note: consider using `_best_voltage` instead
+
+warning: value assigned to `best_voltage` is never read
+   --> parasitic/src/organisms/electric_eel.rs:845:21
+    |
+845 |                     best_voltage = event.voltage_used;
+    |                     ^^^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` on by default
+
+warning: unused variable: `alert_manager`
+   --> parasitic/src/analytics/health/mod.rs:446:13
+    |
+446 |         let alert_manager = Arc::clone(&self.alert_manager);
+    |             ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_alert_manager`
+
+warning: unused variable: `start_time`
+   --> parasitic/src/analytics/health/mod.rs:452:17
+    |
+452 |             let start_time = Instant::now();
+    |                 ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_time`
+
+warning: unused variable: `start_time`
+   --> parasitic/src/analytics/compliance/mod.rs:368:13
+    |
+368 |         let start_time = std::time::Instant::now();
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_time`
+
+warning: unused variable: `compliance_cache`
+   --> parasitic/src/analytics/compliance/mod.rs:468:13
+    |
+468 |         let compliance_cache = Arc::clone(&self.compliance_cache);
+    |             ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_compliance_cache`
+
+warning: unused variable: `event_sender`
+   --> parasitic/src/analytics/compliance/mod.rs:469:13
+    |
+469 |         let event_sender = self.event_sender.clone();
+    |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_event_sender`
+
+warning: unused variable: `code_path`
+   --> parasitic/src/cqgs/sentinels.rs:176:42
+    |
+176 |     async fn analyze_code_quality(&self, code_path: &str) -> Result<f64, Box<dyn std::error::Error + Send + Sync>> {
+    |                                          ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_code_path`
+
+warning: unused variable: `file_path`
+   --> parasitic/src/cqgs/sentinels.rs:182:38
+    |
+182 |     async fn check_complexity(&self, file_path: &str) -> Result<u32, Box<dyn std::error::Error + Send + Sync>> {
+    |                                      ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_file_path`
+
+warning: unused variable: `sentinels`
+   --> parasitic/src/cqgs/coordination.rs:153:9
+    |
+153 |         sentinels: &DashMap<SentinelId, Box<dyn Sentinel>>,
+    |         ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sentinels`
+
+warning: unused variable: `max_hops`
+   --> parasitic/src/cqgs/coordination.rs:318:9
+    |
+318 |         max_hops: usize,
+    |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_max_hops`
+
+warning: unused variable: `from_pos`
+   --> parasitic/src/cqgs/coordination.rs:323:13
+    |
+323 |         let from_pos = self.sentinel_positions.get(from)?.clone();
+    |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_from_pos`
+
+warning: unused variable: `to_pos`
+   --> parasitic/src/cqgs/coordination.rs:324:13
+    |
+324 |         let to_pos = self.sentinel_positions.get(to)?.clone();
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_to_pos`
+
+warning: unused variable: `message`
+   --> parasitic/src/cqgs/coordination.rs:470:9
+    |
+470 |         message: CoordinationMessage,
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_message`
+
+warning: unused variable: `state`
+   --> parasitic/src/cqgs/dashboard.rs:394:11
+    |
+394 |     State(state): State<Arc<DashboardState>>,
+    |           ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+
+warning: unused variable: `new_config`
+   --> parasitic/src/cqgs/dashboard.rs:395:10
+    |
+395 |     Json(new_config): Json<DashboardConfig>,
+    |          ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_config`
+
+warning: variable does not need to be mutable
+   --> parasitic/src/cqgs/consensus.rs:197:21
+    |
+197 |         if let Some(mut info) = registry.get_mut(id) {
+    |                     ----^^^^
+    |                     |
+    |                     help: remove this `mut`
+
+warning: unused variable: `event_bus`
+   --> parasitic/src/cqgs/consensus.rs:565:46
+    |
+565 |     pub async fn start_consensus_loop(&self, event_bus: broadcast::Sender<CqgsEvent>) {
+    |                                              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_event_bus`
+
+warning: unused variable: `sentinel_id`
+   --> parasitic/src/cqgs/mod.rs:483:17
+    |
+483 |             for sentinel_id in healing_sentinel_ids {
+    |                 ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sentinel_id`
+
+warning: unused variable: `entry`
+   --> parasitic/src/quantum/memory.rs:404:13
+    |
+404 |         let entry = PatternEntry {
+    |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_entry`
+
+warning: unused variable: `i`
+   --> parasitic/src/quantum/memory.rs:428:13
+    |
+428 |         for i in 0..limit.min(10) {
+    |             ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: unused variable: `round`
+   --> parasitic/src/quantum/grover.rs:305:13
+    |
+305 |         for round in 0..rounds.min(20) { // Limit rounds for performance
+    |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_round`
+
+warning: unused variable: `measurements`
+   --> parasitic/src/quantum/grover.rs:495:21
+    |
+495 |         if let Some(measurements) = result.measurements.get(&0) {
+    |                     ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_measurements`
+
+warning: unused variable: `simulator`
+   --> parasitic/src/quantum/quantum_simulators.rs:684:13
+    |
+684 |         let simulator = StatevectorSimulator::new(self.num_qubits)?;
+    |             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_simulator`
+
+warning: unused variable: `buffer`
+   --> parasitic/src/gpu/cuda_backend.rs:349:42
+    |
+349 |     pub async fn upload_organisms(&self, buffer: &CudaMemory, organisms: &[crate::gpu::OrganismVector]) -> Result<(), CorrelationError> {
+    |                                          ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `organisms`
+   --> parasitic/src/gpu/cuda_backend.rs:349:63
+    |
+349 |     pub async fn upload_organisms(&self, buffer: &CudaMemory, organisms: &[crate::gpu::OrganismVector]) -> Result<(), CorrelationError> {
+    |                                                               ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_organisms`
+
+warning: unused variable: `params`
+   --> parasitic/src/gpu/cuda_backend.rs:354:51
+    |
+354 |     pub async fn launch_correlation_kernel(&self, params: &crate::gpu::CorrelationKernelParams, input: &CudaMemory, output: &CudaMemory) ...
+    |                                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_params`
+
+warning: unused variable: `input`
+   --> parasitic/src/gpu/cuda_backend.rs:354:97
+    |
+354 | ...gpu::CorrelationKernelParams, input: &CudaMemory, output: &CudaMemory) -> Result<(), CorrelationError> {
+    |                                  ^^^^^ help: if this is intentional, prefix it with an underscore: `_input`
+
+warning: unused variable: `output`
+   --> parasitic/src/gpu/cuda_backend.rs:354:117
+    |
+354 | ...lParams, input: &CudaMemory, output: &CudaMemory) -> Result<(), CorrelationError> {
+    |                                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+
+warning: unused variable: `buffer`
+   --> parasitic/src/gpu/cuda_backend.rs:359:53
+    |
+359 |     pub async fn download_correlation_matrix(&self, buffer: &CudaMemory, size: usize) -> Result<Vec<f32>, CorrelationError> {
+    |                                                     ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `time_bucket`
+   --> parasitic/src/consensus/emergence_detector.rs:248:14
+    |
+248 |         for (time_bucket, votes) in time_groups {
+    |              ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_bucket`
+
+warning: unused variable: `avg_score`
+   --> parasitic/src/consensus/emergence_detector.rs:362:31
+    |
+362 |         for (target_organism, avg_score) in &organism_scores {
+    |                               ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_avg_score`
+
+warning: unused variable: `sender`
+   --> parasitic/src/consensus/voting_engine.rs:318:25
+    |
+318 |             if let Some(sender) = &session.result_sender {
+    |                         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_sender`
+
+warning: unused variable: `timeout_result`
+   --> parasitic/src/consensus/voting_engine.rs:320:21
+    |
+320 |                 let timeout_result = ConsensusResult {
+    |                     ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_timeout_result`
+
+warning: unused import: `ParasiticOrganism`
+  --> parasitic/src/analytics/mod.rs:16:41
+   |
+16 | use crate::organisms::{ResourceMetrics, ParasiticOrganism};
+   |                                         ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `SinkExt`
+   --> parasitic/src/cqgs/dashboard.rs:332:24
+    |
+332 |     use futures_util::{SinkExt, StreamExt};
+    |                        ^^^^^^^
+
+warning: unused variable: `pair_id`
+  --> parasitic/src/organisms/cuckoo.rs:54:33
+   |
+54 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+   |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: unused variable: `pair_id`
+  --> parasitic/src/organisms/virus.rs:72:33
+   |
+72 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+   |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: unused variable: `pair_id`
+  --> parasitic/src/organisms/bacteria.rs:79:33
+   |
+79 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+   |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: unused variable: `measurement`
+    --> parasitic/src/organisms/cordyceps.rs:1043:13
+     |
+1043 |         let measurement = QuantumMeasurement {
+     |             ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_measurement`
+
+warning: unused variable: `rng`
+    --> parasitic/src/organisms/cordyceps.rs:1194:17
+     |
+1194 |         let mut rng = rand::thread_rng();
+     |                 ^^^ help: if this is intentional, prefix it with an underscore: `_rng`
+
+warning: variable does not need to be mutable
+    --> parasitic/src/organisms/cordyceps.rs:1190:13
+     |
+1190 |         let mut offspring_config = self.config.clone();
+     |             ----^^^^^^^^^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> parasitic/src/organisms/cordyceps.rs:1194:13
+     |
+1194 |         let mut rng = rand::thread_rng();
+     |             ----^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: unused variable: `pair_id`
+   --> parasitic/src/organisms/vampire_bat.rs:283:33
+    |
+283 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+    |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: unused variable: `pair_id`
+   --> parasitic/src/organisms/lancet_liver_fluke.rs:449:33
+    |
+449 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+    |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: unused variable: `pair_id`
+   --> parasitic/src/organisms/toxoplasma.rs:468:33
+    |
+468 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+    |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: unused variable: `pair_id`
+   --> parasitic/src/organisms/mycelial_network.rs:672:33
+    |
+672 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+    |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: unused variable: `lure`
+    --> parasitic/src/organisms/anglerfish.rs:1377:13
+     |
+1377 |         let lure = self.create_lure(&target_prey, lure_position).await?;
+     |             ^^^^ help: if this is intentional, prefix it with an underscore: `_lure`
+
+warning: unused variable: `venom_type`
+    --> parasitic/src/organisms/komodo_dragon.rs:1350:45
+     |
+1350 |     fn generate_persistence_timeline(&self, venom_type: &VenomType, potency: f64) -> Vec<VenomStage> {
+     |                                             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_venom_type`
+
+warning: unused variable: `new_location`
+    --> parasitic/src/organisms/komodo_dragon.rs:1532:68
+     |
+1532 |     fn analyze_movement_pattern(&self, history: &[MovementRecord], new_location: &PreyLocation) -> MovementPattern {
+     |                                                                    ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_location`
+
+warning: unused variable: `patterns`
+    --> parasitic/src/organisms/komodo_dragon.rs:1564:38
+     |
+1564 |     fn infer_movement_purpose(&self, patterns: &BehaviorPatterns, location: &PreyLocation) -> MovementPurpose {
+     |                                      ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_patterns`
+
+warning: unused variable: `network_size`
+    --> parasitic/src/organisms/komodo_dragon.rs:1720:12
+     |
+1720 |     fn new(network_size: usize) -> Result<Self, OrganismError> {
+     |            ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_network_size`
+
+warning: unused variable: `trigger_condition`
+    --> parasitic/src/organisms/tardigrade.rs:1608:40
+     |
+1608 |     fn setup_revival_conditions(&self, trigger_condition: &str, severity: f64) -> Vec<RevivalCondition> {
+     |                                        ^^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_trigger_condition`
+
+warning: unused variable: `pair_id`
+    --> parasitic/src/organisms/tardigrade.rs:2440:33
+     |
+2440 |     async fn infect_pair(&self, pair_id: &str, vulnerability: f64) -> Result<InfectionResult, OrganismError> {
+     |                                 ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pair_id`
+
+warning: variable does not need to be mutable
+   --> parasitic/src/analytics/performance/mod.rs:206:13
+    |
+206 |         let mut analytics = Self::new();
+    |             ----^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: unused variable: `violation`
+  --> parasitic/src/cqgs/sentinels.rs:88:36
+   |
+88 |     async fn heal_violation(&self, violation: &QualityViolation) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+   |                                    ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_violation`
+
+warning: unused variable: `uptime`
+   --> parasitic/src/cqgs/sentinels.rs:219:13
+    |
+219 |         let uptime = self.base.start_time.elapsed().unwrap_or(Duration::ZERO);
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_uptime`
+
+warning: unused variable: `uptime`
+   --> parasitic/src/cqgs/sentinels.rs:337:13
+    |
+337 |         let uptime = self.base.start_time.elapsed().unwrap_or(Duration::ZERO);
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_uptime`
+
+warning: unused variable: `throughput`
+   --> parasitic/src/cqgs/sentinels.rs:355:13
+    |
+355 |         let throughput = self.measure_throughput().await;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_throughput`
+
+warning: unused variable: `config`
+   --> parasitic/src/cqgs/sentinels.rs:493:35
+    |
+493 |     async fn update_config(&self, config: serde_json::Value) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    |                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> parasitic/src/cqgs/sentinels.rs:591:35
+    |
+591 |     async fn update_config(&self, config: serde_json::Value) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    |                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> parasitic/src/cqgs/sentinels.rs:667:35
+    |
+667 |     async fn update_config(&self, config: serde_json::Value) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    |                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> parasitic/src/cqgs/sentinels.rs:761:35
+    |
+761 |     async fn update_config(&self, config: serde_json::Value) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    |                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> parasitic/src/cqgs/sentinels.rs:839:35
+    |
+839 |     async fn update_config(&self, config: serde_json::Value) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    |                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> parasitic/src/cqgs/sentinels.rs:927:35
+    |
+927 |     async fn update_config(&self, config: serde_json::Value) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    |                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `violations`
+  --> parasitic/src/cqgs/hyperbolic.rs:71:38
+   |
+71 |     pub fn analyze_violation_pattern(violations: &[crate::cqgs::QualityViolation]) -> PatternAnalysis {
+   |                                      ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_violations`
+
+warning: unused variable: `grid_size`
+   --> parasitic/src/gpu/cuda_backend.rs:557:14
+    |
+557 |         let (grid_size, block_size) = self.context.get_optimal_block_size(size * size);
+    |              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_grid_size`
+
+warning: unused variable: `block_size`
+   --> parasitic/src/gpu/cuda_backend.rs:557:25
+    |
+557 |         let (grid_size, block_size) = self.context.get_optimal_block_size(size * size);
+    |                         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_block_size`
+
+warning: variable does not need to be mutable
+   --> parasitic/src/gpu/mod.rs:196:13
+    |
+196 |         let mut cuda_context = self.cuda_context.lock().await;
+    |             ----^^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable `total_weight` is assigned to, but never used
+   --> parasitic/src/consensus/voting_engine.rs:206:17
+    |
+206 |         let mut total_weight = 0.0;
+    |                 ^^^^^^^^^^^^
+    |
+    = note: consider using `_total_weight` instead
+
+warning: unused variable: `criteria`
+   --> parasitic/src/consensus/organism_selector.rs:395:9
+    |
+395 |         criteria: &SelectionCriteria,
+    |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_criteria`
+
+warning: unused variable: `remaining_slots`
+   --> parasitic/src/consensus/organism_selector.rs:455:13
+    |
+455 |         let remaining_slots = criteria.maximum_organisms.saturating_sub(selected.len());
+    |             ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_remaining_slots`
+
+warning: variable does not need to be mutable
+   --> parasitic/src/consensus/organism_selector.rs:432:9
+    |
+432 |         mut evaluations: Vec<OrganismEvaluation>,
+    |         ----^^^^^^^^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: type `DetectionStatistics` is more private than the item `EmergenceDetector::get_statistics`
+   --> parasitic/src/consensus/emergence_detector.rs:719:5
+    |
+719 |     pub fn get_statistics(&self) -> DetectionStatistics {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `EmergenceDetector::get_statistics` is reachable at visibility `pub`
+    |
+note: but type `DetectionStatistics` is only usable at visibility `pub(self)`
+   --> parasitic/src/consensus/emergence_detector.rs:151:1
+    |
+151 | struct DetectionStatistics {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `performance_weights::PerformanceRecord` is more private than the item `PerformanceWeights::export_history`
+   --> parasitic/src/consensus/performance_weights.rs:458:5
+    |
+458 |     pub fn export_history(&self, organism_id: &Uuid) -> Option<Vec<PerformanceRecord>> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `PerformanceWeights::export_history` is reachable at visibility `pub`
+    |
+note: but type `performance_weights::PerformanceRecord` is only usable at visibility `pub(self)`
+   --> parasitic/src/consensus/performance_weights.rs:130:1
+    |
+130 | struct PerformanceRecord {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `tracking_matrix` is never read
+   --> parasitic/src/organisms/cordyceps.rs:277:5
+    |
+273 | pub struct SIMDSporeTracker {
+    |            ---------------- field in this struct
+...
+277 |     tracking_matrix: Vec<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^
+    |
+    = note: `SIMDSporeTracker` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` on by default
+
+warning: fields `spore_tx` and `command_tx` are never read
+   --> parasitic/src/organisms/cordyceps.rs:306:5
+    |
+282 | pub struct CordycepsOrganism {
+    |            ----------------- fields in this struct
+...
+306 |     spore_tx: mpsc::UnboundedSender<CordycepsSpore>,
+    |     ^^^^^^^^
+307 |     command_tx: mpsc::UnboundedSender<ZombieCommand>,
+    |     ^^^^^^^^^^
+
+warning: fields `entanglement_network`, `quantum_states`, `coherence_tracker`, and `measurement_history` are never read
+   --> parasitic/src/organisms/cordyceps.rs:316:5
+    |
+315 | pub struct QuantumMindController {
+    |            --------------------- fields in this struct
+316 |     entanglement_network: HashMap<String, Vec<String>>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+317 |     quantum_states: Vec<QuantumState>,
+    |     ^^^^^^^^^^^^^^
+318 |     coherence_tracker: HashMap<String, f64>,
+    |     ^^^^^^^^^^^^^^^^^
+319 |     measurement_history: VecDeque<QuantumMeasurement>,
+    |     ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `QuantumMindController` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: trait `DowncastRef` is never used
+    --> parasitic/src/organisms/cordyceps.rs:1433:7
+     |
+1433 | trait DowncastRef<T> {
+     |       ^^^^^^^^^^^
+
+warning: field `region_effectiveness` is never read
+   --> parasitic/src/organisms/toxoplasma.rs:109:5
+    |
+99  | pub struct ToxoplasmaOrganism {
+    |            ------------------ field in this struct
+...
+109 |     region_effectiveness: HashMap<BrainRegion, f64>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `ToxoplasmaOrganism` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `information_database` is never read
+   --> parasitic/src/organisms/mycelial_network.rs:147:5
+    |
+133 | pub struct MycelialNetworkOrganism {
+    |            ----------------------- field in this struct
+...
+147 |     information_database: HashMap<String, (DateTime<Utc>, serde_json::Value)>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `MycelialNetworkOrganism` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `attraction_fields` and `optimization_matrix` are never read
+   --> parasitic/src/organisms/anglerfish.rs:269:5
+    |
+265 | pub struct SIMDLureTracker {
+    |            --------------- fields in this struct
+...
+269 |     attraction_fields: Vec<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^^
+270 |     quantum_states: Option<Vec<QuantumLuminescence>>,
+271 |     optimization_matrix: Vec<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `SIMDLureTracker` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `hunting_territory`, `lure_tx`, and `trap_tx` are never read
+   --> parasitic/src/organisms/anglerfish.rs:287:5
+    |
+275 | pub struct AnglerfishOrganism {
+    |            ------------------ fields in this struct
+...
+287 |     hunting_territory: Arc<RwLock<HuntingTerritory>>,
+    |     ^^^^^^^^^^^^^^^^^
+...
+297 |     lure_tx: mpsc::UnboundedSender<LureCommand>,
+    |     ^^^^^^^
+298 |     trap_tx: mpsc::UnboundedSender<TrapCommand>,
+    |     ^^^^^^^
+
+warning: fields `territory_bounds`, `prey_density_map`, `optimal_lure_positions`, `competition_level`, and `resource_availability` are never read
+   --> parasitic/src/organisms/anglerfish.rs:306:5
+    |
+305 | pub struct HuntingTerritory {
+    |            ---------------- fields in this struct
+306 |     territory_bounds: (f64, f64, f64, f64), // (min_price, max_price, min_volume, max_volume)
+    |     ^^^^^^^^^^^^^^^^
+307 |     prey_density_map: HashMap<PreyType, f64>,
+    |     ^^^^^^^^^^^^^^^^
+308 |     optimal_lure_positions: Vec<LurePosition>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+309 |     competition_level: f64,
+    |     ^^^^^^^^^^^^^^^^^
+310 |     resource_availability: f64,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `HuntingTerritory` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `prey_behavior_patterns`, `prediction_models`, and `detection_accuracy` are never read
+   --> parasitic/src/organisms/anglerfish.rs:316:5
+    |
+314 | pub struct PreyDetectionSystem {
+    |            ------------------- fields in this struct
+315 |     detection_algorithms: Vec<DetectionAlgorithm>,
+316 |     prey_behavior_patterns: HashMap<PreyType, BehaviorPattern>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+317 |     prediction_models: Vec<PreyPredictionModel>,
+    |     ^^^^^^^^^^^^^^^^^
+318 |     detection_accuracy: f64,
+    |     ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `PreyDetectionSystem` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `photon_sources`, `entanglement_network`, `coherence_maintainer`, and `quantum_randomness_source` are never read
+   --> parasitic/src/organisms/anglerfish.rs:368:5
+    |
+367 | pub struct QuantumPhotonGenerator {
+    |            ---------------------- fields in this struct
+368 |     photon_sources: Vec<PhotonSource>,
+    |     ^^^^^^^^^^^^^^
+369 |     entanglement_network: HashMap<Uuid, Vec<Uuid>>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+370 |     coherence_maintainer: CoherenceMaintainer,
+    |     ^^^^^^^^^^^^^^^^^^^^
+371 |     quantum_randomness_source: QuantumRandomnessSource,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `QuantumPhotonGenerator` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `coherence_protocols`, `decoherence_monitoring`, and `error_correction_codes` are never read
+   --> parasitic/src/organisms/anglerfish.rs:385:5
+    |
+384 | pub struct CoherenceMaintainer {
+    |            ------------------- fields in this struct
+385 |     coherence_protocols: Vec<CoherenceProtocol>,
+    |     ^^^^^^^^^^^^^^^^^^^
+386 |     decoherence_monitoring: Vec<DecoherenceMonitor>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+387 |     error_correction_codes: Vec<ErrorCorrectionCode>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `CoherenceMaintainer` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `entropy_sources`, `randomness_extractors`, and `quality_metrics` are never read
+   --> parasitic/src/organisms/anglerfish.rs:416:5
+    |
+415 | pub struct QuantumRandomnessSource {
+    |            ----------------------- fields in this struct
+416 |     entropy_sources: Vec<EntropySource>,
+    |     ^^^^^^^^^^^^^^^
+417 |     randomness_extractors: Vec<RandomnessExtractor>,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+418 |     quality_metrics: RandomnessQuality,
+    |     ^^^^^^^^^^^^^^^
+    |
+    = note: `QuantumRandomnessSource` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `network_topology`, `data_aggregation_center`, and `communication_protocols` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:514:5
+    |
+512 | pub struct SurveillanceNetwork {
+    |            ------------------- fields in this struct
+513 |     surveillance_nodes: Arc<DashMap<Uuid, SurveillanceNode>>,
+514 |     network_topology: Arc<RwLock<NetworkTopology>>,
+    |     ^^^^^^^^^^^^^^^^
+515 |     data_aggregation_center: Arc<RwLock<DataAggregationCenter>>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^
+516 |     communication_protocols: Vec<CommunicationProtocol>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `SurveillanceNetwork` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `node_connections`, `communication_paths`, `redundancy_level`, and `network_resilience` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:557:5
+    |
+556 | pub struct NetworkTopology {
+    |            --------------- fields in this struct
+557 |     node_connections: HashMap<Uuid, Vec<Uuid>>,
+    |     ^^^^^^^^^^^^^^^^
+558 |     communication_paths: Vec<CommunicationPath>,
+    |     ^^^^^^^^^^^^^^^^^^^
+559 |     redundancy_level: f64,
+    |     ^^^^^^^^^^^^^^^^
+560 |     network_resilience: f64,
+    |     ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `NetworkTopology` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `collected_intelligence`, `analysis_algorithms`, `prediction_models`, and `threat_assessment_engine` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:575:5
+    |
+574 | pub struct DataAggregationCenter {
+    |            --------------------- fields in this struct
+575 |     collected_intelligence: HashMap<String, IntelligenceData>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+576 |     analysis_algorithms: Vec<AnalysisAlgorithm>,
+    |     ^^^^^^^^^^^^^^^^^^^
+577 |     prediction_models: Vec<PredictionModel>,
+    |     ^^^^^^^^^^^^^^^^^
+578 |     threat_assessment_engine: ThreatAssessmentEngine,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `DataAggregationCenter` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `threat_models`, `risk_calculation_methods`, and `countermeasure_database` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:612:5
+    |
+611 | pub struct ThreatAssessmentEngine {
+    |            ---------------------- fields in this struct
+612 |     threat_models: Vec<ThreatModel>,
+    |     ^^^^^^^^^^^^^
+613 |     risk_calculation_methods: Vec<RiskCalculationMethod>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^
+614 |     countermeasure_database: HashMap<String, Vec<CountermeasureStrategy>>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `ThreatAssessmentEngine` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `venom_concentrations`, `distribution_factors`, `potency_modifiers`, `target_resistances`, and `quantum_enhancement_factors` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:655:5
+    |
+654 | pub struct SIMDVenomCalculator {
+    |            ------------------- fields in this struct
+655 |     venom_concentrations: Vec<f64>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+656 |     distribution_factors: Vec<f64>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+657 |     potency_modifiers: Vec<f64>,
+    |     ^^^^^^^^^^^^^^^^^
+658 |     target_resistances: Vec<f64>,
+    |     ^^^^^^^^^^^^^^^^^^
+659 |     quantum_enhancement_factors: Option<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `SIMDVenomCalculator` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `territory_map`, `patrol_routes`, `hunting_tx`, `venom_tx`, and `surveillance_tx` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:679:5
+    |
+663 | pub struct KomodoDragonOrganism {
+    |            -------------------- fields in this struct
+...
+679 |     territory_map: Arc<RwLock<TerritoryMap>>,
+    |     ^^^^^^^^^^^^^
+680 |     patrol_routes: Arc<RwLock<Vec<PatrolRoute>>>,
+    |     ^^^^^^^^^^^^^
+...
+689 |     hunting_tx: mpsc::UnboundedSender<HuntingCommand>,
+    |     ^^^^^^^^^^
+690 |     venom_tx: mpsc::UnboundedSender<VenomCommand>,
+    |     ^^^^^^^^
+691 |     surveillance_tx: mpsc::UnboundedSender<SurveillanceCommand>,
+    |     ^^^^^^^^^^^^^^^
+
+warning: fields `production_queue` and `production_efficiency` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:734:5
+    |
+732 | pub struct VenomInventory {
+    |            -------------- fields in this struct
+733 |     available_venoms: HashMap<VenomType, f64>,
+734 |     production_queue: VecDeque<VenomProduction>,
+    |     ^^^^^^^^^^^^^^^^
+735 |     storage_utilization: f64,
+736 |     production_efficiency: f64,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `VenomInventory` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `territory_boundaries`, `resource_locations`, `threat_zones`, and `optimal_hunting_grounds` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:750:5
+    |
+749 | pub struct TerritoryMap {
+    |            ------------ fields in this struct
+750 |     territory_boundaries: Vec<TerritoryBoundary>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+751 |     resource_locations: HashMap<String, ResourceLocation>,
+    |     ^^^^^^^^^^^^^^^^^^
+752 |     threat_zones: Vec<ThreatZone>,
+    |     ^^^^^^^^^^^^
+753 |     optimal_hunting_grounds: Vec<HuntingGround>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `TerritoryMap` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `coherence_matrix`, `quantum_measurement_history`, and `decoherence_model` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:841:5
+    |
+839 | pub struct QuantumTracker {
+    |            -------------- fields in this struct
+840 |     entanglement_pairs: HashMap<String, Vec<String>>,
+841 |     coherence_matrix: Vec<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^
+842 |     quantum_measurement_history: VecDeque<QuantumMeasurement>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+843 |     decoherence_model: DecoherenceModel,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `QuantumTracker` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `environmental_noise`, `interaction_strength`, `temperature_effect`, and `time_evolution_matrix` are never read
+   --> parasitic/src/organisms/komodo_dragon.rs:859:5
+    |
+858 | pub struct DecoherenceModel {
+    |            ---------------- fields in this struct
+859 |     environmental_noise: f64,
+    |     ^^^^^^^^^^^^^^^^^^^
+860 |     interaction_strength: f64,
+    |     ^^^^^^^^^^^^^^^^^^^^
+861 |     temperature_effect: f64,
+    |     ^^^^^^^^^^^^^^^^^^
+862 |     time_evolution_matrix: Vec<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `DecoherenceModel` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `threat_analyzer` and `survival_predictor` are never read
+   --> parasitic/src/organisms/tardigrade.rs:331:5
+    |
+328 | pub struct EnvironmentalStressMonitor {
+    |            -------------------------- fields in this struct
+...
+331 |     threat_analyzer: Arc<RwLock<ThreatAnalyzer>>,
+    |     ^^^^^^^^^^^^^^^
+332 |     survival_predictor: Arc<RwLock<SurvivalPredictor>>,
+    |     ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `EnvironmentalStressMonitor` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `threat_models`, `survival_thresholds`, `correlation_matrix`, and `threat_prediction_horizon` are never read
+   --> parasitic/src/organisms/tardigrade.rs:407:5
+    |
+406 | pub struct ThreatAnalyzer {
+    |            -------------- fields in this struct
+407 |     threat_models: Vec<ThreatModel>,
+    |     ^^^^^^^^^^^^^
+408 |     survival_thresholds: HashMap<StressType, f64>,
+    |     ^^^^^^^^^^^^^^^^^^^
+409 |     correlation_matrix: Vec<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^^^
+410 |     threat_prediction_horizon: u64,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `ThreatAnalyzer` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `prediction_models`, `historical_survival_data`, `success_rate_by_condition`, and `optimal_strategy_cache` are never read
+   --> parasitic/src/organisms/tardigrade.rs:424:5
+    |
+423 | pub struct SurvivalPredictor {
+    |            ----------------- fields in this struct
+424 |     prediction_models: Vec<SurvivalPredictionModel>,
+    |     ^^^^^^^^^^^^^^^^^
+425 |     historical_survival_data: VecDeque<SurvivalEvent>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^
+426 |     success_rate_by_condition: HashMap<String, f64>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+427 |     optimal_strategy_cache: HashMap<String, SurvivalStrategy>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `SurvivalPredictor` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `stress_vectors`, `resistance_vectors`, `survival_probabilities`, `environmental_factors`, `quantum_enhancement_factors`, and `optimization_matrix` are never read
+   --> parasitic/src/organisms/tardigrade.rs:467:5
+    |
+466 | pub struct SIMDSurvivalCalculator {
+    |            ---------------------- fields in this struct
+467 |     stress_vectors: Vec<f64>,
+    |     ^^^^^^^^^^^^^^
+468 |     resistance_vectors: Vec<f64>,
+    |     ^^^^^^^^^^^^^^^^^^
+469 |     survival_probabilities: Vec<f64>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+470 |     environmental_factors: Vec<f64>,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+471 |     quantum_enhancement_factors: Option<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+472 |     optimization_matrix: Vec<Vec<f64>>,
+    |     ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `SIMDSurvivalCalculator` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `preservation_protocols`, `integrity_checkers`, and `restoration_procedures` are never read
+   --> parasitic/src/organisms/tardigrade.rs:479:5
+    |
+477 | pub struct StatePreservationSystem {
+    |            ----------------------- fields in this struct
+478 |     preserved_states: Arc<DashMap<String, PreservedState>>,
+479 |     preservation_protocols: Vec<PreservationProtocol>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+480 |     integrity_checkers: Vec<IntegrityChecker>,
+    |     ^^^^^^^^^^^^^^^^^^
+481 |     restoration_procedures: Vec<RestorationProcedure>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `StatePreservationSystem` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `survival_tx` and `monitoring_tx` are never read
+    --> parasitic/src/organisms/tardigrade.rs:1138:5
+     |
+1114 | pub struct TardigradeOrganism {
+     |            ------------------ fields in this struct
+...
+1138 |     survival_tx: mpsc::UnboundedSender<SurvivalCommand>,
+     |     ^^^^^^^^^^^
+1139 |     monitoring_tx: mpsc::UnboundedSender<MonitoringCommand>,
+     |     ^^^^^^^^^^^^^
+
+warning: fields `quantum_states`, `entanglement_registry`, and `coherence_preservation_protocols` are never read
+    --> parasitic/src/organisms/tardigrade.rs:1180:5
+     |
+1179 | pub struct QuantumPreserver {
+     |            ---------------- fields in this struct
+1180 |     quantum_states: HashMap<String, QuantumState>,
+     |     ^^^^^^^^^^^^^^
+1181 |     entanglement_registry: HashMap<Uuid, EntanglementRecord>,
+     |     ^^^^^^^^^^^^^^^^^^^^^
+1182 |     coherence_preservation_protocols: Vec<CoherenceProtocol>,
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `QuantumPreserver` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `error_correction_codes`, `syndrome_measurement_frequency`, and `correction_success_rate` are never read
+    --> parasitic/src/organisms/tardigrade.rs:1214:5
+     |
+1213 | pub struct QuantumErrorCorrectionSystem {
+     |            ---------------------------- fields in this struct
+1214 |     error_correction_codes: Vec<QuantumErrorCode>,
+     |     ^^^^^^^^^^^^^^^^^^^^^^
+1215 |     syndrome_measurement_frequency: u64,
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1216 |     correction_success_rate: f64,
+     |     ^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `QuantumErrorCorrectionSystem` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `receptor_id` is never read
+    --> parasitic/src/organisms/platypus.rs:1021:9
+     |
+1020 | struct RawSignal {
+     |        --------- field in this struct
+1021 |     pub receptor_id: String,
+     |         ^^^^^^^^^^^
+     |
+     = note: `RawSignal` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `adaptation_speed` is never read
+   --> parasitic/src/organisms/octopus.rs:119:5
+    |
+115 | pub struct DynamicSelectionStrategy {
+    |            ------------------------ field in this struct
+...
+119 |     adaptation_speed: RwLock<f64>,
+    |     ^^^^^^^^^^^^^^^^
+    |
+    = note: `DynamicSelectionStrategy` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `component_name` and `alert_count` are never read
+   --> parasitic/src/analytics/health/mod.rs:103:5
+    |
+102 | pub struct ComponentHealthTracker {
+    |            ---------------------- fields in this struct
+103 |     component_name: String,
+    |     ^^^^^^^^^^^^^^
+...
+106 |     alert_count: RwLock<usize>,
+    |     ^^^^^^^^^^^
+
+warning: field `escalation_count` is never read
+   --> parasitic/src/analytics/health/mod.rs:147:5
+    |
+144 | pub struct AlertManager {
+    |            ------------ field in this struct
+...
+147 |     escalation_count: RwLock<usize>,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: field `trend_data` is never read
+   --> parasitic/src/analytics/health/mod.rs:176:5
+    |
+175 | pub struct TrendAnalyzer {
+    |            ------------- field in this struct
+176 |     trend_data: RwLock<HashMap<String, TrendData>>,
+    |     ^^^^^^^^^^
+
+warning: field `prediction_models` is never read
+   --> parasitic/src/analytics/health/mod.rs:231:5
+    |
+230 | pub struct PredictiveHealthAnalyzer {
+    |            ------------------------ field in this struct
+231 |     prediction_models: RwLock<HashMap<String, PredictionModel>>,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: field `dashboard_data` is never read
+  --> parasitic/src/analytics/dashboard/mod.rs:12:5
+   |
+11 | pub struct DashboardDataGenerator {
+   |            ---------------------- field in this struct
+12 |     dashboard_data: DashboardData,
+   |     ^^^^^^^^^^^^^^
+
+warning: field `violation_patterns` is never read
+   --> parasitic/src/analytics/compliance/mod.rs:216:5
+    |
+213 | pub struct ViolationTracker {
+    |            ---------------- field in this struct
+...
+216 |     violation_patterns: RwLock<HashMap<String, ViolationPattern>>,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: fields `consensus_history` and `voting_patterns` are never read
+   --> parasitic/src/analytics/compliance/mod.rs:231:5
+    |
+230 | pub struct ConsensusEngine {
+    |            --------------- fields in this struct
+231 |     consensus_history: RwLock<VecDeque<SentinelConsensus>>,
+    |     ^^^^^^^^^^^^^^^^^
+232 |     voting_patterns: RwLock<HashMap<String, VotingPattern>>,
+    |     ^^^^^^^^^^^^^^^
+
+warning: fields `learned_patterns`, `training_data`, and `prediction_models` are never read
+   --> parasitic/src/analytics/compliance/mod.rs:247:5
+    |
+246 | pub struct NeuralPatternLearner {
+    |            -------------------- fields in this struct
+247 |     learned_patterns: RwLock<HashMap<String, LearnedPattern>>,
+    |     ^^^^^^^^^^^^^^^^
+248 |     training_data: RwLock<VecDeque<TrainingDataPoint>>,
+    |     ^^^^^^^^^^^^^
+249 |     prediction_models: RwLock<HashMap<String, PredictionModel>>,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: field `coordination_metrics` is never read
+   --> parasitic/src/analytics/compliance/mod.rs:283:5
+    |
+281 | pub struct HyperbolicTopologyIntegration {
+    |            ----------------------------- field in this struct
+282 |     topology_info: RwLock<HyperbolicTopologyInfo>,
+283 |     coordination_metrics: RwLock<CoordinationMetrics>,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: field `validator` is never read
+   --> parasitic/src/cqgs/mod.rs:160:5
+    |
+157 | pub struct CqgsSystem {
+    |            ---------- field in this struct
+...
+160 |     validator: Arc<ZeroMockValidator>,
+    |     ^^^^^^^^^
+
+warning: multiple methods are never used
+   --> parasitic/src/cqgs/mod.rs:404:14
+    |
+193 | impl CqgsSystem {
+    | --------------- methods in this implementation
+...
+404 |     async fn monitoring_loop(&self) {
+    |              ^^^^^^^^^^^^^^^
+...
+421 |     async fn monitor_all_sentinels(&self) {
+    |              ^^^^^^^^^^^^^^^^^^^^^
+...
+445 |     async fn handle_violation(&self, violation: QualityViolation) {
+    |              ^^^^^^^^^^^^^^^^
+...
+481 |     async fn initiate_healing(&self, violation: &QualityViolation) {
+    |              ^^^^^^^^^^^^^^^^
+...
+509 |     async fn find_healing_sentinels(&self) -> Option<Vec<String>> {
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+...
+528 |     async fn healing_loop(&self) {
+    |              ^^^^^^^^^^^^
+...
+544 |     async fn perform_system_healing(&self) {
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+...
+563 |     async fn find_degraded_sentinels(&self) -> Vec<SentinelId> {
+    |              ^^^^^^^^^^^^^^^^^^^^^^^
+...
+578 |     async fn update_system_health(&self) {
+    |              ^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple fields are never read
+   --> parasitic/src/cqgs/mod.rs:644:5
+    |
+643 | struct CqgsSystemMonitor {
+    |        ----------------- fields in this struct
+644 |     sentinels: Arc<DashMap<SentinelId, Box<dyn Sentinel>>>,
+    |     ^^^^^^^^^
+645 |     coordinator: Arc<HyperbolicCoordinator>,
+    |     ^^^^^^^^^^^
+646 |     consensus: Arc<SentinelConsensus>,
+    |     ^^^^^^^^^
+647 |     violations: Arc<RwLock<VecDeque<QualityViolation>>>,
+    |     ^^^^^^^^^^
+648 |     metrics: Arc<DashMap<SentinelId, SentinelMetrics>>,
+    |     ^^^^^^^
+649 |     status: Arc<ParkingRwLock<SystemStatus>>,
+    |     ^^^^^^
+650 |     shutdown_signal: Arc<tokio::sync::Notify>,
+    |     ^^^^^^^^^^^^^^^
+651 |     event_bus: broadcast::Sender<CqgsEvent>,
+    |     ^^^^^^^^^
+    |
+    = note: `CqgsSystemMonitor` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: method `perform_system_healing` is never used
+   --> parasitic/src/cqgs/mod.rs:659:14
+    |
+654 | impl CqgsSystemMonitor {
+    | ---------------------- method in this implementation
+...
+659 |     async fn perform_system_healing(&self) {
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `complexity_limit` and `maintainability_index` are never read
+   --> parasitic/src/cqgs/sentinels.rs:155:5
+    |
+152 | pub struct QualitySentinel {
+    |            --------------- fields in this struct
+...
+155 |     complexity_limit: u32,
+    |     ^^^^^^^^^^^^^^^^
+156 |     maintainability_index: f64,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `check_complexity` is never used
+   --> parasitic/src/cqgs/sentinels.rs:182:14
+    |
+159 | impl QualitySentinel {
+    | -------------------- method in this implementation
+...
+182 |     async fn check_complexity(&self, file_path: &str) -> Result<u32, Box<dyn std::error::Error + Send + Sync>> {
+    |              ^^^^^^^^^^^^^^^^
+
+warning: field `throughput_threshold` is never read
+   --> parasitic/src/cqgs/sentinels.rs:269:5
+    |
+266 | pub struct PerformanceSentinel {
+    |            ------------------- field in this struct
+...
+269 |     throughput_threshold: f64,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: field `compliance_checker` is never read
+   --> parasitic/src/cqgs/sentinels.rs:401:5
+    |
+398 | pub struct SecuritySentinel {
+    |            ---------------- field in this struct
+...
+401 |     compliance_checker: Arc<Mutex<ComplianceChecker>>,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: field `consistency_checker` is never read
+   --> parasitic/src/cqgs/sentinels.rs:599:5
+    |
+597 | pub struct IntegritySentinel {
+    |            ----------------- field in this struct
+598 |     base: BaseSentinel,
+599 |     consistency_checker: Arc<Mutex<ConsistencyChecker>>,
+    |     ^^^^^^^^^^^^^^^^^^^
+
+warning: fields `pattern_recognizer` and `learning_engine` are never read
+   --> parasitic/src/cqgs/sentinels.rs:769:5
+    |
+767 | pub struct NeuralSentinel {
+    |            -------------- fields in this struct
+768 |     base: BaseSentinel,
+769 |     pattern_recognizer: Arc<Mutex<PatternRecognizer>>,
+    |     ^^^^^^^^^^^^^^^^^^
+770 |     learning_engine: Arc<Mutex<LearningEngine>>,
+    |     ^^^^^^^^^^^^^^^
+
+warning: field `scan_patterns` is never read
+   --> parasitic/src/cqgs/sentinels.rs:936:5
+    |
+935 | pub struct VulnerabilityScanner {
+    |            -------------------- field in this struct
+936 |     scan_patterns: Vec<String>,
+    |     ^^^^^^^^^^^^^
+    |
+    = note: `VulnerabilityScanner` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `mock_patterns` is never read
+    --> parasitic/src/cqgs/sentinels.rs:1009:5
+     |
+1008 | pub struct MockDetector {
+     |            ------------ field in this struct
+1009 |     mock_patterns: Vec<String>,
+     |     ^^^^^^^^^^^^^
+     |
+     = note: `MockDetector` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: constant `DEFAULT_CURVATURE` is never used
+  --> parasitic/src/cqgs/coordination.rs:25:7
+   |
+25 | const DEFAULT_CURVATURE: f64 = -1.0;
+   |       ^^^^^^^^^^^^^^^^^
+
+warning: fields `centroid` and `total_energy` are never read
+  --> parasitic/src/cqgs/coordination.rs:39:5
+   |
+37 | struct TopologyCache {
+   |        ------------- fields in this struct
+38 |     distance_matrix: HashMap<(SentinelId, SentinelId), f64>,
+39 |     centroid: HyperbolicCoordinates,
+   |     ^^^^^^^^
+40 |     total_energy: f64,
+   |     ^^^^^^^^^^^^
+   |
+   = note: `TopologyCache` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: constant `DASHBOARD_HTML` is never used
+   --> parasitic/src/cqgs/dashboard.rs:492:7
+    |
+492 | const DASHBOARD_HTML: &str = include_str!("dashboard.html");
+    |       ^^^^^^^^^^^^^^
+
+warning: fields `metrics` and `config` are never read
+   --> parasitic/src/cqgs/remediation.rs:695:5
+    |
+691 | struct RemediationEngineProcessor {
+    |        -------------------------- fields in this struct
+...
+695 |     metrics: Arc<Mutex<RemediationMetrics>>,
+    |     ^^^^^^^
+696 |     config: RemediationConfig,
+    |     ^^^^^^
+    |
+    = note: `RemediationEngineProcessor` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: field `curvature` is never read
+  --> parasitic/src/cqgs/hyperbolic.rs:13:5
+   |
+12 | pub struct HyperbolicSpace {
+   |            --------------- field in this struct
+13 |     curvature: f64,
+   |     ^^^^^^^^^
+
+warning: field `config` is never read
+  --> parasitic/src/quantum/memory.rs:95:5
+   |
+84 | pub struct QuantumTradingMemory {
+   |            -------------------- field in this struct
+...
+95 |     config: QuantumMemoryConfig,
+   |     ^^^^^^
+
+warning: fields `hash_tables` and `hash_functions` are never read
+   --> parasitic/src/quantum/memory.rs:101:5
+    |
+99  | pub struct QuantumLSHIndex {
+    |            --------------- fields in this struct
+100 |     /// Hash tables for locality-sensitive hashing
+101 |     hash_tables: Vec<HashMap<u64, Vec<PatternEntry>>>,
+    |     ^^^^^^^^^^^
+...
+104 |     hash_functions: Vec<QuantumHashFunction>,
+    |     ^^^^^^^^^^^^^^
+
+warning: field `pattern_cache` is never read
+   --> parasitic/src/quantum/memory.rs:122:5
+    |
+117 | pub struct QuantumPatternStore {
+    |            ------------------- field in this struct
+...
+122 |     pattern_cache: Arc<RwLock<HashMap<String, Vec<QuantumParasiticPattern>>>>,
+    |     ^^^^^^^^^^^^^
+
+warning: field `decision_latency_target` is never read
+  --> parasitic/src/cqgs_integration.rs:64:5
+   |
+60 | pub struct CQGSManager {
+   |            ----------- field in this struct
+...
+64 |     decision_latency_target: Duration,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `CUDA_SUCCESS` is never used
+  --> parasitic/src/gpu/cuda_backend.rs:40:7
+   |
+40 | const CUDA_SUCCESS: i32 = 0;
+   |       ^^^^^^^^^^^^
+
+warning: constant `CUDA_MEMCPY_HOST_TO_DEVICE` is never used
+  --> parasitic/src/gpu/cuda_backend.rs:41:7
+   |
+41 | const CUDA_MEMCPY_HOST_TO_DEVICE: i32 = 1;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `CUDA_MEMCPY_DEVICE_TO_HOST` is never used
+  --> parasitic/src/gpu/cuda_backend.rs:42:7
+   |
+42 | const CUDA_MEMCPY_DEVICE_TO_HOST: i32 = 2;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `CUDA_MEMCPY_DEVICE_TO_DEVICE` is never used
+  --> parasitic/src/gpu/cuda_backend.rs:43:7
+   |
+43 | const CUDA_MEMCPY_DEVICE_TO_DEVICE: i32 = 3;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `device_id`, `stream`, and `device_properties` are never read
+   --> parasitic/src/gpu/cuda_backend.rs:171:5
+    |
+170 | pub struct CudaContext {
+    |            ----------- fields in this struct
+171 |     device_id: i32,
+    |     ^^^^^^^^^
+172 |     stream: Arc<CudaStream>,
+    |     ^^^^^^
+173 |     device_properties: CudaDeviceProp,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: function `prefetch_organism_data` is never used
+   --> parasitic/src/gpu/simd_backend.rs:246:4
+    |
+246 | fn prefetch_organism_data(organism: &OrganismVector) {
+    |    ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `criteria`, `available_organisms`, and `weights` are never read
+  --> parasitic/src/consensus/voting_engine.rs:67:5
+   |
+65 | struct ConsensusSession {
+   |        ---------------- fields in this struct
+66 |     id: ConsensusSessionId,
+67 |     criteria: SelectionCriteria,
+   |     ^^^^^^^^
+68 |     available_organisms: Vec<Uuid>,
+   |     ^^^^^^^^^^^^^^^^^^^
+...
+73 |     weights: PerformanceWeights,
+   |     ^^^^^^^
+   |
+   = note: `ConsensusSession` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: constant `MAX_TRACKED_PATTERNS` is never used
+  --> parasitic/src/consensus/emergence_detector.rs:15:7
+   |
+15 | const MAX_TRACKED_PATTERNS: usize = 100;
+   |       ^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `EMERGENCE_SIGNIFICANCE` is never used
+  --> parasitic/src/consensus/emergence_detector.rs:21:7
+   |
+21 | const EMERGENCE_SIGNIFICANCE: f64 = 0.95;
+   |       ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `weight` is never read
+   --> parasitic/src/consensus/emergence_detector.rs:118:5
+    |
+114 | struct VoteTimingData {
+    |        -------------- field in this struct
+...
+118 |     weight: f64,
+    |     ^^^^^^
+    |
+    = note: `VoteTimingData` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `detected_patterns` and `statistical_buffer` are never read
+   --> parasitic/src/consensus/emergence_detector.rs:125:5
+    |
+123 | pub struct EmergenceDetector {
+    |            ----------------- fields in this struct
+124 |     emergence_threshold: f64,
+125 |     detected_patterns: HashMap<String, EmergenceSignal>,
+    |     ^^^^^^^^^^^^^^^^^
+126 |     vote_history: VecDeque<VoteTimingData>,
+127 |     statistical_buffer: VecDeque<StatisticalSnapshot>,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: fields `pattern_hash`, `last_score`, and `computation_time_ns` are never read
+   --> parasitic/src/consensus/emergence_detector.rs:135:5
+    |
+134 | struct CachedPattern {
+    |        ------------- fields in this struct
+135 |     pattern_hash: String,
+    |     ^^^^^^^^^^^^
+136 |     last_score: f64,
+    |     ^^^^^^^^^^
+137 |     computation_time_ns: u64,
+    |     ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `CachedPattern` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `timestamp`, `measures`, and `vote_count` are never read
+   --> parasitic/src/consensus/emergence_detector.rs:144:5
+    |
+143 | struct StatisticalSnapshot {
+    |        ------------------- fields in this struct
+144 |     timestamp: SystemTime,
+    |     ^^^^^^^^^
+145 |     measures: StatisticalMeasures,
+    |     ^^^^^^^^
+146 |     vote_count: usize,
+    |     ^^^^^^^^^^
+    |
+    = note: `StatisticalSnapshot` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `verification` and `hash` are never read
+   --> parasitic/src/consensus/byzantine_tolerance.rs:161:5
+    |
+159 | struct VoteRecord {
+    |        ---------- fields in this struct
+160 |     vote: OrganismVote,
+161 |     verification: VoteVerification,
+    |     ^^^^^^^^^^^^
+162 |     hash: String,
+    |     ^^^^
+    |
+    = note: `VoteRecord` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `organism_id` is never read
+   --> parasitic/src/consensus/byzantine_tolerance.rs:168:5
+    |
+167 | struct NodeBehavior {
+    |        ------------ field in this struct
+168 |     organism_id: Uuid,
+    |     ^^^^^^^^^^^
+    |
+    = note: `NodeBehavior` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `timing_patterns` and `vote_patterns` are never read
+   --> parasitic/src/consensus/byzantine_tolerance.rs:189:5
+    |
+187 | struct AttackDetector {
+    |        -------------- fields in this struct
+188 |     coordination_matrix: HashMap<(Uuid, Uuid), f64>,
+189 |     timing_patterns: HashMap<Uuid, VecDeque<SystemTime>>,
+    |     ^^^^^^^^^^^^^^^
+190 |     vote_patterns: HashMap<Uuid, VecDeque<f64>>,
+    |     ^^^^^^^^^^^^^
+
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> parasitic/src/consensus/byzantine_tolerance.rs:510:9
+    |
+510 |         drop(behavior);
+    |         ^^^^^--------^
+    |              |
+    |              argument has type `&mut NodeBehavior`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+510 -         drop(behavior);
+510 +         let _ = behavior;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:390:5
+    |
+390 |     async fn register_organism(&mut self, organism: Box<dyn ParasiticOrganism>) -> OrganismId;
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+    = note: `#[warn(async_fn_in_trait)]` on by default
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+390 -     async fn register_organism(&mut self, organism: Box<dyn ParasiticOrganism>) -> OrganismId;
+390 +     fn register_organism(&mut self, organism: Box<dyn ParasiticOrganism>) -> impl std::future::Future<Output = OrganismId> + Send;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:393:5
+    |
+393 |     async fn get_organism(&self, id: &OrganismId) -> Option<Arc<RwLock<dyn ParasiticOrganism>>>;
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+393 -     async fn get_organism(&self, id: &OrganismId) -> Option<Arc<RwLock<dyn ParasiticOrganism>>>;
+393 +     fn get_organism(&self, id: &OrganismId) -> impl std::future::Future<Output = Option<Arc<RwLock<dyn ParasiticOrganism>>>> + Send;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:396:5
+    |
+396 |     async fn get_organisms_by_type(&self, organism_type: OrganismType) -> Vec<Arc<RwLock<dyn ParasiticOrganism>>>;
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+396 -     async fn get_organisms_by_type(&self, organism_type: OrganismType) -> Vec<Arc<RwLock<dyn ParasiticOrganism>>>;
+396 +     fn get_organisms_by_type(&self, organism_type: OrganismType) -> impl std::future::Future<Output = Vec<Arc<RwLock<dyn ParasiticOrganism>>>> + Send;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:399:5
+    |
+399 |     async fn remove_organism(&mut self, id: &OrganismId) -> bool;
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+399 -     async fn remove_organism(&mut self, id: &OrganismId) -> bool;
+399 +     fn remove_organism(&mut self, id: &OrganismId) -> impl std::future::Future<Output = bool> + Send;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:402:5
+    |
+402 |     async fn get_organism_metrics(&self, id: &OrganismId) -> Option<OrganismMetrics>;
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+402 -     async fn get_organism_metrics(&self, id: &OrganismId) -> Option<OrganismMetrics>;
+402 +     fn get_organism_metrics(&self, id: &OrganismId) -> impl std::future::Future<Output = Option<OrganismMetrics>> + Send;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:405:5
+    |
+405 |     async fn spawn_mutated_organism(&mut self, parent_id: &OrganismId, mutations: &[StrategyMutation]) -> Result<OrganismId, ParasiticErr...
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+405 -     async fn spawn_mutated_organism(&mut self, parent_id: &OrganismId, mutations: &[StrategyMutation]) -> Result<OrganismId, ParasiticError>;
+405 +     fn spawn_mutated_organism(&mut self, parent_id: &OrganismId, mutations: &[StrategyMutation]) -> impl std::future::Future<Output = Result<OrganismId, ParasiticError>> + Send;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:408:5
+    |
+408 |     async fn get_population_stats(&self) -> PopulationStatistics;
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+408 -     async fn get_population_stats(&self) -> PopulationStatistics;
+408 +     fn get_population_stats(&self) -> impl std::future::Future<Output = PopulationStatistics> + Send;
+    |
+
+warning: use of `async fn` in public traits is discouraged as auto trait bounds cannot be specified
+   --> parasitic/src/traits.rs:411:5
+    |
+411 |     async fn evolutionary_selection(&mut self, pressure: &EvolutionaryPressure) -> Vec<OrganismId>;
+    |     ^^^^^
+    |
+    = note: you can suppress this lint if you plan to use the trait only in your own code, or do not care about auto traits like `Send` on the `Future`
+help: you can alternatively desugar to a normal `fn` that returns `impl Future` and add any desired bounds such as `Send`, but these cannot be relaxed without a breaking API change
+    |
+411 -     async fn evolutionary_selection(&mut self, pressure: &EvolutionaryPressure) -> Vec<OrganismId>;
+411 +     fn evolutionary_selection(&mut self, pressure: &EvolutionaryPressure) -> impl std::future::Future<Output = Vec<OrganismId>> + Send;
+    |
+
+warning: `cwts-ultra` (lib) generated 11 warnings
+warning: `parasitic` (lib) generated 272 warnings (run `cargo fix --lib -p parasitic` to apply 101 suggestions)
+warning: unused imports: `SystemTime` and `UNIX_EPOCH`
+ --> core/../test_risk_management.rs:5:17
+  |
+5 | use std::time::{SystemTime, UNIX_EPOCH};
+  |                 ^^^^^^^^^^  ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: fields `positions` and `historical_returns` are never read
+  --> core/../test_risk_management.rs:91:5
+   |
+89 | pub struct RiskManager {
+   |            ----------- fields in this struct
+90 |     parameters: RiskParameters,
+91 |     positions: HashMap<String, Position>,
+   |     ^^^^^^^^^
+92 |     historical_returns: HashMap<String, Vec<f64>>,
+   |     ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: unused import: `std::path::Path`
+ --> parasitic/src/bin/validate_anglerfish.rs:3:5
+  |
+3 | use std::path::Path;
+  |     ^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused variable: `target_traders`
+   --> parasitic/src/bin/../anglerfish_lure_standalone.rs:356:46
+    |
+356 |     pub fn generate_lure_activity(&mut self, target_traders: &[TraderType]) -> Result<Vec<f64>, LureError> {
+    |                                              ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_target_traders`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `orderbook_bytes`
+  --> wasm/src/lib.rs:29:28
+   |
+29 |     pub fn tick(&mut self, orderbook_bytes: &[u8]) -> u8 {
+   |                            ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_orderbook_bytes`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: methods `backward`, `get_weights`, `set_weights`, `get_biases`, and `set_biases` are never used
+  --> wasm/src/neural_bindings.rs:28:8
+   |
+19 | impl WasmNeuralLayer {
+   | -------------------- methods in this implementation
+...
+28 |     fn backward(&mut self, _gradient: &[f32]) -> Vec<f32> {
+   |        ^^^^^^^^
+...
+32 |     fn get_weights(&self) -> Vec<f32> {
+   |        ^^^^^^^^^^^
+...
+36 |     fn set_weights(&mut self, _weights: &[f32]) {}
+   |        ^^^^^^^^^^^
+37 |     
+38 |     fn get_biases(&self) -> Vec<f32> {
+   |        ^^^^^^^^^^
+...
+42 |     fn set_biases(&mut self, _biases: &[f32]) {}
+   |        ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: methods `forward`, `train`, and `get_loss` are never used
+  --> wasm/src/neural_bindings.rs:75:8
+   |
+65 | impl WasmNeuralNetwork {
+   | ---------------------- methods in this implementation
+...
+75 |     fn forward(&self, _input: &[f32]) -> Vec<f32> {
+   |        ^^^^^^^
+...
+79 |     fn train(&mut self, _inputs: &[f32], _targets: &[f32], _learning_rate: f32) -> f32 {
+   |        ^^^^^
+...
+83 |     fn get_loss(&self, _inputs: &[f32], _targets: &[f32]) -> f32 {
+   |        ^^^^^^^^
+
+warning: methods `add_sample`, `predict`, and `train_incremental` are never used
+   --> wasm/src/neural_bindings.rs:117:8
+    |
+112 | impl WasmStreamingNN {
+    | -------------------- methods in this implementation
+...
+117 |     fn add_sample(&mut self, _sample: &[f32]) {}
+    |        ^^^^^^^^^^
+118 |     
+119 |     fn predict(&self) -> Vec<f32> {
+    |        ^^^^^^^
+...
+123 |     fn train_incremental(&mut self, _target: &[f32], _learning_rate: f32) -> f32 {
+    |        ^^^^^^^^^^^^^^^^^
+
+warning: associated function `softmax` is never used
+   --> wasm/src/neural_bindings.rs:512:8
+    |
+510 | impl JSTradingNN {
+    | ---------------- associated function in this implementation
+511 |     /// Apply softmax normalization
+512 |     fn softmax(logits: &[f32]) -> Vec<f32> {
+    |        ^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> parasitic/src/main.rs:21:5
+   |
+21 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `error`
+  --> parasitic/src/main.rs:23:15
+   |
+23 | use tracing::{error, info, warn};
+   |               ^^^^^
+
+warning: unused variable: `infection_start`
+   --> parasitic/src/main.rs:237:9
+    |
+237 |     let infection_start = std::time::Instant::now();
+    |         ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_infection_start`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `i`
+   --> parasitic/src/main.rs:242:10
+    |
+242 |     for (i, pair) in test_pairs.iter().enumerate() {
+    |          ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: unused import: `std::sync::Arc`
+  --> parasitic/src/consensus/standalone_test.rs:12:5
+   |
+12 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `parking_lot::RwLock`
+  --> parasitic/src/consensus/standalone_test.rs:13:5
+   |
+13 | use parking_lot::RwLock;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `factors`
+   --> parasitic/src/consensus/standalone_test.rs:533:9
+    |
+533 |     let factors = WeightFactors::default();
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_factors`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: field `threshold` is never read
+  --> parasitic/src/consensus/standalone_test.rs:42:5
+   |
+41 | struct ByzantineTolerance {
+   |        ------------------ field in this struct
+42 |     threshold: f64,
+   |     ^^^^^^^^^
+   |
+   = note: `ByzantineTolerance` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` on by default
+
+warning: variants `Synchronization`, `Convergence`, `Divergence`, and `CollectiveIntelligence` are never constructed
+  --> parasitic/src/consensus/standalone_test.rs:79:5
+   |
+78 | enum EmergencePattern {
+   |      ---------------- variants in this enum
+79 |     Synchronization { 
+   |     ^^^^^^^^^^^^^^^
+...
+84 |     Convergence { 
+   |     ^^^^^^^^^^^
+...
+89 |     Divergence { 
+   |     ^^^^^^^^^^
+...
+94 |     CollectiveIntelligence {
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `EmergencePattern` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `performance`, `reliability`, and `efficiency` are never read
+   --> parasitic/src/consensus/standalone_test.rs:142:5
+    |
+141 | struct WeightFactors {
+    |        ------------- fields in this struct
+142 |     performance: f64,
+    |     ^^^^^^^^^^^
+143 |     reliability: f64,
+    |     ^^^^^^^^^^^
+144 |     efficiency: f64,
+    |     ^^^^^^^^^^
+    |
+    = note: `WeightFactors` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `status` is never read
+   --> parasitic/src/consensus/standalone_test.rs:160:5
+    |
+159 | struct FaultToleranceStatus {
+    |        -------------------- field in this struct
+160 |     status: String,
+    |     ^^^^^^
+    |
+    = note: `FaultToleranceStatus` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: struct `TestOrganism` is never constructed
+   --> parasitic/src/consensus/standalone_test.rs:178:8
+    |
+178 | struct TestOrganism {
+    |        ^^^^^^^^^^^^
+
+warning: struct `TestGenetics` is never constructed
+   --> parasitic/src/consensus/standalone_test.rs:186:8
+    |
+186 | struct TestGenetics {
+    |        ^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+   --> parasitic/src/consensus/standalone_test.rs:213:8
+    |
+212 | impl TestOrganism {
+    | ----------------- associated function in this implementation
+213 |     fn new(organism_type: &str) -> Self {
+    |        ^^^
+
+warning: `cwts-ultra` (bin "test_risk_management") generated 2 warnings (run `cargo fix --bin "test_risk_management"` to apply 1 suggestion)
+warning: `parasitic` (bin "validate_anglerfish") generated 2 warnings (run `cargo fix --bin "validate_anglerfish"` to apply 1 suggestion)
+warning: `cwts-ultra-wasm` (lib) generated 5 warnings
+warning: `parasitic` (bin "parasitic-server") generated 4 warnings (run `cargo fix --bin "parasitic-server"` to apply 2 suggestions)
+warning: `parasitic` (bin "consensus-test") generated 10 warnings (run `cargo fix --bin "consensus-test"` to apply 2 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.46s

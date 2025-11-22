@@ -1,0 +1,72 @@
+[run]
+# Coverage configuration for 100% code coverage
+
+# Source paths
+source = .
+omit = 
+    */venv/*
+    */venv_test/*
+    */tests/*
+    */test_*
+    */.pytest_cache/*
+    */node_modules/*
+    */target/*
+    */build/*
+    */dist/*
+    setup.py
+    conftest.py
+    */migrations/*
+    */__pycache__/*
+    */.git/*
+    */site-packages/*
+    */lib/python*/site-packages/*
+
+# Coverage options
+branch = true
+parallel = true
+concurrency = multiprocessing,thread
+
+# Data file location
+data_file = coverage/.coverage
+
+[report]
+# Reporting configuration
+precision = 2
+show_missing = true
+skip_covered = false
+sort = Cover
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    pass
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+
+# Minimum coverage requirements
+fail_under = 100
+
+[html]
+# HTML report configuration
+directory = coverage/html
+title = CWTS Ultra Test Coverage Report
+
+[xml]
+# XML report configuration
+output = coverage/coverage.xml
+
+[json]
+# JSON report configuration
+output = coverage/coverage.json
+pretty_print = true
+
+# Paths for path mapping
+[paths]
+source = 
+    .
+    */site-packages/*

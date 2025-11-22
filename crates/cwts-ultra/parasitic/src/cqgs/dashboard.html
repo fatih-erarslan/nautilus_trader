@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CQGS Dashboard - Collaborative Quality Governance System v2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: auto;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid #00ff88;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #00ff88, #00aaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online { background: #00ff88; }
+        .status-warning { background: #ffaa00; }
+        .status-error { background: #ff4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 1rem;
+            padding: 2rem;
+            height: calc(100vh - 80px);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 255, 136, 0.8);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .card h2 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00aaff;
+            text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #aaaaaa;
+            margin-top: 0.5rem;
+        }
+
+        .hyperbolic-canvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
+        }
+
+        .sentinel-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .sentinel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sentinel-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .violation-alert {
+            background: rgba(255, 68, 68, 0.1);
+            border-left: 4px solid #ff4444;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .violation-critical { border-left-color: #ff0000; }
+        .violation-error { border-left-color: #ff4444; }
+        .violation-warning { border-left-color: #ffaa00; }
+        .violation-info { border-left-color: #00aaff; }
+
+        .consensus-session {
+            background: rgba(0, 170, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00aaff);
+            transition: width 0.3s ease;
+        }
+
+        .performance-chart {
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: #00ff88;
+            animation: pulse-line 2s infinite;
+        }
+
+        @keyframes pulse-line {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 1rem;
+            min-width: 300px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .topology-diagram {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .sentinel-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: glow 3s infinite;
+            cursor: pointer;
+        }
+
+        .sentinel-node:hover {
+            transform: scale(2);
+            z-index: 10;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px #00ff88; }
+            50% { box-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #00aaff 50%, transparent 100%);
+            animation: flow 2s infinite;
+        }
+
+        @keyframes flow {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .real-time-indicator {
+            color: #00ff88;
+            font-size: 0.8rem;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>CQGS Dashboard v2.0</h1>
+        <div class="status-indicator">
+            <div class="status-dot status-online" id="system-status"></div>
+            <span id="system-status-text">System Online</span>
+            <span class="real-time-indicator">● LIVE</span>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- System Overview Card -->
+        <div class="card">
+            <h2>System Overview</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <div class="metric-value" id="active-sentinels">49</div>
+                    <div class="metric-label">Active Sentinels</div>
+                </div>
+                <div>
+                    <div class="metric-value" id="system-health">98.5%</div>
+                    <div class="metric-label">System Health</div>
+                </div>
+                <div>
+                    <div class="metric-value" id="total-violations">127</div>
+                    <div class="metric-label">Total Violations</div>
+                </div>
+                <div>
+                    <div class="metric-value" id="resolved-violations">115</div>
+                    <div class="metric-label">Resolved</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="health-progress" style="width: 98.5%"></div>
+            </div>
+        </div>
+
+        <!-- Hyperbolic Topology Visualization -->
+        <div class="card">
+            <h2>Hyperbolic Topology</h2>
+            <div class="topology-diagram" id="topology-diagram">
+                <!-- Sentinel nodes will be dynamically positioned here -->
+            </div>
+            <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                <div>Stability: <span id="topology-stability" style="color: #00ff88;">94.2%</span></div>
+                <div>Coverage: <span id="topology-coverage" style="color: #00aaff;">87.3%</span></div>
+            </div>
+        </div>
+
+        <!-- Real-time Violations -->
+        <div class="card">
+            <h2>Recent Violations</h2>
+            <div class="sentinel-list" id="violations-list">
+                <!-- Violations will be populated here -->
+            </div>
+        </div>
+
+        <!-- Sentinel Status -->
+        <div class="card">
+            <h2>Sentinel Status</h2>
+            <div class="sentinel-list" id="sentinel-list">
+                <!-- Sentinel status will be populated here -->
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="card">
+            <h2>Performance Metrics</h2>
+            <div class="performance-chart">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center;">
+                    <div>
+                        <div class="metric-value" style="font-size: 1.5rem;" id="cpu-usage">23%</div>
+                        <div class="metric-label">CPU Usage</div>
+                    </div>
+                    <div>
+                        <div class="metric-value" style="font-size: 1.5rem;" id="memory-usage">256MB</div>
+                        <div class="metric-label">Memory</div>
+                    </div>
+                    <div>
+                        <div class="metric-value" style="font-size: 1.5rem;" id="response-time">15ms</div>
+                        <div class="metric-label">Avg Response</div>
+                    </div>
+                </div>
+                <div class="chart-line"></div>
+            </div>
+        </div>
+
+        <!-- Consensus Status -->
+        <div class="card">
+            <h2>Consensus Engine</h2>
+            <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <div class="metric-value" style="font-size: 1.8rem;" id="consensus-sessions">3</div>
+                        <div class="metric-label">Active Sessions</div>
+                    </div>
+                    <div>
+                        <div class="metric-value" style="font-size: 1.8rem;" id="consensus-accuracy">96.8%</div>
+                        <div class="metric-label">Decision Accuracy</div>
+                    </div>
+                </div>
+                <div id="consensus-sessions-list">
+                    <!-- Active consensus sessions will be shown here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        class CQGSDashboard {
+            constructor() {
+                this.websocket = null;
+                this.data = null;
+                this.sentinelPositions = new Map();
+                this.init();
+            }
+
+            init() {
+                this.connectWebSocket();
+                this.initializeTopology();
+                this.startDataUpdates();
+            }
+
+            connectWebSocket() {
+                const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${location.host}/ws`;
+                
+                this.websocket = new WebSocket(wsUrl);
+                
+                this.websocket.onopen = () => {
+                    console.log('Connected to CQGS Dashboard');
+                    this.showNotification('Connected to CQGS System', 'success');
+                };
+                
+                this.websocket.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    this.handleWebSocketMessage(message);
+                };
+                
+                this.websocket.onclose = () => {
+                    console.log('Disconnected from CQGS Dashboard');
+                    this.showNotification('Connection Lost - Attempting Reconnect', 'error');
+                    setTimeout(() => this.connectWebSocket(), 5000);
+                };
+                
+                this.websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                };
+            }
+
+            handleWebSocketMessage(message) {
+                switch (message.type) {
+                    case 'DashboardUpdate':
+                        this.updateDashboard(message.data);
+                        break;
+                    case 'ViolationAlert':
+                        this.showViolationAlert(message.violation);
+                        break;
+                    case 'ConsensusUpdate':
+                        this.updateConsensusStatus(message);
+                        break;
+                    case 'SystemAlert':
+                        this.showNotification(message.message, message.level);
+                        break;
+                    case 'TopologyChange':
+                        this.updateTopology(message.new_positions);
+                        break;
+                }
+            }
+
+            updateDashboard(data) {
+                this.data = data;
+                
+                // Update system overview
+                document.getElementById('active-sentinels').textContent = data.system_status.active_sentinels;
+                document.getElementById('system-health').textContent = (data.system_status.system_health * 100).toFixed(1) + '%';
+                document.getElementById('total-violations').textContent = data.system_status.total_violations;
+                document.getElementById('resolved-violations').textContent = data.system_status.resolved_violations;
+                
+                // Update health progress bar
+                const healthPercent = data.system_status.system_health * 100;
+                document.getElementById('health-progress').style.width = healthPercent + '%';
+                
+                // Update topology metrics
+                document.getElementById('topology-stability').textContent = (data.topology_metrics.stability * 100).toFixed(1) + '%';
+                document.getElementById('topology-coverage').textContent = (data.hyperbolic_visualization.coverage_area).toFixed(1) + '%';
+                
+                // Update performance metrics
+                document.getElementById('cpu-usage').textContent = data.performance_stats.cpu_usage_percent.toFixed(0) + '%';
+                document.getElementById('memory-usage').textContent = data.performance_stats.memory_usage_mb.toFixed(0) + 'MB';
+                document.getElementById('response-time').textContent = data.performance_stats.average_resolution_time_ms.toFixed(0) + 'ms';
+                
+                // Update consensus metrics
+                document.getElementById('consensus-accuracy').textContent = (data.consensus_metrics.decision_accuracy_rate * 100).toFixed(1) + '%';
+                
+                // Update sentinel list
+                this.updateSentinelList(data.sentinel_metrics);
+                
+                // Update violations list
+                this.updateViolationsList(data.recent_violations);
+                
+                // Update topology visualization
+                this.updateTopologyVisualization(data.hyperbolic_visualization);
+                
+                // Update system status indicator
+                this.updateSystemStatus(data.system_status.system_health);
+            }
+
+            updateSentinelList(sentinelMetrics) {
+                const list = document.getElementById('sentinel-list');
+                list.innerHTML = '';
+                
+                Object.entries(sentinelMetrics).forEach(([id, metrics]) => {
+                    const item = document.createElement('div');
+                    item.className = 'sentinel-item';
+                    
+                    const statusClass = metrics.uptime_percentage > 95 ? 'status-online' : 
+                                       metrics.uptime_percentage > 80 ? 'status-warning' : 'status-error';
+                    
+                    item.innerHTML = `
+                        <div style="display: flex; align-items: center;">
+                            <div class="sentinel-status ${statusClass}"></div>
+                            <span>${id}</span>
+                        </div>
+                        <div style="text-align: right; font-size: 0.8rem;">
+                            <div>${metrics.uptime_percentage.toFixed(1)}%</div>
+                            <div style="color: #aaa;">${metrics.response_time_ms.toFixed(0)}ms</div>
+                        </div>
+                    `;
+                    
+                    list.appendChild(item);
+                });
+            }
+
+            updateViolationsList(violations) {
+                const list = document.getElementById('violations-list');
+                list.innerHTML = '';
+                
+                violations.slice(-10).forEach(violation => {
+                    const item = document.createElement('div');
+                    const severityClass = `violation-${violation.severity.toLowerCase()}`;
+                    item.className = `violation-alert ${severityClass}`;
+                    
+                    item.innerHTML = `
+                        <div style="font-weight: bold; color: #fff;">${violation.severity.toUpperCase()}</div>
+                        <div style="font-size: 0.9rem; margin: 0.5rem 0;">${violation.message}</div>
+                        <div style="font-size: 0.8rem; color: #aaa;">${violation.location}</div>
+                    `;
+                    
+                    list.appendChild(item);
+                });
+            }
+
+            updateTopologyVisualization(visualization) {
+                const diagram = document.getElementById('topology-diagram');
+                const rect = diagram.getBoundingClientRect();
+                
+                // Clear existing nodes and connections
+                diagram.innerHTML = '';
+                
+                // Add sentinel nodes
+                Object.entries(visualization.sentinel_positions).forEach(([id, coords]) => {
+                    const node = document.createElement('div');
+                    node.className = 'sentinel-node';
+                    node.title = id;
+                    
+                    // Convert hyperbolic coordinates to screen coordinates
+                    const screenX = (coords.x + 1) * (rect.width / 2) * 0.8 + rect.width * 0.1;
+                    const screenY = (coords.y + 1) * (rect.height / 2) * 0.8 + rect.height * 0.1;
+                    
+                    node.style.left = screenX + 'px';
+                    node.style.top = screenY + 'px';
+                    
+                    diagram.appendChild(node);
+                });
+                
+                // Add communication edges
+                visualization.communication_edges.forEach(edge => {
+                    const line = document.createElement('div');
+                    line.className = 'connection-line';
+                    
+                    const fromCoords = visualization.sentinel_positions[edge.from];
+                    const toCoords = visualization.sentinel_positions[edge.to];
+                    
+                    if (fromCoords && toCoords) {
+                        const fromX = (fromCoords.x + 1) * (rect.width / 2) * 0.8 + rect.width * 0.1;
+                        const fromY = (fromCoords.y + 1) * (rect.height / 2) * 0.8 + rect.height * 0.1;
+                        const toX = (toCoords.x + 1) * (rect.width / 2) * 0.8 + rect.width * 0.1;
+                        const toY = (toCoords.y + 1) * (rect.height / 2) * 0.8 + rect.height * 0.1;
+                        
+                        const length = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+                        const angle = Math.atan2(toY - fromY, toX - fromX) * 180 / Math.PI;
+                        
+                        line.style.width = length + 'px';
+                        line.style.left = fromX + 'px';
+                        line.style.top = fromY + 'px';
+                        line.style.transform = `rotate(${angle}deg)`;
+                        line.style.transformOrigin = '0 50%';
+                        line.style.opacity = edge.efficiency;
+                        
+                        diagram.appendChild(line);
+                    }
+                });
+            }
+
+            updateSystemStatus(health) {
+                const statusDot = document.getElementById('system-status');
+                const statusText = document.getElementById('system-status-text');
+                
+                if (health > 0.95) {
+                    statusDot.className = 'status-dot status-online';
+                    statusText.textContent = 'System Online';
+                } else if (health > 0.8) {
+                    statusDot.className = 'status-dot status-warning';
+                    statusText.textContent = 'System Warning';
+                } else {
+                    statusDot.className = 'status-dot status-error';
+                    statusText.textContent = 'System Error';
+                }
+            }
+
+            showViolationAlert(violation) {
+                this.showNotification(
+                    `${violation.severity.toUpperCase()}: ${violation.message}`,
+                    violation.severity.toLowerCase()
+                );
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                
+                const colors = {
+                    success: '#00ff88',
+                    error: '#ff4444',
+                    warning: '#ffaa00',
+                    info: '#00aaff'
+                };
+                
+                notification.style.borderColor = colors[type] || colors.info;
+                notification.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 0.5rem;">${type.toUpperCase()}</div>
+                    <div>${message}</div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+
+            initializeTopology() {
+                // Initialize with sample sentinel positions
+                const samplePositions = {};
+                for (let i = 0; i < 49; i++) {
+                    const angle = (i / 49) * 2 * Math.PI;
+                    const radius = 0.3 + (i % 3) * 0.2;
+                    samplePositions[`sentinel_${i}`] = {
+                        x: Math.cos(angle) * radius,
+                        y: Math.sin(angle) * radius,
+                        radius: radius
+                    };
+                }
+                
+                this.updateTopologyVisualization({
+                    sentinel_positions: samplePositions,
+                    communication_edges: [],
+                    centroid: { x: 0, y: 0, radius: 0 },
+                    stability_score: 0.942,
+                    coverage_area: 87.3
+                });
+            }
+
+            startDataUpdates() {
+                // Simulate periodic updates when WebSocket is not available
+                if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+                    setInterval(() => {
+                        this.simulateDataUpdate();
+                    }, 2000);
+                }
+            }
+
+            simulateDataUpdate() {
+                // Simulate real-time data updates
+                const cpuUsage = 15 + Math.random() * 20;
+                const memoryUsage = 240 + Math.random() * 50;
+                const responseTime = 10 + Math.random() * 15;
+                
+                document.getElementById('cpu-usage').textContent = cpuUsage.toFixed(0) + '%';
+                document.getElementById('memory-usage').textContent = memoryUsage.toFixed(0) + 'MB';
+                document.getElementById('response-time').textContent = responseTime.toFixed(0) + 'ms';
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new CQGSDashboard();
+        });
+    </script>
+</body>
+</html>

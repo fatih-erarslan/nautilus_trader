@@ -1,0 +1,19 @@
+[package]
+name = "hyperphysics-finance"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+description = "Production-grade financial modeling with peer-reviewed implementations"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+statrs = "0.17"  # Statistical distributions for Black-Scholes
+ndarray = "0.15"  # Numerical arrays for time series
+approx = "0.5"  # Floating-point comparisons
+
+[dev-dependencies]
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+criterion = "0.5"

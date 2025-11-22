@@ -1,0 +1,51 @@
+[workspace]
+
+[package]
+name = "cwts-performance-benchmarks"
+version = "0.1.0"
+edition = "2021"
+description = "CWTS Ultra Scientific Performance Validation Suite"
+authors = ["CWTS Team"]
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+futures = "0.3"
+rand = "0.8"
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.0"
+
+[[bin]]
+name = "performance_validator"
+path = "main.rs"
+
+[[bin]]
+name = "quick_validation"
+path = "quick_validation.rs"
+
+# Benchmarks removed for quick validation demo
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+debug = false
+overflow-checks = false
+
+[profile.bench]
+opt-level = 3
+lto = true
+codegen-units = 1
+debug = true
+
+[features]
+default = ["gpu_acceleration", "statistical_analysis", "real_time_monitoring"]
+gpu_acceleration = []
+statistical_analysis = []
+real_time_monitoring = []
+production_validation = []

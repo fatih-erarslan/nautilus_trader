@@ -11,7 +11,7 @@
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc, Duration};
-use futures_util::{StreamExt, SinkExt};
+use futures_util::SinkExt;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -48,6 +48,10 @@ pub struct BinanceProvider {
     api_secret: Option<String>,
 
     /// Whether using testnet
+    /// Testnet configuration enables:
+    /// - Separate API endpoints (testnet.binance.vision)
+    /// - Sandbox trading environment
+    /// - Test data feeds without real funds
     testnet: bool,
 
     /// Active WebSocket connection
@@ -73,8 +77,10 @@ struct BinanceKline {
     #[serde(rename = "v")]
     volume: String,
     #[serde(rename = "T")]
+    #[allow(dead_code)]
     close_time: i64,
     #[serde(rename = "q")]
+    #[allow(dead_code)]
     quote_volume: String,
     #[serde(rename = "n")]
     trades: i64,
@@ -89,6 +95,7 @@ struct WsSubscribe {
 }
 
 /// WebSocket orderbook depth update
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct DepthUpdate {
     #[serde(rename = "e")]

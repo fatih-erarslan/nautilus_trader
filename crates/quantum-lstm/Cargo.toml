@@ -1,0 +1,160 @@
+[package]
+name = "quantum-lstm"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["Quantum LSTM Team <qlstm@quantum.trading>"]
+description = "Quantum LSTM - Quantum-enhanced LSTM with biological quantum effects for time series prediction"
+repository = "https://github.com/quantum-trading/quantum-lstm"
+license = "MIT OR Apache-2.0"
+keywords = ["quantum", "lstm", "neural", "time-series", "trading"]
+categories = ["science", "algorithms", "mathematics", "finance"]
+
+[lib]
+name = "quantum_lstm"
+path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+# Core quantum computing
+quantum-core = { path = "../quantum-core" }
+
+# Mathematical computing
+ndarray = { version = "0.16.1", features = ["rayon", "blas", "serde"] }
+nalgebra.workspace = true
+num-traits = "0.2"
+num-complex = "0.4"
+statrs = "0.16"
+approx = "0.5"
+rand = { version = "0.8", features = ["small_rng"] }
+rand_distr = "0.4"
+
+# Neural network components
+candle-core = { workspace = true, optional = true }
+candle-nn = { workspace = true, optional = true }
+
+# High-performance computing
+rayon = { version = "1.10.0", optional = true }
+wide = { version = "0.7", optional = true }
+simd-json = { version = "0.13", optional = true }
+
+# Async and concurrency
+tokio = { version = "1.46", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+dashmap = "6.1"
+parking_lot = "0.12"
+crossbeam = "0.8"
+
+# Memory management
+mimalloc = { version = "0.1", optional = true }
+circular-buffer = "0.1"
+ahash = "0.8"
+
+# Serialization and configuration
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+rmp-serde = "1.1"
+toml = "0.8"
+
+# Time and scheduling
+chrono = { version = "0.4.41", features = ["serde"] }
+uuid = { version = "1.10", features = ["v4", "serde"] }
+
+# Logging and monitoring
+tracing = "0.1"
+metrics = "0.21"
+prometheus = { version = "0.13", optional = true }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# GPU acceleration (optional)
+# cudarc = { version = "0.9", optional = true }
+# cust = { version = "0.3", optional = true }
+
+# Hardware acceleration
+accelerate-src = { version = "0.3", optional = true }
+intel-mkl-src = { version = "0.8", optional = true, features = ["mkl-static-lp64-iomp"] }
+
+# Cache and performance
+lru = "0.12"
+moka = { version = "0.12", features = ["future"], optional = true }
+
+# Testing utilities
+mockall = { version = "0.12", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tokio-test = "0.4"
+approx = "0.5"
+pretty_assertions = "1.4"
+tempfile = "3.8"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+
+[features]
+default = ["real-time", "memory-efficient", "biological-effects"]
+
+# Core features
+simd = ["wide", "simd-json"]
+parallel = ["rayon", "ndarray/rayon"]
+real-time = ["tokio/rt-multi-thread"]
+memory-efficient = ["mimalloc", "moka"]
+biological-effects = []
+
+# Hardware acceleration
+# gpu = ["cudarc", "cust"]
+# cuda = ["gpu"]
+# rocm = ["gpu"]
+metal = ["accelerate-src"]
+mkl = ["intel-mkl-src"]
+
+# Neural network backends
+candle = ["candle-core", "candle-nn"]
+
+# Monitoring and profiling
+monitoring = ["prometheus"]
+profiling = []
+
+# Caching strategies
+advanced-cache = ["moka"]
+
+# Full feature set
+full = [
+    "simd", "parallel", "real-time", "memory-efficient", "biological-effects",
+    "candle", "monitoring", "advanced-cache"
+]
+
+# Performance optimization
+performance = ["simd", "parallel", "memory-efficient", "mkl"]
+
+# Development and testing
+dev = ["monitoring", "profiling", "mockall"]
+benchmarking = []
+
+[[bench]]
+name = "quantum_lstm_benchmark"
+harness = false
+required-features = ["benchmarking"]
+
+[[bench]]
+name = "biological_effects_benchmark"
+harness = false
+required-features = ["benchmarking", "biological-effects"]
+
+[[bench]]
+name = "memory_benchmark"
+harness = false
+required-features = ["benchmarking", "memory-efficient"]
+
+[build-dependencies]
+cc = "1.0"
+# cuda_builder = { version = "0.3", optional = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

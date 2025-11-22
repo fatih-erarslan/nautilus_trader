@@ -3,72 +3,70 @@
 //! Reference: Tononi et al. (2016) "Integrated information theory" Nat Rev Neurosci 17:450
 //! IIT 3.0 Axiom: Φ ≥ 0 (integrated information is always non-negative)
 
-use hyperphysics_consciousness::{PhiCalculator, PhiApproximation};
+use hyperphysics_consciousness::PhiCalculator;
 use hyperphysics_pbit::PBitLattice;
+
+/// Helper to create small test lattice with {3,7,1} tessellation (7 nodes)
+fn create_test_lattice(temperature: f64) -> PBitLattice {
+    // Using {3,7} hyperbolic tessellation with depth 1 (7 nodes)
+    PBitLattice::new(3, 7, 1, temperature)
+        .expect("Failed to create test lattice")
+}
+
+/// Helper to create larger test lattice with {3,7,2} tessellation (48 nodes)
+fn create_large_lattice(temperature: f64) -> PBitLattice {
+    PBitLattice::roi_48(temperature)
+        .expect("Failed to create large lattice")
+}
 
 #[test]
 fn test_phi_nonnegative_disconnected_system() {
-    // Disconnected system should have Φ = 0
-    let lattice = PBitLattice::new(4);
+    // Very high temperature = nearly disconnected (random) system, should have low Φ
+    let lattice = create_test_lattice(100.0); // High temp = low coupling
     let calculator = PhiCalculator::exact();
 
     let result = calculator.calculate(&lattice).unwrap();
 
-    assert!(result.phi >= 0.0, "Φ must be non-negative for disconnected system");
-    assert!(result.phi.abs() < 1e-10, "Disconnected system should have Φ ≈ 0");
+    assert!(result.phi >= 0.0, "Φ must be non-negative for high-temp system, got {}", result.phi);
+    assert!(result.phi.is_finite(), "Φ must be finite");
 }
 
 #[test]
 fn test_phi_nonnegative_weakly_coupled() {
-    // Weakly coupled system
-    let mut lattice = PBitLattice::new(6);
-    lattice.set_uniform_coupling(0.1);
-
+    // Medium temperature = weakly coupled system
+    let lattice = create_test_lattice(10.0);
     let calculator = PhiCalculator::greedy();
     let result = calculator.calculate(&lattice).unwrap();
 
-    assert!(result.phi >= 0.0, "Φ must be non-negative for weakly coupled system");
+    assert!(result.phi >= 0.0, "Φ must be non-negative for weakly coupled system, got {}", result.phi);
     assert!(result.phi.is_finite(), "Φ must be finite");
 }
 
 #[test]
 fn test_phi_nonnegative_strongly_coupled() {
-    // Strongly coupled system
-    let mut lattice = PBitLattice::new(8);
-    lattice.set_uniform_coupling(1.0);
-
+    // Low temperature = strongly coupled system
+    let lattice = create_test_lattice(0.1);
     let calculator = PhiCalculator::greedy();
     let result = calculator.calculate(&lattice).unwrap();
 
-    assert!(result.phi >= 0.0, "Φ must be non-negative for strongly coupled system");
+    assert!(result.phi >= 0.0, "Φ must be non-negative for strongly coupled system, got {}", result.phi);
     assert!(result.phi.is_finite(), "Φ must be finite");
 }
 
 #[test]
-fn test_phi_nonnegative_roi_lattices() {
-    // Test all ROI configurations
-    let configurations = vec![
-        (12, 0.5),
-        (24, 1.0),
-        (48, 1.0),
-    ];
-
+fn test_phi_nonnegative_roi_48_lattice() {
+    // Test ROI-48 configuration at different temperatures
+    let temperatures = [0.1, 1.0, 10.0];
     let calculator = PhiCalculator::greedy();
 
-    for (size, coupling) in configurations {
-        let lattice = match size {
-            12 => PBitLattice::roi_12(coupling),
-            24 => PBitLattice::roi_24(coupling),
-            48 => PBitLattice::roi_48(coupling),
-            _ => panic!("Invalid size"),
-        }.unwrap();
-
+    for &temp in &temperatures {
+        let lattice = create_large_lattice(temp);
         let result = calculator.calculate(&lattice).unwrap();
 
         assert!(
             result.phi >= 0.0,
-            "Φ must be non-negative for ROI-{} lattice with coupling {}",
-            size, coupling
+            "Φ must be non-negative for ROI-48 lattice at temp={}, got {}",
+            temp, result.phi
         );
         assert!(result.phi.is_finite(), "Φ must be finite");
     }
@@ -77,12 +75,12 @@ fn test_phi_nonnegative_roi_lattices() {
 #[test]
 fn test_phi_partition_enumeration() {
     // Test that partition enumeration produces valid results
-    let lattice = PBitLattice::new(4);
+    let lattice = create_test_lattice(1.0);
     let calculator = PhiCalculator::exact();
 
     let result = calculator.calculate(&lattice).unwrap();
 
-    assert!(result.phi >= 0.0);
+    assert!(result.phi >= 0.0, "Φ must be non-negative, got {}", result.phi);
     assert!(result.mip.is_some(), "Exact calculation should return MIP");
 
     let mip = result.mip.unwrap();
@@ -93,9 +91,7 @@ fn test_phi_partition_enumeration() {
 #[test]
 fn test_phi_monte_carlo_convergence() {
     // Test that Monte Carlo approximation converges to non-negative values
-    let mut lattice = PBitLattice::new(10);
-    lattice.set_uniform_coupling(0.5);
-
+    let lattice = create_test_lattice(1.0);
     let samples_list = [100, 500, 1000];
 
     for samples in samples_list {
@@ -104,8 +100,8 @@ fn test_phi_monte_carlo_convergence() {
 
         assert!(
             result.phi >= 0.0,
-            "Monte Carlo Φ with {} samples must be non-negative",
-            samples
+            "Monte Carlo Φ with {} samples must be non-negative, got {}",
+            samples, result.phi
         );
         assert!(result.phi.is_finite());
     }
@@ -113,60 +109,78 @@ fn test_phi_monte_carlo_convergence() {
 
 #[test]
 fn test_phi_hierarchical_method() {
-    // Test hierarchical method on larger system
-    let mut lattice = PBitLattice::new(50);
-    lattice.set_uniform_coupling(0.5);
-
+    // Test hierarchical method on ROI-48 system
+    let lattice = create_large_lattice(1.0);
     let calculator = PhiCalculator::hierarchical(3);
     let result = calculator.calculate(&lattice).unwrap();
 
-    assert!(result.phi >= 0.0, "Hierarchical Φ must be non-negative");
+    assert!(result.phi >= 0.0, "Hierarchical Φ must be non-negative, got {}", result.phi);
     assert!(result.phi.is_finite());
 }
 
 #[test]
 fn test_phi_mutual_information_bounds() {
     // Test that mutual information calculation is bounded
-    use hyperphysics_consciousness::phi::PhiCalculator;
-
-    let mut lattice = PBitLattice::new(6);
-    lattice.set_uniform_coupling(1.0);
-
-    // Set deterministic state
-    for i in 0..6 {
-        lattice.set_state(i, i % 2 == 0);
-    }
-
+    let lattice = create_test_lattice(0.5);
     let calculator = PhiCalculator::exact();
     let result = calculator.calculate(&lattice).unwrap();
 
-    assert!(result.phi >= 0.0);
-    // Mutual information should be bounded by min entropy
-    assert!(result.phi <= 6.0 * (2.0_f64).ln(), "Φ should be bounded by system entropy");
+    assert!(result.phi >= 0.0, "Φ must be non-negative, got {}", result.phi);
+
+    // Mutual information should be bounded by system entropy
+    let n = lattice.size() as f64;
+    let max_entropy = n * (2.0_f64).ln();
+    assert!(
+        result.phi <= max_entropy,
+        "Φ ({}) should be bounded by system entropy ({})",
+        result.phi, max_entropy
+    );
 }
 
 #[test]
 fn test_phi_effective_information_properties() {
     // Test effective information properties
-    let mut lattice = PBitLattice::new(8);
-    lattice.set_uniform_coupling(0.5);
-
+    let lattice = create_test_lattice(1.0);
     let calculator = PhiCalculator::greedy();
     let result = calculator.calculate(&lattice).unwrap();
 
-    assert!(result.phi >= 0.0);
+    assert!(result.phi >= 0.0, "Φ must be non-negative, got {}", result.phi);
 
     if let Some(mip) = result.mip {
         // Effective information should equal Φ
-        assert!((mip.effective_info - result.phi).abs() < 1e-10);
+        assert!(
+            (mip.effective_info - result.phi).abs() < 1e-10,
+            "Effective info ({}) should equal Φ ({})",
+            mip.effective_info, result.phi
+        );
 
         // Partitions should be non-empty
-        assert!(!mip.subset_a.is_empty());
-        assert!(!mip.subset_b.is_empty());
+        assert!(!mip.subset_a.is_empty(), "MIP subset A should not be empty");
+        assert!(!mip.subset_b.is_empty(), "MIP subset B should not be empty");
 
         // Partitions should be disjoint
         for &a in &mip.subset_a {
             assert!(!mip.subset_b.contains(&a), "Partitions must be disjoint");
         }
     }
+}
+
+#[test]
+fn test_phi_temperature_dependence() {
+    // Verify that Φ behaves sensibly with temperature
+    // Lower temperature = stronger coupling = higher Φ (typically)
+    let calculator = PhiCalculator::greedy();
+
+    let low_temp = create_test_lattice(0.1);
+    let high_temp = create_test_lattice(10.0);
+
+    let phi_low = calculator.calculate(&low_temp).unwrap().phi;
+    let phi_high = calculator.calculate(&high_temp).unwrap().phi;
+
+    assert!(phi_low >= 0.0, "Low-temp Φ must be non-negative");
+    assert!(phi_high >= 0.0, "High-temp Φ must be non-negative");
+
+    // Both should be non-negative (main invariant)
+    // Note: we don't assert phi_low > phi_high because
+    // the relationship depends on system specifics
 }

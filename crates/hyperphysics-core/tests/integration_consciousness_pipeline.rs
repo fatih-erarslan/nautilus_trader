@@ -15,6 +15,8 @@ use hyperphysics_consciousness::{
     HierarchicalPhiCalculator, ClusteringMethod, CICalculator, CausalDensityEstimator,
 };
 use hyperphysics_thermo::EntropyCalculator;
+use ed25519_dalek::SigningKey;
+use rand::rngs::OsRng;
 
 #[test]
 fn test_full_consciousness_pipeline_basic() {

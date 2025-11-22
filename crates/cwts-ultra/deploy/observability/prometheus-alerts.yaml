@@ -1,0 +1,521 @@
+# Prometheus Alerting Rules for Bayesian VaR Production System
+# Constitutional Prime Directive Compliance Monitoring
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: bayesian-var-alerts
+  namespace: production
+  labels:
+    app: bayesian-var
+    environment: production
+    constitutional-compliance: required
+spec:
+  groups:
+  - name: constitutional_prime_directive
+    interval: 15s
+    rules:
+    - alert: ConstitutionalPrimeDirectiveViolation
+      expr: rate(constitutional_prime_directive_violations_total[5m]) > 0
+      for: 0s  # Immediate escalation
+      labels:
+        severity: critical
+        component: constitutional-compliance
+        escalation: executive
+      annotations:
+        summary: "🚨 CONSTITUTIONAL PRIME DIRECTIVE VIOLATION DETECTED"
+        description: "Constitutional Prime Directive violation detected in Bayesian VaR system. Immediate executive escalation required. Rate: {{ $value }} violations/sec"
+        runbook_url: "https://internal.docs/runbooks/constitutional-violations"
+        escalation_required: "executive-team"
+        
+    - alert: EmergencyStopActivated
+      expr: rate(emergency_stops_total[1m]) > 0
+      for: 0s
+      labels:
+        severity: critical
+        component: emergency-system
+        escalation: immediate
+      annotations:
+        summary: "🚨 EMERGENCY STOP ACTIVATED"
+        description: "Emergency stop procedure has been activated for Bayesian VaR system. System automatically halted for Constitutional Prime Directive compliance."
+        runbook_url: "https://internal.docs/runbooks/emergency-procedures"
+        immediate_action: "required"
+
+    - alert: SafetyProtocolActivation
+      expr: rate(safety_protocol_activations_total[5m]) > 0
+      for: 0s
+      labels:
+        severity: critical
+        component: safety-protocols
+      annotations:
+        summary: "🔥 Safety Protocol Activated"
+        description: "Safety protocols have been activated due to system instability. Rate: {{ $value }} activations/sec"
+        runbook_url: "https://internal.docs/runbooks/safety-protocols"
+
+  - name: system_availability
+    interval: 30s
+    rules:
+    - alert: BayesianVaRSLOBreach
+      expr: (1 - (rate(bayesian_var_calculations_failed_total[5m]) / rate(bayesian_var_total_calculations[5m]))) * 100 < 99.99
+      for: 1m
+      labels:
+        severity: critical
+        component: availability
+        slo: "99.99%"
+      annotations:
+        summary: "🚨 SLO BREACH: Bayesian VaR Availability Below 99.99%"
+        description: "System availability {{ $value }}% is below SLO target of 99.99%. Immediate action required."
+        runbook_url: "https://internal.docs/runbooks/slo-breach"
+        financial_impact: "high"
+
+    - alert: HighErrorRate
+      expr: rate(bayesian_var_calculations_failed_total[5m]) > 0.01
+      for: 30s
+      labels:
+        severity: critical
+        component: calculations
+      annotations:
+        summary: "🔥 High Error Rate in Bayesian VaR Calculations"
+        description: "Error rate {{ $value | humanizePercentage }} exceeds 1% threshold. Financial system stability at risk."
+        runbook_url: "https://internal.docs/runbooks/high-error-rate"
+
+    - alert: SlowCalculations
+      expr: histogram_quantile(0.99, bayesian_var_calculation_duration_seconds) > 1.0
+      for: 2m
+      labels:
+        severity: warning
+        component: performance
+      annotations:
+        summary: "⚠️ Slow Bayesian VaR Calculations"
+        description: "P99 latency {{ $value }}s exceeds 1 second threshold. Performance degradation detected."
+        runbook_url: "https://internal.docs/runbooks/performance-degradation"
+
+  - name: data_connectivity
+    interval: 30s
+    rules:
+    - alert: BinanceConnectionLost
+      expr: bayesian_var_active_connections == 0
+      for: 1m
+      labels:
+        severity: critical
+        component: data-source
+        financial_impact: critical
+      annotations:
+        summary: "🔥 Binance Data Connection Lost"
+        description: "No active Binance WebSocket connections. Real market data unavailable - violates Constitutional Prime Directive."
+        runbook_url: "https://internal.docs/runbooks/binance-connectivity"
+        immediate_action: "restore-data-feed"
+
+    - alert: BinanceConnectionDegraded
+      expr: bayesian_var_active_connections < 3
+      for: 2m
+      labels:
+        severity: warning
+        component: data-source
+      annotations:
+        summary: "⚠️ Binance Connection Degraded"
+        description: "Only {{ $value }} Binance connections active. Redundancy compromised."
+        runbook_url: "https://internal.docs/runbooks/binance-connectivity"
+
+  - name: model_health
+    interval: 60s
+    rules:
+    - alert: ModelAccuracyDegradation
+      expr: bayesian_model_accuracy_score < 0.95
+      for: 5m
+      labels:
+        severity: warning
+        component: model-accuracy
+      annotations:
+        summary: "⚠️ Model Accuracy Below Threshold"
+        description: "Bayesian model accuracy {{ $value | humanizePercentage }} is below 95% Constitutional Prime Directive threshold."
+        runbook_url: "https://internal.docs/runbooks/model-retraining"
+        action_required: "retrain-model"
+
+    - alert: E2BTrainingFailures
+      expr: rate(e2b_sandbox_training_failures_total[30m]) > rate(e2b_sandbox_training_success_total[30m])
+      for: 5m
+      labels:
+        severity: high
+        component: e2b-training
+      annotations:
+        summary: "🟠 E2B Training Failure Rate High"
+        description: "E2B sandbox training failures exceed successes. Model may become stale."
+        runbook_url: "https://internal.docs/runbooks/e2b-sandbox-issues"
+
+    - alert: E2BTrainingStalled
+      expr: rate(e2b_sandbox_training_success_total[60m]) == 0
+      for: 10m
+      labels:
+        severity: high
+        component: e2b-training
+      annotations:
+        summary: "🟠 E2B Training Completely Stalled"
+        description: "No successful E2B training runs in the last hour. Model freshness at risk."
+        runbook_url: "https://internal.docs/runbooks/e2b-sandbox-issues"
+
+  - name: risk_management
+    interval: 30s
+    rules:
+    - alert: RiskThresholdBreach
+      expr: rate(risk_breach_incidents_total[5m]) > 0
+      for: 0s
+      labels:
+        severity: high
+        component: risk-management
+        financial_impact: high
+      annotations:
+        summary: "🟠 Portfolio Risk Threshold Breach"
+        description: "Risk threshold breached {{ $value }} times in 5 minutes. Constitutional Prime Directive monitoring activated."
+        runbook_url: "https://internal.docs/runbooks/risk-management"
+
+    - alert: ExcessivePortfolioRisk
+      expr: portfolio_risk_exposure_usd > 10000000
+      for: 1m
+      labels:
+        severity: critical
+        component: risk-exposure
+        financial_impact: critical
+      annotations:
+        summary: "🚨 EXCESSIVE PORTFOLIO RISK EXPOSURE"
+        description: "Portfolio risk exposure ${{ $value | humanize }} exceeds $10M limit. Immediate risk reduction required."
+        runbook_url: "https://internal.docs/runbooks/excessive-risk"
+        immediate_action: "reduce-portfolio-exposure"
+
+  - name: infrastructure_health
+    interval: 60s
+    rules:
+    - alert: PodCrashLooping
+      expr: rate(kube_pod_container_status_restarts_total{namespace="production",pod=~"bayesian-var-.*"}[15m]) > 0
+      for: 2m
+      labels:
+        severity: warning
+        component: infrastructure
+      annotations:
+        summary: "⚠️ Pod Restart Loop Detected"
+        description: "Pod {{ $labels.pod }} is restarting frequently. Rate: {{ $value }} restarts/sec"
+        runbook_url: "https://internal.docs/runbooks/pod-restarts"
+
+    - alert: InsufficientHealthyPods
+      expr: up{job="bayesian-var-production"} < 3
+      for: 2m
+      labels:
+        severity: critical
+        component: infrastructure
+      annotations:
+        summary: "🔥 Insufficient Healthy Pods"
+        description: "Only {{ $value }} healthy pods running. Minimum 3 required for Constitutional Prime Directive compliance."
+        runbook_url: "https://internal.docs/runbooks/pod-health"
+
+    - alert: HighMemoryUsage
+      expr: (container_memory_usage_bytes{namespace="production",pod=~"bayesian-var-.*"} / container_spec_memory_limit_bytes) * 100 > 85
+      for: 5m
+      labels:
+        severity: warning
+        component: resources
+      annotations:
+        summary: "⚠️ High Memory Usage"
+        description: "Pod {{ $labels.pod }} memory usage {{ $value }}% exceeds 85% threshold."
+        runbook_url: "https://internal.docs/runbooks/high-memory"
+
+    - alert: HighCPUUsage
+      expr: (rate(container_cpu_usage_seconds_total{namespace="production",pod=~"bayesian-var-.*"}[5m])) * 100 > 80
+      for: 10m
+      labels:
+        severity: warning
+        component: resources
+      annotations:
+        summary: "⚠️ High CPU Usage"
+        description: "Pod {{ $labels.pod }} CPU usage {{ $value }}% exceeds 80% threshold."
+        runbook_url: "https://internal.docs/runbooks/high-cpu"
+
+  - name: database_health
+    interval: 60s
+    rules:
+    - alert: DatabaseConnectionFailure
+      expr: up{job="postgresql"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        component: database
+      annotations:
+        summary: "🔥 Database Connection Failure"
+        description: "Cannot connect to PostgreSQL database. Data persistence at risk."
+        runbook_url: "https://internal.docs/runbooks/database-connectivity"
+
+    - alert: SlowDatabaseQueries
+      expr: histogram_quantile(0.95, pg_stat_activity_max_tx_duration) > 30
+      for: 5m
+      labels:
+        severity: warning
+        component: database
+      annotations:
+        summary: "⚠️ Slow Database Queries"
+        description: "Database P95 query duration {{ $value }}s exceeds 30s threshold."
+        runbook_url: "https://internal.docs/runbooks/slow-queries"
+
+  - name: deployment_health
+    interval: 30s
+    rules:
+    - alert: DeploymentRolloutStuck
+      expr: kube_deployment_status_condition{condition="Progressing", status="false", namespace="production", deployment=~"bayesian-var-.*"} > 0
+      for: 10m
+      labels:
+        severity: critical
+        component: deployment
+      annotations:
+        summary: "🔥 Deployment Rollout Stuck"
+        description: "Deployment {{ $labels.deployment }} rollout has been stuck for 10+ minutes."
+        runbook_url: "https://internal.docs/runbooks/stuck-deployment"
+
+    - alert: ImagePullErrors
+      expr: rate(kube_pod_container_status_waiting_reason{reason="ImagePullBackOff", namespace="production"}[5m]) > 0
+      for: 2m
+      labels:
+        severity: high
+        component: deployment
+      annotations:
+        summary: "🟠 Image Pull Errors"
+        description: "Pods failing to pull container images. Deployment may be compromised."
+        runbook_url: "https://internal.docs/runbooks/image-pull-errors"
+
+  - name: business_metrics
+    interval: 300s  # 5 minutes
+    rules:
+    - alert: NoVaRCalculations
+      expr: rate(bayesian_var_total_calculations[10m]) == 0
+      for: 5m
+      labels:
+        severity: critical
+        component: business-logic
+        financial_impact: critical
+      annotations:
+        summary: "🚨 NO VaR CALCULATIONS PROCESSED"
+        description: "No VaR calculations processed in 10 minutes. Business function completely stopped."
+        runbook_url: "https://internal.docs/runbooks/no-calculations"
+        escalation: "business-critical"
+
+    - alert: LowVaRCalculationVolume
+      expr: rate(bayesian_var_total_calculations[5m]) < 1
+      for: 10m
+      labels:
+        severity: warning
+        component: business-logic
+      annotations:
+        summary: "⚠️ Low VaR Calculation Volume"
+        description: "VaR calculation rate {{ $value | humanize }}/sec is below expected volume."
+        runbook_url: "https://internal.docs/runbooks/low-volume"
+
+    - alert: E2BSandboxResourceExhaustion
+      expr: e2b_sandbox_utilization_percent > 95
+      for: 5m
+      labels:
+        severity: warning
+        component: e2b-resources
+      annotations:
+        summary: "⚠️ E2B Sandbox Resource Exhaustion"
+        description: "E2B sandbox utilization {{ $value }}% is critically high. Training capacity limited."
+        runbook_url: "https://internal.docs/runbooks/e2b-resources"
+
+---
+# PagerDuty Integration ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pagerduty-config
+  namespace: production
+  labels:
+    app: bayesian-var
+data:
+  routing_key: "YOUR_PAGERDUTY_ROUTING_KEY"
+  service_url: "https://events.pagerduty.com/v2/enqueue"
+  escalation_policy: "financial-systems-escalation"
+  severity_mapping: |
+    {
+      "critical": "critical",
+      "high": "error", 
+      "warning": "warning",
+      "info": "info"
+    }
+
+---
+# Slack Integration ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: slack-config
+  namespace: production
+  labels:
+    app: bayesian-var
+data:
+  webhook_url: "YOUR_SLACK_WEBHOOK_URL"
+  channel: "#bayesian-var-alerts"
+  username: "Bayesian-VaR-Monitor"
+  icon_emoji: ":chart_with_upwards_trend:"
+  alert_template: |
+    {
+      "text": "{{ .CommonAnnotations.summary }}",
+      "attachments": [
+        {
+          "color": "{{ if eq .Status \"firing\" }}danger{{ else }}good{{ end }}",
+          "fields": [
+            {
+              "title": "Alert",
+              "value": "{{ .CommonLabels.alertname }}",
+              "short": true
+            },
+            {
+              "title": "Severity",
+              "value": "{{ .CommonLabels.severity }}",
+              "short": true
+            },
+            {
+              "title": "Description",
+              "value": "{{ .CommonAnnotations.description }}",
+              "short": false
+            }
+          ]
+        }
+      ]
+    }
+
+---
+# Alertmanager Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: production
+  labels:
+    app: bayesian-var
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'localhost:587'
+      smtp_from: 'bayesian-var-alerts@company.com'
+      pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+      slack_api_url: 'YOUR_SLACK_WEBHOOK_URL'
+
+    route:
+      group_by: ['alertname', 'severity']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'default-receiver'
+      routes:
+      
+      # Constitutional Prime Directive violations - immediate executive escalation
+      - match:
+          component: constitutional-compliance
+        receiver: executive-escalation
+        group_wait: 0s
+        repeat_interval: 5m
+        
+      # Emergency stops - immediate response
+      - match:
+          component: emergency-system
+        receiver: emergency-response
+        group_wait: 0s
+        repeat_interval: 1m
+        
+      # Critical financial system alerts
+      - match:
+          severity: critical
+        receiver: critical-alerts
+        group_wait: 10s
+        repeat_interval: 15m
+        
+      # High severity alerts
+      - match:
+          severity: high
+        receiver: high-priority-alerts
+        group_wait: 30s
+        repeat_interval: 30m
+        
+      # Warning alerts
+      - match:
+          severity: warning
+        receiver: warning-alerts
+        group_wait: 2m
+        repeat_interval: 2h
+
+    receivers:
+    
+    - name: 'default-receiver'
+      slack_configs:
+      - channel: '#bayesian-var-alerts'
+        color: 'warning'
+        title: 'Bayesian VaR Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        
+    - name: 'executive-escalation'
+      pagerduty_configs:
+      - routing_key: 'EXECUTIVE_PAGERDUTY_KEY'
+        severity: 'critical'
+        description: 'Constitutional Prime Directive Violation: {{ .CommonAnnotations.summary }}'
+        details:
+          alert_type: 'constitutional_violation'
+          system: 'bayesian-var'
+          escalation_required: 'executive'
+      slack_configs:
+      - channel: '#executive-alerts'
+        color: 'danger'
+        title: '🚨 CONSTITUTIONAL PRIME DIRECTIVE VIOLATION'
+        text: 'EXECUTIVE ESCALATION REQUIRED: {{ .CommonAnnotations.description }}'
+        
+    - name: 'emergency-response'
+      pagerduty_configs:
+      - routing_key: 'EMERGENCY_PAGERDUTY_KEY'
+        severity: 'critical'
+        description: 'Emergency Stop Activated: {{ .CommonAnnotations.summary }}'
+        details:
+          alert_type: 'emergency_stop'
+          system: 'bayesian-var'
+          immediate_action: 'required'
+      slack_configs:
+      - channel: '#emergency-response'
+        color: 'danger'
+        title: '🚨 EMERGENCY STOP ACTIVATED'
+        text: 'IMMEDIATE RESPONSE REQUIRED: {{ .CommonAnnotations.description }}'
+        
+    - name: 'critical-alerts'
+      pagerduty_configs:
+      - routing_key: 'CRITICAL_PAGERDUTY_KEY'
+        severity: 'critical'
+        description: 'Critical Bayesian VaR Alert: {{ .CommonAnnotations.summary }}'
+      slack_configs:
+      - channel: '#critical-alerts'
+        color: 'danger'
+        title: '🔥 Critical Alert'
+        text: '{{ .CommonAnnotations.description }}'
+        
+    - name: 'high-priority-alerts'
+      pagerduty_configs:
+      - routing_key: 'HIGH_PRIORITY_PAGERDUTY_KEY'
+        severity: 'error'
+        description: 'High Priority Bayesian VaR Alert: {{ .CommonAnnotations.summary }}'
+      slack_configs:
+      - channel: '#bayesian-var-alerts'
+        color: 'warning'
+        title: '🟠 High Priority Alert'
+        text: '{{ .CommonAnnotations.description }}'
+        
+    - name: 'warning-alerts'
+      slack_configs:
+      - channel: '#bayesian-var-alerts'
+        color: 'warning'
+        title: '⚠️ Warning Alert'
+        text: '{{ .CommonAnnotations.description }}'
+
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'component']
+      
+    - source_match:
+        component: 'constitutional-compliance'
+      target_match_re:
+        component: '.*'
+      equal: ['alertname']

@@ -32,11 +32,9 @@
 //! - Lyubashevsky et al. (2017): "CRYSTALS-Dilithium: A Lattice-Based Digital Signature Scheme"
 //! - Langlois & Stehlé (2015): "Worst-case to average-case reductions for module lattices"
 
-use super::ntt::{NTT, DILITHIUM_Q, barrett_reduce, montgomery_reduce, poly_add, poly_sub, poly_multiply};
-use crate::{DilithiumResult, DilithiumError, SecurityLevel};
-use rand::{Rng, SeedableRng};
-use rand_chacha::ChaCha20Rng;
-use sha3::{Shake128, Shake256, digest::{Update, ExtendableOutput, XofReader}};
+use super::ntt::{NTT, DILITHIUM_Q, barrett_reduce, poly_add, poly_sub, poly_multiply};
+use crate::SecurityLevel;
+use tiny_keccak::{Shake, Hasher, Xof};
 
 /// Polynomial degree (always 256 for Dilithium)
 pub const POLY_DEGREE: usize = 256;
@@ -63,6 +61,8 @@ pub type PolyMatrix = Vec<PolyVec>;
 #[derive(Clone, Debug)]
 pub struct ModuleLWE {
     /// Security level
+    /// TODO: Will be used for parameter selection and optimization
+    #[allow(dead_code)]
     security_level: SecurityLevel,
 
     /// Dimension k (rows in A)
@@ -143,6 +143,7 @@ impl ModuleLWE {
     /// Sample uniform polynomial from seed
     ///
     /// Uses rejection sampling to generate uniform coefficients in [0, q).
+    /// Uses tiny-keccak for SHAKE-128 which avoids sha3 crate stack corruption.
     ///
     /// # Arguments
     ///
@@ -155,37 +156,43 @@ impl ModuleLWE {
     /// Polynomial with uniform coefficients mod q
     fn sample_uniform_poly(&self, seed: &[u8; SEED_BYTES], nonce1: u16, nonce2: u16) -> Polynomial {
         let mut poly = vec![0i32; POLY_DEGREE];
-        
-        // Create SHAKE-128 XOF
-        let mut hasher = Shake128::default();
-        hasher.update(seed);
-        hasher.update(&nonce1.to_le_bytes());
-        hasher.update(&nonce2.to_le_bytes());
-        
-        let mut reader = hasher.finalize_xof();
-        let mut buf = [0u8; 3];
+
+        // Use tiny-keccak SHAKE-128 (no stack corruption issues)
+        let mut shake = Shake::v128();
+        shake.update(seed);
+        shake.update(&nonce1.to_le_bytes());
+        shake.update(&nonce2.to_le_bytes());
+
+        // Read ALL data in ONE call - 8KB buffer guarantees no refill needed
+        const BATCH_SIZE: usize = 8192;
+        let mut large_buf = vec![0u8; BATCH_SIZE];
+        shake.squeeze(&mut large_buf);
+
+        let mut buf_pos = 0;
         let mut coeff_idx = 0;
-        
-        // Rejection sampling
+
+        // Rejection sampling from pre-read buffer
         while coeff_idx < POLY_DEGREE {
-            reader.read(&mut buf);
-            
-            // Interpret 3 bytes as coefficient candidate
-            let coeff = ((buf[0] as i32) | ((buf[1] as i32) << 8) | ((buf[2] as i32) << 16)) & 0x7FFFFF;
-            
-            // Accept if < q
+            if buf_pos + 3 > BATCH_SIZE {
+                panic!("sample_uniform_poly: exhausted 8KB buffer");
+            }
+
+            let coeff = ((large_buf[buf_pos] as i32) | ((large_buf[buf_pos + 1] as i32) << 8) | ((large_buf[buf_pos + 2] as i32) << 16)) & 0x7FFFFF;
+            buf_pos += 3;
+
             if coeff < self.q {
                 poly[coeff_idx] = coeff;
                 coeff_idx += 1;
             }
         }
-        
+
         poly
     }
     
     /// Sample polynomial with small coefficients from {-η, ..., η}
     ///
     /// Uses centered binomial distribution for security.
+    /// Uses tiny-keccak for SHAKE-256 which avoids sha3 crate stack corruption.
     ///
     /// # Arguments
     ///
@@ -197,64 +204,57 @@ impl ModuleLWE {
     /// Polynomial with coefficients in {-η, ..., η}
     pub fn sample_small_poly(&self, seed: &[u8; SEED_BYTES], nonce: u16) -> Polynomial {
         let mut poly = vec![0i32; POLY_DEGREE];
-        
-        // Use SHAKE-256 for small coefficient sampling
-        let mut hasher = Shake256::default();
-        hasher.update(seed);
-        hasher.update(&nonce.to_le_bytes());
-        
-        let mut reader = hasher.finalize_xof();
-        
+
+        // Use tiny-keccak SHAKE-256 (no stack corruption issues)
+        let mut shake = Shake::v256();
+        shake.update(seed);
+        shake.update(&nonce.to_le_bytes());
+
         // Sample using centered binomial distribution
         match self.eta {
-            2 => self.sample_eta_2(&mut reader, &mut poly),
-            4 => self.sample_eta_4(&mut reader, &mut poly),
-            _ => panic!("Unsupported eta value: {}", self.eta),
-        }
-        
-        poly
-    }
-    
-    /// Sample with η=2 (centered binomial)
-    ///
-    /// Each coefficient is sum of 2 bits minus sum of 2 other bits
-    fn sample_eta_2(&self, reader: &mut dyn XofReader, poly: &mut Polynomial) {
-        let mut buf = [0u8; 1];
-        
-        for i in (0..POLY_DEGREE).step_by(4) {
-            reader.read(&mut buf);
-            let byte = buf[0];
-            
-            for j in 0..4 {
-                if i + j < POLY_DEGREE {
-                    let bits = (byte >> (2 * j)) & 0x03;
-                    let a = (bits & 0x01) as i32;
-                    let b = ((bits >> 1) & 0x01) as i32;
-                    poly[i + j] = a - b;
+            2 => {
+                // Read all bytes upfront - 64 bytes for eta=2
+                const BYTES_NEEDED: usize = POLY_DEGREE / 4;
+                let mut large_buf = [0u8; BYTES_NEEDED];
+                shake.squeeze(&mut large_buf);
+
+                let mut buf_idx = 0;
+                for i in (0..POLY_DEGREE).step_by(4) {
+                    let byte = large_buf[buf_idx];
+                    buf_idx += 1;
+
+                    for j in 0..4 {
+                        if i + j < POLY_DEGREE {
+                            let bits = (byte >> (2 * j)) & 0x03;
+                            let a = (bits & 0x01) as i32;
+                            let b = ((bits >> 1) & 0x01) as i32;
+                            poly[i + j] = a - b;
+                        }
+                    }
                 }
             }
+            4 => {
+                // Read all bytes upfront - 256 bytes for eta=4
+                let mut large_buf = [0u8; POLY_DEGREE];
+                shake.squeeze(&mut large_buf);
+
+                for i in 0..POLY_DEGREE {
+                    let byte = large_buf[i];
+                    let a = (byte & 0x0F).count_ones() as i32;
+                    let b = ((byte >> 4) & 0x0F).count_ones() as i32;
+                    poly[i] = a - b;
+                }
+            }
+            _ => panic!("Unsupported eta value: {}", self.eta),
         }
+
+        poly
     }
-    
-    /// Sample with η=4 (centered binomial)
-    ///
-    /// Each coefficient is sum of 4 bits minus sum of 4 other bits
-    fn sample_eta_4(&self, reader: &mut dyn XofReader, poly: &mut Polynomial) {
-        let mut buf = [0u8; 1];
-        
-        for i in 0..POLY_DEGREE {
-            reader.read(&mut buf);
-            let byte = buf[0];
-            
-            let a = (byte & 0x0F).count_ones() as i32;
-            let b = ((byte >> 4) & 0x0F).count_ones() as i32;
-            poly[i] = a - b;
-        }
-    }
-    
+
     /// Generate challenge polynomial c
     ///
     /// Samples polynomial with exactly τ non-zero coefficients in {-1, 1}.
+    /// Uses tiny-keccak for SHAKE-256 which avoids sha3 crate stack corruption.
     ///
     /// # Arguments
     ///
@@ -266,39 +266,48 @@ impl ModuleLWE {
     /// Challenge polynomial
     pub fn sample_challenge(&self, seed: &[u8; SEED_BYTES], tau: usize) -> Polynomial {
         let mut poly = vec![0i32; POLY_DEGREE];
-        
-        // Use SHAKE-256 for challenge sampling
-        let mut hasher = Shake256::default();
-        hasher.update(seed);
-        
-        let mut reader = hasher.finalize_xof();
-        let mut buf = [0u8; 1];
-        
+
+        // Use tiny-keccak SHAKE-256 (no stack corruption issues)
+        let mut shake = Shake::v256();
+        shake.update(seed);
+
+        // Read ALL data in ONE call - 2KB buffer for generous safety margin
+        const BATCH_SIZE: usize = 2048;
+        let mut large_buf = vec![0u8; BATCH_SIZE];
+        shake.squeeze(&mut large_buf);
+
+        let mut buf_pos = 0;
         let mut signs = 0u64;
         let mut positions = Vec::with_capacity(tau);
-        
+
         // Sample sign bits
         for _ in 0..(tau + 7) / 8 {
-            reader.read(&mut buf);
-            signs = (signs << 8) | (buf[0] as u64);
+            if buf_pos >= BATCH_SIZE {
+                panic!("sample_challenge: exhausted buffer for signs");
+            }
+            signs = (signs << 8) | (large_buf[buf_pos] as u64);
+            buf_pos += 1;
         }
-        
-        // Sample positions using rejection sampling
+
+        // Sample positions using rejection sampling from pre-read buffer
         while positions.len() < tau {
-            reader.read(&mut buf);
-            let pos = buf[0] as usize;
-            
+            if buf_pos >= BATCH_SIZE {
+                panic!("sample_challenge: exhausted buffer for positions");
+            }
+            let pos = large_buf[buf_pos] as usize;
+            buf_pos += 1;
+
             if pos < POLY_DEGREE && !positions.contains(&pos) {
                 positions.push(pos);
             }
         }
-        
+
         // Set coefficients
         for (i, &pos) in positions.iter().enumerate() {
             let sign = ((signs >> i) & 1) as i32;
             poly[pos] = 1 - 2 * sign;  // Maps 0→1, 1→-1
         }
-        
+
         poly
     }
     
@@ -365,7 +374,89 @@ impl ModuleLWE {
             .map(|poly| poly_multiply(scalar, poly))
             .collect()
     }
-    
+
+    /// Matrix-vector multiplication into pre-allocated output (avoids allocation)
+    pub fn matrix_vector_multiply_into(&self, matrix: &PolyMatrix, vector: &PolyVec, result: &mut PolyVec) {
+        assert_eq!(matrix[0].len(), vector.len());
+        assert_eq!(matrix.len(), result.len());
+
+        for i in 0..matrix.len() {
+            // Zero out result polynomial
+            for c in result[i].iter_mut() {
+                *c = 0;
+            }
+            for j in 0..vector.len() {
+                let a_ntt = self.ntt.forward(&matrix[i][j]);
+                let s_ntt = self.ntt.forward(&vector[j]);
+                let product_ntt = self.ntt.pointwise_mul(&a_ntt, &s_ntt);
+                let product = self.ntt.inverse(&product_ntt);
+                for (k, &p) in product.iter().enumerate() {
+                    result[i][k] = barrett_reduce((result[i][k] as i64) + (p as i64));
+                }
+            }
+        }
+    }
+
+    /// Vector addition into pre-allocated output: result = a + b
+    pub fn vector_add_into(&self, a: &PolyVec, b: &PolyVec, result: &mut PolyVec) {
+        assert_eq!(a.len(), b.len());
+        assert_eq!(a.len(), result.len());
+
+        for i in 0..a.len() {
+            for j in 0..POLY_DEGREE {
+                result[i][j] = barrett_reduce((a[i][j] as i64) + (b[i][j] as i64));
+            }
+        }
+    }
+
+    /// Vector subtraction into pre-allocated output: result = a - b
+    pub fn vector_sub_into(&self, a: &PolyVec, b: &PolyVec, result: &mut PolyVec) {
+        assert_eq!(a.len(), b.len());
+        assert_eq!(a.len(), result.len());
+
+        for i in 0..a.len() {
+            for j in 0..POLY_DEGREE {
+                result[i][j] = barrett_reduce((a[i][j] as i64) - (b[i][j] as i64));
+            }
+        }
+    }
+
+    /// Vector addition into pre-allocated output WITHOUT modular reduction.
+    /// Used for computing z = y + cs1 before infinity norm check in signing.
+    /// The result stays in signed form for proper bounds checking.
+    pub fn vector_add_signed_into(&self, a: &PolyVec, b: &PolyVec, result: &mut PolyVec) {
+        assert_eq!(a.len(), b.len());
+        assert_eq!(a.len(), result.len());
+
+        for i in 0..a.len() {
+            for j in 0..POLY_DEGREE {
+                // Keep as signed i32 - no modular reduction
+                result[i][j] = a[i][j].wrapping_add(b[i][j]);
+            }
+        }
+    }
+
+    /// Signed infinity norm of vector.
+    /// Used for bounds checking in signing where values are already in signed form.
+    /// Does NOT center around q - assumes values are already signed.
+    pub fn vector_inf_norm_signed(&self, vector: &PolyVec) -> i32 {
+        vector.iter()
+            .flat_map(|poly| poly.iter())
+            .map(|&c| c.abs())
+            .max()
+            .unwrap_or(0)
+    }
+
+    /// Scalar-vector multiplication into pre-allocated output: result = c * v
+    pub fn scalar_vector_multiply_into(&self, scalar: &Polynomial, vector: &PolyVec, result: &mut PolyVec) {
+        assert_eq!(vector.len(), result.len());
+
+        for i in 0..vector.len() {
+            let product = poly_multiply(scalar, &vector[i]);
+            result[i].copy_from_slice(&product);
+        }
+    }
+
     /// Infinity norm of polynomial
     ///
     /// Returns maximum absolute value of coefficients.
@@ -428,23 +519,45 @@ impl ModuleLWE {
     
     /// HighBits: extract high bits of r
     ///
-    /// Used in signature compression.
+    /// Per FIPS 204, Decompose(r) returns (r1, r0) where:
+    /// - r0 = r mod alpha (centered around 0)
+    /// - r1 = (r - r0) / alpha
+    ///
+    /// This function returns r1.
     pub fn high_bits(&self, r: i32, alpha: i32) -> i32 {
+        let r0 = self.low_bits_internal(r, alpha);
         let r_mod = barrett_reduce(r as i64);
-        let r1 = (r_mod + 127) >> 7;
-        
-        if r1 > (self.q - 1) / (2 * alpha) {
-            r1 - (self.q / alpha)
+        // r1 = (r - r0) / alpha, reduced modulo m where m = (q-1)/alpha
+        let m = (self.q - 1) / alpha;
+        let r1 = ((r_mod as i64 - r0 as i64) / alpha as i64) as i32;
+        // Ensure r1 is in [0, m) - can be m when r is near q
+        if r1 >= m {
+            r1 - m
+        } else if r1 < 0 {
+            r1 + m
         } else {
             r1
         }
     }
-    
-    /// LowBits: extract low bits of r
-    pub fn low_bits(&self, r: i32, alpha: i32) -> i32 {
+
+    /// Internal LowBits computation to avoid circular dependency
+    fn low_bits_internal(&self, r: i32, alpha: i32) -> i32 {
         let r_mod = barrett_reduce(r as i64);
-        let r1 = self.high_bits(r, alpha);
-        r_mod - r1 * alpha
+        // r0 = r mod alpha (centered)
+        let r0 = r_mod % alpha;
+        // Center around 0: if r0 > alpha/2, subtract alpha
+        if r0 > alpha / 2 {
+            r0 - alpha
+        } else {
+            r0
+        }
+    }
+
+    /// LowBits: extract low bits of r
+    ///
+    /// Per FIPS 204, returns r0 where r = r1*alpha + r0 and r0 in (-alpha/2, alpha/2]
+    pub fn low_bits(&self, r: i32, alpha: i32) -> i32 {
+        self.low_bits_internal(r, alpha)
     }
     
     /// MakeHint: create hint bit
@@ -456,21 +569,35 @@ impl ModuleLWE {
         r1 != v1
     }
     
-    /// UseHint: recover high bits using hint
+    /// UseHint: recover high bits using hint (FIPS 204 compliant)
+    ///
+    /// When hint is true, adjusts r1 up or down by 1 based on the sign of low bits.
+    /// The adjustment direction is determined by whether r0 > 0.
     pub fn use_hint(&self, hint: bool, r: i32, alpha: i32) -> i32 {
         let m = (self.q - 1) / alpha;
         let r1 = self.high_bits(r, alpha);
-        
+        let r0 = self.low_bits(r, alpha);
+
         if !hint {
             return r1;
         }
-        
-        if r1 == 0 {
-            m - 1
-        } else if r1 == m - 1 {
-            0
+
+        // When hint is true, high bits changed due to adding z.
+        // We need to adjust r1 by +1 or -1 depending on low bits sign.
+        if r0 > 0 {
+            // r0 positive -> adding z pushed us up to next bin
+            if r1 == m - 1 {
+                0  // Wrap around
+            } else {
+                r1 + 1
+            }
         } else {
-            r1
+            // r0 <= 0 -> adding z pushed us down to previous bin
+            if r1 == 0 {
+                m - 1  // Wrap around
+            } else {
+                r1 - 1
+            }
         }
     }
     
@@ -534,6 +661,11 @@ impl ModuleLWE {
     /// Get security parameters
     pub fn params(&self) -> (usize, usize, i32) {
         (self.k, self.l, self.eta)
+    }
+
+    /// Get the modulus q
+    pub fn q(&self) -> i32 {
+        self.q
     }
 }
 

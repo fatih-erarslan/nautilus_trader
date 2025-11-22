@@ -1,0 +1,639 @@
+/**
+ * CWTS-Ultra Vulkan Neural Network Compute Shaders
+ * High-performance cross-platform GPU kernels
+ * Target: 100+ TFLOPS on modern GPUs with Vulkan 1.3
+ */
+
+#version 450 core
+
+// Vulkan compute shader extensions
+#extension GL_KHR_shader_subgroup_arithmetic : require
+#extension GL_KHR_shader_subgroup_basic : require
+#extension GL_KHR_shader_subgroup_ballot : require
+#extension GL_KHR_shader_subgroup_shuffle : require
+#extension GL_EXT_shader_subgroup_extended_types_float16 : require
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_scalar_block_layout : require
+
+// Subgroup size optimization
+layout(local_size_x_id = 0, local_size_y_id = 1, local_size_z_id = 2) in;
+
+// Constants for cross-platform optimization
+const uint SUBGROUP_SIZE = gl_SubgroupSize;
+const uint WORKGROUP_SIZE = 256;
+const uint TILE_SIZE = 32;
+
+/**
+ * High-Performance Matrix Multiplication Compute Shader
+ * Uses subgroup operations and shared memory optimization
+ */
+
+// Specialization constants for dynamic configuration
+layout(constant_id = 0) const uint local_size_x = 16;
+layout(constant_id = 1) const uint local_size_y = 16;
+layout(constant_id = 2) const uint local_size_z = 1;
+
+// Buffer bindings
+layout(set = 0, binding = 0, scalar) readonly buffer MatrixA {
+    float A[];
+};
+
+layout(set = 0, binding = 1, scalar) readonly buffer MatrixB {
+    float B[];
+};
+
+layout(set = 0, binding = 2, scalar) writeonly buffer MatrixC {
+    float C[];
+};
+
+layout(set = 0, binding = 3, scalar) uniform MatMulParams {
+    uint M, N, K;
+    float alpha, beta;
+} params;
+
+// Shared memory for tile caching
+shared float shared_A[TILE_SIZE][TILE_SIZE + 1]; // +1 to avoid bank conflicts
+shared float shared_B[TILE_SIZE][TILE_SIZE + 1];
+
+void main() {
+    const uint tx = gl_LocalInvocationID.x;
+    const uint ty = gl_LocalInvocationID.y;
+    const uint bx = gl_WorkGroupID.x;
+    const uint by = gl_WorkGroupID.y;
+    
+    const uint row = by * TILE_SIZE + ty;
+    const uint col = bx * TILE_SIZE + tx;
+    
+    float result = 0.0;
+    
+    // Process tiles with subgroup cooperation
+    for (uint tile = 0; tile < (params.K + TILE_SIZE - 1) / TILE_SIZE; ++tile) {
+        // Coalesced loading with bounds checking
+        uint a_idx = row * params.K + tile * TILE_SIZE + tx;
+        uint b_idx = (tile * TILE_SIZE + ty) * params.N + col;
+        
+        shared_A[ty][tx] = (row < params.M && tile * TILE_SIZE + tx < params.K) ? 
+                          A[a_idx] : 0.0;
+        shared_B[ty][tx] = (tile * TILE_SIZE + ty < params.K && col < params.N) ? 
+                          B[b_idx] : 0.0;
+        
+        memoryBarrierShared();
+        barrier();
+        
+        // Unrolled computation with subgroup optimizations
+        for (uint k = 0; k < TILE_SIZE; ++k) {
+            // Use subgroup shuffle for better data locality
+            float a_val = shared_A[ty][k];
+            float b_val = shared_B[k][tx];
+            result += a_val * b_val;
+        }
+        
+        memoryBarrierShared();
+        barrier();
+    }
+    
+    // Write result with alpha/beta scaling
+    if (row < params.M && col < params.N) {
+        uint c_idx = row * params.N + col;
+        C[c_idx] = params.alpha * result + params.beta * C[c_idx];
+    }
+}
+
+// Separate shader for ReLU + Dropout fusion
+#ifdef RELU_DROPOUT_SHADER
+
+layout(set = 0, binding = 0, scalar) readonly buffer InputBuffer {
+    float input_data[];
+};
+
+layout(set = 0, binding = 1, scalar) writeonly buffer OutputBuffer {
+    float output_data[];
+};
+
+layout(set = 0, binding = 2, scalar) writeonly buffer MaskBuffer {
+    float mask_data[];
+};
+
+layout(set = 0, binding = 3, scalar) buffer RandomState {
+    uint random_states[];
+};
+
+layout(set = 0, binding = 4, scalar) uniform ReluDropoutParams {
+    uint size;
+    float dropout_prob;
+    float scale;
+} relu_params;
+
+// Fast random number generation using Linear Congruential Generator
+uint lcg_random(inout uint seed) {
+    seed = seed * 1664525u + 1013904223u;
+    return seed;
+}
+
+void main() {
+    const uint idx = gl_GlobalInvocationID.x;
+    if (idx >= relu_params.size) return;
+    
+    // Vectorized processing for better memory bandwidth
+    const uint vec_size = 4;
+    const uint vec_idx = idx / vec_size;
+    
+    if (idx % vec_size == 0 && idx + vec_size - 1 < relu_params.size) {
+        // Process 4 elements simultaneously
+        vec4 input_vec = vec4(
+            input_data[idx],
+            input_data[idx + 1],
+            input_data[idx + 2],
+            input_data[idx + 3]
+        );
+        
+        // Vectorized ReLU
+        vec4 relu_vec = max(input_vec, vec4(0.0));
+        
+        // Generate random numbers for dropout
+        uint seed = random_states[gl_SubgroupInvocationID];
+        vec4 rand_vec = vec4(
+            float(lcg_random(seed) & 0xFFFFu) / 65536.0,
+            float(lcg_random(seed) & 0xFFFFu) / 65536.0,
+            float(lcg_random(seed) & 0xFFFFu) / 65536.0,
+            float(lcg_random(seed) & 0xFFFFu) / 65536.0
+        );
+        random_states[gl_SubgroupInvocationID] = seed;
+        
+        // Apply dropout mask
+        vec4 mask_vec = vec4(greaterThan(rand_vec, vec4(relu_params.dropout_prob))) * relu_params.scale;
+        vec4 output_vec = relu_vec * mask_vec;
+        
+        // Store results
+        output_data[idx] = output_vec.x;
+        output_data[idx + 1] = output_vec.y;
+        output_data[idx + 2] = output_vec.z;
+        output_data[idx + 3] = output_vec.w;
+        
+        mask_data[idx] = mask_vec.x;
+        mask_data[idx + 1] = mask_vec.y;
+        mask_data[idx + 2] = mask_vec.z;
+        mask_data[idx + 3] = mask_vec.w;
+    }
+}
+
+#endif
+
+// Softmax compute shader with subgroup reductions
+#ifdef SOFTMAX_SHADER
+
+layout(set = 0, binding = 0, scalar) readonly buffer SoftmaxInput {
+    float softmax_input[];
+};
+
+layout(set = 0, binding = 1, scalar) writeonly buffer SoftmaxOutput {
+    float softmax_output[];
+};
+
+layout(set = 0, binding = 2, scalar) uniform SoftmaxParams {
+    uint batch_size;
+    uint seq_length;
+    uint vocab_size;
+} softmax_params;
+
+shared float shared_max;
+shared float shared_sum;
+
+void main() {
+    const uint batch_idx = gl_WorkGroupID.y;
+    const uint seq_idx = gl_WorkGroupID.x;
+    const uint tid = gl_LocalInvocationID.x;
+    
+    if (batch_idx >= softmax_params.batch_size || seq_idx >= softmax_params.seq_length) return;
+    
+    const uint row_offset = (batch_idx * softmax_params.seq_length + seq_idx) * softmax_params.vocab_size;
+    
+    // Find maximum using subgroup reduction
+    float thread_max = -1.0 / 0.0; // -infinity
+    for (uint i = tid; i < softmax_params.vocab_size; i += gl_WorkGroupSize.x) {
+        thread_max = max(thread_max, softmax_input[row_offset + i]);
+    }
+    
+    // Subgroup max reduction
+    float subgroup_max = subgroupMax(thread_max);
+    
+    // Store subgroup results and find global max
+    if (gl_SubgroupInvocationID == 0) {
+        atomicMax(shared_max, subgroup_max);
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    float global_max = shared_max;
+    
+    // Reset shared memory for sum computation
+    if (tid == 0) {
+        shared_sum = 0.0;
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    // Compute exponentials and sum
+    float thread_sum = 0.0;
+    for (uint i = tid; i < softmax_params.vocab_size; i += gl_WorkGroupSize.x) {
+        float exp_val = exp(softmax_input[row_offset + i] - global_max);
+        softmax_output[row_offset + i] = exp_val;
+        thread_sum += exp_val;
+    }
+    
+    // Subgroup sum reduction
+    float subgroup_sum = subgroupAdd(thread_sum);
+    
+    if (gl_SubgroupInvocationID == 0) {
+        atomicAdd(shared_sum, subgroup_sum);
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    // Normalize
+    float inv_sum = 1.0 / shared_sum;
+    for (uint i = tid; i < softmax_params.vocab_size; i += gl_WorkGroupSize.x) {
+        softmax_output[row_offset + i] *= inv_sum;
+    }
+}
+
+#endif
+
+// Multi-Head Attention compute shader
+#ifdef ATTENTION_SHADER
+
+layout(set = 0, binding = 0, scalar) readonly buffer Queries {
+    float queries[];
+};
+
+layout(set = 0, binding = 1, scalar) readonly buffer Keys {
+    float keys[];
+};
+
+layout(set = 0, binding = 2, scalar) readonly buffer Values {
+    float values[];
+};
+
+layout(set = 0, binding = 3, scalar) writeonly buffer AttentionOutput {
+    float attention_output[];
+};
+
+layout(set = 0, binding = 4, scalar) buffer AttentionWeights {
+    float attention_weights[];
+};
+
+layout(set = 0, binding = 5, scalar) uniform AttentionParams {
+    uint batch_size;
+    uint seq_length;
+    uint num_heads;
+    uint head_dim;
+    float scale;
+} attn_params;
+
+shared float query_cache[128]; // Assuming max head_dim = 128
+shared float attention_cache[512]; // Cache for attention scores
+
+void main() {
+    const uint batch_idx = gl_WorkGroupID.z;
+    const uint head_idx = gl_WorkGroupID.y;
+    const uint seq_idx = gl_WorkGroupID.x;
+    const uint tid = gl_LocalInvocationID.x;
+    
+    if (batch_idx >= attn_params.batch_size || head_idx >= attn_params.num_heads || 
+        seq_idx >= attn_params.seq_length) return;
+    
+    const uint head_offset = (batch_idx * attn_params.num_heads + head_idx) * 
+                            attn_params.seq_length * attn_params.head_dim;
+    const uint query_offset = head_offset + seq_idx * attn_params.head_dim;
+    
+    // Load query into shared memory cooperatively
+    for (uint i = tid; i < attn_params.head_dim; i += gl_WorkGroupSize.x) {
+        query_cache[i] = queries[query_offset + i];
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    // Compute attention scores with vectorized operations
+    float max_score = -1.0 / 0.0;
+    for (uint k = tid; k < attn_params.seq_length; k += gl_WorkGroupSize.x) {
+        const uint key_offset = head_offset + k * attn_params.head_dim;
+        
+        float score = 0.0;
+        // Unrolled dot product for better performance
+        for (uint d = 0; d < attn_params.head_dim; d += 4) {
+            if (d + 3 < attn_params.head_dim) {
+                vec4 q_vec = vec4(query_cache[d], query_cache[d+1], query_cache[d+2], query_cache[d+3]);
+                vec4 k_vec = vec4(keys[key_offset + d], keys[key_offset + d + 1], 
+                                 keys[key_offset + d + 2], keys[key_offset + d + 3]);
+                score += dot(q_vec, k_vec);
+            } else {
+                // Handle remaining elements
+                for (uint dd = d; dd < attn_params.head_dim; ++dd) {
+                    score += query_cache[dd] * keys[key_offset + dd];
+                }
+            }
+        }
+        
+        score *= attn_params.scale;
+        const uint weight_idx = head_offset / attn_params.head_dim + seq_idx * attn_params.seq_length + k;
+        attention_weights[weight_idx] = score;
+        max_score = max(max_score, score);
+    }
+    
+    // Subgroup max reduction
+    max_score = subgroupMax(max_score);
+    
+    // Softmax with subgroup operations
+    float sum = 0.0;
+    for (uint k = tid; k < attn_params.seq_length; k += gl_WorkGroupSize.x) {
+        const uint weight_idx = head_offset / attn_params.head_dim + seq_idx * attn_params.seq_length + k;
+        float exp_score = exp(attention_weights[weight_idx] - max_score);
+        attention_weights[weight_idx] = exp_score;
+        sum += exp_score;
+    }
+    
+    sum = subgroupAdd(sum);
+    
+    // Broadcast sum to all threads in workgroup
+    sum = subgroupBroadcastFirst(sum);
+    
+    // Normalize attention weights
+    if (sum > 0.0) {
+        float inv_sum = 1.0 / sum;
+        for (uint k = tid; k < attn_params.seq_length; k += gl_WorkGroupSize.x) {
+            const uint weight_idx = head_offset / attn_params.head_dim + seq_idx * attn_params.seq_length + k;
+            attention_weights[weight_idx] *= inv_sum;
+        }
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    // Compute weighted output
+    for (uint d = tid; d < attn_params.head_dim; d += gl_WorkGroupSize.x) {
+        float output_val = 0.0;
+        for (uint k = 0; k < attn_params.seq_length; ++k) {
+            const uint weight_idx = head_offset / attn_params.head_dim + seq_idx * attn_params.seq_length + k;
+            const uint value_idx = head_offset + k * attn_params.head_dim + d;
+            output_val += attention_weights[weight_idx] * values[value_idx];
+        }
+        attention_output[query_offset + d] = output_val;
+    }
+}
+
+#endif
+
+// Layer Normalization compute shader
+#ifdef LAYER_NORM_SHADER
+
+layout(set = 0, binding = 0, scalar) readonly buffer LayerNormInput {
+    float ln_input[];
+};
+
+layout(set = 0, binding = 1, scalar) writeonly buffer LayerNormOutput {
+    float ln_output[];
+};
+
+layout(set = 0, binding = 2, scalar) readonly buffer LayerNormWeight {
+    float ln_weight[];
+};
+
+layout(set = 0, binding = 3, scalar) readonly buffer LayerNormBias {
+    float ln_bias[];
+};
+
+layout(set = 0, binding = 4, scalar) uniform LayerNormParams {
+    uint batch_size;
+    uint hidden_size;
+    float eps;
+} ln_params;
+
+shared float shared_stats[2]; // [mean, variance]
+
+void main() {
+    const uint batch_idx = gl_WorkGroupID.x;
+    const uint tid = gl_LocalInvocationID.x;
+    
+    if (batch_idx >= ln_params.batch_size) return;
+    
+    const uint row_offset = batch_idx * ln_params.hidden_size;
+    
+    // Compute mean using subgroup reduction
+    float thread_sum = 0.0;
+    for (uint i = tid; i < ln_params.hidden_size; i += gl_WorkGroupSize.x) {
+        thread_sum += ln_input[row_offset + i];
+    }
+    
+    float subgroup_sum = subgroupAdd(thread_sum);
+    
+    if (gl_SubgroupInvocationID == 0) {
+        atomicAdd(shared_stats[0], subgroup_sum);
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    float mean = shared_stats[0] / float(ln_params.hidden_size);
+    
+    // Reset shared memory for variance
+    if (tid == 0) {
+        shared_stats[1] = 0.0;
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    // Compute variance
+    float thread_var_sum = 0.0;
+    for (uint i = tid; i < ln_params.hidden_size; i += gl_WorkGroupSize.x) {
+        float diff = ln_input[row_offset + i] - mean;
+        thread_var_sum += diff * diff;
+    }
+    
+    float subgroup_var_sum = subgroupAdd(thread_var_sum);
+    
+    if (gl_SubgroupInvocationID == 0) {
+        atomicAdd(shared_stats[1], subgroup_var_sum);
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    float variance = shared_stats[1] / float(ln_params.hidden_size);
+    float inv_std = inversesqrt(variance + ln_params.eps);
+    
+    // Normalize and scale
+    for (uint i = tid; i < ln_params.hidden_size; i += gl_WorkGroupSize.x) {
+        float normalized = (ln_input[row_offset + i] - mean) * inv_std;
+        ln_output[row_offset + i] = ln_weight[i] * normalized + ln_bias[i];
+    }
+}
+
+#endif
+
+// Reduction compute shader template
+#ifdef REDUCTION_SHADER
+
+layout(set = 0, binding = 0, scalar) readonly buffer ReductionInput {
+    float reduction_input[];
+};
+
+layout(set = 0, binding = 1, scalar) writeonly buffer ReductionOutput {
+    float reduction_output[];
+};
+
+layout(set = 0, binding = 2, scalar) uniform ReductionParams {
+    uint input_size;
+    uint operation; // 0=sum, 1=max, 2=min, 3=product
+} reduce_params;
+
+shared float shared_data[WORKGROUP_SIZE];
+
+void main() {
+    const uint tid = gl_LocalInvocationID.x;
+    const uint global_id = gl_GlobalInvocationID.x;
+    const uint stride = gl_NumWorkGroups.x * gl_WorkGroupSize.x;
+    
+    // Grid-stride loop for processing large arrays
+    float thread_result = 0.0;
+    if (reduce_params.operation == 1 || reduce_params.operation == 2) {
+        thread_result = (reduce_params.operation == 1) ? -1.0/0.0 : 1.0/0.0; // -inf : +inf
+    } else if (reduce_params.operation == 3) {
+        thread_result = 1.0; // Identity for multiplication
+    }
+    
+    for (uint i = global_id; i < reduce_params.input_size; i += stride) {
+        switch (reduce_params.operation) {
+            case 0: // Sum
+                thread_result += reduction_input[i];
+                break;
+            case 1: // Max
+                thread_result = max(thread_result, reduction_input[i]);
+                break;
+            case 2: // Min
+                thread_result = min(thread_result, reduction_input[i]);
+                break;
+            case 3: // Product
+                thread_result *= reduction_input[i];
+                break;
+        }
+    }
+    
+    // Subgroup reduction
+    switch (reduce_params.operation) {
+        case 0:
+            thread_result = subgroupAdd(thread_result);
+            break;
+        case 1:
+            thread_result = subgroupMax(thread_result);
+            break;
+        case 2:
+            thread_result = subgroupMin(thread_result);
+            break;
+        case 3:
+            thread_result = subgroupMul(thread_result);
+            break;
+    }
+    
+    // Store subgroup results in shared memory
+    if (gl_SubgroupInvocationID == 0) {
+        shared_data[gl_SubgroupID] = thread_result;
+    }
+    
+    memoryBarrierShared();
+    barrier();
+    
+    // Final reduction by first subgroup
+    if (gl_SubgroupID == 0) {
+        float final_result = (tid < gl_NumSubgroups) ? shared_data[tid] : 
+                           ((reduce_params.operation == 1) ? -1.0/0.0 : 
+                            (reduce_params.operation == 2) ? 1.0/0.0 : 
+                            (reduce_params.operation == 3) ? 1.0 : 0.0);
+        
+        switch (reduce_params.operation) {
+            case 0:
+                final_result = subgroupAdd(final_result);
+                break;
+            case 1:
+                final_result = subgroupMax(final_result);
+                break;
+            case 2:
+                final_result = subgroupMin(final_result);
+                break;
+            case 3:
+                final_result = subgroupMul(final_result);
+                break;
+        }
+        
+        if (gl_SubgroupInvocationID == 0) {
+            atomicAdd(reduction_output[0], final_result);
+        }
+    }
+}
+
+#endif
+
+// Utility functions for Vulkan compute optimization
+
+// Memory barrier and synchronization utilities
+void memory_barrier_buffer() {
+    memoryBarrierBuffer();
+    barrier();
+}
+
+void memory_barrier_shared() {
+    memoryBarrierShared();
+    barrier();
+}
+
+// Vectorized load/store utilities for better memory bandwidth
+vec4 load_vec4(uint base_idx) {
+    return vec4(
+        reduction_input[base_idx],
+        reduction_input[base_idx + 1],
+        reduction_input[base_idx + 2],
+        reduction_input[base_idx + 3]
+    );
+}
+
+void store_vec4(uint base_idx, vec4 data) {
+    reduction_output[base_idx] = data.x;
+    reduction_output[base_idx + 1] = data.y;
+    reduction_output[base_idx + 2] = data.z;
+    reduction_output[base_idx + 3] = data.w;
+}
+
+// Performance optimization macros for different GPU vendors
+// These would be set via specialization constants or preprocessor defines
+
+// NVIDIA optimization hints
+#ifdef GPU_NVIDIA
+    #define PREFERRED_WORKGROUP_SIZE 256
+    #define USE_COOPERATIVE_MATRIX 1
+    #define PREFER_WAVE32 0
+#endif
+
+// AMD optimization hints  
+#ifdef GPU_AMD
+    #define PREFERRED_WORKGROUP_SIZE 256
+    #define USE_COOPERATIVE_MATRIX 0
+    #define PREFER_WAVE64 1
+#endif
+
+// Intel optimization hints
+#ifdef GPU_INTEL
+    #define PREFERRED_WORKGROUP_SIZE 128
+    #define USE_COOPERATIVE_MATRIX 0
+    #define PREFER_SIMD16 1
+#endif
+
+// Mobile GPU optimization hints
+#ifdef GPU_MOBILE
+    #define PREFERRED_WORKGROUP_SIZE 64
+    #define USE_LOWER_PRECISION 1
+    #define MINIMIZE_BANDWIDTH 1
+#endif

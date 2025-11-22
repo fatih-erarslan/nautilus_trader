@@ -1,0 +1,50 @@
+[package]
+name = "hyperphysics-napi"
+version = "0.1.0"
+edition = "2021"
+description = "Zero-overhead Node.js bindings for HyperPhysics via NAPI-RS"
+license = "MIT OR Apache-2.0"
+authors = ["HyperPhysics Team"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# NAPI-RS for zero-overhead Node.js bindings
+napi = { version = "2.16", default-features = false, features = [
+    "napi9",           # Node.js 20+ APIs
+    "async",           # Async/Promise support
+    "serde-json",      # JSON serialization
+    "tokio_rt",        # Tokio runtime integration
+] }
+napi-derive = "2.16"
+
+# HyperPhysics core modules
+hyperphysics-core = { path = "../hyperphysics-core", default-features = false }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-dilithium = { path = "../hyperphysics-dilithium" }
+hyperphysics-finance = { path = "../hyperphysics-finance" }
+hyperphysics-risk = { path = "../hyperphysics-risk" }
+
+# Async runtime
+tokio = { version = "1.35", features = ["rt-multi-thread", "sync"] }
+
+# System info
+num_cpus = "1.16"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Math
+ndarray = "0.15"
+
+[build-dependencies]
+napi-build = "2.1"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+strip = "symbols"

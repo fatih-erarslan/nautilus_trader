@@ -401,12 +401,13 @@ mod tests {
         let position = HyperbolicPoint::new(0.0, 0.0);
         let mut pbit = CryptographicPBit::new(position, 0.5, SecurityLevel::Standard)
             .expect("Failed to create CryptopBit");
-        
+
         // Tamper with internal state (bypass update method)
         pbit.probability = 0.9;
-        
-        // Signature should now be invalid
-        assert!(!pbit.verify_signature().unwrap());
+
+        // Signature should now be invalid (either returns false or errors out)
+        // Tampering can cause either Ok(false) or Err(VerificationFailed)
+        assert!(!pbit.verify_signature().unwrap_or(false));
     }
     
     #[test]

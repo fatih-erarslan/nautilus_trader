@@ -21,8 +21,6 @@
 //! - Intel Vector Math Library (VML) design principles
 
 
-#[cfg(target_arch = "x86_64")]
-use std::arch::x86_64::*;
 
 #[cfg(target_arch = "aarch64")]
 use std::arch::aarch64::*;
@@ -46,14 +44,22 @@ mod exp_constants {
     pub const C5: f64 = 0.0083333333333331650;
     pub const C6: f64 = 0.0013888888888888834;
 
-    // Single precision constants
+    // Single precision constants (reserved for future f32 SIMD optimization)
+    #[allow(dead_code)]
     pub const LN2_F32: f32 = 0.693147180559945309417;
+    #[allow(dead_code)]
     pub const INV_LN2_F32: f32 = 1.44269504088896340736;
+    #[allow(dead_code)]
     pub const C0_F32: f32 = 1.0;
+    #[allow(dead_code)]
     pub const C1_F32: f32 = 1.0;
+    #[allow(dead_code)]
     pub const C2_F32: f32 = 0.5;
+    #[allow(dead_code)]
     pub const C3_F32: f32 = 0.166666666666666657;
+    #[allow(dead_code)]
     pub const C4_F32: f32 = 0.041666666666666664;
+    #[allow(dead_code)]
     pub const C5_F32: f32 = 0.008333333333333333;
 }
 

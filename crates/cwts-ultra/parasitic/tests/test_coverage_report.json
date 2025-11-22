@@ -1,0 +1,125 @@
+{
+  "timestamp": "2025-08-11T04:43:52.660Z",
+  "testsRun": 29,
+  "testsPassed": 29,
+  "testsFailed": 0,
+  "coverage": 100,
+  "results": [
+    {
+      "name": "WebSocket connection establishment",
+      "status": "passed"
+    },
+    {
+      "name": "Subscribe to market data",
+      "status": "passed"
+    },
+    {
+      "name": "Direct tool call routing",
+      "status": "passed"
+    },
+    {
+      "name": "Invalid method handling",
+      "status": "passed"
+    },
+    {
+      "name": "Multiple concurrent WebSocket connections",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: scan_parasitic_opportunities",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: detect_whale_nests",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: identify_zombie_pairs",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: analyze_mycelial_network",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: activate_octopus_camouflage",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: deploy_anglerfish_lure",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: track_wounded_pairs",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: enter_cryptobiosis",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: electric_shock",
+      "status": "passed"
+    },
+    {
+      "name": "Tool: electroreception_scan",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: cuckoo",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: wasp",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: cordyceps",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: mycelial_network",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: octopus",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: anglerfish",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: komodo_dragon",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: tardigrade",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: electric_eel",
+      "status": "passed"
+    },
+    {
+      "name": "Organism strategy: platypus",
+      "status": "passed"
+    },
+    {
+      "name": "Sub-millisecond latency requirement",
+      "status": "passed"
+    },
+    {
+      "name": "Zero-mock validation",
+      "status": "passed"
+    },
+    {
+      "name": "CQGS sentinel validation",
+      "status": "passed"
+    },
+    {
+      "name": "Multi-tool workflow",
+      "status": "passed"
+    }
+  ]
+}

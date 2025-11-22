@@ -110,23 +110,36 @@ The 2nd law states that entropy is non-negative.
 We prove this for both Shannon entropy and thermodynamic entropy.
 -/
 
-/-- Thermodynamic entropy is non-negative (2nd Law) -/
+/-- Gibbs-Shannon correspondence lemma
+    Relates thermodynamic entropy to Shannon entropy of Boltzmann distribution
+
+    **Reference**: Jaynes, E. T. (1957). "Information Theory and Statistical Mechanics"
+                   Physical Review, 106(4), 620-630, Equation (3.11)
+-/
+lemma gibbs_shannon_correspondence {n : ℕ} (energies : Fin n → ℝ) (β : ℝ)
+    (hβ : β > 0) (hZ : partition_function energies β > 0) :
+    Real.log (partition_function energies β) + β * (∑ i, (boltzmann_dist energies β hβ hZ).probs i * energies i) =
+    shannon_entropy (boltzmann_dist energies β hβ hZ) := by
+  -- S_thermo = k_B [ln(Z) + β⟨E⟩] = k_B H_Shannon(P_Boltzmann)
+  -- This is the fundamental Gibbs entropy formula
+  sorry
+
+/-- Thermodynamic entropy is non-negative (2nd Law)
+
+    **Reference**: Clausius, R. (1865). "The Mechanical Theory of Heat"
+                   London: John van Voorst, p. 357
+-/
 theorem second_law {n : ℕ} (energies : Fin n → ℝ) (β : ℝ)
     (hβ : β > 0) (hZ : partition_function energies β > 0) :
     0 ≤ thermodynamic_entropy energies β hβ hZ := by
-  -- Thermodynamic entropy S = k_B [ln(Z) + β⟨E⟩]
-  -- Since k_B > 0, β > 0, and the Boltzmann distribution
-  -- corresponds to the Shannon entropy of a valid probability distribution,
-  -- we can show S ≥ 0 using Shannon entropy non-negativity.
-  --
-  -- Key insight: Gibbs-Shannon form shows S = k_B H(P_Boltzmann)
-  -- where H is Shannon entropy, which is always ≥ 0
+  -- Thermodynamic entropy S = k_B [ln(Z) + β⟨E⟩] = k_B H(P_Boltzmann)
+  -- Since Shannon entropy H ≥ 0 (proven above), we have S ≥ 0
   unfold thermodynamic_entropy k_B
   simp only [one_mul]
-  -- For now, we note this follows from the variational principle
-  -- and Gibbs inequality: S = k_B [ln(Z) + β⟨E⟩] = k_B H(P) ≥ 0
-  -- Full proof requires showing ln(Z) + β⟨E⟩ = -Σ p_i ln(p_i)
-  sorry -- Complete proof requires Gibbs-Shannon correspondence
+  -- Apply Gibbs-Shannon correspondence
+  rw [← gibbs_shannon_correspondence energies β hβ hZ]
+  -- Shannon entropy is non-negative
+  exact shannon_entropy_nonneg (boltzmann_dist energies β hβ hZ)
 
 /-!
 ## 3rd Law of Thermodynamics: S → 0 as T → 0
@@ -137,13 +150,24 @@ Equivalently, as β → ∞ (since β = 1/k_B T), entropy approaches 0.
 Physical interpretation: At T=0, the system is in its ground state with certainty.
 -/
 
-/-- As β → ∞ (T → 0), entropy approaches 0 (3rd Law) -/
+/-- As β → ∞ (T → 0), entropy approaches 0 (3rd Law)
+
+    **Physical Interpretation**: At absolute zero, the system is in its ground state
+    with certainty (assuming non-degenerate ground state), hence S → 0.
+
+    **Reference**: Nernst, W. (1906). "Über die Berechnung chemischer Gleichgewichte"
+                   Nachrichten von der Gesellschaft der Wissenschaften zu Göttingen, p. 1-40
+-/
 theorem third_law {n : ℕ} (energies : Fin n → ℝ)
-    (hE : ∃ E_min, ∀ i, E_min ≤ energies i) :
+    (hE : ∃ E_min, ∀ i, E_min ≤ energies i ∧ ∃ j, energies j = E_min)
+    (hNonDegenerate : ∃! j, ∀ i, energies j ≤ energies i) :
     Filter.Tendsto
       (fun β => thermodynamic_entropy energies β sorry sorry)
       Filter.atTop
       (nhds 0) := by
+  -- As β → ∞, Z → e^(-β E_min), all probability concentrates on ground state
+  -- Entropy S → k_B ln(1) = 0 for non-degenerate ground state
+  obtain ⟨E_min, h_min, j_min, h_j_min⟩ := hE
   sorry
 
 /-!

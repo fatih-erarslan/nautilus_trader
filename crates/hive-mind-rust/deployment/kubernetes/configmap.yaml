@@ -1,0 +1,212 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hive-mind-config
+  namespace: hive-mind-production
+  labels:
+    app: hive-mind-rust
+data:
+  production.toml: |
+    # Production configuration for Hive Mind Rust Backend
+    # High-performance, fault-tolerant configuration for production trading
+    
+    [instance]
+    instance_id = "${POD_NAME:-hive-mind-instance}"
+    environment = "production"
+    log_level = "info"
+    
+    [network]
+    listen_addr = "0.0.0.0"
+    p2p_port = 8080
+    api_port = 8090
+    max_peers = 100
+    connection_timeout = "30s"
+    heartbeat_interval = "10s"
+    enable_encryption = true
+    enable_compression = true
+    
+    [consensus]
+    algorithm = "raft"
+    min_nodes = 5
+    max_nodes = 21
+    timeout = "1s"
+    election_timeout = "5s"
+    heartbeat_interval = "500ms"
+    byzantine_threshold = 0.33
+    enable_fast_commit = true
+    batch_size = 1000
+    
+    [memory]
+    max_pool_size = 8589934592  # 8GB
+    cleanup_interval = "2m"
+    replication_factor = 3
+    enable_persistence = true
+    snapshot_interval = "10m"
+    compression_level = 6
+    cache_size = 2147483648  # 2GB
+    
+    [neural]
+    enable_pattern_recognition = true
+    architecture = "transformer"
+    training_enabled = false  # Disabled in production
+    model_cache_size = 1073741824  # 1GB
+    inference_timeout = "5ms"
+    training_batch_size = 64
+    learning_rate = 0.001
+    enable_gpu = false  # CPU-optimized for financial latency
+    
+    [agents]
+    max_agents = 500
+    spawning_strategy = "adaptive"
+    heartbeat_interval = "15s"
+    task_timeout = "30s"
+    enable_auto_scaling = true
+    min_agents = 50
+    max_cpu_per_agent = 80.0
+    max_memory_per_agent = 268435456  # 256MB
+    
+    [metrics]
+    enabled = true
+    collection_interval = "5s"  # High frequency for trading
+    prometheus_port = 9090
+    enable_detailed_metrics = true
+    retention_period = "30d"  # Extended for compliance
+    export_interval = "10s"
+    
+    [security]
+    enable_encryption = true
+    encryption_algorithm = "chacha20_poly1305"
+    key_rotation_interval = "6h"  # Frequent rotation
+    enable_mutual_auth = true
+    token_expiration = "30m"
+    rate_limit_requests_per_second = 50000  # High throughput
+    
+    [fault_tolerance]
+    enable_circuit_breakers = true
+    circuit_breaker_threshold = 3
+    circuit_breaker_timeout = "15s"
+    enable_auto_recovery = true
+    max_recovery_attempts = 3
+    recovery_interval = "10s"
+    health_check_interval = "5s"
+    enable_graceful_degradation = true
+    
+    [performance]
+    enable_simd = true
+    enable_threading = true
+    max_threads = 32  # Optimized for high-performance nodes
+    enable_zero_copy = true
+    buffer_size = 131072  # 128KB
+    batch_processing = true
+    enable_prefetch = true
+    
+    [monitoring]
+    enable_health_dashboard = true
+    dashboard_port = 8091
+    enable_alerts = true
+    alert_channels = ["prometheus", "webhook"]
+    webhook_url = "${MONITORING_WEBHOOK_URL}"
+    enable_profiling = false  # Disabled for security
+    
+    [trading_integration]
+    enable_trading_hooks = true
+    trading_engine_endpoint = "${TRADING_ENGINE_ENDPOINT}"
+    risk_management_endpoint = "${RISK_MANAGEMENT_ENDPOINT}"
+    market_data_endpoint = "${MARKET_DATA_ENDPOINT}"
+    enable_fast_execution = true
+    latency_target_microseconds = 50  # Sub-100μs target
+    
+    [database]
+    connection_string = "${DATABASE_URL}"
+    max_connections = 50
+    connection_timeout = "10s"
+    query_timeout = "30s"
+    enable_prepared_statements = true
+    
+    [logging]
+    level = "info"
+    format = "json"
+    enable_structured_logging = true
+    log_to_file = true
+    log_file_path = "/app/logs/hive-mind.log"
+    max_log_file_size = "100MB"
+    max_log_files = 10
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hive-mind-scripts
+  namespace: hive-mind-production
+  labels:
+    app: hive-mind-rust
+data:
+  health-check.sh: |
+    #!/bin/bash
+    # Comprehensive health check script for Kubernetes probes
+    set -e
+    
+    # Check API endpoint
+    curl -f http://localhost:8091/health/live --max-time 3 --silent
+    
+    # Check metrics endpoint
+    curl -f http://localhost:9090/metrics --max-time 3 --silent | grep -q "hive_mind_"
+    
+    # Check consensus health (if applicable)
+    if curl -f http://localhost:8091/health/consensus --max-time 3 --silent 2>/dev/null; then
+        echo "Consensus healthy"
+    fi
+    
+    echo "Health check passed"
+
+  backup.sh: |
+    #!/bin/bash
+    # Backup script for critical system state
+    set -e
+    
+    BACKUP_DIR="${BACKUP_DIR:-/app/data/backups}"
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    
+    mkdir -p "$BACKUP_DIR"
+    
+    # Backup system state
+    curl -X POST http://localhost:8091/admin/backup \
+      -H "Content-Type: application/json" \
+      -d "{\"destination\": \"$BACKUP_DIR/state_$TIMESTAMP.backup\"}" \
+      --max-time 60
+    
+    # Cleanup old backups (keep 10 most recent)
+    ls -t "$BACKUP_DIR"/*.backup | tail -n +11 | xargs -r rm --
+    
+    echo "Backup completed: state_$TIMESTAMP.backup"
+
+  performance-test.sh: |
+    #!/bin/bash
+    # Performance validation script
+    set -e
+    
+    HOST="${1:-localhost}"
+    PORT="${2:-8091}"
+    
+    echo "Running performance tests against $HOST:$PORT"
+    
+    # Latency test
+    for i in {1..100}; do
+      start=$(date +%s%N)
+      curl -s "http://$HOST:$PORT/health" > /dev/null
+      end=$(date +%s%N)
+      latency_us=$(( (end - start) / 1000 ))
+      echo "Test $i: ${latency_us}μs"
+    done | tee /tmp/latency_results.txt
+    
+    # Calculate statistics
+    avg_latency=$(awk '{sum+=$3} END {print sum/NR}' /tmp/latency_results.txt | cut -d':' -f2)
+    echo "Average latency: ${avg_latency}μs"
+    
+    # Validate against SLA
+    if (( $(echo "$avg_latency > 1000" | bc -l) )); then
+      echo "ERROR: Average latency ${avg_latency}μs exceeds 1ms SLA"
+      exit 1
+    fi
+    
+    echo "Performance test passed"

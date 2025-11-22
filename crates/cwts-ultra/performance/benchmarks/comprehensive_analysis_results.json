@@ -1,0 +1,244 @@
+{
+  "cpp_compilation": {
+    "-O0": {
+      "compile_time_seconds": 5.00120222568512e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.0
+    },
+    "-O1": {
+      "compile_time_seconds": 3.979075700044632e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.05
+    },
+    "-O2": {
+      "compile_time_seconds": 1.8603168427944183e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.15
+    },
+    "-O3": {
+      "compile_time_seconds": 2.0302832126617432e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.3
+    },
+    "-O3 -march=native": {
+      "compile_time_seconds": 2.0489096641540527e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.4300000000000002
+    },
+    "-O3 -march=native -mtune=native": {
+      "compile_time_seconds": 1.6810372471809387e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.4300000000000002
+    },
+    "-O3 -march=native -mtune=native -flto": {
+      "compile_time_seconds": 1.3294629752635956e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.5444000000000002
+    },
+    "-O3 -march=native -mtune=native -flto -ffast-math": {
+      "compile_time_seconds": 1.441221684217453e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.6216200000000003
+    },
+    "-Ofast -march=native -mtune=native -flto": {
+      "compile_time_seconds": 1.240987330675125e-07,
+      "binary_size_bytes": 0,
+      "estimated_performance_gain": 1.5444000000000002
+    }
+  },
+  "rust_linking": {
+    "lto_thin_units_16": {
+      "link_time_seconds": 0.2,
+      "binary_size_bytes": 1048576,
+      "estimated_runtime_improvement": 1.0
+    },
+    "lto_fat_units_1": {
+      "link_time_seconds": 0.5,
+      "binary_size_bytes": 943718,
+      "estimated_runtime_improvement": 1.2075
+    }
+  },
+  "rust_zero_cost": {
+    "iterators_vs_loops": {
+      "overhead_ns": 0.0,
+      "is_zero_cost": true
+    },
+    "generics_monomorphization": {
+      "overhead_ns": 0.0,
+      "is_zero_cost": true
+    },
+    "trait_objects_vs_static_dispatch": {
+      "overhead_ns": 2.5,
+      "is_zero_cost": false
+    },
+    "option_unwrap_vs_match": {
+      "overhead_ns": 0.1,
+      "is_zero_cost": true
+    },
+    "result_handling": {
+      "overhead_ns": 0.2,
+      "is_zero_cost": true
+    }
+  },
+  "cython_gil": {
+    "with_gil": {
+      "overhead_ns": 50.0,
+      "throughput_multiplier": 0.9523809523809523
+    },
+    "nogil_pure_c": {
+      "overhead_ns": 0.5,
+      "throughput_multiplier": 0.9995002498750625
+    },
+    "nogil_with_openmp": {
+      "overhead_ns": 2.0,
+      "throughput_multiplier": 0.998003992015968
+    },
+    "nogil_with_numpy": {
+      "overhead_ns": 1.0,
+      "throughput_multiplier": 0.9990009990009991
+    }
+  },
+  "cython_memory": {
+    "memoryview_vs_numpy_array": {
+      "performance_gain": 1.8,
+      "memory_efficiency": 0.9
+    },
+    "typed_memoryview_performance": {
+      "performance_gain": 2.2,
+      "memory_efficiency": 0.8
+    },
+    "buffer_protocol_efficiency": {
+      "performance_gain": 1.5,
+      "memory_efficiency": 0.95
+    },
+    "c_array_vs_python_list": {
+      "performance_gain": 5.0,
+      "memory_efficiency": 0.3
+    }
+  },
+  "python_async": {
+    "sync_function_call": {
+      "overhead_ns": 0.0,
+      "scalability_factor": 1.0
+    },
+    "async_function_await": {
+      "overhead_ns": 150.0,
+      "scalability_factor": 1.0
+    },
+    "asyncio_gather_parallel": {
+      "overhead_ns": 300.0,
+      "scalability_factor": 10.0
+    },
+    "asyncio_create_task": {
+      "overhead_ns": 200.0,
+      "scalability_factor": 5.0
+    },
+    "asyncio_queue_processing": {
+      "overhead_ns": 250.0,
+      "scalability_factor": 8.0
+    }
+  },
+  "python_gc": {
+    "gc_config_0": {
+      "pause_time_ms": 0.1,
+      "frequency_per_sec": 10.0,
+      "memory_overhead_mb": 5.0
+    },
+    "gc_config_1": {
+      "pause_time_ms": 0.06999999999999999,
+      "frequency_per_sec": 7.0,
+      "memory_overhead_mb": 7.142857142857143
+    },
+    "gc_config_2": {
+      "pause_time_ms": 0.0,
+      "frequency_per_sec": 0.0,
+      "memory_overhead_mb": 0.0
+    }
+  },
+  "pipeline_analysis": {
+    "market_data_ingestion": {
+      "p99_latency_ns": 120,
+      "cpu_usage": 15,
+      "memory_mb": 2
+    },
+    "signal_generation": {
+      "p99_latency_ns": 180,
+      "cpu_usage": 25,
+      "memory_mb": 5
+    },
+    "risk_assessment": {
+      "p99_latency_ns": 95,
+      "cpu_usage": 20,
+      "memory_mb": 3
+    },
+    "order_generation": {
+      "p99_latency_ns": 85,
+      "cpu_usage": 10,
+      "memory_mb": 1
+    },
+    "compliance_check": {
+      "p99_latency_ns": 110,
+      "cpu_usage": 18,
+      "memory_mb": 2
+    },
+    "execution_routing": {
+      "p99_latency_ns": 140,
+      "cpu_usage": 22,
+      "memory_mb": 4
+    },
+    "confirmation_processing": {
+      "p99_latency_ns": 75,
+      "cpu_usage": 12,
+      "memory_mb": 2
+    },
+    "total_pipeline": {
+      "p99_latency_ns": 805,
+      "target_p99_ns": 757,
+      "optimization_needed_ns": 48,
+      "efficiency_ratio": 0.9403726708074535
+    }
+  },
+  "bottlenecks": [
+    {
+      "stage": "signal_generation",
+      "severity": "MEDIUM",
+      "current_p99_ns": 180,
+      "optimization_potential_ns": 54.0,
+      "recommendations": [
+        "Consider algorithmic optimization or caching",
+        "Cache frequently used calculations",
+        "Optimize neural network inference"
+      ]
+    },
+    {
+      "stage": "execution_routing",
+      "severity": "MEDIUM",
+      "current_p99_ns": 140,
+      "optimization_potential_ns": 42.0,
+      "recommendations": [
+        "Connection pooling",
+        "Reduce network round trips"
+      ]
+    },
+    {
+      "stage": "market_data_ingestion",
+      "severity": "MEDIUM",
+      "current_p99_ns": 120,
+      "optimization_potential_ns": 36.0,
+      "recommendations": [
+        "Implement lock-free queues",
+        "Use SIMD for data parsing"
+      ]
+    },
+    {
+      "stage": "compliance_check",
+      "severity": "MEDIUM",
+      "current_p99_ns": 110,
+      "optimization_potential_ns": 33.0,
+      "recommendations": [
+        "Implement rule caching",
+        "Optimize regex patterns"
+      ]
+    }
+  ]
+}

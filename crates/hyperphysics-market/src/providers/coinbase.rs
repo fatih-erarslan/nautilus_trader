@@ -11,8 +11,8 @@
 use async_trait::async_trait;
 use base64::{Engine as _, engine::general_purpose};
 use chrono::{DateTime, Utc, Duration};
-use futures_util::{StreamExt, SinkExt};
-use serde::{Deserialize, Serialize};
+use futures_util::SinkExt;
+use serde::Serialize;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tokio::net::TcpStream;
@@ -162,6 +162,7 @@ impl CoinbaseProvider {
     }
 
     /// Generate authentication signature for API requests
+    #[allow(dead_code)]
     fn generate_signature(&self, timestamp: &str, method: &str, path: &str, body: &str) -> Option<String> {
         let api_secret = self.api_secret.as_ref()?;
         let message = format!("{}{}{}{}", timestamp, method, path, body);

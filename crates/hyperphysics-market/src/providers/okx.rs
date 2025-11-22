@@ -11,7 +11,7 @@
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc, Duration};
-use futures_util::{StreamExt, SinkExt};
+use futures_util::SinkExt;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -27,6 +27,7 @@ use super::MarketDataProvider;
 /// OKX API endpoints
 const OKX_REST_URL: &str = "https://www.okx.com";
 const OKX_WS_PUBLIC: &str = "wss://ws.okx.com:8443/ws/v5/public";
+#[allow(dead_code)]
 const OKX_WS_PRIVATE: &str = "wss://ws.okx.com:8443/ws/v5/private";
 const OKX_DEMO_REST: &str = "https://www.okx.com"; // Demo uses same REST URL
 const OKX_DEMO_WS: &str = "wss://wspap.okx.com:8443/ws/v5/public?brokerId=9999";
@@ -52,6 +53,7 @@ pub struct OKXProvider {
     api_passphrase: Option<String>,
 
     /// Whether using demo trading
+    #[allow(dead_code)]
     demo: bool,
 
     /// Active WebSocket connection
@@ -77,10 +79,12 @@ struct OKXCandle {
     #[serde(rename = "vol")]
     volume: String,
     #[serde(rename = "volCcy")]
+    #[allow(dead_code)]
     quote_volume: String,
     #[serde(rename = "volCcyQuote")]
     _quote_volume_alt: Option<String>,
     #[serde(rename = "confirm")]
+    #[allow(dead_code)]
     confirmed: String,
 }
 

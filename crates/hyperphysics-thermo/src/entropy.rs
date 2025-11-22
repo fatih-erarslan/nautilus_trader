@@ -424,6 +424,7 @@ impl EntropyCalculator {
         let independent_entropy = self.calculate_independent_entropy(lattice);
 
         // Step 2: Calculate correlation correction for coupled systems
+        #[allow(deprecated)]
         let correlation_correction = self.calculate_correlation_correction(lattice);
 
         // Step 3: Combine with proper statistical mechanics
@@ -637,7 +638,7 @@ impl EntropyCalculator {
     /// # Scientific Basis
     /// - Atkins, P.W. (2010) "Physical Chemistry" 9th Ed. Section 3.7
     /// - McQuarrie, D.A. (2000) "Statistical Mechanics" Eq. 6-33
-    fn pressure_correction(&self, temperature: f64, pressure: f64) -> f64 {
+    fn pressure_correction(&self, _temperature: f64, pressure: f64) -> f64 {
         const STANDARD_PRESSURE: f64 = 100000.0; // 1 bar in Pa
 
         if pressure <= 0.0 {

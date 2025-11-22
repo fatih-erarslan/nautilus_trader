@@ -1,0 +1,44 @@
+[package]
+name = "cwts-core-server"
+version = "0.1.0"
+edition = "2021"
+description = "CWTS Core Server - ATS-CP Integration with Market Intelligence"
+
+[dependencies]
+# Core async runtime
+tokio = { version = "1.46", features = ["full"] }
+futures = "0.3"
+
+# HTTP server and client
+axum = { version = "0.7", features = ["ws", "tracing"] }
+tower = { version = "0.4", features = ["full"] }
+tower-http = { version = "0.6.6", features = ["full"] }
+reqwest = { version = "0.12", features = ["json", "gzip", "rustls-tls"] }
+
+# Data processing and serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Configuration
+clap = { version = "4.0", features = ["derive"] }
+
+# Concurrency
+dashmap = "6.1"
+
+# Mathematical calculations for ATS-CP
+nalgebra.workspace = true
+statrs = "0.17"
+
+# UUID for tracking
+uuid = { version = "1.0", features = ["v4", "serde"] }

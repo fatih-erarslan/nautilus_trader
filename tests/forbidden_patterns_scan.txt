@@ -1,0 +1,84 @@
+crates/hyperphysics-risk/src/var.rs:    /// TODO: Implement full maximum entropy optimization
+crates/hyperphysics-risk/src/var.rs:        // Placeholder: For now, use parametric VaR with entropy adjustment
+crates/hyperphysics-market/src/providers/alpaca.rs:        // TODO: Implement Alpaca bars API call
+crates/hyperphysics-market/src/providers/alpaca.rs:        // TODO: Implement Alpaca latest bar API call
+crates/hyperphysics-market/src/providers/alpaca.rs:        // TODO: Implement symbol validation
+crates/hyperphysics-consciousness/src/phi.rs:            let chunk_phi = chunk_indices.len() as f64 * 0.1; // Placeholder
+crates/hyperphysics-consciousness/src/ci.rs:        // Placeholder: would need time-series analysis
+crates/hyperphysics-verify/src/theorems.rs:/// Placeholder for Lean 4 theorem integration
+crates/hyperphysics-market/src/providers/binance.rs:    /// TODO: Will be used for test environment configuration
+crates/hyperphysics-verification/src/invariant_checker.rs:    /// Check entropy monotonicity (placeholder)
+crates/hyperphysics-verification/src/invariant_checker.rs:            details: "Placeholder - implement full entropy monotonicity check".to_string(),
+crates/hyperphysics-verification/src/z3_verifier.rs:            details: "Placeholder - implement full proof".to_string(),
+crates/hyperphysics-verification/src/z3_verifier.rs:            details: "Placeholder - implement full proof".to_string(),
+crates/hyperphysics-verification/src/z3_verifier.rs:            details: "Placeholder - implement full proof".to_string(),
+crates/hyperphysics-verification/src/z3_verifier.rs:            details: "Placeholder - implement full proof".to_string(),
+crates/hyperphysics-verification/src/z3_verifier.rs:            details: "Placeholder - implement full proof".to_string(),
+crates/hyperphysics-verification/src/z3_verifier.rs:            details: "Placeholder - implement full proof".to_string(),
+crates/hyperphysics-verification/src/z3_verifier.rs:            details: "Placeholder - implement full proof".to_string(),
+crates/hyperphysics-verification/src/property_testing.rs:            let initial_energy = 0.0; // Placeholder - would need proper energy calculation
+crates/hyperphysics-verification/src/property_testing.rs:        // TODO: Re-enable once proptest error handling is fixed
+crates/hyperphysics-verification/src/property_testing.rs:    // Placeholder implementations for remaining tests
+crates/hyperphysics-verification/src/property_testing.rs:            details: "Placeholder - implement full test".to_string(),
+crates/hyperphysics-verification/src/property_testing.rs:            details: "Placeholder - implement full test".to_string(),
+crates/hyperphysics-verification/src/property_testing.rs:            details: "Placeholder - implement full test".to_string(),
+crates/hyperphysics-verification/src/property_testing.rs:            details: "Placeholder - implement full test".to_string(),
+crates/hyperphysics-verification/src/property_testing.rs:            details: "Placeholder - implement full test".to_string(),
+crates/hyperphysics-verification/src/property_testing.rs:            details: "Placeholder - implement full test".to_string(),
+crates/hyperphysics-verification/src/property_testing.rs:            details: "Placeholder - implement full test".to_string(),
+crates/hyperphysics-core/src/gpu/kernels.rs:    // TODO: Implement tree reduction in shared memory
+crates/hyperphysics-core/src/gpu/kernels.rs:    // This is a placeholder for the reduction kernel
+crates/hyperphysics-dilithium/src/keypair.rs:    /// TODO: Will be used for advanced polynomial operations
+crates/hyperphysics-dilithium/src/zeroize_polynomial.rs:/// TODO: Will be used for secure polynomial operations
+crates/hyperphysics-dilithium/src/zeroize_polyvec.rs:/// TODO: Will be used for secure polynomial vector operations
+crates/hyperphysics-dilithium/src/verification.rs:    /// TODO: Will be used for performance optimization via caching
+crates/hyperphysics-dilithium/src/verification.rs:            node_id: 0,  // TODO: Get actual node ID
+crates/hyperphysics-dilithium/src/zeroize_wrappers.rs:/// TODO: Will be used for secure key management in hybrid schemes
+crates/hyperphysics-dilithium/src/zeroize_wrappers.rs:/// TODO: Will be used for secure key management in hybrid schemes
+crates/hyperphysics-market/src/arbitrage.rs:    /// TODO: Implement latency checks in opportunity detection
+crates/hyperphysics-dilithium/src/crypto_lattice.rs:        // TODO: Implement proper {7,3} hyperbolic tessellation
+crates/hyperphysics-market/src/topology/mapper.rs:    // TODO: Add fields for topology configuration
+crates/hyperphysics-market/src/topology/mapper.rs:    /// TODO: Implement mapping that:
+crates/hyperphysics-market/src/topology/mapper.rs:        // Placeholder: will use hyperphysics-geometry for actual topology
+crates/hyperphysics-market/src/topology/mapper.rs:    /// TODO: Use Vietoris-Rips complex to analyze topological features
+crates/hyperphysics-core/tests/integration_consciousness_pipeline.rs:    let signing_key = vec![42u8; 32]; // Placeholder key
+crates/hyperphysics-core/src/crypto/signed_state.rs:    /// Dilithium signature (placeholder - will use actual signature when integrated)
+crates/hyperphysics-core/src/crypto/signed_state.rs:    /// Signer public key (placeholder - will use actual key when integrated)
+crates/hyperphysics-core/src/crypto/signed_state.rs:    /// * `signing_key` - Private key for signing (placeholder)
+crates/hyperphysics-core/src/crypto/signed_state.rs:        // Sign the hash (placeholder - will use Dilithium when integrated)
+crates/hyperphysics-core/src/crypto/signed_state.rs:        let signature = Self::sign_placeholder(&state_hash, signing_key);
+crates/hyperphysics-core/src/crypto/signed_state.rs:        // Extract public key from signing key (placeholder)
+crates/hyperphysics-core/src/crypto/signed_state.rs:        let public_key = Self::derive_public_key_placeholder(signing_key);
+crates/hyperphysics-core/src/crypto/signed_state.rs:        // Verify signature (placeholder - will use Dilithium when integrated)
+crates/hyperphysics-core/src/crypto/signed_state.rs:        let signature_valid = Self::verify_signature_placeholder(
+crates/hyperphysics-core/src/crypto/signed_state.rs:    /// Placeholder signing (will use Dilithium when NTT integration is complete)
+crates/hyperphysics-core/src/crypto/signed_state.rs:    fn sign_placeholder(hash: &[u8; 64], signing_key: &[u8]) -> Vec<u8> {
+crates/hyperphysics-core/src/crypto/signed_state.rs:        // Placeholder: Simple signature using key material
+crates/hyperphysics-core/src/crypto/signed_state.rs:    /// Placeholder signature verification
+crates/hyperphysics-core/src/crypto/signed_state.rs:    fn verify_signature_placeholder(hash: &[u8; 64], signature: &[u8], _public_key: &[u8]) -> bool {
+crates/hyperphysics-core/src/crypto/signed_state.rs:        // Placeholder verification
+crates/hyperphysics-core/src/crypto/signed_state.rs:    /// Placeholder public key derivation
+crates/hyperphysics-core/src/crypto/signed_state.rs:    fn derive_public_key_placeholder(signing_key: &[u8]) -> Vec<u8> {
+crates/hyperphysics-core/src/crypto/signed_state.rs:        // Placeholder: In production, derive from Dilithium key pair
+crates/hyperphysics-core/src/crypto/signed_state.rs:        vec![42u8; 64] // Placeholder key
+crates/hyperphysics-syntergic/src/green_function.rs:        // This is a placeholder for the full implementation
+crates/hyperphysics-dilithium/src/lattice/mod.rs:// Placeholder modules for future implementation
+crates/hyperphysics-dilithium/src/lattice/module_lwe.rs:    /// TODO: Will be used for parameter selection and optimization
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:/// TODO: Will be used for advanced NTT operations
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:/// TODO: Will be used for Montgomery arithmetic optimization
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:/// TODO: Will be used for optimized modular reduction
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:    /// TODO: Will be used for dynamic polynomial operations
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:    /// TODO: Will be used for modular arithmetic
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:/// TODO: Will be used for bit-reversed NTT implementation
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:/// TODO: Will be used for twiddle factor computation
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:/// TODO: Will be used for advanced cryptographic operations
+crates/hyperphysics-dilithium/src/lattice/ntt.rs:    // TODO: Generate these properly or use include_bytes!
+
+75 matches
+75 matched lines
+24 files contained matches
+152 files searched
+8658 bytes printed
+1320497 bytes searched
+0.004866 seconds spent searching
+0.009773 seconds

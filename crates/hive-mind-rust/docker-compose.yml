@@ -1,0 +1,167 @@
+version: '3.8'
+
+services:
+  hive-mind-primary:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hive-mind-primary
+    environment:
+      - RUST_LOG=info
+      - HIVE_MIND_CONFIG=/app/config/production.toml
+      - HIVE_MIND_ROLE=primary
+    ports:
+      - "8080:8080"   # P2P port
+      - "8090:8090"   # API port
+      - "9090:9090"   # Metrics port
+      - "8091:8091"   # Health dashboard
+    volumes:
+      - ./config:/app/config:ro
+      - hive-mind-data:/app/data
+      - hive-mind-logs:/app/logs
+    networks:
+      - hive-mind-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  hive-mind-secondary-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hive-mind-secondary-1
+    environment:
+      - RUST_LOG=info
+      - HIVE_MIND_CONFIG=/app/config/production.toml
+      - HIVE_MIND_ROLE=secondary
+      - HIVE_MIND_BOOTSTRAP_PEER=hive-mind-primary:8080
+    ports:
+      - "8081:8080"
+      - "8092:8090"
+      - "9091:9090"
+    volumes:
+      - ./config:/app/config:ro
+      - hive-mind-data-2:/app/data
+      - hive-mind-logs:/app/logs
+    networks:
+      - hive-mind-network
+    depends_on:
+      - hive-mind-primary
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  hive-mind-secondary-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hive-mind-secondary-2
+    environment:
+      - RUST_LOG=info
+      - HIVE_MIND_CONFIG=/app/config/production.toml
+      - HIVE_MIND_ROLE=secondary
+      - HIVE_MIND_BOOTSTRAP_PEER=hive-mind-primary:8080
+    ports:
+      - "8082:8080"
+      - "8093:8090"
+      - "9092:9090"
+    volumes:
+      - ./config:/app/config:ro
+      - hive-mind-data-3:/app/data
+      - hive-mind-logs:/app/logs
+    networks:
+      - hive-mind-network
+    depends_on:
+      - hive-mind-primary
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hive-mind-prometheus
+    ports:
+      - "9000:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - hive-mind-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=168h'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hive-mind-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - hive-mind-network
+    depends_on:
+      - prometheus
+
+  redis:
+    image: redis:7-alpine
+    container_name: hive-mind-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - hive-mind-network
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+
+  nginx:
+    image: nginx:alpine
+    container_name: hive-mind-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - hive-mind-network
+    depends_on:
+      - hive-mind-primary
+      - hive-mind-secondary-1
+      - hive-mind-secondary-2
+
+volumes:
+  hive-mind-data:
+  hive-mind-data-2:
+  hive-mind-data-3:
+  hive-mind-logs:
+  prometheus-data:
+  grafana-data:
+  redis-data:
+
+networks:
+  hive-mind-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

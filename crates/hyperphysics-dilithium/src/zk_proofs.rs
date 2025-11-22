@@ -330,7 +330,7 @@ mod serde_proof {
 }
 
 mod serde_commitment {
-    use super::*;
+    
     use serde::{Deserializer, Serializer};
     
     pub fn serialize<S>(

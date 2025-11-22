@@ -1,0 +1,290 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Hive Mind Rust - Financial Trading System",
+    "tags": ["hive-mind", "trading", "financial", "production"],
+    "timezone": "UTC",
+    "refresh": "5s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Health Overview",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "up{job=~\"hive-mind.*\"}",
+            "legendFormat": "{{instance}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Trading Latency (99th percentile)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.99, rate(trading_operation_duration_seconds_bucket[1m]))",
+            "legendFormat": "P99 Latency"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 0.0005},
+                {"color": "red", "value": 0.001}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Trading Operations per Second",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(trading_operations_total[1m])",
+            "legendFormat": "Ops/sec"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Consensus Success Rate",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(consensus_operations_success_total[5m]) / rate(consensus_operations_total[5m]) * 100",
+            "legendFormat": "Success Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 99}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Trading Latency Distribution",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(trading_operation_duration_seconds_bucket[1m]))",
+            "legendFormat": "P50"
+          },
+          {
+            "expr": "histogram_quantile(0.90, rate(trading_operation_duration_seconds_bucket[1m]))",
+            "legendFormat": "P90"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(trading_operation_duration_seconds_bucket[1m]))",
+            "legendFormat": "P99"
+          },
+          {
+            "expr": "histogram_quantile(0.999, rate(trading_operation_duration_seconds_bucket[1m]))",
+            "legendFormat": "P99.9"
+          }
+        ],
+        "yAxes": [
+          {
+            "unit": "s",
+            "max": 0.002,
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "System Resource Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "targets": [
+          {
+            "expr": "rate(process_cpu_seconds_total[1m]) * 100",
+            "legendFormat": "CPU Usage %"
+          },
+          {
+            "expr": "process_resident_memory_bytes / 1024 / 1024",
+            "legendFormat": "Memory MB"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Neural Network Performance",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+        "targets": [
+          {
+            "expr": "rate(neural_inference_total[1m])",
+            "legendFormat": "Inferences/sec"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(neural_inference_duration_seconds_bucket[1m]))",
+            "legendFormat": "P95 Latency"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "P&L and Trading Metrics",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+        "targets": [
+          {
+            "expr": "increase(total_pnl_usd[1h])",
+            "legendFormat": "Hourly P&L USD"
+          },
+          {
+            "expr": "rate(successful_trades_total[5m])",
+            "legendFormat": "Successful Trades/sec"
+          },
+          {
+            "expr": "rate(failed_trades_total[5m])",
+            "legendFormat": "Failed Trades/sec"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Network and Consensus",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+        "targets": [
+          {
+            "expr": "hive_mind_peer_count",
+            "legendFormat": "Connected Peers"
+          },
+          {
+            "expr": "rate(consensus_operations_total[1m])",
+            "legendFormat": "Consensus Ops/sec"
+          },
+          {
+            "expr": "rate(network_messages_received_total[1m])",
+            "legendFormat": "Messages Received/sec"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Database Performance",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+        "targets": [
+          {
+            "expr": "database_connections_active",
+            "legendFormat": "Active Connections"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(database_query_duration_seconds_bucket[1m]))",
+            "legendFormat": "P95 Query Time"
+          },
+          {
+            "expr": "rate(database_queries_total[1m])",
+            "legendFormat": "Queries/sec"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Error Rates and Anomalies",
+        "type": "graph",
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 28},
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[1m])",
+            "legendFormat": "5xx Errors/sec"
+          },
+          {
+            "expr": "rate(trading_errors_total[1m])",
+            "legendFormat": "Trading Errors/sec"
+          },
+          {
+            "expr": "rate(consensus_failures_total[1m])",
+            "legendFormat": "Consensus Failures/sec"
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [0.1],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": ["A", "1m", "now"]
+              },
+              "reducer": {
+                "params": [],
+                "type": "avg"
+              },
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "noDataState": "no_data",
+          "frequency": "10s",
+          "handler": 1,
+          "name": "High Error Rate Alert",
+          "message": "Error rate is above acceptable threshold"
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "instance",
+          "type": "query",
+          "query": "label_values(up{job=~\"hive-mind.*\"}, instance)",
+          "refresh": 1,
+          "includeAll": true,
+          "allValue": ".*"
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": "Prometheus",
+          "expr": "changes(process_start_time_seconds[1m]) > 0",
+          "titleFormat": "Deployment",
+          "textFormat": "Service restarted"
+        }
+      ]
+    }
+  }
+}

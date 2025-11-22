@@ -3,6 +3,8 @@ use pqcrypto_kyber::kyber768::{PublicKey as KyberPublicKey, SecretKey as KyberSe
 use pqcrypto_traits::kem::{PublicKey as _, SecretKey as _};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
+/// TODO: Will be used for secure key management in hybrid schemes
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct PublicKey(pub KyberPublicKey);
 
@@ -15,6 +17,8 @@ impl Zeroize for PublicKey {
 
 impl ZeroizeOnDrop for PublicKey {}
 
+/// TODO: Will be used for secure key management in hybrid schemes
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct SecretKey(pub KyberSecretKey);
 

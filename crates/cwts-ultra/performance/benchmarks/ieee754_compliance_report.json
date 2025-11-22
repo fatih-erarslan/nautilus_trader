@@ -1,0 +1,47 @@
+{
+  "summary": {
+    "total_tests": 48,
+    "compliant_tests": 45,
+    "compliance_rate": 0.9375,
+    "stability_rate": 0.9791666666666666,
+    "test_timestamp": 1757096809.745156
+  },
+  "error_statistics": {
+    "max_absolute_error": 1.2246467991473532e-16,
+    "mean_absolute_error": 6.270623879459971e-18,
+    "max_relative_error": 1.2246467991473532e-16,
+    "mean_relative_error": 6.270623879459971e-18,
+    "max_ulp_error": 4368955796522032135,
+    "mean_ulp_error": 1.8581719134929136e+17
+  },
+  "stability_analysis": {
+    "stable_operations": 47,
+    "unstable_operations": 0,
+    "catastrophic_operations": 1
+  },
+  "problematic_operations": [
+    {
+      "operation": "/",
+      "inputs": [
+        1.0,
+        0.0
+      ],
+      "stability": "catastrophic",
+      "compliance": false,
+      "relative_error": Infinity,
+      "recommendations": [
+        "Critical: Use higher precision arithmetic (decimal or arbitrary precision)",
+        "Consider algorithm reformulation to avoid catastrophic cancellation",
+        "Large ULP error detected - verify algorithm implementation",
+        "Check for division by near-zero values"
+      ]
+    }
+  ],
+  "recommendations": [
+    "IEEE 754 compliance rate below 95% - review arithmetic implementations",
+    "Implement runtime checks for extreme values in production",
+    "Consider using decimal arithmetic for critical financial calculations",
+    "Validate algorithms with multiple precision libraries",
+    "Monitor for precision loss in long computation chains"
+  ]
+}

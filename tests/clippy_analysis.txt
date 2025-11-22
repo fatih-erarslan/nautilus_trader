@@ -1,0 +1,44 @@
+   Compiling clang-sys v1.8.1
+   Compiling prost-build v0.12.6
+    Checking nalgebra v0.32.6
+   Compiling fhe-math v0.1.0-beta.8
+   Compiling fhe v0.1.0-beta.8
+   Compiling bindgen v0.66.1
+    Checking hyperphysics-homomorphic v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-homomorphic)
+error: lint group `all` has the same priority (0) as a lint
+  --> Cargo.toml:40:1
+   |
+40 | all = "warn"
+   | ^^^   ------ has an implicit priority of 0
+...
+49 | too_many_lines = "allow"
+   | -------------- has the same priority as this lint
+   |
+   = note: the order of the lints in the table is ignored by Cargo
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#lint_groups_priority
+   = note: `#[deny(clippy::lint_groups_priority)]` on by default
+help: to have lints override the group set `all` to a lower priority
+   |
+40 - all = "warn"
+40 + all = { level = "warn", priority = -1 }
+   |
+
+error: lint group `pedantic` has the same priority (0) as a lint
+  --> Cargo.toml:41:1
+   |
+41 | pedantic = "warn"
+   | ^^^^^^^^   ------ has an implicit priority of 0
+...
+49 | too_many_lines = "allow"
+   | -------------- has the same priority as this lint
+   |
+   = note: the order of the lints in the table is ignored by Cargo
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#lint_groups_priority
+help: to have lints override the group set `pedantic` to a lower priority
+   |
+41 - pedantic = "warn"
+41 + pedantic = { level = "warn", priority = -1 }
+   |
+
+error: could not compile `hyperphysics-homomorphic` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

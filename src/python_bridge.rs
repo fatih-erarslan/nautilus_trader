@@ -30,10 +30,12 @@ use tokio::runtime::Runtime;
 
 // Re-export finance types
 use hyperphysics_finance::{
-    FinanceSystem, FinanceConfig, FinanceState,
-    orderbook::{OrderBook, OrderBookConfig, OrderBookState},
-    risk::{RiskEngine, RiskConfig, RiskMetrics, Greeks},
-    L2Snapshot, L2Level, Price, Quantity,
+    FinanceSystem, FinanceConfig,
+    OrderBookState, OrderBookConfig,
+    RiskEngine, RiskConfig, RiskMetrics, Greeks,
+    L2Snapshot, Price, Quantity, OptionParams,
+    calculate_black_scholes,
+    VarModel,
 };
 
 /// Python wrapper for HyperPhysics Financial System
@@ -50,20 +52,16 @@ impl PyFinanceSystem {
     /// Args:
     ///     use_gpu (bool): Enable GPU acceleration (default: True)
     ///     device (str): Device to use ("cuda:0", "rocm:0", or "cpu")
-    ///     verify (bool): Enable formal verification (default: True)
-    ///     max_levels (int): Maximum order book levels per side (default: 100)
     ///
     /// Returns:
     ///     HyperPhysicsSystem: Initialized system
     #[new]
-    #[pyo3(signature = (use_gpu=true, device="rocm:0", verify=true, max_levels=100))]
+    #[pyo3(signature = (use_gpu=true, device="rocm:0"))]
     fn new(
         use_gpu: bool,
         device: &str,
-        verify: bool,
-        max_levels: usize,
     ) -> PyResult<Self> {
-        // Set PyTorch device
+        // Set PyTorch device (for future GPU integration)
         let _torch_device = if use_gpu {
             if device.starts_with("rocm") {
                 tch::Device::Cuda(0)  // PyTorch uses CUDA API for ROCm
@@ -79,13 +77,8 @@ impl PyFinanceSystem {
             tch::Device::Cpu
         };
 
-        // Create finance configuration
-        let mut config = FinanceConfig::default();
-        config.use_gpu = use_gpu;
-        config.verify = verify;
-        config.orderbook.max_levels = max_levels;
-        config.orderbook.use_gpu = use_gpu;
-        config.risk.use_gpu = use_gpu;
+        // Create finance configuration (uses defaults)
+        let config = FinanceConfig::default();
 
         // Create tokio runtime for async operations
         let runtime = Runtime::new()
@@ -94,11 +87,7 @@ impl PyFinanceSystem {
             ))?;
 
         // Initialize finance system
-        let system = runtime.block_on(async {
-            FinanceSystem::new(config)
-        }).map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-            format!("Failed to initialize finance system: {}", e)
-        ))?;
+        let system = FinanceSystem::new(config);
 
         Ok(Self {
             system: Arc::new(system),
@@ -126,16 +115,12 @@ impl PyFinanceSystem {
         // Convert to L2Snapshot
         let snapshot = self.create_snapshot(bids, asks, timestamp)?;
 
-        // This would update the system in real implementation
-        // For now, return mock state
-        let state = OrderBookState {
-            best_bid: snapshot.bids.first().map(|l| l.price),
-            best_ask: snapshot.asks.first().map(|l| l.price),
-            mid_price: None,
-            spread: None,
-            total_bid_quantity: snapshot.bids.iter().map(|l| l.quantity.units()).sum(),
-            total_ask_quantity: snapshot.asks.iter().map(|l| l.quantity.units()).sum(),
-        };
+        // Get mutable reference to system (requires Arc::get_mut or interior mutability)
+        // For now, create a new state from snapshot directly
+        let state = OrderBookState::from_snapshot(snapshot)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                format!("Failed to create order book state: {:?}", e)
+            ))?;
 
         // Convert to Python dict
         self.orderbook_state_to_dict(py, &state)
@@ -156,22 +141,19 @@ impl PyFinanceSystem {
         returns: PyReadonlyArray1<f64>,
         confidence: f64,
     ) -> PyResult<PyObject> {
+        use ndarray::Array1;
+
         let returns_slice = returns.as_slice()?;
 
-        // Mock risk metrics for now
-        let metrics = RiskMetrics {
-            var_95: 0.0,
-            var_99: 0.0,
-            expected_shortfall: 0.0,
-            volatility: returns_slice.iter()
-                .map(|&r| r * r)
-                .sum::<f64>()
-                .sqrt() / (returns_slice.len() as f64).sqrt(),
-            greeks: Greeks::default(),
-            max_drawdown: 0.0,
-            sharpe_ratio: 0.0,
-            beta: 0.0,
-        };
+        // Convert to ndarray for RiskMetrics calculation
+        let returns_array = Array1::from_vec(returns_slice.to_vec());
+
+        // Calculate real risk metrics using peer-reviewed implementation
+        // Default periods_per_year = 252 (daily data)
+        let metrics = RiskMetrics::from_returns(returns_array.view(), 252.0)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                format!("Failed to calculate risk metrics: {:?}", e)
+            ))?;
 
         self.risk_metrics_to_dict(py, &metrics)
     }
@@ -196,14 +178,20 @@ impl PyFinanceSystem {
         time_to_expiry: f64,
         risk_free_rate: f64,
     ) -> PyResult<PyObject> {
-        // Mock Greeks calculation
-        let greeks = Greeks {
-            delta: 0.5,
-            gamma: 0.01,
-            vega: 0.2,
-            theta: -0.05,
-            rho: 0.1,
+        // Create option parameters using Black-Scholes model
+        let params = OptionParams {
+            spot,
+            strike,
+            rate: risk_free_rate,
+            volatility,
+            time_to_maturity: time_to_expiry,
         };
+
+        // Calculate real Black-Scholes Greeks
+        let (_call_price, greeks) = calculate_black_scholes(&params)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                format!("Failed to calculate Greeks: {:?}", e)
+            ))?;
 
         self.greeks_to_dict(py, &greeks)
     }
@@ -243,33 +231,52 @@ impl PyFinanceSystem {
         asks: Vec<(f64, f64)>,
         timestamp: Option<f64>,
     ) -> PyResult<L2Snapshot> {
-        let tick_size = 0.01;
-
-        let bid_levels: Vec<L2Level> = bids.iter()
-            .map(|(price, qty)| L2Level {
-                price: Price::from_decimal(*price, tick_size),
-                quantity: Quantity::from_units((*qty * 1e8) as i64),
+        // Convert to Price and Quantity types
+        let bid_levels: Result<Vec<_>, _> = bids.iter()
+            .map(|(price, qty)| {
+                Ok((
+                    Price::new(*price).map_err(|e|
+                        PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                            format!("Invalid bid price: {:?}", e)
+                        ))?,
+                    Quantity::new(*qty).map_err(|e|
+                        PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                            format!("Invalid bid quantity: {:?}", e)
+                        ))?
+                ))
             })
             .collect();
+        let bid_levels = bid_levels?;
 
-        let ask_levels: Vec<L2Level> = asks.iter()
-            .map(|(price, qty)| L2Level {
-                price: Price::from_decimal(*price, tick_size),
-                quantity: Quantity::from_units((*qty * 1e8) as i64),
+        let ask_levels: Result<Vec<_>, _> = asks.iter()
+            .map(|(price, qty)| {
+                Ok((
+                    Price::new(*price).map_err(|e|
+                        PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                            format!("Invalid ask price: {:?}", e)
+                        ))?,
+                    Quantity::new(*qty).map_err(|e|
+                        PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                            format!("Invalid ask quantity: {:?}", e)
+                        ))?
+                ))
             })
             .collect();
+        let ask_levels = ask_levels?;
 
-        let timestamp = timestamp
-            .map(|ts| {
-                chrono::DateTime::from_timestamp(ts as i64, 0)
-                    .unwrap_or_else(chrono::Utc::now)
-            })
-            .unwrap_or_else(chrono::Utc::now);
+        // Use current time in microseconds
+        let timestamp_us = timestamp
+            .map(|ts| (ts * 1_000_000.0) as u64)
+            .unwrap_or_else(|| {
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_micros() as u64
+            });
 
         Ok(L2Snapshot {
             symbol: "BTC/USD".to_string(),
-            exchange: "binance".to_string(),
-            timestamp,
+            timestamp_us,
             bids: bid_levels,
             asks: ask_levels,
         })
@@ -282,22 +289,34 @@ impl PyFinanceSystem {
     ) -> PyResult<PyObject> {
         let dict = PyDict::new(py);
 
-        if let Some(best_bid) = state.best_bid {
-            dict.set_item("best_bid", best_bid.to_decimal(0.01))?;
+        // Get analytics from state
+        let analytics = &state.analytics;
+
+        // Get best bid/ask from snapshot
+        let best_bid = state.snapshot.best_bid().map(|p| p.value());
+        let best_ask = state.snapshot.best_ask().map(|p| p.value());
+
+        if let Some(bid) = best_bid {
+            dict.set_item("best_bid", bid)?;
         } else {
             dict.set_item("best_bid", py.None())?;
         }
 
-        if let Some(best_ask) = state.best_ask {
-            dict.set_item("best_ask", best_ask.to_decimal(0.01))?;
+        if let Some(ask) = best_ask {
+            dict.set_item("best_ask", ask)?;
         } else {
             dict.set_item("best_ask", py.None())?;
         }
 
-        dict.set_item("mid_price", state.mid_price.unwrap_or(0.0))?;
-        dict.set_item("spread", state.spread.unwrap_or(0.0))?;
-        dict.set_item("total_bid_qty", state.total_bid_quantity)?;
-        dict.set_item("total_ask_qty", state.total_ask_quantity)?;
+        dict.set_item("mid_price", analytics.mid_price)?;
+        dict.set_item("spread", analytics.spread)?;
+        dict.set_item("relative_spread", analytics.relative_spread)?;
+        dict.set_item("vwmp", analytics.vwmp)?;
+        dict.set_item("order_imbalance", analytics.order_imbalance)?;
+        dict.set_item("total_bid_volume", analytics.total_bid_volume)?;
+        dict.set_item("total_ask_volume", analytics.total_ask_volume)?;
+        dict.set_item("bid_depth", analytics.bid_depth)?;
+        dict.set_item("ask_depth", analytics.ask_depth)?;
 
         Ok(dict.into())
     }

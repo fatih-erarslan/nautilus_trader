@@ -1,0 +1,51 @@
+[organisms]
+enabled = ["cuckoo", "wasp", "cordyceps", "mycelial_network", "octopus", "anglerfish", "komodo_dragon", "tardigrade", "electric_eel", "platypus"]
+
+[organisms.cuckoo]
+aggressiveness = 0.7
+deception_level = 0.8
+nest_detection_threshold = 0.6
+
+[organisms.wasp]
+paralysis_strength = 0.85
+precision = 0.9
+stealth_mode = true
+
+[organisms.cordyceps]
+neural_control_strength = 0.75
+host_detection_accuracy = 0.88
+
+[organisms.mycelial_network]
+network_expansion_rate = 0.6
+information_sharing = true
+correlation_threshold = 0.7
+
+[organisms.octopus]
+camouflage_effectiveness = 0.9
+adaptation_speed = 0.8
+chromatophore_patterns = ["aggressive", "defensive", "neutral"]
+
+[organisms.anglerfish]
+lure_effectiveness = 0.85
+deep_market_penetration = 0.7
+bioluminescence_intensity = 0.9
+
+[organisms.komodo_dragon]
+persistence_level = 0.95
+venom_potency = 0.8
+tracking_accuracy = 0.9
+
+[organisms.tardigrade]
+survival_threshold = 0.99
+cryptobiosis_trigger = 0.3
+revival_conditions = ["volume_recovery", "volatility_decrease"]
+
+[organisms.electric_eel]
+shock_intensity = 0.8
+electrical_field_radius = 50
+discharge_frequency = 0.7
+
+[organisms.platypus]
+electroreception_sensitivity = 0.95
+signal_processing_accuracy = 0.88
+anomaly_detection_threshold = 0.6

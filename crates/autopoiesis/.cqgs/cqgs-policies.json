@@ -1,0 +1,128 @@
+{
+  "version": "2.0.0",
+  "project": "autopoiesis-financial-system",
+  "policies": {
+    "SYNTHETIC_DATA_PROHIBITION": {
+      "id": "SDP-001",
+      "name": "Absolute Synthetic Data Prohibition",
+      "description": "Zero tolerance policy for synthetic data generation in financial systems",
+      "severity": "CRITICAL",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "no-fastrand-usage",
+          "pattern": "fastrand::",
+          "message": "CRITICAL: fastrand usage detected - synthetic data generation prohibited",
+          "action": "BLOCK"
+        },
+        {
+          "name": "no-random-multipliers",
+          "pattern": "\\*\\s*\\(.*random.*\\)",
+          "message": "CRITICAL: Random multipliers detected - indicates synthetic data",
+          "action": "BLOCK"
+        },
+        {
+          "name": "no-fake-market-data",
+          "pattern": "(fake|synthetic|mock|dummy).*market.*data",
+          "message": "CRITICAL: Fake market data patterns detected",
+          "action": "BLOCK"
+        }
+      ]
+    },
+    "REAL_DATA_REQUIREMENT": {
+      "id": "RDR-001", 
+      "name": "Real Data Integration Requirement",
+      "description": "All financial data must come from authenticated API sources",
+      "severity": "HIGH",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "require-api-authentication",
+          "files": ["**/market_data/**/*.rs", "**/financial/**/*.rs"],
+          "required_patterns": ["API_KEY", "authenticate", "env::var"],
+          "message": "HIGH: Real API authentication required for financial data",
+          "action": "WARN"
+        },
+        {
+          "name": "require-data-validation",
+          "files": ["**/market_data/**/*.rs"],
+          "required_patterns": ["validate", "verify", "check.*integrity"],
+          "message": "HIGH: Data validation required for market data",
+          "action": "WARN"
+        }
+      ]
+    },
+    "SECURITY_COMPLIANCE": {
+      "id": "SEC-001",
+      "name": "Financial Security Compliance",
+      "description": "Security requirements for financial trading systems",
+      "severity": "CRITICAL",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "no-hardcoded-secrets",
+          "pattern": "(password|api_key|secret|token)\\s*=\\s*\"[^\"]+\"",
+          "message": "CRITICAL: Hardcoded credentials detected - security violation",
+          "action": "BLOCK"
+        },
+        {
+          "name": "no-default-credentials",
+          "pattern": "(admin|password|123|test).*password",
+          "message": "CRITICAL: Default credentials detected",
+          "action": "BLOCK"
+        }
+      ]
+    },
+    "CODE_QUALITY_STANDARDS": {
+      "id": "CQS-001",
+      "name": "Financial Code Quality Standards", 
+      "description": "Quality standards specific to financial trading systems",
+      "severity": "MEDIUM",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "no-todo-in-production",
+          "pattern": "TODO.*production|FIXME.*production",
+          "files": ["src/**/*.rs"],
+          "exclude_files": ["**/tests/**", "**/examples/**"],
+          "message": "MEDIUM: TODO/FIXME found in production code",
+          "action": "WARN"
+        },
+        {
+          "name": "require-error-handling",
+          "files": ["**/financial/**/*.rs"],
+          "required_patterns": ["Result<", "Error", "anyhow"],
+          "message": "MEDIUM: Proper error handling required in financial modules",
+          "action": "WARN"
+        }
+      ]
+    }
+  },
+  "enforcement": {
+    "mode": "strict",
+    "blockOnCritical": true,
+    "blockOnHigh": false,
+    "warningsAsErrors": false,
+    "maxWarnings": 10
+  },
+  "exceptions": {
+    "temporaryExemptions": [],
+    "permanentExemptions": [
+      {
+        "rule": "no-fastrand-usage",
+        "files": ["**/FASTRAND_INVESTIGATION_REPORT.md"],
+        "reason": "Documentation of removed fastrand usage"
+      }
+    ]
+  },
+  "metrics": {
+    "trackCompliance": true,
+    "generateScores": true,
+    "trendAnalysis": true,
+    "benchmarkTargets": {
+      "syntheticDataScore": 0.0,
+      "securityScore": 1.0,
+      "qualityScore": 0.85
+    }
+  }
+}

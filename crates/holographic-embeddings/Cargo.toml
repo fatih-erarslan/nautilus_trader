@@ -1,0 +1,18 @@
+[package]
+name = "holographic-embeddings"
+version = "0.1.0"
+edition = "2021"
+description = "Hyperbolic embeddings for hierarchical market structure and crash prediction"
+
+[dependencies]
+nalgebra = { workspace = true }
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
+dashmap = { workspace = true }
+rand = { workspace = true }
+rayon = { workspace = true }
+
+[dev-dependencies]
+approx = "0.5"

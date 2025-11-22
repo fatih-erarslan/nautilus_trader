@@ -1,0 +1,249 @@
+{
+  "crates": {
+    "autopoiesis-core": {
+      "modules": [
+        "core::dissipative",
+        "core::mind",
+        "core::sync",
+        "core::syntergy",
+        "core::web",
+        "core::autopoiesis",
+        "core::state",
+        "core::boundary",
+        "core::process",
+        "core::environment",
+        "utils::config",
+        "utils::metrics",
+        "utils::logging",
+        "utils::math",
+        "utils::cpu_features",
+        "ml::nhits::core::model"
+      ],
+      "line_count": 6442,
+      "dependencies": [
+        "external_only"
+      ]
+    },
+    "autopoiesis-ml": {
+      "modules": [
+        "ml::nhits::model",
+        "ml::nhits::forecasting::example",
+        "ml::nhits::consciousness::syntergic_forecasting",
+        "ml::nhits::consciousness::consciousness_attention",
+        "ml::nhits::consciousness::adaptive_learning",
+        "ml::nhits::consciousness::quantum_forecasting",
+        "ml::nhits::consciousness::market_consciousness",
+        "ml::nhits::consciousness::temporal_consciousness",
+        "ml::nhits::consciousness::field_synchronization",
+        "ml::nhits::consciousness::syntergic_ensemble",
+        "ml::nhits::consciousness::consciousness_anomaly",
+        "ml::nhits::api::websocket",
+        "ml::nhits::api::models",
+        "ml::nhits::api::handlers",
+        "ml::nhits::api::monitoring",
+        "ml::nhits::api::client",
+        "ml::nhits::api::middleware",
+        "ml::nhits::api::server",
+        "ml::nhits::api::streaming",
+        "ml::nhits::tests::regression_tests",
+        "ml::nhits::tests::validation",
+        "ml::nhits::tests::real_test_data",
+        "ml::nhits::tests::unit_tests",
+        "ml::nhits::tests::load_tests",
+        "ml::nhits::tests::integration_tests",
+        "ml::nhits::tests::benchmarks",
+        "ml::nhits::tests::property_tests",
+        "ml::nhits::financial::portfolio_optimization",
+        "ml::nhits::financial::market_regime",
+        "ml::nhits::financial::algorithmic_trading",
+        "ml::nhits::financial::crypto_forecasting",
+        "ml::nhits::financial::real_market_data",
+        "ml::nhits::financial::derivatives_pricing",
+        "ml::nhits::financial::volatility_modeling",
+        "ml::nhits::financial::risk_metrics",
+        "ml::nhits::financial::price_prediction",
+        "ml::nhits::optimization::gpu_acceleration",
+        "ml::nhits::optimization::parallel_processing",
+        "ml::nhits::optimization::memory_optimization",
+        "ml::nhits::optimization::cache_optimization",
+        "ml::nhits::optimization::missing_types",
+        "ml::nhits::optimization::auto_tuning",
+        "ml::nhits::optimization::vectorization",
+        "ml::nhits::optimization::profiling",
+        "ml::nhits::optimization::benchmarking",
+        "ml::nhits::optimization::distributed_computing",
+        "ml::nhits::api::examples::basic_client",
+        "ml::nhits::api::examples::websocket_client",
+        "ml::nhits::api::examples::streaming_example"
+      ],
+      "line_count": 35488,
+      "dependencies": [
+        "autopoiesis-core"
+      ]
+    },
+    "autopoiesis-finance": {
+      "modules": [
+        "domains::finance::market_mind",
+        "domains::finance::dissipative_trading",
+        "domains::finance::sync_traders",
+        "domains::finance::syntergic_market"
+      ],
+      "line_count": 7593,
+      "dependencies": [
+        "autopoiesis-core",
+        "autopoiesis-ml"
+      ]
+    },
+    "autopoiesis-consciousness": {
+      "modules": [
+        "consciousness::neuronal_field",
+        "consciousness::syntergic_unity",
+        "consciousness::lattice",
+        "consciousness::reality_interface",
+        "consciousness::core",
+        "consciousness::field_coherence"
+      ],
+      "line_count": 2908,
+      "dependencies": [
+        "autopoiesis-core"
+      ]
+    }
+  },
+  "circular_dependencies": [],
+  "metrics": {
+    "total_modules": 117,
+    "total_lines": 74804,
+    "total_size_bytes": 2550574,
+    "circular_dependencies": 0,
+    "largest_modules": [
+      [
+        "domains::finance::syntergic_market",
+        3007
+      ],
+      [
+        "domains::finance::sync_traders",
+        1773
+      ],
+      [
+        "ml::nhits::optimization::profiling",
+        1695
+      ],
+      [
+        "ml::nhits::optimization::auto_tuning",
+        1598
+      ],
+      [
+        "domains::finance::dissipative_trading",
+        1480
+      ],
+      [
+        "ml::nhits::optimization::benchmarking",
+        1454
+      ],
+      [
+        "ml::nhits::optimization::cache_optimization",
+        1406
+      ],
+      [
+        "analysis::statistical",
+        1369
+      ],
+      [
+        "ml::nhits::optimization::distributed_computing",
+        1358
+      ],
+      [
+        "domains::finance::market_mind",
+        1333
+      ]
+    ],
+    "module_types": {
+      "other": 28,
+      "core": 11,
+      "observers": 5,
+      "engines": 4,
+      "utilities": 5,
+      "analysis": 4,
+      "consciousness": 6,
+      "api": 1,
+      "finance": 4,
+      "machine_learning": 49
+    },
+    "dependency_counts": {
+      "crate": 2,
+      "core::dissipative": 1,
+      "core::mind": 1,
+      "core::sync": 1,
+      "core::syntergy": 1,
+      "core::web": 1,
+      "core::autopoiesis": 1,
+      "core::boundary": 1,
+      "core::process": 1,
+      "core::environment": 1,
+      "observers::momentum": 1,
+      "observers::volatility": 1,
+      "observers::volume": 1,
+      "observers::sentiment": 1,
+      "observers::pattern": 1,
+      "engines::market_making": 1,
+      "engines::trend_following": 2,
+      "engines::arbitrage": 1,
+      "engines::autopoietic": 1,
+      "market_data::feed": 2,
+      "market_data::normalizer": 2,
+      "market_data::aggregator": 2,
+      "market_data::storage": 2,
+      "utils::config": 1,
+      "utils::metrics": 1,
+      "utils::logging": 1,
+      "utils::math": 1,
+      "analysis::sentiment": 1,
+      "analysis::statistical": 2,
+      "analysis::technical": 2,
+      "analysis::machine_learning": 2,
+      "execution::router": 2,
+      "execution::optimizer": 2,
+      "execution::monitor": 2,
+      "execution::executor": 2,
+      "risk::monitor": 2,
+      "risk::limiter": 2,
+      "risk::allocator": 2,
+      "risk::calculator": 2,
+      "portfolio::analytics": 1,
+      "portfolio::optimizer": 2,
+      "portfolio::rebalancer": 2,
+      "portfolio::manager": 2,
+      "consciousness::neuronal_field": 1,
+      "consciousness::syntergic_unity": 1,
+      "consciousness::lattice": 1,
+      "consciousness::reality_interface": 1,
+      "emergence::detector": 1,
+      "api::nhits_api": 2,
+      "domains::finance::market_mind": 2,
+      "domains::finance::dissipative_trading": 2,
+      "domains::finance::sync_traders": 2,
+      "domains::finance::syntergic_market": 3,
+      "ml::nhits::forecasting::example": 2,
+      "ml::nhits::consciousness::syntergic_forecasting": 1,
+      "ml::nhits::consciousness::consciousness_attention": 1,
+      "ml::nhits::consciousness::adaptive_learning": 1,
+      "ml::nhits::consciousness::quantum_forecasting": 1,
+      "ml::nhits::consciousness::market_consciousness": 1,
+      "ml::nhits::consciousness::temporal_consciousness": 1,
+      "ml::nhits::consciousness::field_synchronization": 1,
+      "ml::nhits::consciousness::syntergic_ensemble": 1,
+      "ml::nhits::consciousness::consciousness_anomaly": 1,
+      "ml::nhits::tests::load_tests": 1,
+      "ml::nhits::tests::integration_tests": 1,
+      "ml::nhits::optimization::gpu_acceleration": 1,
+      "ml::nhits::optimization::parallel_processing": 1,
+      "ml::nhits::optimization::memory_optimization": 1,
+      "ml::nhits::optimization::cache_optimization": 1,
+      "ml::nhits::optimization::auto_tuning": 1,
+      "ml::nhits::optimization::vectorization": 2,
+      "ml::nhits::optimization::profiling": 1,
+      "ml::nhits::optimization::benchmarking": 1,
+      "ml::nhits::optimization::distributed_computing": 1
+    }
+  }
+}

@@ -186,9 +186,9 @@ impl Strategy for DualMovingAverageStrategy {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!("HyperPhysics Backtesting Framework Demo");
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!();
 
     // Create historical data provider with an uptrend
@@ -225,9 +225,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Display results
     println!();
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!("BACKTEST RESULTS");
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!();
 
     println!("Performance Metrics:");
@@ -257,9 +257,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!();
 
     // Display trade log
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!("TRADE LOG");
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!();
 
     for (i, trade) in result.trades.iter().enumerate() {
@@ -282,9 +282,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!();
 
     // Display equity curve sample
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!("EQUITY CURVE (Sample - First 10 points)");
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!();
 
     for (i, (timestamp, equity)) in result.equity_curve.iter().take(10).enumerate() {
@@ -300,9 +300,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     println!();
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
     println!("Backtest Complete!");
-    println!("=".repeat(80));
+    println!("{}", "=".repeat(80));
 
     Ok(())
 }

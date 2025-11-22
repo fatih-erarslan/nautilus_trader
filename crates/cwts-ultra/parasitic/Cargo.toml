@@ -1,0 +1,120 @@
+[package]
+name = "parasitic"
+version = "0.2.0"
+edition = "2021"
+description = "Advanced parasitic trading system with quantum capabilities"
+authors = ["TONYUKUK Team"]
+license = "MIT"
+
+[dependencies]
+# Use workspace dependencies to ensure version consistency
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+async-trait = { workspace = true }
+tokio-tungstenite = { workspace = true }
+tungstenite = { workspace = true }
+bytes = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+rand = { workspace = true }
+rand_distr = { workspace = true }
+crossbeam = { workspace = true }
+num_cpus = { workspace = true }
+jemallocator = { version = "0.5", optional = true }
+memmap2 = { workspace = true }
+once_cell = { workspace = true }
+num-complex = { workspace = true }
+sys-info = { workspace = true }
+nalgebra = { workspace = true }
+ndarray = { workspace = true }
+rayon = { workspace = true }
+fastrand = { workspace = true }
+clap = { workspace = true }
+toml = { workspace = true }
+wide = { version = "0.7", optional = true }
+proptest = { workspace = true }
+sha2 = { workspace = true }
+
+# GPU acceleration dependencies added to existing deps above
+
+# Neural network dependencies - using workspace unified versions
+candle-core = { workspace = true, optional = true }
+candle-nn = { workspace = true, optional = true }
+
+# Web server and middleware dependencies
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+hyper = { workspace = true }
+regex = { workspace = true }
+
+# Performance optimization (BLAS disabled to resolve compilation issues)
+# blas-src = { version = "0.10", features = ["openblas"] }
+# openblas-src = { version = "0.10", features = ["cblas", "system"] }
+
+# Quantum simulation
+qip = { version = "0.8", optional = true }
+
+[features]
+default = ["simd"]
+simd = ["dep:wide"]
+jemalloc = ["dep:jemallocator"]
+quantum = ["dep:qip"]
+cuda = []  # CUDA feature for GPU acceleration
+neural = ["dep:candle-core", "dep:candle-nn"]  # Optional neural features
+full = ["simd", "jemalloc", "quantum", "cuda", "neural"]
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.5"
+test-case = "3.1"
+tokio-test = "0.4"
+tempfile = "3.8"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+inherits = "release"
+
+# Benchmarks disabled - no benches directory
+# [[bench]]
+# name = "simd_performance" 
+# harness = false
+# [[bench]]
+# name = "parasitic_evolution"
+# harness = false
+# [[bench]]
+# name = "mcp_server_latency"
+# harness = false
+
+# Examples disabled - no examples directory
+# [[example]]
+# name = "vampire_bat_demo"
+
+# [[example]]
+# name = "toxoplasma_demo"
+
+# [[example]]
+# name = "system_benchmark"
+
+[[bin]]
+name = "parasitic-server"
+path = "src/main.rs"
+
+[[bin]]
+name = "consensus-test"
+path = "src/consensus/standalone_test.rs"

@@ -3,7 +3,6 @@
 use hyperphysics_market::providers::{BinanceProvider, OKXProvider, MarketDataProvider};
 use hyperphysics_market::data::Timeframe;
 use hyperphysics_market::arbitrage::{ArbitrageDetector, ArbitrageType};
-use chrono::{Utc, Duration};
 use std::sync::Arc;
 
 #[tokio::test]

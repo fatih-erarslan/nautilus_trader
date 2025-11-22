@@ -92,6 +92,8 @@ pub struct ArbitrageDetector {
     min_profit_pct: f64,
 
     /// Maximum latency tolerance in milliseconds
+    /// TODO: Implement latency checks in opportunity detection
+    #[allow(dead_code)]
     max_latency_ms: u64,
 
     /// Detected opportunities
@@ -149,8 +151,8 @@ impl ArbitrageDetector {
             return Ok(opportunities);
         }
 
-        // Sort by price
-        exchange_prices.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        // Sort by price (NaN-safe: treat NaN as greater than any value)
+        exchange_prices.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Greater));
 
         // Find opportunities: buy low, sell high
         let (low_exchange, low_price) = &exchange_prices[0];
@@ -317,7 +319,7 @@ impl ArbitrageDetector {
             return None;
         }
 
-        symbol_prices.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        symbol_prices.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Greater));
 
         let min = symbol_prices[0];
         let max = symbol_prices[symbol_prices.len() - 1];

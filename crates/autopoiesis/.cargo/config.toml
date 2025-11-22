@@ -1,0 +1,38 @@
+# Cargo configuration for optimized builds
+[build]
+# Use all available CPU cores for compilation (0 = auto)
+# Build cache configuration  
+pipelining = true
+
+# Use faster linker when available
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+# General rustflags for performance (disabled LTO for development)
+[target.'cfg(all())']
+rustflags = [
+    # Enable faster instruction sets when available
+    "-C", "target-cpu=native",
+]
+
+# Network configuration for faster dependency downloads
+[net]
+retry = 3
+git-fetch-with-cli = true
+
+# Registry configuration
+[registry]
+default = "crates-io"
+
+# Source replacement for faster builds (disabled for now)
+# [source.crates-io]
+# replace-with = "vendored-sources"
+
+# [source.vendored-sources] 
+# directory = "vendor"
+
+# Incremental compilation settings
+[env]
+CARGO_INCREMENTAL = "1"
+RUSTC_BOOTSTRAP = "1"

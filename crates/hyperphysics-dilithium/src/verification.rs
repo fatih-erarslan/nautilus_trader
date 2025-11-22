@@ -16,6 +16,8 @@ pub struct AuthenticationToken {
 /// Consciousness state authenticator
 pub struct ConsciousnessAuthenticator {
     keypair: DilithiumKeypair,
+    /// TODO: Will be used for performance optimization via caching
+    #[allow(dead_code)]
     verification_cache: HashMap<u64, bool>,
 }
 

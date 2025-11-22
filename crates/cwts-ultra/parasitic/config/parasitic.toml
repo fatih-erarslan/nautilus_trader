@@ -1,0 +1,145 @@
+# Parasitic System Configuration
+# Version: 0.2.0
+
+[system]
+enabled = true
+max_pairs = 500
+selection_interval_ms = 100
+parallel_processing = true
+thread_pool_size = 8
+
+[performance]
+simd_enabled = true
+gpu_correlation = false  # Requires CUDA
+cache_size = 1000
+parallel_organisms = true
+max_latency_ms = 1
+batch_size = 100
+
+[quantum]
+mode = "enhanced"  # classical, enhanced, full
+max_qubits = 8
+auto_switch = false
+grover_iterations = 100
+
+[organisms]
+# Cuckoo configuration
+[organisms.cuckoo]
+enabled = true
+sensitivity = 0.8
+nest_threshold = 0.7
+stealth_factor = 0.8
+
+# Wasp configuration
+[organisms.wasp]
+enabled = true
+tracking_depth = 10
+injection_rate = 0.1
+aggression = 0.9
+
+# Cordyceps configuration
+[organisms.cordyceps]
+enabled = true
+pattern_threshold = 0.75
+exploitation_aggression = 0.6
+neural_control = true
+
+# Mycelial configuration
+[organisms.mycelial]
+enabled = true
+correlation_threshold = 0.6
+network_depth = 3
+resource_sharing = true
+
+# Octopus configuration
+[organisms.octopus]
+enabled = true
+camouflage_sensitivity = 0.9
+adaptation_rate = 0.5
+threat_detection = true
+
+# Anglerfish configuration
+[organisms.anglerfish]
+enabled = true
+lure_intensity = 0.3
+trap_duration = 300
+prey_attraction = 0.8
+
+# Komodo configuration
+[organisms.komodo]
+enabled = true
+persistence_factor = 0.8
+wound_threshold = 2.0
+venom_potency = 0.7
+
+# Tardigrade configuration
+[organisms.tardigrade]
+enabled = true
+cryptobiosis_trigger = 0.1
+revival_threshold = 0.3
+survival_mode = true
+
+# Electric Eel configuration
+[organisms.electric_eel]
+enabled = true
+shock_voltage = 0.5
+discharge_interval = 60
+liquidity_reveal = true
+
+# Platypus configuration
+[organisms.platypus]
+enabled = true
+electroreception_sensitivity = 0.95
+signal_threshold = 0.01
+pattern_recognition = true
+
+[voting]
+consensus_threshold = 0.6
+emergence_weight = 1.5
+quantum_enhancement = true
+minimum_organisms = 3
+
+[risk]
+max_host_resistance = 0.8
+parasite_detection_threshold = 0.9
+emergency_cryptobiosis = 0.05
+diversity_requirement = 0.4
+max_exposure = 0.3
+
+[analytics]
+enabled = true
+metrics_interval_ms = 1000
+performance_tracking = true
+emergence_detection = true
+dashboard_port = 8081
+
+[evolution]
+enabled = true
+population_size = 100
+mutation_rate = 0.1
+crossover_rate = 0.7
+selection_pressure = 0.5
+generations_per_epoch = 10
+
+[mcp]
+enabled = true
+port = 8080
+websocket_enabled = true
+resource_handlers = true
+tool_handlers = true
+max_connections = 100
+
+[cqgs]
+enabled = true
+sentinels = 49
+hyperbolic_topology = true
+neural_enhancement = true
+zero_mock_enforcement = true
+governance_threshold = 0.9
+
+[logging]
+level = "info"  # trace, debug, info, warn, error
+file = "parasitic.log"
+console = true
+format = "json"
+rotation = "daily"

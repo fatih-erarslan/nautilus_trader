@@ -131,7 +131,7 @@ impl BfvContext {
                 message: format!("Failed to decode plaintext: {:?}", e),
             })?;
 
-        values.get(0).copied().ok_or_else(|| HomomorphicError::DecryptionFailure {
+        values.first().copied().ok_or_else(|| HomomorphicError::DecryptionFailure {
             message: "Decrypted plaintext is empty".to_string(),
         })
     }

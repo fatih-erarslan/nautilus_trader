@@ -169,15 +169,21 @@ mod tests {
     fn test_invalid_signature_fails() {
         let keypair = DilithiumKeypair::generate(SecurityLevel::Standard)
             .expect("Key generation failed");
-        
+
         let message = b"test message";
-        let mut signature = keypair.sign(message)
+        let signature = keypair.sign(message)
             .expect("Signing failed");
-        
-        // Corrupt signature
-        signature.signature_bytes[0] ^= 1;
-        
-        assert!(!keypair.verify(message, &signature)
+
+        // Corrupt signature bytes and re-decode to get a corrupted signature
+        let mut corrupted_bytes = signature.signature_bytes.clone();
+        corrupted_bytes[0] ^= 1;
+
+        // Re-decode the corrupted bytes
+        let corrupted_sig = DilithiumSignature::decode(&corrupted_bytes, SecurityLevel::Standard)
+            .expect("Decode should still work even with corruption");
+
+        // Verify should fail for corrupted signature
+        assert!(!keypair.verify(message, &corrupted_sig)
             .unwrap_or(false));
     }
 }

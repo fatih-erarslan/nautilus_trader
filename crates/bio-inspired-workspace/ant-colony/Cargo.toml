@@ -1,0 +1,18 @@
+[package]
+name = "ant-colony"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Ant Colony Optimization (ACO) algorithm implementation"
+
+[dependencies]
+# Basic dependencies for optimization algorithms
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+async-trait = "0.1"
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "test-util"] }

@@ -1,0 +1,209 @@
+[workspace]
+members = [
+    "autopoiesis-core",
+    "autopoiesis-ml",
+    "autopoiesis-finance", 
+    "autopoiesis-consciousness",
+    "autopoiesis-engines",
+    "autopoiesis-analysis",
+    "autopoiesis-api",
+    "autopoiesis",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/autopoiesis"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+tokio-stream = "0.1"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Mathematical operations
+ndarray = "0.15"
+ndarray-rand = "0.14"
+ndarray-stats = "0.5"
+statrs = "0.16"
+num-traits = "0.2"
+num-derive = "0.4"
+num-complex = "0.4"
+nalgebra = "0.32"
+
+# Machine learning
+smartcore = { version = "0.3", features = ["serde"] }
+linfa = "0.7"
+linfa-clustering = "0.7"
+linfa-reduction = "0.7"
+
+# Optimization
+argmin = { version = "0.10", features = ["serde1"] }
+argmin-math = { version = "0.4", features = ["ndarray_latest"] }
+
+# WebSocket for market data
+tokio-tungstenite = { version = "0.23", features = ["native-tls"] }
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Database
+sqlx = { version = "0.8", features = ["runtime-tokio-native-tls", "postgres", "chrono", "uuid", "rust_decimal"] }
+
+# Message passing
+crossbeam-channel = "0.5"
+
+# Metrics
+prometheus = "0.13"
+
+# Configuration
+config = "0.14"
+
+# UUID generation
+uuid = { version = "1.10", features = ["v4", "serde"] }
+
+# Rate limiting
+governor = "0.6"
+
+# Circuit breaker
+failsafe = "1.3"
+
+# Caching
+moka = { version = "0.12", features = ["future"] }
+
+# Random number generation
+rand = "0.8"
+rand_distr = "0.4"
+
+# Genetic algorithms
+genevo = "0.7"
+
+# Graph algorithms
+petgraph = "0.6"
+
+# Compression
+flate2 = "1.0"
+
+# Cryptography
+ring = "0.17"
+hex = "0.4"
+base64 = "0.22"
+
+# System utilities
+num_cpus = "1.16"
+toml = "0.8"
+
+# Decimal arithmetic
+rust_decimal = { version = "1.35", features = ["serde"] }
+
+# Feature flags
+bitflags = "2.6"
+
+# Parallel computation
+rayon = "1.10"
+
+# Lock-free data structures
+dashmap = "6.0"
+
+# Time series analysis
+ta = "0.5"
+
+# Statistical distributions
+rv = "0.16"
+
+# Regex
+regex = "1.10"
+
+# Lazy static
+lazy_static = "1.5"
+once_cell = "1.19"
+
+# Derive more traits
+derive_more = "0.99"
+
+# Builder pattern
+derive_builder = "0.20"
+
+# Enum utilities
+strum = { version = "0.26", features = ["derive"] }
+strum_macros = "0.26"
+
+# Type erasure
+dyn-clone = "1.0"
+
+# Async traits
+async-trait = "0.1"
+
+# Futures utilities
+futures = "0.3"
+futures-util = "0.3"
+
+# Pin utilities
+pin-project = "1.1"
+
+# Additional dependencies for ML/NHITS
+bincode = "1.3"
+axum = { version = "0.7", features = ["tokio", "json", "ws"] }
+urlencoding = "2.1"
+crossbeam-deque = "0.8"
+tower-http = { version = "0.6", features = ["cors", "trace", "timeout"] }
+jsonwebtoken = "9.0"
+url = "2.5"
+sha2 = "0.10"
+tower = "0.5"
+
+# Internal workspace dependencies
+autopoiesis-core = { path = "./autopoiesis-core" }
+autopoiesis-ml = { path = "./autopoiesis-ml" }
+autopoiesis-finance = { path = "./autopoiesis-finance" }
+autopoiesis-consciousness = { path = "./autopoiesis-consciousness" }
+autopoiesis-engines = { path = "./autopoiesis-engines" }
+autopoiesis-analysis = { path = "./autopoiesis-analysis" }
+autopoiesis-api = { path = "./autopoiesis-api" }
+
+[workspace.dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.5"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+pretty_assertions = "1.4"
+serial_test = "3.1"
+test-case = "3.3"
+approx = "0.5"
+tempfile = "3.8"
+
+[profile.release]
+opt-level = 3
+lto = "thin"  # Use thin LTO for faster builds
+codegen-units = 16  # Allow more codegen units for parallel compilation
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = 2
+codegen-units = 256  # Maximum parallelism for dev builds
+
+[profile.test]
+opt-level = 2
+debug = 2
+
+[profile.bench]
+inherits = "release"
+debug = 2  # Enable debug info for profiling

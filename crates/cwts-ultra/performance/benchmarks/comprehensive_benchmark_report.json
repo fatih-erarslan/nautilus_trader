@@ -1,0 +1,152 @@
+{
+  "summary": {
+    "total_benchmarks": 5,
+    "successful_benchmarks": 4,
+    "failed_benchmarks": 1,
+    "success_rate": 80.0,
+    "total_execution_time": 30.046220302581787,
+    "performance_score": 96.9,
+    "timestamp": "2025-09-05T21:27:10.553496"
+  },
+  "system_info": {
+    "cpu_info": "Intel(R) Core(TM) i7-7820HK CPU @ 2.90GHz",
+    "memory_total_gb": 31.29686737060547,
+    "python_version": "3.12.10",
+    "platform": "linux",
+    "core_count": 8,
+    "timestamp": 1757096809.3577967
+  },
+  "benchmark_results": [
+    {
+      "benchmark_name": "IEEE754 Compliance Validation",
+      "execution_time": 0.4483351707458496,
+      "success": true,
+      "output": "\ud83d\udd2c CWTS IEEE 754 Compliance and Numerical Stability Validator\n============================================================\n\n\ud83d\udcd0 Testing basic arithmetic operations...\n\ud83d\udcca Testing transcendental functions...\n\ud83d\udcb0 Testing financial computations...\n\u26a0\ufe0f  Testing extreme values...\n\n\u2705 Validation complete. Report saved to: /home/kutlu/CWTS/cwts-ultra/performance/benchmarks/ieee754_compliance_report.json\n\n============================================================\n\ud83d\udcc8 COMPLIANCE SUMMARY\n============================================================\nTotal tests: 48\nIEEE 754 compliance: 93.8%\nNumerical stability: 97.9%\nMax relative error: 1.22e-16\nMax ULP error: 4368955796522032135\n\n\u26a0\ufe0f  Problematic operations: 1\n\n\ud83c\udfaf Key Recommendations:\n  \u2022 IEEE 754 compliance rate below 95% - review arithmetic implementations\n  \u2022 Implement runtime checks for extreme values in production\n  \u2022 Consider using decimal arithmetic for critical financial calculations\n",
+      "error": "/home/kutlu/CWTS/cwts-ultra/performance/benchmarks/ieee754_compliance_validator.py:180: RuntimeWarning: overflow encountered in scalar divide\n  (\"extreme_ratio\", [IEEE754_MAX, IEEE754_MIN_NORMAL], IEEE754_MAX/IEEE754_MIN_NORMAL),\n/home/kutlu/CWTS/cwts-ultra/performance/benchmarks/ieee754_compliance_validator.py:288: RuntimeWarning: overflow encountered in scalar divide\n  computed = inputs[0] / inputs[1]\n",
+      "metrics": {
+        "compliance_rate": 93.8,
+        "total_tests": 48,
+        "max_relative_error": 1.22e-16
+      },
+      "timestamp": 1757096809.8176615
+    },
+    {
+      "benchmark_name": "GIL Elimination Benchmarking",
+      "execution_time": 7.977314710617065,
+      "success": true,
+      "output": "\ud83d\ude80 CWTS GIL Elimination Performance Benchmarker\n============================================================\n\n\ud83d\udcca Testing workload size: 1000\nBenchmarking standard_threading...\n  1 threads: 52210 ops/sec\n  2 threads: 76326 ops/sec\n  4 threads: 111816 ops/sec\n  8 threads: 75386 ops/sec\nBenchmarking thread_pool_executor...\n  1 threads: 13974 ops/sec\n  2 threads: 19119 ops/sec\n  4 threads: 21048 ops/sec\n  8 threads: 19508 ops/sec\nBenchmarking c_extension_nogil...\n  1 threads: 279 ops/sec\n  2 threads: 1208 ops/sec\n  4 threads: 1810 ops/sec\n  8 threads: 3389 ops/sec\nBenchmarking numba_parallel...\n  1 threads: 70 ops/sec\n  2 threads: 40737 ops/sec\n  4 threads: 37709 ops/sec\n  8 threads: 27641 ops/sec\nBenchmarking multiprocessing_pool...\n  Error with 1 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 2 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 4 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 8 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\nBenchmarking asyncio_uvloop...\n  1 threads: 13362 ops/sec\n  2 threads: 17134 ops/sec\n  4 threads: 28375 ops/sec\n  8 threads: 33965 ops/sec\nBenchmarking process_pool_executor...\n  Error with 1 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 2 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 4 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 8 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n\n\ud83d\udcca Testing workload size: 10000\nBenchmarking standard_threading...\n  1 threads: 21880 ops/sec\n  2 threads: 42177 ops/sec\n  4 threads: 53083 ops/sec\n  8 threads: 38370 ops/sec\nBenchmarking thread_pool_executor...\n  1 threads: 11464 ops/sec\n  2 threads: 16363 ops/sec\n  4 threads: 12358 ops/sec\n  8 threads: 16968 ops/sec\nBenchmarking c_extension_nogil...\n  1 threads: 9 ops/sec\n  2 threads: 147 ops/sec\n  4 threads: 353 ops/sec\n  8 threads: 990 ops/sec\nBenchmarking numba_parallel...\n  1 threads: 6126 ops/sec\n  2 threads: 8675 ops/sec\n  4 threads: 13977 ops/sec\n  8 threads: 7669 ops/sec\nBenchmarking multiprocessing_pool...\n  Error with 1 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 2 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 4 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 8 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\nBenchmarking asyncio_uvloop...\n  1 threads: 4725 ops/sec\n  2 threads: 12199 ops/sec\n  4 threads: 17668 ops/sec\n  8 threads: 8711 ops/sec\nBenchmarking process_pool_executor...\n  Error with 1 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 2 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 4 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 8 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n\n\ud83d\udcca Testing workload size: 100000\nBenchmarking standard_threading...\n  1 threads: 9046 ops/sec\n  2 threads: 27592 ops/sec\n  4 threads: 23853 ops/sec\n  8 threads: 25315 ops/sec\nBenchmarking thread_pool_executor...\n  1 threads: 6266 ops/sec\n  2 threads: 10033 ops/sec\n  4 threads: 9940 ops/sec\n  8 threads: 11848 ops/sec\nBenchmarking c_extension_nogil...\n  1 threads: 1 ops/sec\n  2 threads: 7 ops/sec\n  4 threads: 18 ops/sec\n  8 threads: 96 ops/sec\nBenchmarking numba_parallel...\n  1 threads: 518 ops/sec\n  2 threads: 783 ops/sec\n  4 threads: 1438 ops/sec\n  8 threads: 730 ops/sec\nBenchmarking multiprocessing_pool...\n  Error with 1 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 2 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 4 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\n  Error with 8 threads: Can't get local object 'GILEliminationBenchmarker._multiprocessing_benchmark.<locals>.compute_process'\nBenchmarking asyncio_uvloop...\n  1 threads: 535 ops/sec\n  2 threads: 1066 ops/sec\n  4 threads: 1950 ops/sec\n  8 threads: 4045 ops/sec\nBenchmarking process_pool_executor...\n  Error with 1 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 2 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 4 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n  Error with 8 threads: Can't get local object 'GILEliminationBenchmarker._process_pool_benchmark.<locals>.cpu_bound_task'\n\n\u2705 Benchmark complete. Results saved to: /home/kutlu/CWTS/cwts-ultra/performance/benchmarks/gil_elimination_results.json\n\n============================================================\n\ud83d\udcc8 EXECUTIVE SUMMARY\n============================================================\nstandard_threading: 111816 ops/sec (scaling: 0.36)\nthread_pool_executor: 21048 ops/sec (scaling: 0.34)\nc_extension_nogil: 3389 ops/sec (scaling: 0.34)\nnumba_parallel: 40737 ops/sec (scaling: 0.34)\nasyncio_uvloop: 33965 ops/sec (scaling: 0.33)\n\n\ud83c\udfaf Recommendations:\n  \u2022 Best overall technique: standard_threading\n  \u2022 Lowest GIL contention: numba_parallel\n  \u2022 Best scaling efficiency: standard_threading\n  \u2022 Consider C extensions with GIL release for CPU-bound tasks\n  \u2022 Use multiprocessing for truly parallel CPU-bound work\n  \u2022 Asyncio is best for I/O-bound concurrent operations\n",
+      "error": "",
+      "metrics": {
+        "throughput": 52210.0,
+        "max_throughput": 111816,
+        "avg_throughput": 19000.2
+      },
+      "timestamp": 1757096817.345897
+    },
+    {
+      "benchmark_name": "Scientific Data Processing",
+      "execution_time": 8.049184083938599,
+      "success": true,
+      "output": "\ud83d\udd2c CWTS Scientific Data Processor\n==================================================\n\n\ud83d\udcca Fetching and processing real market data...\n\nProcessing AAPL...\n  Average Price: $210.92\n  Volatility: 39.8%\n  Sharpe Ratio: 0.27\n  Max Drawdown: -27.9%\n  Liquidity Score: 0.697\n\nProcessing GOOGL...\n  Average Price: $175.70\n  Volatility: 34.7%\n  Sharpe Ratio: 1.89\n  Max Drawdown: -16.7%\n  Liquidity Score: 0.694\n\nProcessing TSLA...\n  Average Price: $302.59\n  Volatility: 73.1%\n  Sharpe Ratio: 0.98\n  Max Drawdown: -23.0%\n  Liquidity Score: 0.742\n\nProcessing SPY...\n  Average Price: $592.61\n  Volatility: 24.5%\n  Sharpe Ratio: 0.99\n  Max Drawdown: -13.7%\n  Liquidity Score: 0.700\n\n\u2705 Scientific data processing demonstration complete\n",
+      "error": "",
+      "metrics": {
+        "avg_volatility": 43.025,
+        "avg_sharpe_ratio": 1.0325
+      },
+      "timestamp": 1757096817.4174526
+    },
+    {
+      "benchmark_name": "Comprehensive Performance Analysis",
+      "execution_time": 0.43758273124694824,
+      "success": true,
+      "output": "\ud83d\ude80 CWTS Neural Trader Comprehensive Performance Analysis\n============================================================\n\n\ud83d\udcca 1. C/C++ Compilation Optimization Analysis\nTesting compilation flags: -O0\nTesting compilation flags: -O1\nTesting compilation flags: -O2\nTesting compilation flags: -O3\nTesting compilation flags: -O3 -march=native\nTesting compilation flags: -O3 -march=native -mtune=native\nTesting compilation flags: -O3 -march=native -mtune=native -flto\nTesting compilation flags: -O3 -march=native -mtune=native -flto -ffast-math\nTesting compilation flags: -Ofast -march=native -mtune=native -flto\n\n\ud83e\udd80 2. Rust Crate Linking Efficiency Analysis\n\n\ud83d\udc0d 3. Cython Extension Performance Analysis\n\n\ud83d\udd04 4. Python Orchestration Overhead Analysis\n\n\u26a1 5. 757ns P99 Pipeline Bottleneck Analysis\n\n\u2705 Analysis complete. Results saved to: /home/kutlu/CWTS/cwts-ultra/performance/benchmarks/comprehensive_analysis_results.json\n\n============================================================\n\ud83d\udcc8 EXECUTIVE SUMMARY\n============================================================\nCurrent P99 latency: 805ns\nTarget P99 latency: 757ns\nOptimization needed: 48ns\n\n\ud83d\udd25 Top 4 Performance Bottlenecks:\n1. signal_generation: 180ns (MEDIUM severity)\n2. execution_routing: 140ns (MEDIUM severity)\n3. market_data_ingestion: 120ns (MEDIUM severity)\n",
+      "error": "",
+      "metrics": {
+        "latency_p99": 805.0
+      },
+      "timestamp": 1757096817.8557074
+    },
+    {
+      "benchmark_name": "Cython GIL Profiler",
+      "execution_time": 13.133803606033325,
+      "success": false,
+      "output": "\ud83d\udc0d Cython GIL and Extension Performance Profiler\n=======================================================\n\n1. Profiling GIL overhead...\nProfiling GIL overhead for: pure_computation\n",
+      "error": "concurrent.futures.process._RemoteTraceback: \n\"\"\"\nTraceback (most recent call last):\n  File \"/home/linuxbrew/.linuxbrew/opt/python@3.12/lib/python3.12/multiprocessing/queues.py\", line 264, in _feed\n    obj = _ForkingPickler.dumps(obj)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/linuxbrew/.linuxbrew/opt/python@3.12/lib/python3.12/multiprocessing/reduction.py\", line 51, in dumps\n    cls(buf, protocol).dump(obj)\nAttributeError: Can't get local object 'CythonGILProfiler._profile_nogil_operation.<locals>.worker'\n\"\"\"\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/home/kutlu/CWTS/cwts-ultra/performance/benchmarks/cython_gil_profiler.py\", line 719, in <module>\n    main()\n  File \"/home/kutlu/CWTS/cwts-ultra/performance/benchmarks/cython_gil_profiler.py\", line 695, in main\n    results[\"gil_overhead\"] = profiler.profile_gil_overhead_comprehensive()\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kutlu/CWTS/cwts-ultra/performance/benchmarks/cython_gil_profiler.py\", line 71, in profile_gil_overhead_comprehensive\n    nogil_time = self._profile_nogil_operation(operation)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kutlu/CWTS/cwts-ultra/performance/benchmarks/cython_gil_profiler.py\", line 335, in _profile_nogil_operation\n    results = [f.result() for f in futures]\n               ^^^^^^^^^^\n  File \"/home/linuxbrew/.linuxbrew/opt/python@3.12/lib/python3.12/concurrent/futures/_base.py\", line 456, in result\n    return self.__get_result()\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/home/linuxbrew/.linuxbrew/opt/python@3.12/lib/python3.12/concurrent/futures/_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"/home/linuxbrew/.linuxbrew/opt/python@3.12/lib/python3.12/multiprocessing/queues.py\", line 264, in _feed\n    obj = _ForkingPickler.dumps(obj)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/linuxbrew/.linuxbrew/opt/python@3.12/lib/python3.12/multiprocessing/reduction.py\", line 51, in dumps\n    cls(buf, protocol).dump(obj)\nAttributeError: Can't get local object 'CythonGILProfiler._profile_nogil_operation.<locals>.worker'\n",
+      "metrics": {},
+      "timestamp": 1757096830.5520725
+    }
+  ],
+  "aggregated_metrics": {
+    "compliance_rate": {
+      "mean": 93.8,
+      "std": 0.0,
+      "min": 93.8,
+      "max": 93.8,
+      "count": 1
+    },
+    "total_tests": {
+      "mean": 48.0,
+      "std": 0.0,
+      "min": "48",
+      "max": "48",
+      "count": 1
+    },
+    "max_relative_error": {
+      "mean": 1.22e-16,
+      "std": 0.0,
+      "min": 1.22e-16,
+      "max": 1.22e-16,
+      "count": 1
+    },
+    "throughput": {
+      "mean": 52210.0,
+      "std": 0.0,
+      "min": 52210.0,
+      "max": 52210.0,
+      "count": 1
+    },
+    "max_throughput": {
+      "mean": 111816.0,
+      "std": 0.0,
+      "min": "111816",
+      "max": "111816",
+      "count": 1
+    },
+    "avg_throughput": {
+      "mean": 19000.2,
+      "std": 0.0,
+      "min": 19000.2,
+      "max": 19000.2,
+      "count": 1
+    },
+    "avg_volatility": {
+      "mean": 43.025,
+      "std": 0.0,
+      "min": 43.025,
+      "max": 43.025,
+      "count": 1
+    },
+    "avg_sharpe_ratio": {
+      "mean": 1.0325,
+      "std": 0.0,
+      "min": 1.0325,
+      "max": 1.0325,
+      "count": 1
+    },
+    "latency_p99": {
+      "mean": 805.0,
+      "std": 0.0,
+      "min": 805.0,
+      "max": 805.0,
+      "count": 1
+    }
+  },
+  "recommendations": [
+    "IEEE 754 compliance at 93.8% - review arithmetic operations",
+    "1 benchmarks failed - check system dependencies and resources",
+    "Consider implementing Cython extensions for critical paths",
+    "Monitor memory usage patterns in production",
+    "Validate numerical stability in financial calculations",
+    "Use SIMD optimizations for vectorized operations"
+  ]
+}

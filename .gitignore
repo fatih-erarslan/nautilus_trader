@@ -3,6 +3,23 @@
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
 
+
+# Removed Windows wrapper files per user request
+hive-mind-prompt-*.txt
+
+# Rust build artifacts
+target/
+Cargo.lock
+*.proptest-regressions
+
+# Rust compiler crash reports
+rustc-ice-*.txt
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # Claude Flow generated files
 .claude/settings.local.json
 .mcp.json
@@ -29,16 +46,3 @@ coordination/orchestration/*
 claude-flow
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
-
-# Rust build artifacts
-target/
-Cargo.lock
-*.proptest-regressions
-
-# Rust compiler crash reports
-rustc-ice-*.txt
-
-# macOS system files
-.DS_Store
-.AppleDouble
-.LSOverride

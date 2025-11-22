@@ -38,12 +38,12 @@
 
 use crate::{DilithiumKeypair, DilithiumSignature, DilithiumResult, DilithiumError, SecurityLevel};
 use chacha20poly1305::{
-    aead::{Aead, KeyInit, OsRng},
+    aead::{Aead, KeyInit},
     ChaCha20Poly1305, Nonce, Key
 };
 use pqcrypto_kyber::kyber768;
-use pqcrypto_traits::kem::{PublicKey as KyberPublicKeyTrait, SecretKey as KyberSecretKeyTrait, Ciphertext as KyberCiphertextTrait, SharedSecret as KyberSharedSecretTrait};
-use zeroize::{Zeroize, ZeroizeOnDrop};
+use pqcrypto_traits::kem::SharedSecret as KyberSharedSecretTrait;
+use zeroize::ZeroizeOnDrop;
 use serde::{Serialize, Deserialize};
 
 /// Kyber keypair for key encapsulation

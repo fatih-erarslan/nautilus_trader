@@ -1,0 +1,38 @@
+{
+  "name": "parasitic-trading-mcp",
+  "version": "2.0.0",
+  "mcp": {
+    "enabled": true,
+    "port": 8081,
+    "websocket": true,
+    "tools": [
+      "scan_parasitic_opportunities",
+      "detect_whale_nests", 
+      "identify_zombie_pairs",
+      "analyze_mycelial_network",
+      "activate_octopus_camouflage",
+      "deploy_anglerfish_lure",
+      "track_wounded_pairs",
+      "enter_cryptobiosis",
+      "electric_shock",
+      "electroreception_scan"
+    ]
+  },
+  "cqgs": {
+    "sentinel_count": 49,
+    "compliance_monitoring": true,
+    "zero_mock_enforcement": true,
+    "real_time_validation": true
+  },
+  "performance": {
+    "target_latency_ms": 1,
+    "gpu_acceleration": true,
+    "simd_optimization": true,
+    "quantum_enhancement": true
+  },
+  "trading": {
+    "max_organisms": 10,
+    "concurrent_strategies": 5,
+    "risk_management": true
+  }
+}

@@ -26,6 +26,8 @@ members = [
     "crates/holographic-embeddings",
     "crates/gpu-marl",
     "crates/ising-optimizer",
+    # NAPI zero-overhead Node.js bindings
+    "crates/hyperphysics-napi",
 ]
 resolver = "2"
 

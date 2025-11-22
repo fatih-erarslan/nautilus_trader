@@ -1,0 +1,96 @@
+# Tarpaulin configuration for comprehensive coverage analysis
+# Scientific testing requires 100% coverage validation
+
+[tool.tarpaulin.autopoiesis]
+# Coverage targets
+target-dir = "target/tarpaulin"
+out = ["Html", "Xml", "Json", "Stdout"]
+output-dir = "target/coverage"
+timeout = "600s"
+
+# Coverage scope
+all-features = true
+workspace = true
+run-types = ["Tests", "Doctests"]
+
+# Exclusions
+exclude-files = [
+    "tests/*",
+    "benches/*", 
+    "examples/*",
+    "target/*",
+    "*/tests.rs",
+    "*/test_*.rs",
+    "*_test.rs"
+]
+
+# Inclusions - ensure critical modules are covered
+include-tests = true
+ignored = false
+
+# Engine configuration
+engine = "llvm"
+release = false
+no-default-features = false
+
+# Reporting
+verbose = true
+frozen = true
+locked = true
+offline = false
+
+# Threshold configuration
+fail-under = 95.0  # Require 95% minimum coverage
+
+# Advanced options
+avoid-cfg-tarpaulin = false
+forward = true
+count = true
+branch = true
+implicit-test-threads = true
+
+# Post-processing
+post-args = []
+command = "cargo"
+args = [
+    "test",
+    "--all-features",
+    "--workspace"
+]
+
+# Environment variables
+[tool.tarpaulin.autopoiesis.env]
+RUST_BACKTRACE = "1"
+RUST_LOG = "info"
+TARPAULIN_VERBOSE = "true"
+
+# Hook configuration for pre/post processing
+[tool.tarpaulin.autopoiesis.hooks]
+pre-test = [
+    "echo 'Starting coverage analysis...'",
+    "mkdir -p target/coverage"
+]
+post-test = [
+    "echo 'Coverage analysis complete'",
+    "ls -la target/coverage/"
+]
+
+# Feature-specific coverage
+[tool.tarpaulin.features]
+full = [
+    "ml",
+    "optimization", 
+    "backtesting",
+    "metrics",
+    "benchmarks",
+    "property-tests"
+]
+
+# Module-specific thresholds
+[tool.tarpaulin.thresholds]
+"src/core/" = 98.0
+"src/consciousness/" = 95.0
+"src/ml/" = 90.0
+"src/analysis/" = 92.0
+"src/risk/" = 95.0
+"src/execution/" = 90.0

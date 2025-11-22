@@ -24,7 +24,7 @@ fn test_portfolio_weights_fixed() {
     println!("  GOOGL weight: {:.6}", googl_weight);
     println!("  Weight sum: {:.6}", aapl_weight + googl_weight);
 
-    assert!((aapl_weight + googl_weight - 1.0).abs() < 1e-6, "Weights should sum to 1.0");
+    assert!((aapl_weight + googl_weight - 1.0_f64).abs() < 1e-6, "Weights should sum to 1.0");
     println!("  ✓ Portfolio weights sum to 1.0");
 }
 

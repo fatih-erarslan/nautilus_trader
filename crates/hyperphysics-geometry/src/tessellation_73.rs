@@ -269,6 +269,7 @@ impl HeptagonalTessellation {
     }
 
     /// Convert PoincarePoint to Complex64 (2D projection)
+    #[allow(dead_code)] // Reserved for future Möbius transformation integration
     fn poincare_to_complex(point: &PoincarePoint) -> Complex64 {
         let coords = point.coords();
         Complex64::new(coords.x, coords.y)
@@ -281,6 +282,7 @@ impl HeptagonalTessellation {
     }
 
     /// Apply a Möbius transformation to a PoincarePoint
+    #[allow(dead_code)] // Reserved for future Möbius transformation integration
     fn apply_moebius(transform: &MoebiusTransform, point: &PoincarePoint) -> Result<PoincarePoint> {
         let z = Self::poincare_to_complex(point);
         let transformed_z = transform.apply(z);

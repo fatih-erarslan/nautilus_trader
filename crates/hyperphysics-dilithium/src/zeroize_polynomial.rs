@@ -4,6 +4,8 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 use std::ops::{Deref, DerefMut};
 
 /// Wrapper around `Polynomial` that implements `Zeroize` and `ZeroizeOnDrop`.
+/// TODO: Will be used for secure polynomial operations
+#[allow(dead_code)]
 #[derive(Clone, Default)]
 pub struct ZeroizablePolynomial(pub Polynomial);
 

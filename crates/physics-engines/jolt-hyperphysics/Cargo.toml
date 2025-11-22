@@ -1,0 +1,22 @@
+[package]
+name = "jolt-hyperphysics"
+version = "0.1.0"
+edition = "2021"
+description = "Deterministic JoltPhysics integration for HyperPhysics"
+authors = ["HyperPhysics Team"]
+
+[dependencies]
+nalgebra = { workspace = true }
+bitflags = "2.4"
+lazy_static = "1.4"
+thiserror = "1.0"
+
+[build-dependencies]
+cc = "1.0"
+bindgen = "0.69"
+cmake = "0.1"
+
+[features]
+default = ["simd"]
+simd = []
+double-precision = []

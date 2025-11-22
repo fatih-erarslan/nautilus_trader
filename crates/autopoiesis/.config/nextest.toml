@@ -1,0 +1,103 @@
+# Nextest configuration for autopoiesis testing
+# Provides comprehensive test execution with categorization and parallelization
+
+[profile.default]
+# Test execution configuration
+test-threads = "num-cpus"
+retries = 3
+timeout = "300s"
+leak-timeout = "100ms"
+
+# Output configuration
+failure-output = "immediate"
+success-output = "never" 
+fail-fast = false
+show-output = false
+
+# Test filtering
+filter = ""
+
+[profile.unit]
+# Unit tests - fast execution
+test-threads = 8
+timeout = "30s"
+retries = 1
+
+[[profile.unit.overrides]]
+filter = "test(unit)"
+test-threads = 8
+timeout = "30s"
+
+[profile.integration]
+# Integration tests - moderate parallelism
+test-threads = 4
+timeout = "120s"
+retries = 2
+
+[[profile.integration.overrides]]
+filter = "test(integration)"
+test-threads = 4
+timeout = "120s"
+
+[profile.performance]
+# Performance tests - sequential execution
+test-threads = 1
+timeout = "600s"
+retries = 1
+
+[[profile.performance.overrides]]
+filter = "test(performance|benchmark)"
+test-threads = 1
+timeout = "600s"
+
+[profile.property]
+# Property-based tests
+test-threads = 4
+timeout = "300s"
+retries = 1
+
+[[profile.property.overrides]]
+filter = "test(property|proptest)"
+test-threads = 4
+timeout = "300s"
+
+[profile.chaos]
+# Chaos engineering tests
+test-threads = 1
+timeout = "900s"
+retries = 0
+
+[[profile.chaos.overrides]]
+filter = "test(chaos)"
+test-threads = 1
+timeout = "900s"
+
+[profile.ci]
+# Continuous integration profile
+test-threads = 2
+timeout = "300s"
+retries = 2
+fail-fast = true
+
+# Test groups configuration
+[test-groups]
+unit = { max-threads = 8 }
+integration = { max-threads = 4 }
+performance = { max-threads = 1 }
+property = { max-threads = 4 }
+chaos = { max-threads = 1 }
+
+# Slow tests configuration
+[slow-timeout]
+period = "60s"
+terminate-after = 2
+
+# Test data configuration
+[test-data]
+junit = true
+junit-path = "target/nextest/junit.xml"
+
+# Coverage integration
+[coverage]
+enabled = true
+engine = "tarpaulin"

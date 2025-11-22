@@ -1,0 +1,38 @@
+[package]
+name = "quantum-circuit"
+version = "0.1.0"
+edition = "2021"
+authors = ["SERRA Project"]
+description = "Quantum-enhanced circuit architectures for classical ML with PennyLane-inspired API"
+license = "MIT"
+repository = "https://github.com/ruvnet/serra"
+
+# [workspace] - This is a workspace member, not a workspace root
+# Empty workspace table to make this crate independent
+
+[dependencies]
+nalgebra = { workspace = true }
+num-complex = { workspace = true }
+ndarray = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+rand = { workspace = true }
+rand_distr = { workspace = true }
+rayon = { workspace = true }
+thiserror = { workspace = true }
+approx = { workspace = true }
+itertools = { workspace = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tokio = { version = "1.35", features = ["full"] }
+
+[[bench]]
+name = "quantum_benchmarks"
+harness = false
+
+[features]
+default = ["simd"]
+simd = []
+python-bindings = []

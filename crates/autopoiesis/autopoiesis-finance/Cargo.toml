@@ -1,0 +1,90 @@
+[package]
+name = "autopoiesis-finance"
+description = "Financial domain components"
+
+[features]
+default = []
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[package.version]
+workspace = true
+
+[package.edition]
+workspace = true
+
+[package.authors]
+workspace = true
+
+[package.license]
+workspace = true
+
+[package.repository]
+workspace = true
+
+[dependencies.anyhow]
+workspace = true
+
+[dependencies.async-trait]
+workspace = true
+
+[dependencies.serde]
+workspace = true
+
+[dependencies.thiserror]
+workspace = true
+
+[dependencies.tokio]
+workspace = true
+
+[dependencies.tracing]
+workspace = true
+
+[dependencies.autopoiesis-core]
+workspace = true
+
+[dependencies.rust_decimal]
+workspace = true
+
+[dependencies.chrono]
+workspace = true
+
+[dependencies.uuid]
+workspace = true
+
+[dependencies.ta]
+workspace = true
+
+[dependencies.statrs]
+workspace = true
+
+[dependencies.ndarray]
+workspace = true
+
+[dev-dependencies.approx]
+workspace = true
+
+[dev-dependencies.tempfile]
+workspace = true
+
+[dev-dependencies.proptest]
+workspace = true
+
+[dev-dependencies.criterion]
+workspace = true
+
+[dev-dependencies.pretty_assertions]
+workspace = true
+
+[dev-dependencies.test-case]
+workspace = true
+
+[dev-dependencies.quickcheck]
+workspace = true
+
+[dev-dependencies.quickcheck_macros]
+workspace = true
+
+[dev-dependencies.serial_test]
+workspace = true

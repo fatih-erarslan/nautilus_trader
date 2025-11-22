@@ -1,0 +1,57 @@
+[package]
+name = "rapier-hyperphysics"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team <team@hyperphysics.ai>"]
+description = "Rapier physics engine integration for HyperPhysics HFT market simulation"
+repository = "https://github.com/hyperphysics/hft-ecosystem"
+license = "MIT OR Apache-2.0"
+keywords = ["physics", "rapier", "hft", "market-simulation"]
+rust-version = "1.75.0"
+
+[dependencies]
+# HyperPhysics core
+hyperphysics-core = { path = "../../hyperphysics-core" }
+hyperphysics-geometry = { path = "../../hyperphysics-geometry" }
+hyperphysics-market = { path = "../../hyperphysics-market" }
+
+# Rapier physics engine
+rapier3d = { version = "0.22", features = ["simd-stable", "parallel", "serde-serialize"] }
+
+# Math
+nalgebra = { version = "0.33", features = ["serde-serialize"] }
+
+# Parallelism
+rayon = "1.10"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+
+# Time
+chrono = "0.4"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+approx = "0.5"
+
+[features]
+default = ["simd"]
+simd = []
+deterministic = []
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+
+[[bench]]
+name = "rapier_benchmark"
+harness = false

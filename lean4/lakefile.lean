@@ -3,8 +3,9 @@ open Lake DSL
 
 package «hyperphysics» where
   -- Project configuration for HyperPhysics formal verification
-  version := "0.1.0"
+  -- Note: 'version' field removed for Lean 4.x compatibility
 
+@[default_target]
 lean_lib «HyperPhysics» where
   -- Library for pBit lattice physics and Gillespie algorithm formalization
   globs := #[.andSubmodules `HyperPhysics]

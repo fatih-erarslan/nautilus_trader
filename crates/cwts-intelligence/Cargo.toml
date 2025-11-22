@@ -1,0 +1,54 @@
+[package]
+name = "cwts-intelligence-server"
+version = "0.1.0"
+edition = "2021"
+description = "CWTS Intelligent Trading Pair Selection and Market Analysis Server"
+
+[dependencies]
+# Core async runtime
+tokio = { version = "1.46", features = ["full"] }
+tokio-stream = "0.1"
+futures = "0.3"
+
+# HTTP server and WebSocket support
+axum = { version = "0.7", features = ["ws", "tracing"] }
+tower = { version = "0.4", features = ["full"] }
+tower-http = { version = "0.6.6", features = ["full"] }
+
+# HTTP clients
+reqwest = { version = "0.12", features = ["json", "gzip", "rustls-tls"] }
+
+# Data processing and serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Configuration
+clap = { version = "4.0", features = ["derive"] }
+
+# Rate limiting
+governor = "0.6"
+
+# Concurrency and threading
+dashmap = "6.1"
+rayon = "1.10"
+
+# Mathematical calculations
+nalgebra.workspace = true
+statrs = "0.17"
+
+# UUID for tracking
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Metrics
+metrics = "0.22"

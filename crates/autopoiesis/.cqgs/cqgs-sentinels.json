@@ -1,0 +1,162 @@
+{
+  "version": "2.0.0",
+  "project": "autopoiesis",
+  "configured": "2025-07-24T04:11:30Z",
+  "sentinels": {
+    "mock-detection": {
+      "enabled": true,
+      "strictMode": true,
+      "confidence_threshold": 0.95,
+      "description": "Detects mock frameworks and synthetic data generation",
+      "patterns": [
+        "mockall::",
+        "wiremock::",
+        "fastrand::",
+        "mock_data",
+        "synthetic.*data",
+        "fake.*data",
+        "random.*generate",
+        "\\bmock\\b.*struct",
+        "generate.*synthetic"
+      ],
+      "excludePaths": [
+        "**/tests/**/*.rs",
+        "**/benches/**/*.rs",
+        "**/*_test.rs",
+        "**/CQGS_*.md",
+        "**/FASTRAND_*.md"
+      ],
+      "blockOnDetection": true,
+      "alertLevel": "CRITICAL"
+    },
+    "zero-synthetic": {
+      "enabled": true,
+      "strictMode": true,
+      "confidence_threshold": 0.90,
+      "description": "Enforces zero synthetic data policy",
+      "patterns": [
+        "fastrand::f32\\(\\)",
+        "random\\(\\).*\\*.*2\\.0.*-.*1\\.0",
+        "\\d+\\.\\d+.*\\+.*fastrand",
+        "synthetic.*price",
+        "fake.*market",
+        "toy.*data",
+        "placeholder.*data",
+        "dummy.*data",
+        "artificial.*data",
+        "simulated.*data",
+        "generated.*data.*random"
+      ],
+      "max_synthetic_score": 0.1,
+      "exclude_paths": [
+        "**/docs/**",
+        "**/examples/**",
+        "**/target/**",
+        "**/*.md"
+      ],
+      "blockOnDetection": true,
+      "alertLevel": "CRITICAL"
+    },
+    "real-data-enforcement": {
+      "enabled": true,
+      "strictMode": true,
+      "confidence_threshold": 0.85,
+      "description": "Ensures real API integration and data validation",
+      "required_patterns": [
+        "API_KEY",
+        "authenticate",
+        "validate.*data",
+        "real.*market.*data",
+        "api.*integration"
+      ],
+      "forbidden_patterns": [
+        "synthetic.*fallback",
+        "mock.*when.*prod",
+        "fake.*if.*missing",
+        "default.*random",
+        "generate.*if.*no.*api"
+      ],
+      "enforce_api_keys": true,
+      "require_validation": true,
+      "alertLevel": "HIGH"
+    },
+    "policy-enforcement": {
+      "enabled": true,
+      "strictMode": true,
+      "description": "Custom code quality rules for financial systems",
+      "policies": {
+        "no-hardcoded-credentials": {
+          "enabled": true,
+          "patterns": [
+            "password.*=.*\".*\"",
+            "api_key.*=.*\".*\"",
+            "secret.*=.*\".*\"",
+            "token.*=.*\".*\""
+          ],
+          "severity": "CRITICAL"
+        },
+        "no-synthetic-financial-data": {
+          "enabled": true,
+          "patterns": [
+            "price.*\\*.*random",
+            "volume.*\\*.*random",
+            "sentiment.*random",
+            "ohlc.*fake",
+            "market.*synthetic"
+          ],
+          "severity": "CRITICAL"
+        },
+        "require-real-data-validation": {
+          "enabled": true,
+          "required_in_files": [
+            "**/market_data/**/*.rs",
+            "**/financial/**/*.rs"
+          ],
+          "patterns": [
+            "validate.*data",
+            "verify.*authenticity",
+            "check.*integrity"
+          ],
+          "severity": "HIGH"
+        }
+      }
+    }
+  },
+  "hooks": {
+    "enabled": true,
+    "blockOnCritical": true,
+    "triggers": {
+      "preEdit": true,
+      "postEdit": true,
+      "preCommit": true,
+      "preBuild": true
+    },
+    "commands": {
+      "preEdit": "npx claude-flow@alpha cqgs analyze --target={file} --quick",
+      "postEdit": "npx claude-flow@alpha cqgs analyze --target={file} --full",
+      "preCommit": "npx claude-flow@alpha cqgs analyze . --fail-on-detection"
+    }
+  },
+  "performance": {
+    "parallel": true,
+    "maxWorkers": 8,
+    "timeout": 30000,
+    "cacheResults": true,
+    "cacheTTL": 300,
+    "maxFileSize": "10MB"
+  },
+  "notifications": {
+    "enabled": true,
+    "channels": ["console", "file"],
+    "logFile": ".cqgs/cqgs-alerts.log",
+    "format": "detailed",
+    "includeContext": true
+  },
+  "reporting": {
+    "generateReports": true,
+    "reportFormat": "markdown",
+    "reportPath": ".cqgs/reports/",
+    "scheduleDaily": true,
+    "includeMetrics": true
+  }
+}

@@ -1,0 +1,108 @@
+# Minimal configuration for Hive Mind Rust Backend
+# Basic setup for testing and resource-constrained environments
+
+[instance]
+instance_id = "minimal-550e8400-e29b-41d4-a716-446655440000"
+environment = "minimal"
+log_level = "warn"
+
+[network]
+listen_addr = "127.0.0.1"
+p2p_port = 8280
+api_port = 8290
+max_peers = 3
+connection_timeout = "120s"
+heartbeat_interval = "60s"
+enable_encryption = false
+enable_compression = false
+
+[consensus]
+algorithm = "raft"
+min_nodes = 1
+max_nodes = 3
+timeout = "10s"
+election_timeout = "30s"
+heartbeat_interval = "5s"
+byzantine_threshold = 0.0
+enable_fast_commit = false
+batch_size = 10
+
+[memory]
+max_pool_size = 134217728  # 128MB
+cleanup_interval = "10m"
+replication_factor = 1
+enable_persistence = false
+snapshot_interval = "60m"
+compression_level = 0
+cache_size = 33554432  # 32MB
+
+[neural]
+enable_pattern_recognition = false
+architecture = "simple_nn"
+training_enabled = false
+model_cache_size = 16777216  # 16MB
+inference_timeout = "1s"
+training_batch_size = 4
+learning_rate = 0.1
+enable_gpu = false
+
+[agents]
+max_agents = 5
+spawning_strategy = "manual"
+heartbeat_interval = "120s"
+task_timeout = "300s"
+enable_auto_scaling = false
+min_agents = 1
+max_cpu_per_agent = 25.0
+max_memory_per_agent = 16777216  # 16MB
+
+[metrics]
+enabled = false
+collection_interval = "300s"
+prometheus_port = 9290
+enable_detailed_metrics = false
+retention_period = "1h"
+export_interval = "600s"
+
+[security]
+enable_encryption = false
+encryption_algorithm = "none"
+key_rotation_interval = "168h"
+enable_mutual_auth = false
+token_expiration = "24h"
+rate_limit_requests_per_second = 100
+
+[fault_tolerance]
+enable_circuit_breakers = false
+circuit_breaker_threshold = 10
+circuit_breaker_timeout = "300s"
+enable_auto_recovery = false
+max_recovery_attempts = 1
+recovery_interval = "300s"
+health_check_interval = "120s"
+enable_graceful_degradation = false
+
+[performance]
+enable_simd = false
+enable_threading = false
+max_threads = 1
+enable_zero_copy = false
+buffer_size = 4096
+batch_processing = false
+enable_prefetch = false
+
+[monitoring]
+enable_health_dashboard = false
+dashboard_port = 8291
+enable_alerts = false
+alert_channels = []
+webhook_url = ""
+enable_profiling = false
+
+[trading_integration]
+enable_trading_hooks = false
+trading_engine_endpoint = ""
+risk_management_endpoint = ""
+market_data_endpoint = ""
+enable_fast_execution = false
+latency_target_microseconds = 100000

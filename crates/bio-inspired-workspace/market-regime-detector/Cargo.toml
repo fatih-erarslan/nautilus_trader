@@ -1,0 +1,11 @@
+[package]
+name = "market-regime-detector"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Market regime detection for trading strategies"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde"] }

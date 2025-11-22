@@ -328,6 +328,7 @@ pub struct InteractiveBrokersProvider {
     base_url: String,
 
     /// Configuration
+    #[allow(dead_code)]
     config: ProviderConfig,
 
     /// Session authentication status

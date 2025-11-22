@@ -1,0 +1,242 @@
+{
+  "timestamp": "2025-08-11T02:51:29.364Z",
+  "tools": {
+    "scan_parasitic_opportunities": {
+      "status": "SUCCESS",
+      "execution_time": 152,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": true,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "scan_results",
+          "selected_pairs",
+          "organism_analysis",
+          "performance"
+        ]
+      }
+    },
+    "detect_whale_nests": {
+      "status": "SUCCESS",
+      "execution_time": 2,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": true,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "whale_detection",
+          "whale_nests",
+          "cuckoo_recommendations",
+          "whale_analytics",
+          "performance"
+        ]
+      }
+    },
+    "identify_zombie_pairs": {
+      "status": "SUCCESS",
+      "execution_time": 2,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": true,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "zombie_detection",
+          "zombie_pairs",
+          "cordyceps_strategies",
+          "algorithmic_analysis",
+          "mind_control_metrics",
+          "performance"
+        ]
+      }
+    },
+    "analyze_mycelial_network": {
+      "status": "SUCCESS",
+      "execution_time": 16,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": true,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "mycelial_analysis",
+          "correlation_matrix",
+          "network_topology",
+          "correlation_clusters",
+          "hub_pairs",
+          "resource_distribution",
+          "nutrient_flow_analysis",
+          "spore_propagation_paths",
+          "network_health_metrics",
+          "performance"
+        ]
+      }
+    },
+    "activate_octopus_camouflage": {
+      "status": "SUCCESS",
+      "execution_time": 2,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": false,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "camouflage_activation",
+          "threat_assessment",
+          "chromatophore_configuration",
+          "camouflage_strategies",
+          "adaptive_behaviors",
+          "stealth_metrics",
+          "predator_evasion",
+          "performance"
+        ]
+      }
+    },
+    "deploy_anglerfish_lure": {
+      "status": "SUCCESS",
+      "execution_time": 2,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": true,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "lure_deployment",
+          "bioluminescent_configuration",
+          "lure_strategies",
+          "prey_analysis",
+          "honey_pot_setup",
+          "artificial_activity_patterns",
+          "predatory_behavior",
+          "performance"
+        ]
+      }
+    },
+    "track_wounded_pairs": {
+      "status": "SUCCESS",
+      "execution_time": 5,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": false,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "wounded_pair_tracking",
+          "wounded_pairs",
+          "tracking_strategy",
+          "venom_system",
+          "hunting_behavior",
+          "predatory_analytics",
+          "performance"
+        ]
+      }
+    },
+    "enter_cryptobiosis": {
+      "status": "SUCCESS",
+      "execution_time": 2,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": false,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "cryptobiosis_activation",
+          "market_analysis",
+          "metabolic_shutdown",
+          "preservation_systems",
+          "suspended_activities",
+          "dormancy_metrics",
+          "revival_monitoring",
+          "survival_adaptations",
+          "performance"
+        ]
+      }
+    },
+    "electric_shock": {
+      "status": "SUCCESS",
+      "execution_time": 2,
+      "has_result": true,
+      "has_error": true,
+      "fallback_used": true,
+      "cqgs_compliant": false,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": false,
+        "has_performance_metrics": false,
+        "has_cqgs_validation": true,
+        "data_fields": [
+          "error",
+          "details",
+          "cqgs_compliance",
+          "timestamp",
+          "fallback_data"
+        ]
+      }
+    },
+    "electroreception_scan": {
+      "status": "SUCCESS",
+      "execution_time": 3,
+      "has_result": true,
+      "has_error": false,
+      "fallback_used": false,
+      "cqgs_compliant": true,
+      "real_data": true,
+      "result_structure": {
+        "has_main_data": false,
+        "has_performance_metrics": true,
+        "has_cqgs_validation": false,
+        "data_fields": [
+          "electroreception_scan",
+          "electroreceptor_analysis",
+          "detected_signals",
+          "bioelectric_analysis",
+          "subtle_order_flow",
+          "neural_processing",
+          "environmental_analysis",
+          "performance"
+        ]
+      }
+    }
+  },
+  "summary": {
+    "total_tools": 10,
+    "successful_tools": 10,
+    "success_rate": 100,
+    "total_execution_time_ms": 188,
+    "average_execution_time_ms": 18.8
+  }
+}

@@ -1,0 +1,81 @@
+[package]
+name = "autopoiesis-ml"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Machine learning components"
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+autopoiesis-core.workspace = true
+
+# Mathematical dependencies
+ndarray.workspace = true
+nalgebra.workspace = true
+num-traits.workspace = true
+num-complex.workspace = true
+statrs.workspace = true
+rand.workspace = true
+rand_distr.workspace = true
+
+# Machine learning
+smartcore.workspace = true
+linfa.workspace = true
+linfa-clustering.workspace = true
+linfa-reduction.workspace = true
+
+# Optimization
+argmin.workspace = true
+argmin-math.workspace = true
+
+# System utilities
+chrono.workspace = true
+uuid.workspace = true
+rust_decimal.workspace = true
+once_cell.workspace = true
+
+# HTTP and API
+axum.workspace = true
+reqwest.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+jsonwebtoken.workspace = true
+url.workspace = true
+
+# Parallel processing
+crossbeam-channel.workspace = true
+crossbeam-deque.workspace = true
+dashmap.workspace = true
+rayon.workspace = true
+
+# Additional utilities
+bincode.workspace = true
+urlencoding.workspace = true
+sha2.workspace = true
+
+# Optional dependencies for features
+criterion = { workspace = true, optional = true }
+proptest = { workspace = true, optional = true }
+
+[features]
+default = []
+benchmarks = ["criterion"]
+property-tests = ["proptest"]
+
+[dev-dependencies]
+tokio-test = "0.4"
+approx.workspace = true
+tempfile.workspace = true
+pretty_assertions.workspace = true
+test-case.workspace = true
+quickcheck.workspace = true
+quickcheck_macros.workspace = true
+serial_test.workspace = true

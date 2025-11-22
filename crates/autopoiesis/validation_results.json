@@ -1,0 +1,101 @@
+{
+  "workspace_compilation": {
+    "success": false,
+    "time": 0.3380165100097656,
+    "stdout": "",
+    "stderr": "warning: virtual workspace defaulting to `resolver = \"1\"` despite one or more workspace members being on edition 2021 which implies `resolver = \"2\"`\nnote: to keep the current resolver, specify `workspace.resolver = \"1\"` in the workspace root's manifest\nnote: to use the edition 2021 resolver, specify `workspace.resolver = \"2\"` in the workspace root's manifest\nnote: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions\nwarning: missing documentation for an enum\n  --> autopoiesis-consciousness/src/lib.rs:10:1\n   |\n10 | pub enum ConsciousnessError {\n   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\nnote: the lint level is defined here\n  --> autopoiesis-consciousness/src/lib.rs:2:9\n   |\n2  | #![warn(missing_docs)]\n   |         ^^^^^^^^^^^^\n\nwarning: missing documentation for a variant\n  --> autopoiesis-consciousness/src/lib.rs:12:5\n   |\n12 |     Processing(String),\n   |     ^^^^^^^^^^\n\nwarning: missing documentation for a type alias\n  --> autopoiesis-consciousness/src/lib.rs:15:1\n   |\n15 | pub type Result<T> = std::result::Result<T, ConsciousnessError>;\n   | ^^^^^^^^^^^^^^^^^^\n\nwarning: missing documentation for a module\n  --> autopoiesis-consciousness/src/lib.rs:17:1\n   |\n17 | pub mod prelude {\n   | ^^^^^^^^^^^^^^^\n\nwarning: missing documentation for an enum\n  --> autopoiesis-finance/src/lib.rs:10:1\n   |\n10 | pub enum FinanceError {\n   | ^^^^^^^^^^^^^^^^^^^^^\n   |\nnote: the lint level is defined here\n  --> autopoiesis-finance/src/lib.rs:2:9\n   |\n2  | #![warn(missing_docs)]\n   |         ^^^^^^^^^^^^\n\nwarning: missing documentation for a variant\n  --> autopoiesis-finance/src/lib.rs:12:5\n   |\n12 |     Processing(String),\n   |     ^^^^^^^^^^\n\nwarning: missing documentation for a type alias\n  --> autopoiesis-finance/src/lib.rs:15:1\n   |\n15 | pub type Result<T> = std::result::Result<T, FinanceError>;\n   | ^^^^^^^^^^^^^^^^^^\n\nwarning: missing documentation for a module\n  --> autopoiesis-finance/src/lib.rs:17:1\n   |\n17 | pub mod prelude {\n   | ^^^^^^^^^^^^^^^\n\nwarning: missing documentation for an enum\n  --> autopoiesis-api/src/lib.rs:10:1\n   |\n10 | pub enum ApiError {\n   | ^^^^^^^^^^^^^^^^^\n   |\nnote: the lint level is defined here\n  --> autopoiesis-api/src/lib.rs:2:9\n   |\n2  | #![warn(missing_docs)]\n   |         ^^^^^^^^^^^^\n\nwarning: missing documentation for a variant\n  --> autopoiesis-api/src/lib.rs:12:5\n   |\n12 |     Processing(String),\n   |     ^^^^^^^^^^\n\nwarning: missing documentation for a type alias\n  --> autopoiesis-api/src/lib.rs:15:1\n   |\n15 | pub type Result<T> = std::result::Result<T, ApiError>;\n   | ^^^^^^^^^^^^^^^^^^\n\nwarning: missing documentation for a module\n  --> autopoiesis-api/src/lib.rs:17:1\n   |\n17 | pub mod prelude {\n   | ^^^^^^^^^^^^^^^\n\nwarning: missing documentation for a variant\n  --> autopoiesis-ml/src/lib.rs:13:5\n   |\n13 |     Processing(String),\n   |     ^^^^^^^^^^\n   |\nnote: the lint level is defined here\n  --> autopoiesis-ml/src/lib.rs:2:9\n   |\n2  | #![warn(missing_docs)]\n   |         ^^^^^^^^^^^^\n\nwarning: missing documentation for a type alias\n  --> autopoiesis-ml/src/lib.rs:16:1\n   |\n16 | pub type Result<T> = std::result::Result<T, MlError>;\n   | ^^^^^^^^^^^^^^^^^^\n\nwarning: missing documentation for a module\n  --> autopoiesis-ml/src/lib.rs:18:1\n   |\n18 | pub mod prelude {\n   | ^^^^^^^^^^^^^^^\n\nwarning: missing documentation for an enum\n  --> autopoiesis-analysis/src/lib.rs:10:1\n   |\n10 | pub enum AnalysisError {\n   | ^^^^^^^^^^^^^^^^^^^^^^\n   |\nnote: the lint level is defined here\n  --> autopoiesis-analysis/src/lib.rs:2:9\n   |\n2  | #![warn(missing_docs)]\n   |         ^^^^^^^^^^^^\n\nwarning: missing documentation for a variant\n  --> autopoiesis-analysis/src/lib.rs:12:5\n   |\n12 |     Processing(String),\n   |     ^^^^^^^^^^\n\nwarning: missing documentation for a type alias\n  --> autopoiesis-analysis/src/lib.rs:15:1\n   |\n15 | pub type Result<T> = std::result::Result<T, AnalysisError>;\n   | ^^^^^^^^^^^^^^^^^^\n\nwarning: missing documentation for a module\n  --> autopoiesis-analysis/src/lib.rs:17:1\n   |\n17 | pub mod prelude {\n   | ^^^^^^^^^^^^^^^\n\nwarning: missing documentation for an enum\n  --> autopoiesis-engines/src/lib.rs:10:1\n   |\n10 | pub enum EnginesError {\n   | ^^^^^^^^^^^^^^^^^^^^^\n   |\nnote: the lint level is defined here\n  --> autopoiesis-engines/src/lib.rs:2:9\n   |\n2  | #![warn(missing_docs)]\n   |         ^^^^^^^^^^^^\n\nwarning: missing documentation for a variant\n  --> autopoiesis-engines/src/lib.rs:12:5\n   |\n12 |     Processing(String),\n   |     ^^^^^^^^^^\n\nwarning: missing documentation for a type alias\n  --> autopoiesis-engines/src/lib.rs:15:1\n   |\n15 | pub type Result<T> = std::result::Result<T, EnginesError>;\n   | ^^^^^^^^^^^^^^^^^^\n\nwarning: missing documentation for a module\n  --> autopoiesis-engines/src/lib.rs:17:1\n   |\n17 | pub mod prelude {\n   | ^^^^^^^^^^^^^^^\n\nwarning: `autopoiesis-consciousness` (lib) generated 4 warnings\nwarning: `autopoiesis-finance` (lib) generated 4 warnings\nwarning: `autopoiesis-api` (lib) generated 4 warnings\nwarning: `autopoiesis-ml` (lib) generated 3 warnings\nwarning: `autopoiesis-analysis` (lib) generated 4 warnings\nwarning: `autopoiesis-engines` (lib) generated 4 warnings\n    Checking autopoiesis v0.1.0 (/home/kutlu/TONYUKUK/autopoiesis/autopoiesis)\nerror[E0433]: failed to resolve: use of unresolved module or unlinked crate `tracing_subscriber`\n --> autopoiesis/src/main.rs:9:5\n  |\n9 |     tracing_subscriber::fmt::init();\n  |     ^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `tracing_subscriber`\n  |\n  = help: if you wanted to use a crate named `tracing_subscriber`, use `cargo add tracing_subscriber` to add it to your `Cargo.toml`\n\nwarning: unused import: `autopoiesis::prelude::*`\n --> autopoiesis/src/main.rs:3:5\n  |\n3 | use autopoiesis::prelude::*;\n  |     ^^^^^^^^^^^^^^^^^^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` on by default\n\nwarning: unused import: `error`\n --> autopoiesis/src/main.rs:4:21\n  |\n4 | use tracing::{info, error};\n  |                     ^^^^^\n\nFor more information about this error, try `rustc --explain E0433`.\nwarning: `autopoiesis` (bin \"autopoiesis\") generated 2 warnings\nerror: could not compile `autopoiesis` (bin \"autopoiesis\") due to 1 previous error; 2 warnings emitted\n"
+  },
+  "crate_compilation": {
+    "autopoiesis-core": {
+      "success": true,
+      "time": 0.2722494602203369,
+      "lines_of_code": 6375
+    },
+    "autopoiesis-ml": {
+      "success": true,
+      "time": 0.9195075035095215,
+      "lines_of_code": 43774
+    },
+    "autopoiesis-consciousness": {
+      "success": true,
+      "time": 0.3484029769897461,
+      "lines_of_code": 3472
+    },
+    "autopoiesis-finance": {
+      "success": true,
+      "time": 0.3784315586090088,
+      "lines_of_code": 8187
+    },
+    "autopoiesis-engines": {
+      "success": true,
+      "time": 0.3312692642211914,
+      "lines_of_code": 8587
+    },
+    "autopoiesis-analysis": {
+      "success": true,
+      "time": 0.3347287178039551,
+      "lines_of_code": 10241
+    },
+    "autopoiesis-api": {
+      "success": true,
+      "time": 0.3315141201019287,
+      "lines_of_code": 2906
+    }
+  },
+  "crate_structure": {
+    "autopoiesis-core": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 18
+    },
+    "autopoiesis-ml": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 67
+    },
+    "autopoiesis-consciousness": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 7
+    },
+    "autopoiesis-finance": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 5
+    },
+    "autopoiesis-engines": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 20
+    },
+    "autopoiesis-analysis": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 19
+    },
+    "autopoiesis-api": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 7
+    },
+    "autopoiesis": {
+      "exists": true,
+      "has_cargo_toml": true,
+      "has_lib_rs": true,
+      "src_modules": 0
+    }
+  },
+  "incremental_compilation": {
+    "full_compile_time": 0.3662552833557129,
+    "incremental_compile_time": 0.38091611862182617,
+    "improvement_ratio": 0.9615116437730256,
+    "both_successful": false
+  }
+}

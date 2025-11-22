@@ -9,9 +9,8 @@
 //! - Multi-symbol subscriptions
 
 use async_trait::async_trait;
-use base64::{Engine as _, engine::general_purpose};
 use chrono::{DateTime, Utc, Duration};
-use futures_util::{StreamExt, SinkExt};
+use futures_util::SinkExt;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -64,7 +63,9 @@ struct BybitKlineResponse {
 
 #[derive(Debug, Deserialize)]
 struct BybitKlineResult {
+    #[allow(dead_code)]
     symbol: String,
+    #[allow(dead_code)]
     category: String,
     list: Vec<Vec<String>>,
 }
@@ -187,6 +188,7 @@ impl BybitProvider {
     }
 
     /// Generate authentication signature for API requests
+    #[allow(dead_code)]
     fn generate_signature(&self, timestamp: &str, params: &str) -> Option<String> {
         let api_secret = self.api_secret.as_ref()?;
 

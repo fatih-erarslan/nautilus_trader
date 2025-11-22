@@ -1,0 +1,152 @@
+[package]
+name = "cwts-ultra"
+version = "2.0.0"
+edition = "2021"
+
+[dependencies]
+# Use workspace dependencies for version consistency
+crossbeam = { workspace = true }
+parking_lot = { workspace = true }
+spin = "0.9"
+
+# Atomics
+atomic = "0.5"
+
+# Memory
+mimalloc = { version = "0.1", default-features = false }
+
+# Math
+libm = "0.2"
+nalgebra = { workspace = true }
+ndarray = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+
+# Serialization (zero-copy)
+zerocopy = "0.7"
+bytemuck = "1.14"
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_urlencoded = "0.7"
+
+# Time
+quanta = "0.12"
+chrono = { workspace = true }
+
+# Async
+tokio = { workspace = true }
+axum = { workspace = true }
+tower = { workspace = true }
+futures-util = { workspace = true }
+
+# Randomness  
+rand = { workspace = true }
+rand_distr = "0.4"
+fastrand = "2.0"
+
+# System
+num_cpus = "1.16"
+
+# Missing dependencies
+log = { workspace = true }
+rust_decimal = { workspace = true }
+crossbeam-channel = { workspace = true }
+
+# Testing
+quickcheck = { version = "1.0", optional = true }
+quickcheck_macros = { version = "1.0", optional = true }
+approx = { version = "0.5", optional = true }
+statrs = "0.16"  # Required for scientific validation
+
+# Async-safe wrappers
+git2 = { version = "0.19", optional = true }
+rocksdb = { version = "0.22", optional = true }
+tempfile = { version = "3.8", optional = true }
+bytes = { workspace = true }
+
+# Parallel processing
+rayon = { workspace = true }
+
+# Metrics
+prometheus = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# WebSocket and MCP Protocol
+tokio-tungstenite = { workspace = true }
+futures = { workspace = true }
+uuid = { workspace = true }
+
+# HTTP
+reqwest = { version = "0.11", features = ["json"] }
+url = "2.4"
+
+# Additional dependencies for real data integration (using existing dependencies)
+
+# Neural network dependencies - using workspace unified versions
+candle-core = { workspace = true, optional = true }
+candle-nn = { workspace = true, optional = true }
+
+# Crypto
+hmac = "0.12"
+sha2 = { workspace = true }
+hex = "0.4"
+base64 = "0.21"
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+md5 = "0.7"
+
+# Bayesian VaR specific dependencies
+ring = "0.17"
+num-bigint = "0.4"
+
+# SIMD support
+wide = { version = "0.7", optional = true }
+
+# Optional GPU
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# cuda-sys = { version = "0.2", optional = true }
+# metal = { version = "0.27", optional = true }
+# vulkano = { version = "0.34", optional = true }
+
+# WASM
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+web-sys = "0.3"
+console_error_panic_hook = "0.1"
+
+[features]
+default = ["simd"]
+simd = ["dep:wide"]
+candle = ["dep:candle-core", "dep:candle-nn"]
+testing = ["dep:quickcheck", "dep:quickcheck_macros", "dep:approx"]
+cuda = []
+metal = []
+vulkan = []
+git-support = ["dep:git2", "dep:tempfile"]
+db-support = ["dep:rocksdb"]
+async-wrappers = ["git-support", "db-support"]
+all-gpu = ["cuda", "metal", "vulkan"]
+full = ["simd", "candle", "async-wrappers", "all-gpu"]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+debug = false
+overflow-checks = false
+
+[profile.bench]
+inherits = "release"
+
+[[bin]]
+name = "test_risk_management"
+path = "../test_risk_management.rs"
+
+[[bin]]
+name = "test_neural_fixes"
+path = "../src/test_neural_fixes.rs"

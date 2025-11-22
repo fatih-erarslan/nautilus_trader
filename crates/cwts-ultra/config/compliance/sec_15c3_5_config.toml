@@ -1,0 +1,302 @@
+# SEC Rule 15c3-5 Market Access Rule Configuration
+# CRITICAL: This configuration enforces regulatory compliance requirements
+
+[regulatory_requirements]
+# Maximum allowed pre-trade validation latency (nanoseconds)
+max_validation_latency_ns = 100_000_000  # 100ms regulatory limit
+
+# Maximum kill switch propagation time (nanoseconds)
+max_kill_switch_propagation_ns = 1_000_000_000  # 1 second regulatory limit
+
+# Audit trail retention period (years)
+audit_retention_years = 7
+
+# Immediate regulatory reporting required
+immediate_reporting = true
+
+[risk_controls]
+# Default risk limits for new clients
+[risk_controls.default_limits]
+max_order_size = "1000000"  # $1M
+max_position_size = "10000000"  # $10M
+max_daily_loss = "5000000"  # $5M
+max_credit_exposure = "50000000"  # $50M
+max_concentration_pct = "25.0"  # 25%
+max_orders_per_second = 100
+
+# High-frequency trading limits
+[risk_controls.hft_limits]
+max_order_size = "100000"  # $100K
+max_position_size = "1000000"  # $1M
+max_daily_loss = "500000"  # $500K
+max_credit_exposure = "5000000"  # $5M
+max_concentration_pct = "15.0"  # 15%
+max_orders_per_second = 1000
+
+# Institution-level limits
+[risk_controls.institutional_limits]
+max_order_size = "10000000"  # $10M
+max_position_size = "100000000"  # $100M
+max_daily_loss = "50000000"  # $50M
+max_credit_exposure = "500000000"  # $500M
+max_concentration_pct = "35.0"  # 35%
+max_orders_per_second = 10
+
+[market_access_controls]
+# Circuit breaker thresholds (percentage declines)
+level_1_threshold = "7.0"   # 7% - 15 minute halt
+level_2_threshold = "13.0"  # 13% - 15 minute halt
+level_3_threshold = "20.0"  # 20% - halt until next day
+
+# Market stress indicators
+[market_access_controls.stress_thresholds]
+volatility_warning = "30.0"    # VIX > 30
+volatility_critical = "50.0"   # VIX > 50
+liquidity_stress_warning = "70.0"  # 70th percentile
+liquidity_stress_critical = "90.0" # 90th percentile
+credit_stress_warning = "60.0"
+credit_stress_critical = "80.0"
+
+[kill_switch]
+# Authorization levels required for kill switch actions
+[kill_switch.authorization_levels]
+level_1 = ["trader", "senior_trader"]
+level_2 = ["desk_head", "risk_manager"]
+level_3 = ["compliance_officer", "cro"]
+level_4 = ["ceo", "president"]
+
+# Auto-trigger conditions
+[kill_switch.auto_triggers]
+# Daily loss limit trigger
+[kill_switch.auto_triggers.daily_loss]
+enabled = true
+threshold = "10000000"  # $10M daily loss
+requires_manual_confirm = false
+time_window_seconds = 86400  # 24 hours
+
+# Validation timeout rate trigger
+[kill_switch.auto_triggers.validation_timeout]
+enabled = true
+threshold = "10.0"  # 10% timeout rate
+requires_manual_confirm = true
+time_window_seconds = 300  # 5 minutes
+
+# Order rejection rate trigger
+[kill_switch.auto_triggers.rejection_rate]
+enabled = true
+threshold = "25.0"  # 25% rejection rate
+requires_manual_confirm = true
+time_window_seconds = 600  # 10 minutes
+
+# System latency trigger
+[kill_switch.auto_triggers.system_latency]
+enabled = true
+threshold = "200.0"  # 200ms average latency
+requires_manual_confirm = false
+time_window_seconds = 60  # 1 minute
+
+[audit_trail]
+# Cryptographic settings
+hash_algorithm = "SHA-256"
+audit_salt = "CWTS_AUDIT_TRAIL_2024_SEC_15C3_5"
+
+# Real-time integrity verification
+enable_real_time_verification = true
+verification_interval_seconds = 300  # 5 minutes
+
+# Archival settings
+[audit_trail.archival]
+auto_archive = true
+compression_threshold = 1000000  # 1M records
+compression_algorithm = "gzip"
+archive_location = "/var/audit/archives"
+
+# Anomaly detection thresholds
+[audit_trail.anomaly_detection]
+max_orders_per_second_per_trader = 100
+suspicious_pattern_score_threshold = 0.8
+hft_pattern_detection = true
+unusual_trading_pattern_detection = true
+
+[regulatory_reporting]
+# Immediate reporting triggers
+[regulatory_reporting.immediate_triggers]
+kill_switch_activation = true
+circuit_breaker_level_2_or_3 = true
+daily_loss_exceeds_threshold = true
+system_failure = true
+security_breach = true
+
+# Scheduled reporting
+[regulatory_reporting.scheduled]
+daily_reports = true
+weekly_reports = true
+monthly_reports = true
+quarterly_reports = true
+
+# Report delivery
+[regulatory_reporting.delivery]
+# Regulatory contacts (would be real emails in production)
+sec_contact = "sec-reporting@regulator.gov"
+finra_contact = "finra-reporting@regulator.gov"
+internal_compliance = "compliance@firm.com"
+risk_management = "risk@firm.com"
+
+# Report formats
+formats = ["JSON", "XML", "CSV"]
+encryption_required = true
+digital_signature_required = true
+
+[performance_monitoring]
+# Performance thresholds for alerts
+max_validation_time_ms = 80  # Alert at 80ms (before 100ms limit)
+max_system_latency_ms = 50
+max_memory_usage_pct = 80.0
+max_cpu_usage_pct = 70.0
+
+# Load testing parameters
+[performance_monitoring.load_testing]
+max_concurrent_orders = 100000
+stress_test_duration_seconds = 300
+throughput_target_orders_per_second = 50000
+
+[notifications]
+# Emergency notification settings
+[notifications.emergency]
+phone_alerts = true
+email_alerts = true
+sms_alerts = true
+slack_alerts = true
+
+# Escalation matrix
+[notifications.escalation]
+# Level 1: Immediate notification (0-5 minutes)
+level_1_contacts = [
+    "risk-manager@firm.com",
+    "compliance-officer@firm.com"
+]
+
+# Level 2: Senior management (5-15 minutes)
+level_2_contacts = [
+    "cro@firm.com",
+    "cto@firm.com"
+]
+
+# Level 3: Executive leadership (15-30 minutes)
+level_3_contacts = [
+    "ceo@firm.com",
+    "president@firm.com"
+]
+
+# Level 4: Board/External (30+ minutes)
+level_4_contacts = [
+    "board-chair@firm.com",
+    "external-counsel@firm.com"
+]
+
+[system_integration]
+# Exchange connections
+[system_integration.exchanges]
+enable_exchange_integration = true
+max_exchange_latency_ms = 10
+heartbeat_interval_seconds = 5
+
+# Order management system
+[system_integration.oms]
+enable_oms_integration = true
+order_state_sync_interval_ms = 100
+position_sync_interval_ms = 1000
+
+# Risk management system
+[system_integration.rms]
+enable_rms_integration = true
+real_time_risk_updates = true
+position_limit_sync_interval_ms = 500
+
+# Market data feeds
+[system_integration.market_data]
+enable_market_data_integration = true
+price_update_interval_ms = 10
+volatility_calculation_interval_seconds = 60
+
+[database]
+# Audit database configuration
+[database.audit]
+connection_string = "postgresql://audit_user:password@localhost/audit_db"
+connection_pool_size = 50
+max_connection_lifetime_seconds = 3600
+query_timeout_seconds = 30
+
+# Risk database configuration
+[database.risk]
+connection_string = "postgresql://risk_user:password@localhost/risk_db"
+connection_pool_size = 100
+max_connection_lifetime_seconds = 1800
+query_timeout_seconds = 10
+
+# Real-time cache (Redis)
+[database.cache]
+redis_url = "redis://localhost:6379"
+connection_pool_size = 20
+key_expiration_seconds = 300
+
+[security]
+# Encryption settings
+encryption_algorithm = "AES-256-GCM"
+key_rotation_interval_days = 90
+
+# Access control
+[security.access_control]
+multi_factor_authentication = true
+session_timeout_minutes = 30
+max_failed_login_attempts = 3
+account_lockout_duration_minutes = 15
+
+# Network security
+[security.network]
+enable_tls = true
+min_tls_version = "1.3"
+enable_ip_whitelisting = true
+max_connections_per_ip = 100
+
+# Audit logging of security events
+[security.audit]
+log_all_access_attempts = true
+log_configuration_changes = true
+log_privilege_escalations = true
+alert_on_suspicious_activity = true
+
+[backup_and_recovery]
+# Backup configuration
+[backup_and_recovery.backup]
+enable_automated_backup = true
+backup_interval_hours = 4
+backup_retention_days = 30
+backup_encryption = true
+
+# Disaster recovery
+[backup_and_recovery.disaster_recovery]
+enable_hot_standby = true
+failover_timeout_seconds = 30
+recovery_point_objective_minutes = 5  # Max 5 minutes data loss
+recovery_time_objective_minutes = 15  # Max 15 minutes downtime
+
+[logging]
+# Log levels
+default_level = "INFO"
+audit_level = "DEBUG"
+risk_level = "DEBUG"
+performance_level = "INFO"
+
+# Log rotation
+[logging.rotation]
+max_file_size_mb = 100
+max_files = 100
+compress_old_files = true
+
+# Structured logging
+[logging.format]
+use_json_format = true
+include_timestamps = true
+include_correlation_ids = true
+include_performance_metrics = true

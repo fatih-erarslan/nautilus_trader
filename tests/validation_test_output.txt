@@ -1,0 +1,1042 @@
+   Compiling wgpu-hal v0.21.1
+   Compiling objc v0.2.7
+   Compiling wgpu-core v0.21.1
+   Compiling wgpu-types v0.20.0
+   Compiling nalgebra v0.32.6
+   Compiling naga v0.20.0
+   Compiling wgpu v0.20.1
+   Compiling bindgen v0.66.1
+   Compiling prost-build v0.12.6
+   Compiling metal v0.28.0
+   Compiling fhe-math v0.1.0-beta.8
+   Compiling fhe v0.1.0-beta.8
+   Compiling z3-sys v0.8.1
+   Compiling hyperphysics-homomorphic v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-homomorphic)
+   Compiling hyperphysics-geometry v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-geometry)
+   Compiling statrs v0.17.1
+   Compiling hyperphysics-finance v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-finance)
+   Compiling hyperphysics-pbit v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-pbit)
+   Compiling hyperphysics-market v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-market)
+   Compiling hyperphysics-thermo v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-thermo)
+   Compiling hyperphysics-consciousness v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-consciousness)
+   Compiling hyperphysics-syntergic v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-syntergic)
+   Compiling hyperphysics-risk v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-risk)
+warning: unused import: `approx::assert_relative_eq`
+ --> crates/hyperphysics-pbit/tests/proptest_coupling.rs:7:5
+  |
+7 | use approx::assert_relative_eq;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `size`
+  --> crates/hyperphysics-pbit/tests/proptest_gillespie.rs:22:13
+   |
+22 |             size in 1usize..100,
+   |             ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `temperature`
+  --> crates/hyperphysics-pbit/tests/proptest_gillespie.rs:23:13
+   |
+23 |             temperature in 0.1f64..1000.0,
+   |             ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temperature`
+
+warning: unused variable: `temperature`
+  --> crates/hyperphysics-pbit/tests/proptest_gillespie.rs:40:13
+   |
+40 |             temperature in 0.1f64..1000.0,
+   |             ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temperature`
+
+warning: unused variable: `temperature`
+  --> crates/hyperphysics-pbit/tests/proptest_gillespie.rs:59:13
+   |
+59 |             temperature in 0.1f64..1000.0,
+   |             ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temperature`
+
+warning: unused variable: `temperature`
+  --> crates/hyperphysics-pbit/tests/proptest_gillespie.rs:80:13
+   |
+80 |             temperature in 0.1f64..1000.0,
+   |             ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temperature`
+
+warning: unused variable: `temperature`
+  --> crates/hyperphysics-pbit/tests/proptest_gillespie.rs:98:13
+   |
+98 |             temperature in 0.1f64..1000.0,
+   |             ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_temperature`
+
+warning: unused import: `approx::assert_relative_eq`
+   --> crates/hyperphysics-risk/src/var.rs:152:9
+    |
+152 |     use approx::assert_relative_eq;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling hyperphysics-core v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-core)
+warning: unused variable: `calc`
+    --> crates/hyperphysics-thermo/src/entropy.rs:1295:13
+     |
+1295 |         let calc = EntropyCalculator::new();
+     |             ^^^^ help: if this is intentional, prefix it with an underscore: `_calc`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/hyperphysics-risk/src/var.rs:159:13
+    |
+159 |         let mut returns: Vec<f64> = (0..100).map(|i| (i as f64 - 50.0) / 10.0).collect();
+    |             ----^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hyperphysics-pbit` (test "proptest_coupling") generated 1 warning (run `cargo fix --test "proptest_coupling" -p hyperphysics-pbit` to apply 1 suggestion)
+warning: `hyperphysics-risk` (lib test) generated 2 warnings (run `cargo fix --lib -p hyperphysics-risk --tests` to apply 2 suggestions)
+warning: unnecessary parentheses around block return value
+  --> crates/hyperphysics-consciousness/tests/proptest_hierarchical_phi.rs:24:5
+   |
+24 |     (0.1f64..=10.0f64)
+   |     ^                ^
+   |
+   = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+   |
+24 -     (0.1f64..=10.0f64)
+24 +     0.1f64..=10.0f64
+   |
+
+warning: unnecessary parentheses around block return value
+  --> crates/hyperphysics-consciousness/tests/proptest_hierarchical_phi.rs:29:5
+   |
+29 |     (1usize..=5usize)
+   |     ^               ^
+   |
+help: remove these parentheses
+   |
+29 -     (1usize..=5usize)
+29 +     1usize..=5usize
+   |
+
+warning: unnecessary parentheses around block return value
+  --> crates/hyperphysics-consciousness/tests/proptest_hierarchical_phi.rs:34:5
+   |
+34 |     (1.5f64..=4.0f64)
+   |     ^               ^
+   |
+help: remove these parentheses
+   |
+34 -     (1.5f64..=4.0f64)
+34 +     1.5f64..=4.0f64
+   |
+
+warning: unnecessary parentheses around block return value
+  --> crates/hyperphysics-consciousness/tests/proptest_hierarchical_phi.rs:39:5
+   |
+39 |     (2usize..=10usize)
+   |     ^                ^
+   |
+help: remove these parentheses
+   |
+39 -     (2usize..=10usize)
+39 +     2usize..=10usize
+   |
+
+warning: `hyperphysics-thermo` (lib test) generated 1 warning (run `cargo fix --lib -p hyperphysics-thermo --tests` to apply 1 suggestion)
+warning: `hyperphysics-pbit` (test "proptest_gillespie") generated 6 warnings (run `cargo fix --test "proptest_gillespie" -p hyperphysics-pbit` to apply 6 suggestions)
+warning: `hyperphysics-consciousness` (test "proptest_hierarchical_phi") generated 4 warnings (run `cargo fix --test "proptest_hierarchical_phi" -p hyperphysics-consciousness` to apply 4 suggestions)
+warning: struct `DepthUpdate` is never constructed
+  --> crates/hyperphysics-market/src/providers/binance.rs:97:8
+   |
+97 | struct DepthUpdate {
+   |        ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `symbol` and `category` are never read
+  --> crates/hyperphysics-market/src/providers/bybit.rs:66:5
+   |
+65 | struct BybitKlineResult {
+   |        ---------------- fields in this struct
+66 |     symbol: String,
+   |     ^^^^^^
+67 |     category: String,
+   |     ^^^^^^^^
+   |
+   = note: `BybitKlineResult` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `generate_signature` is never used
+   --> crates/hyperphysics-market/src/providers/bybit.rs:189:8
+    |
+ 78 | impl BybitProvider {
+    | ------------------ method in this implementation
+...
+189 |     fn generate_signature(&self, timestamp: &str, params: &str) -> Option<String> {
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: method `generate_signature` is never used
+   --> crates/hyperphysics-market/src/providers/coinbase.rs:165:8
+    |
+ 70 | impl CoinbaseProvider {
+    | --------------------- method in this implementation
+...
+165 |     fn generate_signature(&self, timestamp: &str, method: &str, path: &str, body: &str) -> Option<String> {
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: field `config` is never read
+   --> crates/hyperphysics-market/src/providers/interactive_brokers.rs:331:5
+    |
+323 | pub struct InteractiveBrokersProvider {
+    |            -------------------------- field in this struct
+...
+331 |     config: ProviderConfig,
+    |     ^^^^^^
+
+warning: method `generate_signature` is never used
+   --> crates/hyperphysics-market/src/providers/kraken.rs:206:8
+    |
+ 85 | impl KrakenProvider {
+    | ------------------- method in this implementation
+...
+206 |     fn generate_signature(&self, path: &str, nonce: &str, postdata: &str) -> Option<String> {
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: constant `OKX_WS_PRIVATE` is never used
+  --> crates/hyperphysics-market/src/providers/okx.rs:30:7
+   |
+30 | const OKX_WS_PRIVATE: &str = "wss://ws.okx.com:8443/ws/v5/private";
+   |       ^^^^^^^^^^^^^^
+
+warning: field `demo` is never read
+  --> crates/hyperphysics-market/src/providers/okx.rs:55:5
+   |
+35 | pub struct OKXProvider {
+   |            ----------- field in this struct
+...
+55 |     demo: bool,
+   |     ^^^^
+
+warning: fields `quote_volume` and `confirmed` are never read
+  --> crates/hyperphysics-market/src/providers/okx.rs:80:5
+   |
+66 | struct OKXCandle {
+   |        --------- fields in this struct
+...
+80 |     quote_volume: String,
+   |     ^^^^^^^^^^^^
+...
+84 |     confirmed: String,
+   |     ^^^^^^^^^
+   |
+   = note: `OKXCandle` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variable does not need to be mutable
+   --> crates/hyperphysics-market/src/risk.rs:934:13
+    |
+934 |         let mut position = Position {
+    |             ----^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hyperphysics-market` (lib test) generated 9 warnings (8 duplicates) (run `cargo fix --lib -p hyperphysics-market --tests` to apply 1 suggestion)
+warning: `hyperphysics-market` (lib) generated 9 warnings
+   Compiling hyperphysics v0.1.0 (/Users/ashina/Desktop/Kurultay/HyperPhysics)
+warning: unused import: `std::collections::HashMap`
+ --> tests/verify_risk_fixes.rs:3:5
+  |
+3 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0689]: can't call method `abs` on ambiguous numeric type `{float}`
+  --> tests/verify_risk_fixes.rs:27:48
+   |
+27 |     assert!((aapl_weight + googl_weight - 1.0).abs() < 1e-6, "Weights should sum to 1.0");
+   |                                                ^^^
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:189:17
+    |
+189 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:189:18
+    |
+189 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+189 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:191:17
+    |
+191 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:191:18
+    |
+191 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+191 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:228:17
+    |
+228 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:228:18
+    |
+228 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+228 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:230:17
+    |
+230 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:230:18
+    |
+230 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+230 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:260:17
+    |
+260 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:260:18
+    |
+260 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+260 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:262:17
+    |
+262 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:262:18
+    |
+262 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+262 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:285:17
+    |
+285 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:285:18
+    |
+285 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+285 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:287:17
+    |
+287 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:287:18
+    |
+287 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+287 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:303:17
+    |
+303 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:303:18
+    |
+303 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+303 |     println!("={}".repeat(80));
+    |                ++
+
+error: expected `,`, found `.`
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:305:17
+    |
+305 |     println!("=".repeat(80));
+    |                 ^ expected `,`
+
+error: argument never used
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:305:18
+    |
+305 |     println!("=".repeat(80));
+    |              --- ^^^^^^^^^^ argument never used
+    |              |
+    |              formatting specifier missing
+    |
+help: format specifiers use curly braces, consider adding a format specifier
+    |
+305 |     println!("={}".repeat(80));
+    |                ++
+
+warning: unused imports: `Duration` and `Utc`
+ --> crates/hyperphysics-market/tests/crypto_integration.rs:6:14
+  |
+6 | use chrono::{Utc, Duration};
+  |              ^^^  ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+For more information about this error, try `rustc --explain E0689`.
+warning: `hyperphysics` (test "verify_risk_fixes") generated 1 warning
+error: could not compile `hyperphysics` (test "verify_risk_fixes") due to 1 previous error; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...
+error[E0432]: unresolved import `ndarray`
+  --> tests/python_bridge_integration.rs:16:9
+   |
+16 |     use ndarray::Array1;
+   |         ^^^^^^^ use of unresolved module or unlinked crate `ndarray`
+   |
+   = help: if you wanted to use a crate named `ndarray`, use `cargo add ndarray` to add it to your `Cargo.toml`
+
+error[E0432]: unresolved import `approx`
+  --> tests/python_bridge_integration.rs:17:9
+   |
+17 |     use approx::assert_relative_eq;
+   |         ^^^^^^ use of unresolved module or unlinked crate `approx`
+   |
+   = help: if you wanted to use a crate named `approx`, use `cargo add approx` to add it to your `Cargo.toml`
+
+warning: unnecessary parentheses around assigned value
+   --> tests/python_bridge_integration.rs:129:30
+    |
+129 |             let volatility = ((i as f64 * 0.1).sin() * 2.0);
+    |                              ^                            ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+129 -             let volatility = ((i as f64 * 0.1).sin() * 2.0);
+129 +             let volatility = (i as f64 * 0.1).sin() * 2.0;
+    |
+
+error[E0432]: unresolved import `ed25519_dalek`
+ --> tests/crypto_standalone.rs:5:9
+  |
+5 |     use ed25519_dalek::{Signer, Verifier, SigningKey, VerifyingKey, Signature};
+  |         ^^^^^^^^^^^^^ use of unresolved module or unlinked crate `ed25519_dalek`
+  |
+  = help: if you wanted to use a crate named `ed25519_dalek`, use `cargo add ed25519_dalek` to add it to your `Cargo.toml`
+
+error[E0432]: unresolved import `serde`
+ --> tests/crypto_standalone.rs:6:9
+  |
+6 |     use serde::{Deserialize, Serialize};
+  |         ^^^^^ help: a similar path exists: `chrono::serde`
+
+warning: unused variable: `i`
+   --> examples/risk_management_example.rs:144:10
+    |
+144 |     for (i, ret) in returns.iter().enumerate() {
+    |          ^ help: if this is intentional, prefix it with an underscore: `_i`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+error: cannot find attribute `serde` in this scope
+  --> tests/crypto_standalone.rs:13:11
+   |
+13 |         #[serde(skip)]
+   |           ^^^^^
+   |
+   = note: `serde` is an attribute that can be used by the derive macros `Deserialize` and `Serialize`, you might be missing a `derive` attribute
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:189:18
+    |
+189 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:191:18
+    |
+191 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:228:18
+    |
+228 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:230:18
+    |
+230 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:260:18
+    |
+260 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:262:18
+    |
+262 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:285:18
+    |
+285 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:287:18
+    |
+287 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:303:18
+    |
+303 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0425]: cannot find function `repeat` in this scope
+   --> crates/hyperphysics-market/examples/backtest_demo.rs:305:18
+    |
+305 |     println!("=".repeat(80));
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing one of these functions
+    |
+  5 + use std::array::repeat;
+    |
+  5 + use std::io::repeat;
+    |
+  5 + use std::iter::repeat;
+    |
+  5 + use core::array::repeat;
+    |
+    = and 6 other candidates
+
+error[E0407]: method `on_trade` is not a member of trait `Strategy`
+   --> examples/risk_backtest_integration.rs:169:5
+    |
+169 | /     fn on_trade(&mut self, bar: &Bar, side: Side, quantity: f64, price: f64) {
+170 | |         println!("{} - {} {} @ ${:.2}",
+171 | |             bar.timestamp.format("%Y-%m-%d"),
+172 | |             if matches!(side, Side::Long) { "BUY" } else { "SELL" },
+...   |
+184 | |     }
+    | |_____^ not a member of trait `Strategy`
+
+error[E0407]: method `on_close` is not a member of trait `Strategy`
+   --> examples/risk_backtest_integration.rs:186:5
+    |
+186 | /     fn on_close(&mut self, bar: &Bar, side: Side, quantity: f64, price: f64, pnl: f64) {
+187 | |         println!("{} - CLOSE {} @ ${:.2} (P&L: ${:.2})",
+188 | |             bar.timestamp.format("%Y-%m-%d"),
+189 | |             quantity,
+...   |
+199 | |         self.risk_manager.update_capital(current_capital + pnl);
+200 | |     }
+    | |_____^ not a member of trait `Strategy`
+
+error[E0407]: method `on_day_end` is not a member of trait `Strategy`
+   --> examples/risk_backtest_integration.rs:202:5
+    |
+202 | /     fn on_day_end(&mut self, _date: chrono::NaiveDate) {
+203 | |         // Reset daily tracking
+204 | |         self.risk_manager.reset_daily();
+...   |
+213 | |         println!("  Leverage: {:.2}x\n", metrics.leverage);
+214 | |     }
+    | |_____^ not a member of trait `Strategy`
+
+error[E0407]: method `final_report` is not a member of trait `Strategy`
+   --> examples/risk_backtest_integration.rs:216:5
+    |
+216 | /     fn final_report(&self) {
+217 | |         println!("\n=== Risk Management Report ===");
+218 | |
+219 | |         let metrics = self.risk_manager.get_metrics();
+...   |
+247 | |         println!("\n=== End Report ===\n");
+248 | |     }
+    | |_____^ not a member of trait `Strategy`
+
+error[E0574]: expected struct, variant or union type, found enum `Signal`
+   --> examples/risk_backtest_integration.rs:161:14
+    |
+161 |         Some(Signal {
+    |              ^^^^^^ not a struct, variant or union type
+
+error[E0603]: struct `Bar` is private
+  --> examples/risk_backtest_integration.rs:10:55
+   |
+10 |     Strategy, BacktestEngine, BacktestConfig, Signal, Bar, Side,
+   |                                                       ^^^ private struct
+   |
+note: the struct `Bar` is defined here
+  --> /Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-market/src/backtest.rs:65:19
+   |
+65 | use crate::data::{Bar, Tick, Timeframe};
+   |                   ^^^
+help: import `Bar` directly
+   |
+10 |     Strategy, BacktestEngine, BacktestConfig, Signal, hyperphysics_market::data::bar::Bar, Side,
+   |                                                       ++++++++++++++++++++++++++++++++
+
+warning: unused import: `hyperphysics_market::data::Timeframe`
+  --> examples/risk_backtest_integration.rs:12:5
+   |
+12 | use hyperphysics_market::data::Timeframe;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0195]: lifetime parameters or bounds on method `on_bar` do not match the trait declaration
+   --> examples/risk_backtest_integration.rs:90:14
+    |
+ 90 |     fn on_bar(&mut self, bar: &Bar) -> Option<Signal> {
+    |              ^ lifetimes do not match method in trait
+    |
+   ::: /Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-market/src/backtest.rs:103:5
+    |
+103 |     async fn on_bar(&mut self, bar: &Bar) -> Vec<Signal>;
+    |     ----------------------------------------------------- lifetimes in impl do not match this method in trait
+
+error[E0046]: not all trait items implemented, missing: `initialize`, `finalize`
+  --> examples/risk_backtest_integration.rs:89:1
+   |
+89 | impl Strategy for RiskAwareTrendStrategy {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ missing `initialize`, `finalize` in implementation
+   |
+   = help: implement the missing item: `fn initialize<'life0: 'async_trait, 'async_trait>(&'life0 mut self) -> Pin<Box<(dyn Future<Output = ()> + Send + 'async_trait)>> { todo!() }`
+   = help: implement the missing item: `fn finalize<'life0: 'async_trait, 'async_trait>(&'life0 mut self) -> Pin<Box<(dyn Future<Output = ()> + Send + 'async_trait)>> { todo!() }`
+
+For more information about this error, try `rustc --explain E0432`.
+warning: `hyperphysics` (test "python_bridge_integration") generated 1 warning
+error: could not compile `hyperphysics` (test "python_bridge_integration") due to 2 previous errors; 1 warning emitted
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+  --> tests/crypto_test.rs:65:9
+   |
+65 |         hex::encode(signature.to_bytes()),
+   |         ^^^ use of unresolved module or unlinked crate `hex`
+   |
+   = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+  --> tests/crypto_test.rs:86:20
+   |
+86 |         signature: hex::encode(agent1.sign(message).unwrap().to_bytes()),
+   |                    ^^^ use of unresolved module or unlinked crate `hex`
+   |
+   = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+  --> tests/crypto_test.rs:93:20
+   |
+93 |         signature: hex::encode(agent2.sign(message).unwrap().to_bytes()),
+   |                    ^^^ use of unresolved module or unlinked crate `hex`
+   |
+   = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+   --> tests/crypto_test.rs:100:20
+    |
+100 |         signature: hex::encode(agent3.sign(message).unwrap().to_bytes()),
+    |                    ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+  --> tests/crypto_standalone.rs:24:29
+   |
+24 |                 public_key: hex::encode(verifying_key.to_bytes()),
+   |                             ^^^ use of unresolved module or unlinked crate `hex`
+   |
+   = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+   --> tests/crypto_test.rs:143:9
+    |
+143 |         hex::encode(queen_signature.to_bytes()),
+    |         ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+   --> tests/crypto_test.rs:158:24
+    |
+158 |             signature: hex::encode(agent1.sign(&vote_message).unwrap().to_bytes()),
+    |                        ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+   --> tests/crypto_test.rs:164:24
+    |
+164 |             signature: hex::encode(agent2.sign(&vote_message).unwrap().to_bytes()),
+    |                        ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+   --> tests/crypto_test.rs:170:24
+    |
+170 |             signature: hex::encode(agent3.sign(&vote_message).unwrap().to_bytes()),
+    |                        ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0425`.
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `hyperphysics-market` (example "backtest_demo") due to 30 previous errors
+error: could not compile `hyperphysics` (test "crypto_test") due to 8 previous errors
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `hex`
+  --> tests/crypto_standalone.rs:36:32
+   |
+36 |             let public_bytes = hex::decode(public_key)
+   |                                ^^^ use of unresolved module or unlinked crate `hex`
+   |
+   = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0599]: no variant or associated item named `Long` found for enum `Side` in the current scope
+  --> examples/risk_backtest_integration.rs:80:24
+   |
+80 |             Some(Side::Long)
+   |                        ^^^^ variant or associated item not found in `Side`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `serde_json`
+   --> tests/crypto_standalone.rs:114:21
+    |
+114 |         let bytes = serde_json::to_vec(&mandate).unwrap();
+    |                     ^^^^^^^^^^ use of unresolved module or unlinked crate `serde_json`
+    |
+    = help: if you wanted to use a crate named `serde_json`, use `cargo add serde_json` to add it to your `Cargo.toml`
+
+error[E0599]: no variant or associated item named `Short` found for enum `Side` in the current scope
+  --> examples/risk_backtest_integration.rs:82:24
+   |
+82 |             Some(Side::Short)
+   |                        ^^^^^ variant or associated item not found in `Side`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `serde_json`
+   --> tests/crypto_standalone.rs:154:29
+    |
+154 |         let mandate_bytes = serde_json::to_vec(&mandate).unwrap();
+    |                             ^^^^^^^^^^ use of unresolved module or unlinked crate `serde_json`
+    |
+    = help: if you wanted to use a crate named `serde_json`, use `cargo add serde_json` to add it to your `Cargo.toml`
+
+warning: `hyperphysics` (example "risk_management_example") generated 1 warning (run `cargo fix --example "risk_management_example" -p hyperphysics` to apply 1 suggestion)
+error[E0599]: no variant or associated item named `Long` found for enum `Side` in the current scope
+   --> examples/risk_backtest_integration.rs:132:45
+    |
+132 |         let is_long = matches!(trend, Side::Long);
+    |                                             ^^^^ variant or associated item not found in `Side`
+
+error[E0599]: no variant or associated item named `Long` found for enum `Side` in the current scope
+   --> examples/risk_backtest_integration.rs:172:37
+    |
+172 |             if matches!(side, Side::Long) { "BUY" } else { "SELL" },
+    |                                     ^^^^ variant or associated item not found in `Side`
+
+error[E0599]: no variant named `PerShare` found for enum `Commission`
+   --> examples/risk_backtest_integration.rs:260:64
+    |
+260 |         commission: hyperphysics_market::backtest::Commission::PerShare { rate: 0.005 },
+    |                                                                ^^^^^^^^ variant not found in `Commission`
+
+error[E0559]: variant `Slippage::Fixed` has no field named `amount`
+   --> examples/risk_backtest_integration.rs:261:68
+    |
+261 |         slippage: hyperphysics_market::backtest::Slippage::Fixed { amount: 0.01 },
+    |                                                                    ^^^^^^ field does not exist
+    |
+   ::: /Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-market/src/backtest.rs:355:5
+    |
+355 |     Fixed(f64),
+    |     ----- `Slippage::Fixed` defined here
+    |
+help: `Slippage::Fixed` is a tuple variant, use the appropriate syntax
+    |
+261 -         slippage: hyperphysics_market::backtest::Slippage::Fixed { amount: 0.01 },
+261 +         slippage: hyperphysics_market::backtest::Slippage::Fixed(/* f64 */),
+    |
+
+error[E0063]: missing fields `end_date`, `start_date`, `symbols` and 1 other field in initializer of `BacktestConfig`
+   --> examples/risk_backtest_integration.rs:258:18
+    |
+258 |     let config = BacktestConfig {
+    |                  ^^^^^^^^^^^^^^ missing `end_date`, `start_date`, `symbols` and 1 other field
+
+Some errors have detailed explanations: E0432, E0433.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `hyperphysics` (test "crypto_standalone") due to 7 previous errors
+error[E0277]: the trait bound `RiskAwareTrendStrategy: MarketDataProvider` is not satisfied
+   --> examples/risk_backtest_integration.rs:265:42
+    |
+265 |     let mut engine = BacktestEngine::new(strategy, config);
+    |                      ------------------- ^^^^^^^^ unsatisfied trait bound
+    |                      |
+    |                      required by a bound introduced by this call
+    |
+help: the trait `MarketDataProvider` is not implemented for `RiskAwareTrendStrategy`
+   --> examples/risk_backtest_integration.rs:16:1
+    |
+ 16 | struct RiskAwareTrendStrategy {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `MarketDataProvider`:
+              AlpacaProvider
+              BinanceProvider
+              BybitProvider
+              CoinbaseProvider
+              InteractiveBrokersProvider
+              KrakenProvider
+              OKXProvider
+note: required by a bound in `BacktestEngine::<P>::new`
+   --> /Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-market/src/backtest.rs:649:9
+    |
+649 | impl<P: MarketDataProvider> BacktestEngine<P> {
+    |         ^^^^^^^^^^^^^^^^^^ required by this bound in `BacktestEngine::<P>::new`
+650 |     /// Create a new backtest engine
+651 |     pub fn new(provider: P, config: BacktestConfig) -> Self {
+    |            --- required by a bound in this associated function
+
+error[E0277]: the trait bound `RiskAwareTrendStrategy: MarketDataProvider` is not satisfied
+   --> examples/risk_backtest_integration.rs:265:22
+    |
+265 |     let mut engine = BacktestEngine::new(strategy, config);
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `MarketDataProvider` is not implemented for `RiskAwareTrendStrategy`
+   --> examples/risk_backtest_integration.rs:16:1
+    |
+ 16 | struct RiskAwareTrendStrategy {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `MarketDataProvider`:
+              AlpacaProvider
+              BinanceProvider
+              BybitProvider
+              CoinbaseProvider
+              InteractiveBrokersProvider
+              KrakenProvider
+              OKXProvider
+note: required by a bound in `BacktestEngine`
+   --> /Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-market/src/backtest.rs:642:30
+    |
+642 | pub struct BacktestEngine<P: MarketDataProvider> {
+    |                              ^^^^^^^^^^^^^^^^^^ required by this bound in `BacktestEngine`
+
+error[E0599]: the method `run` exists for struct `BacktestEngine<RiskAwareTrendStrategy>`, but its trait bounds were not satisfied
+   --> examples/risk_backtest_integration.rs:274:12
+    |
+ 16 | struct RiskAwareTrendStrategy {
+    | ----------------------------- doesn't satisfy `RiskAwareTrendStrategy: MarketDataProvider`
+...
+274 |     engine.run(&bars);
+    |            ^^^ method cannot be called on `BacktestEngine<RiskAwareTrendStrategy>` due to unsatisfied trait bounds
+    |
+    = note: the following trait bounds were not satisfied:
+            `RiskAwareTrendStrategy: MarketDataProvider`
+note: the trait `MarketDataProvider` must be implemented
+   --> /Users/ashina/Desktop/Kurultay/HyperPhysics/crates/hyperphysics-market/src/providers/mod.rs:27:1
+    |
+ 27 | pub trait MarketDataProvider: Send + Sync {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `get_result` found for struct `BacktestEngine<P>` in the current scope
+   --> examples/risk_backtest_integration.rs:277:25
+    |
+277 |     let result = engine.get_result();
+    |                         ^^^^^^^^^^ method not found in `BacktestEngine<RiskAwareTrendStrategy>`
+
+Some errors have detailed explanations: E0046, E0063, E0195, E0277, E0407, E0559, E0574, E0599, E0603.
+For more information about an error, try `rustc --explain E0046`.
+warning: `hyperphysics` (example "risk_backtest_integration") generated 1 warning
+error: could not compile `hyperphysics` (example "risk_backtest_integration") due to 19 previous errors; 1 warning emitted
+warning: `hyperphysics-market` (test "crypto_integration") generated 1 warning (run `cargo fix --test "crypto_integration" -p hyperphysics-market` to apply 1 suggestion)

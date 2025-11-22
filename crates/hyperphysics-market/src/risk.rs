@@ -367,7 +367,7 @@ impl RiskManager {
         }
 
         let mut sorted_returns = self.returns.clone();
-        sorted_returns.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        sorted_returns.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Greater));
 
         let index = ((1.0 - confidence_level) * sorted_returns.len() as f64) as usize;
         let var = -sorted_returns[index.min(sorted_returns.len() - 1)];
@@ -382,7 +382,7 @@ impl RiskManager {
         }
 
         let mut sorted_returns = self.returns.clone();
-        sorted_returns.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        sorted_returns.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Greater));
 
         let index = ((1.0 - confidence_level) * sorted_returns.len() as f64) as usize;
         let tail_returns: Vec<f64> = sorted_returns.iter().take(index + 1).copied().collect();
@@ -931,7 +931,7 @@ mod tests {
         let config = RiskConfig::default();
         let risk_manager = RiskManager::new(100000.0, config);
 
-        let mut position = Position {
+        let position = Position {
             symbol: "AAPL".to_string(),
             entry_price: 100.0,
             current_price: 110.0, // 10% profit

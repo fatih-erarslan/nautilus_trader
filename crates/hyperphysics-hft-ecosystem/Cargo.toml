@@ -1,0 +1,195 @@
+[package]
+name = "hyperphysics-hft-ecosystem"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team <team@hyperphysics.ai>"]
+description = "Enterprise-grade HFT ecosystem integrating HyperPhysics, 7 physics engines, and 14+ biomimetic algorithms"
+repository = "https://github.com/hyperphysics/hft-ecosystem"
+license = "MIT OR Apache-2.0"
+keywords = ["hft", "physics-engine", "biomimetic", "trading", "formal-verification"]
+categories = ["science", "simulation", "finance"]
+rust-version = "1.75.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# HyperPhysics core crates
+hyperphysics-core = { path = "../hyperphysics-core" }
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+hyperphysics-thermo = { path = "../hyperphysics-thermo" }
+hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-market = { path = "../hyperphysics-market", optional = true }
+hyperphysics-risk = { path = "../hyperphysics-risk", optional = true }
+active-inference-agent = { path = "../active-inference-agent" }
+
+# Physics engines (all optional, for modular deployment)
+rapier-hyperphysics = { path = "../physics-engines/rapier-hyperphysics", optional = true }
+# TODO: Add other physics engines: jolt, avian, warp, taichi, mujoco, genesis
+
+# Trading systems (optional until we fix ats-core compilation issues)
+ats-core = { path = "../ats-core", optional = true }
+# cwts-core = { path = "../cwts-core", optional = true }
+# cwts-intelligence = { path = "../cwts-intelligence", optional = true }
+# cwts-ultra = { path = "../cwts-ultra", optional = true }
+
+# Bio-inspired algorithms (via workspace members)
+dynamic-swarm-selector = { path = "../bio-inspired-workspace/dynamic-swarm-selector", optional = true }
+whale-optimization = { path = "../bio-inspired-workspace/whale-optimization", optional = true }
+cuckoo-search = { path = "../bio-inspired-workspace/cuckoo-search", optional = true }
+particle-swarm = { path = "../bio-inspired-workspace/particle-swarm", optional = true }
+ant-colony = { path = "../bio-inspired-workspace/ant-colony", optional = true }
+genetic-algorithm = { path = "../bio-inspired-workspace/genetic-algorithm", optional = true }
+differential-evolution = { path = "../bio-inspired-workspace/differential-evolution", optional = true }
+grey-wolf = { path = "../bio-inspired-workspace/grey-wolf", optional = true }
+artificial-bee-colony = { path = "../bio-inspired-workspace/artificial-bee-colony", optional = true }
+bat-algorithm = { path = "../bio-inspired-workspace/bat-algorithm", optional = true }
+firefly-algorithm = { path = "../bio-inspired-workspace/firefly-algorithm", optional = true }
+bacterial-foraging = { path = "../bio-inspired-workspace/bacterial-foraging", optional = true }
+social-spider = { path = "../bio-inspired-workspace/social-spider", optional = true }
+moth-flame = { path = "../bio-inspired-workspace/moth-flame", optional = true }
+salp-swarm = { path = "../bio-inspired-workspace/salp-swarm", optional = true }
+market-regime-detector = { path = "../bio-inspired-workspace/market-regime-detector", optional = true }
+
+# Physics engines (will be added as created)
+jolt-hyperphysics = { path = "../physics-engines/jolt-hyperphysics", optional = true }
+rapier3d = { version = "0.22", optional = true }
+# avian3d = { version = "0.4", optional = true }
+
+# Core dependencies
+tokio = { version = "1.40", features = ["full", "macros", "rt-multi-thread"] }
+async-trait = "0.1"
+futures = "0.3"
+rayon = "1.10"
+
+# Math and linear algebra
+nalgebra.workspace = true
+ndarray = { version = "0.15", features = ["rayon", "serde"] }
+num-traits = "0.2"
+num-complex = { version = "0.4", features = ["serde"] }
+statrs = "0.17"
+
+# Concurrency
+dashmap = "6.1"
+parking_lot = "0.12"
+crossbeam = "0.8"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Random
+rand = { version = "0.8", features = ["small_rng"] }
+rand_distr = "0.4"
+
+# System info
+num_cpus = "1.16"
+
+# SIMD (for performance-critical paths)
+wide = { version = "0.7", optional = true }
+
+# FFI for physics engines
+pyo3 = { version = "0.22", optional = true, features = ["auto-initialize"] }
+
+# WASM support
+wasm-bindgen = { version = "0.2", optional = true }
+js-sys = { version = "0.3", optional = true }
+web-sys = { version = "0.3", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.5"
+approx = "0.5"
+tokio-test = "0.4"
+
+[features]
+default = ["hft-core", "biomimetic-tier1", "simd"]
+
+# Core features
+hft-core = ["hyperphysics-market", "hyperphysics-risk"] # , "ats-core"] # Disabled until websocket modules complete
+simd = ["wide"]
+
+# Biomimetic algorithm tiers
+biomimetic-tier1 = [
+    "whale-optimization",
+    "bat-algorithm",
+    "firefly-algorithm",
+    "cuckoo-search"
+]
+biomimetic-tier2 = [
+    "particle-swarm",
+    "genetic-algorithm",
+    "differential-evolution",
+    "grey-wolf",
+    "artificial-bee-colony"
+]
+biomimetic-tier3 = [
+    "ant-colony",
+    "bacterial-foraging",
+    "social-spider",
+    "moth-flame",
+    "salp-swarm"
+]
+biomimetic-all = [
+    "biomimetic-tier1",
+    "biomimetic-tier2",
+    "biomimetic-tier3",
+    "dynamic-swarm-selector",
+    "market-regime-detector"
+]
+
+# Physics engine features (modular selection)
+physics-rapier = ["rapier-hyperphysics"]
+physics-jolt = ["jolt-hyperphysics"]
+physics-avian = []  # TODO
+physics-warp = []  # TODO
+physics-taichi = []  # TODO
+physics-mujoco = []  # TODO
+physics-genesis = []  # TODO
+gpu = []
+
+# Language binding features
+python-bindings = ["pyo3"]
+wasm-bindings = ["wasm-bindgen", "js-sys", "web-sys"]
+
+# Formal verification
+verification = []
+
+# Full feature set (for testing)
+full = [
+    "hft-core",
+    "biomimetic-all",
+    "physics-rapier",
+    "simd",
+    "verification"
+]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+inherits = "release"
+
+[profile.dev]
+opt-level = 0
+
+[package.metadata.docs.rs]
+all-features = true
+targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin"]

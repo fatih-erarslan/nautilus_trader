@@ -43,7 +43,7 @@ gpu-allocator = { version = "0.26", features = ["vulkan"], optional = true }
 # Utilities
 rayon = "1.8"
 parking_lot = "0.12"
-dashmap = "5.5"
+dashmap = "6.1"
 tracing = "0.1"
 
 [dev-dependencies]

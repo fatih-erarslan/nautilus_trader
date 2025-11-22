@@ -1,0 +1,198 @@
+{
+  "summary": {
+    "total_tests": 9,
+    "passed_tests": 9,
+    "success_rate": 1.0,
+    "total_time": 0.027700424194335938
+  },
+  "test_results": [
+    {
+      "name": "Mathematical Precision",
+      "status": "PASSED",
+      "execution_time": 3.886222839355469e-05,
+      "result": {
+        "difference": "0.2469",
+        "percentage": "0.0004938012196890126318612006972",
+        "rounded": "0.0005",
+        "precision_validated": true
+      }
+    },
+    {
+      "name": "Complex Adaptive Systems",
+      "status": "PASSED",
+      "execution_time": 2.8848648071289062e-05,
+      "result": {
+        "agents_count": 4,
+        "system_fitness": 0.7692307692307692,
+        "weighted_state": 0.30769230769230765,
+        "emergence_factor": 0.4710557197659957,
+        "adaptation_applied": true,
+        "total_strength_after": 2.6950000000000003
+      }
+    },
+    {
+      "name": "Dynamic Configuration",
+      "status": "PASSED",
+      "execution_time": 9.5367431640625e-06,
+      "result": {
+        "original_config_valid": true,
+        "adapted_config": {
+          "adaptation_rate": 0.1,
+          "feedback_threshold": 0.7,
+          "emergence_factor": 0.3,
+          "precision_tolerance": 0.0001,
+          "coverage_threshold": 100.0
+        },
+        "performance_trend": -0.019999999999999962,
+        "adaptation_triggered": false,
+        "system_learning": true
+      }
+    },
+    {
+      "name": "Scientific Validation",
+      "status": "PASSED",
+      "execution_time": 2.574920654296875e-05,
+      "result": {
+        "sample_size": 12,
+        "mean": 1.425,
+        "std_dev": 0.2808267016571543,
+        "confidence_interval": [
+          1.2465700233369694,
+          1.6034299766630307
+        ],
+        "t_statistic": -0.9251528419563041,
+        "validations_passed": true,
+        "statistical_power": 0.46257642097815205
+      }
+    },
+    {
+      "name": "Financial Calculations",
+      "status": "PASSED",
+      "execution_time": 1.430511474609375e-05,
+      "result": {
+        "portfolio_return": 0.095,
+        "portfolio_volatility": 0.09069178573608527,
+        "sharpe_ratio": 0.8269767696299568,
+        "weight_sum": 1.0,
+        "calculations_valid": true,
+        "risk_return_ratio": 1.0475039081979454
+      }
+    },
+    {
+      "name": "Risk Metrics",
+      "status": "PASSED",
+      "execution_time": 2.384185791015625e-05,
+      "result": {
+        "mean_return": 0.009600000000000001,
+        "volatility": 0.02381969306640574,
+        "downside_deviation": 0.013371611720357423,
+        "var_5_percent": -0.02,
+        "max_drawdown": 0.015000000000000005,
+        "risk_metrics_valid": true
+      }
+    },
+    {
+      "name": "Edge Cases",
+      "status": "PASSED",
+      "execution_time": 1.7404556274414062e-05,
+      "result": {
+        "total_edge_cases": 5,
+        "cases_handled": 5,
+        "edge_case_details": [
+          [
+            "division_by_zero",
+            true,
+            "Properly handled"
+          ],
+          [
+            "empty_data",
+            true,
+            "Empty data handled"
+          ],
+          [
+            "extreme_values",
+            true,
+            "All values finite"
+          ],
+          [
+            "nan_detection",
+            true,
+            "NaN properly detected"
+          ],
+          [
+            "inf_detection",
+            true,
+            "Infinity properly detected"
+          ]
+        ],
+        "all_cases_handled": true
+      }
+    },
+    {
+      "name": "Performance Testing",
+      "status": "PASSED",
+      "execution_time": 0.027418136596679688,
+      "result": {
+        "computation_time": 0.022624731063842773,
+        "computation_result": 333328333350000,
+        "algorithm_time": 0.003431558609008789,
+        "data_processed": 5000,
+        "moving_averages_count": 980,
+        "performance_requirements_met": true
+      }
+    },
+    {
+      "name": "System Boundaries",
+      "status": "PASSED",
+      "execution_time": 1.6927719116210938e-05,
+      "result": {
+        "total_boundaries": 6,
+        "boundaries_respected": 6,
+        "boundary_details": [
+          [
+            "risk_tolerance",
+            true
+          ],
+          [
+            "leverage",
+            true
+          ],
+          [
+            "sharpe_ratio",
+            true
+          ],
+          [
+            "max_drawdown",
+            true
+          ],
+          [
+            "success_probability",
+            true
+          ],
+          [
+            "execution_time",
+            true
+          ]
+        ],
+        "all_boundaries_valid": true,
+        "boundary_compliance": 1.0
+      }
+    }
+  ],
+  "adaptation_history": [
+    {
+      "timestamp": 1757096803.9263525,
+      "performance_metrics": {
+        "recent_avg": 0.9166666666666666,
+        "trend": -0.019999999999999962,
+        "history_length": 7
+      },
+      "config_changes": {
+        "precision_tolerance": 0.0001,
+        "adaptation_rate": 0.1,
+        "emergence_factor": 0.3
+      }
+    }
+  ],
+  "timestamp": 1757096803.954087
+}

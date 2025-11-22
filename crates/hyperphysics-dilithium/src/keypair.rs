@@ -44,13 +44,14 @@
 //! - FIPS 204: Module-Lattice-Based Digital Signature Standard
 //! - Ducas et al. (2018): "CRYSTALS-Dilithium: A Lattice-Based Digital Signature Scheme"
 
-use crate::{DilithiumResult, SecurityLevel, DilithiumSignature};
+use crate::{DilithiumError, DilithiumResult, SecurityLevel, DilithiumSignature};
 use crate::lattice::module_lwe::{ModuleLWE, Polynomial, PolyVec, POLY_DEGREE, SEED_BYTES};
 use crate::lattice::ntt::NTT;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 use serde::{Serialize, Deserialize};
-use sha3::{Shake256, Sha3_256, digest::{ExtendableOutput, XofReader, Update}};
+use sha3::Sha3_256;
 use sha3::Digest as Sha3Digest;
+use tiny_keccak::{Shake, Hasher, Xof};
 use rand::RngCore;
 
 /// Dilithium public key
@@ -113,6 +114,8 @@ pub struct DilithiumKeypair {
     mlwe: ModuleLWE,
     
     /// NTT engine
+    /// TODO: Will be used for advanced polynomial operations
+    #[allow(dead_code)]
     ntt: NTT,
 }
 
@@ -145,7 +148,7 @@ impl DilithiumKeypair {
     pub fn generate(level: SecurityLevel) -> DilithiumResult<Self> {
         let mlwe = ModuleLWE::new(level);
         let ntt = NTT::new();
-        let (k, l, eta) = mlwe.params();
+        let (k, l, _eta) = mlwe.params();
         
         // Generate random seeds
         let mut rng = rand::thread_rng();
@@ -251,107 +254,155 @@ impl DilithiumKeypair {
             SecurityLevel::Maximum => (1 << 19, (8380417 - 1) / 32, 60, 120, 75),
         };
         
-        // Compute μ = H(tr || M)
-        let mut mu_hasher = Shake256::default();
-        mu_hasher.update(&self.secret_key.tr);
-        mu_hasher.update(message);
-        let mut mu_reader = mu_hasher.finalize_xof();
+        // Compute μ = H(tr || M) using tiny-keccak (no stack corruption)
         let mut mu = [0u8; 64];
-        mu_reader.read(&mut mu);
+        let mut shake = Shake::v256();
+        shake.update(&self.secret_key.tr);
+        shake.update(message);
+        shake.squeeze(&mut mu);
         
         // Expand matrix A
         let matrix_a = self.mlwe.expand_a(&self.secret_key.rho);
         
-        // Rejection sampling loop
-        let rng = rand::thread_rng();
-        let mut nonce = 0u16;
-        
+        // Pre-allocate reusable buffers OUTSIDE the loop to prevent stack overflow.
+        // The rejection sampling loop can iterate many times and creating new
+        // Vec allocations each iteration exhausts the stack.
+        let mut y: Vec<Polynomial> = (0..l).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut w: Vec<Polynomial> = (0..k).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut w1: Vec<Polynomial> = (0..k).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut c = vec![0i32; POLY_DEGREE];
+        let mut cs1: Vec<Polynomial> = (0..l).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut z: Vec<Polynomial> = (0..l).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut cs2: Vec<Polynomial> = (0..k).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut w_minus_cs2: Vec<Polynomial> = (0..k).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut r0: Vec<Polynomial> = (0..k).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut ct0: Vec<Polynomial> = (0..k).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut w_minus_cs2_plus_ct0: Vec<Polynomial> = (0..k).map(|_| vec![0i32; POLY_DEGREE]).collect();
+        let mut h: Vec<Vec<bool>> = (0..k).map(|_| vec![false; POLY_DEGREE]).collect();
+
+        let mut nonce = 0u32;
+        const MAX_NONCE: u32 = 65536;
+
         loop {
-            // Sample masking vector y
-            let mut y = Vec::with_capacity(l);
+            if nonce >= MAX_NONCE {
+                return Err(DilithiumError::SignatureFailed(
+                    format!("Rejection sampling exceeded {} iterations - check parameters", MAX_NONCE)
+                ));
+            }
+
+            // Sample masking vector y (reusing buffer)
             for i in 0..l {
                 let mut seed = self.secret_key.key;
-                seed[0] ^= nonce as u8;
-                seed[1] ^= (nonce >> 8) as u8;
-                y.push(self.sample_gamma1_poly(&seed, i as u16, gamma1));
+                seed[0] ^= (nonce & 0xFF) as u8;
+                seed[1] ^= ((nonce >> 8) & 0xFF) as u8;
+                let new_poly = self.sample_gamma1_poly(&seed, i as u16, gamma1);
+                y[i].copy_from_slice(&new_poly);
             }
             nonce += 1;
-            
-            // Compute w = Ay
-            let w = self.mlwe.matrix_vector_multiply(&matrix_a, &y);
-            
+
+            // Compute w = Ay (reusing buffer)
+            self.mlwe.matrix_vector_multiply_into(&matrix_a, &y, &mut w);
+
             // Extract high bits w1 = HighBits(w, 2γ2)
-            let w1: Vec<Polynomial> = w.iter()
-                .map(|poly| {
-                    poly.iter()
-                        .map(|&coeff| self.mlwe.high_bits(coeff, 2 * gamma2))
-                        .collect()
-                })
-                .collect();
-            
+            for i in 0..k {
+                for j in 0..POLY_DEGREE {
+                    w1[i][j] = self.mlwe.high_bits(w[i][j], 2 * gamma2);
+                }
+            }
+
             // Compute challenge c = H(μ || w1)
             let c_seed = self.hash_to_challenge(&mu, &w1);
-            let c = self.mlwe.sample_challenge(&c_seed, tau);
-            
-            // Compute z = y + cs1
-            let cs1 = self.mlwe.scalar_vector_multiply(&c, &self.secret_key.s1);
-            let z = self.mlwe.vector_add(&y, &cs1);
-            
-            // Check ||z||_∞ < γ1 - β
-            if self.mlwe.vector_inf_norm(&z) >= gamma1 - beta {
-                continue; // Reject and retry
+            let new_c = self.mlwe.sample_challenge(&c_seed, tau);
+            c.copy_from_slice(&new_c);
+
+            // Compute z = y + cs1 (reusing buffers)
+            // Use signed arithmetic WITHOUT modular reduction for proper bounds checking
+            self.mlwe.scalar_vector_multiply_into(&c, &self.secret_key.s1, &mut cs1);
+
+            // Convert cs1 to signed centered form before adding
+            // NTT multiplication can produce values in (-q, q), so first normalize to [0, q)
+            // then center to (-q/2, q/2]
+            let q = self.mlwe.q();
+            let q_half = q / 2;
+            for poly in cs1.iter_mut() {
+                for coeff in poly.iter_mut() {
+                    // First normalize to [0, q) - handle negative values from Montgomery reduction
+                    let mut val = *coeff;
+                    if val < 0 {
+                        val += q;
+                    } else if val >= q {
+                        val -= q;
+                    }
+                    // Then center to signed form (-q/2, q/2]
+                    if val > q_half {
+                        val -= q;
+                    }
+                    *coeff = val;
+                }
             }
-            
+
+            self.mlwe.vector_add_signed_into(&y, &cs1, &mut z);
+
+            // Check ||z||_∞ < γ1 - β using signed infinity norm
+            let z_norm = self.mlwe.vector_inf_norm_signed(&z);
+            if z_norm >= gamma1 - beta {
+                continue;
+            }
+
+            // Now reduce z to [0, q) for the signature output
+            for poly in z.iter_mut() {
+                for coeff in poly.iter_mut() {
+                    if *coeff < 0 {
+                        *coeff += self.mlwe.q();
+                    }
+                }
+            }
+
             // Compute r0 = LowBits(w - cs2, 2γ2)
-            let cs2 = self.mlwe.scalar_vector_multiply(&c, &self.secret_key.s2);
-            let w_minus_cs2 = self.mlwe.vector_sub(&w, &cs2);
-            
-            let r0: Vec<Polynomial> = w_minus_cs2.iter()
-                .map(|poly| {
-                    poly.iter()
-                        .map(|&coeff| self.mlwe.low_bits(coeff, 2 * gamma2))
-                        .collect()
-                })
-                .collect();
-            
-            // Check ||r0||_∞ < γ2 - β
-            if self.mlwe.vector_inf_norm(&r0) >= gamma2 - beta {
-                continue; // Reject and retry
-            }
-            
-            // Compute hint h = MakeHint(-ct0, w - cs2 + ct0, 2γ2)
-            let ct0 = self.mlwe.scalar_vector_multiply(&c, &self.secret_key.t0);
-            let w_minus_cs2_plus_ct0 = self.mlwe.vector_add(&w_minus_cs2, &ct0);
-            
-            let mut h = Vec::with_capacity(k);
-            let mut hint_count = 0;
-            
+            self.mlwe.scalar_vector_multiply_into(&c, &self.secret_key.s2, &mut cs2);
+            self.mlwe.vector_sub_into(&w, &cs2, &mut w_minus_cs2);
+
             for i in 0..k {
-                let mut h_poly = vec![false; POLY_DEGREE];
+                for j in 0..POLY_DEGREE {
+                    r0[i][j] = self.mlwe.low_bits(w_minus_cs2[i][j], 2 * gamma2);
+                }
+            }
+
+            // Check ||r0||_∞ < γ2 - β
+            let r0_norm = self.mlwe.vector_inf_norm(&r0);
+            if r0_norm >= gamma2 - beta {
+                continue;
+            }
+
+            // Compute hint h = MakeHint(-ct0, w - cs2 + ct0, 2γ2)
+            self.mlwe.scalar_vector_multiply_into(&c, &self.secret_key.t0, &mut ct0);
+            self.mlwe.vector_add_into(&w_minus_cs2, &ct0, &mut w_minus_cs2_plus_ct0);
+
+            let mut hint_count = 0;
+            for i in 0..k {
                 for j in 0..POLY_DEGREE {
                     let hint = self.mlwe.make_hint(
                         -ct0[i][j],
                         w_minus_cs2_plus_ct0[i][j],
                         2 * gamma2
                     );
-                    h_poly[j] = hint;
+                    h[i][j] = hint;
                     if hint {
                         hint_count += 1;
                     }
                 }
-                h.push(h_poly);
             }
-            
+
             // Check number of hints ≤ ω
             if hint_count > omega {
-                continue; // Reject and retry
+                continue;
             }
-            
-            // Success! Return signature
+
+            // Success! Return signature (clone the reusable buffers for output)
             return DilithiumSignature::new_from_components(
-                c,
-                z,
-                h,
+                c.clone(),
+                z.clone(),
+                h.clone(),
                 self.security_level,
             );
         }
@@ -378,52 +429,77 @@ impl DilithiumKeypair {
     }
     
     /// Sample polynomial with coefficients in [-γ1, γ1]
+    ///
+    /// Uses tiny-keccak for SHAKE-256 which avoids sha3 crate stack corruption.
+    /// Per FIPS 204, gamma1 = 2^17 for ML-DSA-44 or 2^19 for ML-DSA-65/87.
     fn sample_gamma1_poly(&self, seed: &[u8; SEED_BYTES], nonce: u16, gamma1: i32) -> Polynomial {
         let mut poly = vec![0i32; POLY_DEGREE];
-        
-        let mut hasher = Shake256::default();
-        hasher.update(seed);
-        hasher.update(&nonce.to_le_bytes());
-        
-        let mut reader = hasher.finalize_xof();
-        let mut buf = [0u8; 5];
-        
+
+        // Use tiny-keccak SHAKE-256 (no stack corruption issues)
+        let mut shake = Shake::v256();
+        shake.update(seed);
+        shake.update(&nonce.to_le_bytes());
+
+        // Read large buffer - 8KB is enough for 256 coefficients
+        // With proper bit width, rejection rate is ~50% max
+        const BATCH_SIZE: usize = 8192;
+        let mut large_buf = vec![0u8; BATCH_SIZE];
+        shake.squeeze(&mut large_buf);
+
+        let mut buf_pos = 0;
+
+        // Determine bit width based on gamma1
+        // gamma1 = 2^17 -> need 18 bits (mask 0x3FFFF)
+        // gamma1 = 2^19 -> need 20 bits (mask 0xFFFFF)
+        let (mask, bytes_per_sample) = if gamma1 == (1 << 17) {
+            (0x3FFFFi64, 3usize) // 18 bits, 3 bytes
+        } else {
+            (0xFFFFFi64, 3usize) // 20 bits, 3 bytes (need to extract carefully)
+        };
+        let bound = (2 * gamma1) as i64;
+
         for coeff in poly.iter_mut() {
             loop {
-                reader.read(&mut buf);
-                let val = (((buf[0] as i64)
+                if buf_pos + bytes_per_sample > BATCH_SIZE {
+                    panic!("sample_gamma1_poly: exhausted buffer (buf_pos={})", buf_pos);
+                }
+
+                let buf = &large_buf[buf_pos..buf_pos + bytes_per_sample];
+                buf_pos += bytes_per_sample;
+
+                // Extract value with appropriate mask
+                let val = ((buf[0] as i64)
                     | ((buf[1] as i64) << 8)
-                    | ((buf[2] as i64) << 16)
-                    | ((buf[3] as i64) << 24)
-                    | ((buf[4] as i64) << 32)) & 0xFFFFF) as i32;
-                
-                if val <= 2 * gamma1 {
-                    *coeff = val - gamma1;
+                    | ((buf[2] as i64) << 16)) & mask;
+
+                if val < bound {
+                    *coeff = (val - gamma1 as i64) as i32;
                     break;
                 }
             }
         }
-        
+
         poly
     }
     
     /// Hash to challenge seed
+    ///
+    /// Uses tiny-keccak for SHAKE-256 which avoids sha3 crate stack corruption.
     fn hash_to_challenge(&self, mu: &[u8], w1: &PolyVec) -> [u8; SEED_BYTES] {
-        let mut hasher = Shake256::default();
-        hasher.update(mu);
-        
-        // Encode w1
+        // Use tiny-keccak SHAKE-256 (no stack corruption issues)
+        let mut shake = Shake::v256();
+        shake.update(mu);
+
         for poly in w1.iter() {
             let encoded = self.mlwe.poly_encode(poly, 6);
-            hasher.update(&encoded);
+            shake.update(&encoded);
         }
-        
-        let mut reader = hasher.finalize_xof();
+
         let mut seed = [0u8; SEED_BYTES];
-        reader.read(&mut seed);
+        shake.squeeze(&mut seed);
         seed
     }
-    
+
     /// Encode public key to bytes
     fn encode_public_key(rho: &[u8; SEED_BYTES], t1: &PolyVec, level: SecurityLevel) -> Vec<u8> {
         let mut bytes = Vec::new();

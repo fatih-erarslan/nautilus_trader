@@ -34,10 +34,11 @@
 use crate::{DilithiumResult, DilithiumError, SecurityLevel};
 use crate::keypair::PublicKey;
 use crate::lattice::module_lwe::{ModuleLWE, Polynomial, PolyVec, POLY_DEGREE, SEED_BYTES};
-use crate::lattice::ntt::{constant_time_eq, poly_add, poly_sub};
+use crate::lattice::ntt::constant_time_eq;
 use std::time::SystemTime;
 use serde::{Serialize, Deserialize};
-use sha3::{Shake256, Sha3_256, Digest, digest::{Update, ExtendableOutput, XofReader}};
+use sha3::{Sha3_256, Digest};
+use tiny_keccak::{Shake, Hasher, Xof};
 
 /// Post-quantum digital signature
 ///
@@ -120,7 +121,7 @@ impl DilithiumSignature {
         public_key: &PublicKey,
         mlwe: &ModuleLWE,
     ) -> DilithiumResult<bool> {
-        let (k, l, _eta) = mlwe.params();
+        let (k, _l, _eta) = mlwe.params();
         
         // Get parameters based on security level
         let (gamma1, gamma2, tau, beta, _omega) = match self.security_level {
@@ -136,17 +137,18 @@ impl DilithiumSignature {
             ));
         }
         
-        // Compute μ = H(tr || M)
+        // Compute μ = H(tr || M) using tiny-keccak (avoids sha3 stack corruption)
+        // tr = SHA3-256(pk_bytes) - must match signing's tr computation
         let mut hasher = Sha3_256::new();
         Digest::update(&mut hasher, &public_key.bytes);
         let tr_hash = hasher.finalize();
-        
-        let mut mu_hasher = Shake256::default();
+
+        // Use tiny-keccak SHAKE-256 for XOF operation
+        let mut mu_hasher = Shake::v256();
         mu_hasher.update(&tr_hash);
         mu_hasher.update(message);
-        let mut mu_reader = mu_hasher.finalize_xof();
         let mut mu = [0u8; 64];
-        mu_reader.read(&mut mu);
+        mu_hasher.squeeze(&mut mu);
         
         // Expand matrix A from ρ
         let matrix_a = mlwe.expand_a(&public_key.rho);
@@ -155,24 +157,31 @@ impl DilithiumSignature {
         let az = mlwe.matrix_vector_multiply(&matrix_a, &self.z);
         
         // Compute ct = c * t1 * 2^d
+        // Per FIPS 204: scale t1 by 2^d FIRST, then multiply by c
         let d = 13;
-        let ct1 = mlwe.scalar_vector_multiply(&self.c, &public_key.t1);
-        
-        // Scale by 2^d
-        let ct: Vec<Polynomial> = ct1.iter()
+        let q = mlwe.q();
+
+        // Scale t1 by 2^d with modular reduction
+        let t1_scaled: Vec<Polynomial> = public_key.t1.iter()
             .map(|poly| {
                 poly.iter()
-                    .map(|&coeff| coeff << d)
+                    .map(|&coeff| {
+                        let scaled = (coeff as i64) << d;
+                        (scaled % q as i64) as i32
+                    })
                     .collect()
             })
             .collect();
+
+        // Now multiply c * (t1 * 2^d)
+        let ct = mlwe.scalar_vector_multiply(&self.c, &t1_scaled);
         
         // Compute w' = Az - ct
         let w_prime = mlwe.vector_sub(&az, &ct);
         
         // Extract w1' = UseHint(h, w', 2γ2)
         let mut w1_prime = Vec::with_capacity(k);
-        
+
         for i in 0..k {
             let mut w1_poly = vec![0i32; POLY_DEGREE];
             for j in 0..POLY_DEGREE {
@@ -202,20 +211,18 @@ impl DilithiumSignature {
         Ok(true)
     }
     
-    /// Hash to challenge seed
+    /// Hash to challenge seed using tiny-keccak (avoids sha3 stack corruption)
     fn hash_to_challenge(&self, mu: &[u8], w1: &PolyVec, mlwe: &ModuleLWE) -> [u8; SEED_BYTES] {
-        let mut hasher = Shake256::default();
-        hasher.update(mu);
-        
-        // Encode w1
+        let mut shake = Shake::v256();
+        shake.update(mu);
+
         for poly in w1.iter() {
             let encoded = mlwe.poly_encode(poly, 6);
-            hasher.update(&encoded);
+            shake.update(&encoded);
         }
-        
-        let mut reader = hasher.finalize_xof();
+
         let mut seed = [0u8; SEED_BYTES];
-        reader.read(&mut seed);
+        shake.squeeze(&mut seed);
         seed
     }
     
@@ -229,8 +236,12 @@ impl DilithiumSignature {
         let mut bytes = Vec::new();
         let mlwe = ModuleLWE::new(level.clone());
         
-        // Encode challenge c
-        let c_encoded = mlwe.poly_encode(c, 8);
+        // Encode challenge c (coefficients in {-1, 0, 1})
+        // Use 2 bits per coefficient: 0→0, 1→1, -1→2
+        let c_shifted: Vec<i32> = c.iter().map(|&coeff| {
+            if coeff == -1 { 2 } else { coeff }
+        }).collect();
+        let c_encoded = mlwe.poly_encode(&c_shifted, 2);
         bytes.extend_from_slice(&c_encoded);
         
         // Encode response z
@@ -242,8 +253,19 @@ impl DilithiumSignature {
         
         let z_bits = if gamma1 == (1 << 17) { 18 } else { 20 };
         
+        // Per FIPS 204, encode z as (γ1 - z_i) to ensure positive values in [1, 2γ1-1]
+        // z values in signature are in [0, q) with actual values in [-γ1+β+1, γ1-β-1]
+        // after centering from [0, q). Negative values are represented as q + negative.
+        let q = mlwe.q();
         for poly in z.iter() {
-            let encoded = mlwe.poly_encode(poly, z_bits);
+            // Shift each coefficient: encode γ1 - z_i (mod q centered)
+            let shifted: Vec<i32> = poly.iter().map(|&coeff| {
+                // Convert from [0, q) back to centered form
+                let centered = if coeff > q / 2 { coeff - q } else { coeff };
+                // Then shift by gamma1 to make positive
+                (gamma1 - centered) as i32
+            }).collect();
+            let encoded = mlwe.poly_encode(&shifted, z_bits);
             bytes.extend_from_slice(&encoded);
         }
         
@@ -268,14 +290,17 @@ impl DilithiumSignature {
         
         let mut offset = 0;
         
-        // Decode challenge c
-        let c_bytes = POLY_DEGREE;
+        // Decode challenge c (2 bits per coeff: 0→0, 1→1, 2→-1)
+        let c_bytes = (POLY_DEGREE * 2 + 7) / 8;  // 2 bits per coefficient
         if bytes.len() < offset + c_bytes {
             return Err(DilithiumError::SignatureFailed(
                 "Signature too short".to_string()
             ));
         }
-        let c = mlwe.poly_decode(&bytes[offset..offset + c_bytes], 8);
+        let c_raw = mlwe.poly_decode(&bytes[offset..offset + c_bytes], 2);
+        let c: Vec<i32> = c_raw.iter().map(|&val| {
+            if val == 2 { -1 } else { val }
+        }).collect();
         offset += c_bytes;
         
         // Decode response z
@@ -288,6 +313,8 @@ impl DilithiumSignature {
         let z_bits = if gamma1 == (1 << 17) { 18 } else { 20 };
         let z_poly_bytes = (POLY_DEGREE * z_bits + 7) / 8;
         
+        // Decode z with reverse shift: z_i = γ1 - encoded_value
+        let q = mlwe.q();
         let mut z = Vec::with_capacity(l);
         for _ in 0..l {
             if bytes.len() < offset + z_poly_bytes {
@@ -295,7 +322,17 @@ impl DilithiumSignature {
                     "Signature too short for z".to_string()
                 ));
             }
-            let poly = mlwe.poly_decode(&bytes[offset..offset + z_poly_bytes], z_bits);
+            let encoded = mlwe.poly_decode(&bytes[offset..offset + z_poly_bytes], z_bits);
+            // Reverse the encoding: z_i = γ1 - encoded, then convert back to [0, q) form
+            let poly: Vec<i32> = encoded.iter().map(|&val| {
+                let centered = gamma1 - val;  // Recover centered value
+                // Convert centered to [0, q) representation
+                if centered < 0 {
+                    centered + q
+                } else {
+                    centered
+                }
+            }).collect();
             z.push(poly);
             offset += z_poly_bytes;
         }

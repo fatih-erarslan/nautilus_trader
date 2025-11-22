@@ -1,0 +1,17 @@
+[package]
+name = "gpu-marl"
+version = "0.1.0"
+edition = "2021"
+description = "GPU-Native Massive Multi-Agent Reinforcement Learning"
+
+[dependencies]
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
+
+# Will integrate with warp-hyperphysics for GPU kernels
+warp-hyperphysics = { path = "../physics-engines/warp-hyperphysics" }
+
+[dev-dependencies]
+approx = "0.5"
