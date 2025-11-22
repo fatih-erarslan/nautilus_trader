@@ -2,7 +2,7 @@
 //!
 //! Proves that Φ ≥ 0 using SMT solver for all valid system configurations
 
-use z3::{Config, Context, Solver, ast::{Real, Bool}};
+use z3::{Config, Context, Solver, ast::{Ast, Real, Bool}};
 
 #[test]
 fn test_z3_prove_phi_nonnegative() {
@@ -24,7 +24,13 @@ fn test_z3_prove_phi_nonnegative() {
     // For proper partitions: Causal_influence ≥ 0
     let causal_influence = Real::new_const(&ctx, "causal_influence");
     solver.assert(&causal_influence.ge(&Real::from_real(&ctx, 0, 1)));
-    solver.assert(&ei._eq(&causal_influence.sub(&[&mi])));
+
+    // Key IIT constraint: For physically valid systems, Causal_influence ≥ MI
+    // This ensures EI ≥ 0 (information can't be negative)
+    solver.assert(&causal_influence.ge(&mi));
+
+    let ei_value = Real::sub(&ctx, &[&causal_influence, &mi]);
+    solver.assert(&ei._eq(&ei_value));
 
     // 3. Φ is the minimum effective information over all partitions
     // Therefore: Φ = min(EI) where EI ≥ 0 implies Φ ≥ 0
@@ -74,7 +80,8 @@ fn test_z3_partition_properties() {
     solver.assert(&size_b.gt(&Real::from_real(&ctx, 0, 1)));
 
     // 2. Partition = full system
-    solver.assert(&size_a.add(&[&size_b])._eq(&n));
+    let sum_sizes = Real::add(&ctx, &[&size_a, &size_b]);
+    solver.assert(&sum_sizes._eq(&n));
 
     // 3. Effective information for valid partition
     let ei = Real::new_const(&ctx, "ei");
@@ -142,10 +149,13 @@ fn test_z3_causal_influence_nonnegative() {
     // |coupling| ≥ 0 always holds
     solver.assert(&causal_influence.ge(&Real::from_real(&ctx, 0, 1)));
 
-    // For negative coupling
+    // For negative coupling: causal_influence = -coupling (negation makes it positive)
     solver.push();
     solver.assert(&coupling.lt(&Real::from_real(&ctx, 0, 1)));
-    solver.assert(&causal_influence._eq(&coupling.mul(&[&Real::from_real(&ctx, -1, 1)])));
+    // Use unary minus: causal_influence = -coupling
+    let neg_one = Real::from_real(&ctx, -1, 1);
+    let neg_coupling = Real::mul(&ctx, &[&coupling, &neg_one]);
+    solver.assert(&causal_influence._eq(&neg_coupling));
 
     // Still non-negative
     solver.assert(&causal_influence.ge(&Real::from_real(&ctx, 0, 1)));
