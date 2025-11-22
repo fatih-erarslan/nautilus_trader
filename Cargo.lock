@@ -2853,6 +2853,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperphysics-reasoning-backends"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "hyperphysics-reasoning-router",
+ "hyperphysics-unified",
+ "nalgebra 0.33.2",
+ "parking_lot",
+ "rand 0.8.5",
+ "rand_distr",
+ "serde",
+ "serde_json",
+ "statrs 0.18.0",
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "hyperphysics-reasoning-router"
 version = "0.1.0"
 dependencies = [

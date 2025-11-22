@@ -32,6 +32,8 @@ members = [
     "crates/hyperphysics-napi",
     # Modular hierarchical reasoning router
     "crates/hyperphysics-reasoning-router",
+    # Backend adapters for reasoning router
+    "crates/hyperphysics-reasoning-backends",
 ]
 resolver = "2"
 

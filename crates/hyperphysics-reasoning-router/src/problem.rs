@@ -36,6 +36,18 @@ pub enum ProblemType {
     Verification,
     /// Control system
     Control,
+    /// Statistical estimation
+    Estimation,
+    /// Risk assessment and analysis
+    RiskAssessment,
+    /// Bayesian inference
+    Inference,
+    /// Parameter tuning
+    ParameterTuning,
+    /// Dynamic system analysis
+    Dynamics,
+    /// Constraint satisfaction
+    ConstraintSatisfaction,
     /// General computation
     General,
 }
@@ -152,11 +164,11 @@ impl ProblemSignature {
     pub fn to_feature_vector(&self) -> [f32; 16] {
         let mut features = [0.0f32; 16];
 
-        // Problem type (one-hot encoded, 7 slots)
-        features[self.problem_type as usize] = 1.0;
+        // Problem type (normalized to [0, 1])
+        features[0] = (self.problem_type as u8) as f32 / 12.0; // 13 types (0-12)
 
         // Domain (normalized)
-        features[7] = (self.domain as u8) as f32 / 6.0;
+        features[7] = (self.domain as u8) as f32 / 7.0; // 8 domains (0-7)
 
         // Dimensionality (log-scaled, normalized)
         features[8] = (self.dimensionality as f32 + 1.0).log10() / 6.0; // Up to 10^6
@@ -367,11 +379,18 @@ mod tests {
 
     #[test]
     fn test_feature_vector() {
-        let sig = ProblemSignature::new(ProblemType::Optimization, ProblemDomain::Physics);
+        // Test with General type (enum variant 12) - should normalize to 12/12 = 1.0
+        let sig = ProblemSignature::new(ProblemType::General, ProblemDomain::General);
         let features = sig.to_feature_vector();
 
         assert_eq!(features.len(), 16);
-        assert!(features[0] > 0.9); // Optimization flag
+        assert!(features[0] > 0.9, "General type (12/12) should give ~1.0, got {}", features[0]);
+        assert!(features[7] > 0.9, "General domain (7/7) should give ~1.0, got {}", features[7]);
+
+        // Test with Optimization (enum variant 0) - should be 0.0
+        let opt_sig = ProblemSignature::new(ProblemType::Optimization, ProblemDomain::Physics);
+        let opt_features = opt_sig.to_feature_vector();
+        assert!(opt_features[0] < 0.1, "Optimization (0/12) should give ~0.0");
     }
 
     #[test]

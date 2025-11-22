@@ -60,7 +60,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
 /// Latency tier classification
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum LatencyTier {
     /// Ultra-fast: < 10μs (lookup tables, SIMD only)
     UltraFast,
@@ -112,11 +112,13 @@ pub enum ProblemDomain {
     /// Statistical inference
     Statistical,
     /// Formal verification
-    Formal,
+    Verification,
     /// Financial/trading
     Financial,
     /// Control systems
     Control,
+    /// Engineering applications
+    Engineering,
     /// General/unknown
     General,
 }
