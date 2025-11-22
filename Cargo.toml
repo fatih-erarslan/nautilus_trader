@@ -30,6 +30,8 @@ members = [
     "crates/ising-optimizer",
     # NAPI zero-overhead Node.js bindings
     "crates/hyperphysics-napi",
+    # Modular hierarchical reasoning router
+    "crates/hyperphysics-reasoning-router",
 ]
 resolver = "2"
 
