@@ -1,0 +1,29 @@
+# Cargo build configuration for stability + sccache
+# System: i9-13900K, 96GB RAM, RX 6800 XT + RX 5500 XT
+
+[build]
+# Use sccache for compilation caching (dramatically speeds up rebuilds)
+rustc-wrapper = "sccache"
+
+# Reduced parallelism to prevent thermal issues
+jobs = 4
+
+[env]
+# Increase rustc stack size (prevents SIGSEGV in LLVM)
+RUST_MIN_STACK = "33554432"
+
+# sccache configuration
+SCCACHE_CACHE_SIZE = "50G"
+
+[profile.dev]
+opt-level = 0
+debug = true
+incremental = true
+
+[profile.test]
+# NO optimization to avoid LLVM InstCombine crashes
+opt-level = 0
+debug = true
+incremental = true
+
+# REMOVED: target-cpu=native - causes LLVM crashes with SIMD code

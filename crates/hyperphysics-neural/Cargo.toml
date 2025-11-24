@@ -1,0 +1,74 @@
+[package]
+name = "hyperphysics-neural"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Central neural intelligence layer for HyperPhysics HFT ecosystem"
+keywords = ["neural-network", "machine-learning", "hft", "trading", "physics"]
+categories = ["science", "simulation", "mathematics"]
+
+[features]
+default = ["core", "forecasting", "ats"]
+
+# Core neural network functionality (ruv-FANN)
+core = []
+
+# Time-series forecasting models (Neuro-Divergent: N-BEATS, LSTM, Transformers)
+forecasting = ["core"]
+
+# Surrogate physics modeling
+surrogate = ["core"]
+
+# Meta-learning router
+meta-router = ["core"]
+
+# GPU acceleration via WebGPU
+gpu = ["wgpu", "bytemuck"]
+
+# ATS-Core integration (conformal prediction + temperature scaling)
+ats = ["core"]
+
+# 27+ Neural architectures from ats-core
+architectures = ["ats"]
+
+# Full feature set
+full = ["core", "forecasting", "surrogate", "meta-router", "gpu", "ats", "architectures"]
+
+[dependencies]
+# Workspace dependencies
+thiserror.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+rayon.workspace = true
+rand.workspace = true
+rand_chacha.workspace = true
+ndarray = { workspace = true, features = ["rayon", "serde"] }
+parking_lot = "0.12"
+async-trait = "0.1"
+tracing.workspace = true
+chrono.workspace = true
+
+# ruv-FANN neural network library (vendored in crates/vendor/)
+ruv-fann = { path = "../vendor/ruv-fann", features = ["serde", "parallel"] }
+
+# Distribution for random sampling
+rand_distr = { workspace = true }
+
+# Optional GPU support
+wgpu = { version = "0.20", optional = true }
+bytemuck = { version = "1.14", features = ["derive"], optional = true }
+
+# Integration with reasoning router
+hyperphysics-reasoning-router = { path = "../hyperphysics-reasoning-router" }
+
+# ATS-Core for conformal prediction and temperature scaling
+ats-core = { path = "../ats-core" }
+
+# UUID generation
+uuid = { version = "1.0", features = ["v4"] }
+
+[dev-dependencies]
+criterion.workspace = true
+approx.workspace = true
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }

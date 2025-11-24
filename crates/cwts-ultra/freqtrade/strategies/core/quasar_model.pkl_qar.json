@@ -1,0 +1,177 @@
+{
+  "factor_weights": {
+    "trend": 0.6,
+    "volatility": 0.5,
+    "momentum": 0.55,
+    "sentiment": 0.45,
+    "liquidity": 0.35,
+    "correlation": 0.4,
+    "cycle": 0.5,
+    "anomaly": 0.3
+  },
+  "factor_importance": {
+    "trend": 1.0,
+    "volatility": 1.0,
+    "momentum": 1.0,
+    "sentiment": 1.0,
+    "liquidity": 1.0,
+    "correlation": 1.0,
+    "cycle": 1.0,
+    "anomaly": 1.0
+  },
+  "baseline_weights": {
+    "trend": 0.6,
+    "volatility": 0.5,
+    "momentum": 0.55,
+    "sentiment": 0.45,
+    "liquidity": 0.35,
+    "correlation": 0.4,
+    "cycle": 0.5,
+    "anomaly": 0.3
+  },
+  "regime_specific_weights": {
+    "growth": {
+      "trend": 0.6,
+      "volatility": 0.5,
+      "momentum": 0.55,
+      "sentiment": 0.45,
+      "liquidity": 0.35,
+      "correlation": 0.4,
+      "cycle": 0.5,
+      "anomaly": 0.3
+    },
+    "conservation": {
+      "trend": 0.6,
+      "volatility": 0.5,
+      "momentum": 0.55,
+      "sentiment": 0.45,
+      "liquidity": 0.35,
+      "correlation": 0.4,
+      "cycle": 0.5,
+      "anomaly": 0.3
+    },
+    "release": {
+      "trend": 0.6,
+      "volatility": 0.5,
+      "momentum": 0.55,
+      "sentiment": 0.45,
+      "liquidity": 0.35,
+      "correlation": 0.4,
+      "cycle": 0.5,
+      "anomaly": 0.3
+    },
+    "reorganization": {
+      "trend": 0.6,
+      "volatility": 0.5,
+      "momentum": 0.55,
+      "sentiment": 0.45,
+      "liquidity": 0.35,
+      "correlation": 0.4,
+      "cycle": 0.5,
+      "anomaly": 0.3
+    }
+  },
+  "cumulative_performance": 0.0,
+  "memory_length": 50,
+  "decision_threshold": 0.6,
+  "quantum_failure_count": 0,
+  "performance_metrics": {
+    "total_decisions": 1,
+    "decision_counts": {
+      "HOLD": 1
+    },
+    "avg_qar_quantum_path_time_ms": 0,
+    "avg_qar_classical_path_time_ms": 0,
+    "qar_quantum_path_decision_count": 0,
+    "qar_classical_path_decision_count": 0,
+    "qar_quantum_path_usage_ratio": 0,
+    "qar_circuit_cache_stats": {},
+    "cumulative_performance": 0.0,
+    "component_quantum_lmsr": {
+      "normalize_probability": {
+        "avg_time": 2.968311309814453e-06,
+        "max_time": 6.198883056640625e-06,
+        "min_time": 1.9073486328125e-06,
+        "call_count": 20
+      },
+      "get_market_probability": {
+        "avg_time": 0.0003058115641276042,
+        "max_time": 0.0005824565887451172,
+        "min_time": 0.00021004676818847656,
+        "call_count": 24
+      },
+      "get_all_market_probabilities": {
+        "avg_time": 0.0020513534545898438,
+        "max_time": 0.0021469593048095703,
+        "min_time": 0.001955747604370117,
+        "call_count": 2
+      },
+      "calculate_information_gain": {
+        "avg_time": 7.557868957519531e-05,
+        "max_time": 7.557868957519531e-05,
+        "min_time": 7.557868957519531e-05,
+        "call_count": 1
+      },
+      "to_log_odds": {
+        "avg_time": 3.417332967122396e-06,
+        "max_time": 6.4373016357421875e-06,
+        "min_time": 1.1920928955078125e-06,
+        "call_count": 12
+      },
+      "cost_function": {
+        "avg_time": 0.1002894937992096,
+        "max_time": 0.10944962501525879,
+        "min_time": 0.04147481918334961,
+        "call_count": 16
+      },
+      "calculate_cost_to_move": {
+        "avg_time": 0.20100533962249756,
+        "max_time": 0.21468710899353027,
+        "min_time": 0.15101122856140137,
+        "call_count": 8
+      },
+      "quantum_device": {
+        "name": "lightning.kokkos",
+        "wires": 8,
+        "shots": null,
+        "mode": "quantum"
+      },
+      "hardware": {
+        "quantum_available": true,
+        "gpu_available": true,
+        "device_type": "OTHER"
+      }
+    },
+    "component_quantum_pt": {}
+  },
+  "timestamp": "2025-05-17T23:22:56.952940",
+  "qar_system_version": "1.1",
+  "qar_factors_order": [
+    "trend",
+    "volatility",
+    "momentum",
+    "sentiment",
+    "liquidity",
+    "correlation",
+    "cycle",
+    "anomaly"
+  ],
+  "qar_config_params": {
+    "qha_feature_dim": 8
+  },
+  "qar_component_state_files": {
+    "hedge_algorithm": "component_states/qha_internal_state.json",
+    "quantum_lmsr": "component_states/qlmsr_internal_state.json",
+    "quantum_pt": "component_states/qpt_internal_state.json"
+  },
+  "qar_qlmsr_factor_quantities": {
+    "trend": -0.012921609290658144,
+    "volatility": 1.7004036127704454,
+    "momentum": 19.292289706253236,
+    "sentiment": 9.870814001794956,
+    "liquidity": 6.019218759798362,
+    "correlation": 7.898593527105845,
+    "cycle": 12.41904164268954,
+    "anomaly": 4.513576767256814
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "factors": [
+    "trend",
+    "volatility",
+    "momentum",
+    "sentiment_score"
+  ],
+  "factor_weights": {
+    "trend": 0.25,
+    "volatility": 0.25,
+    "momentum": 0.25,
+    "sentiment_score": 0.25
+  },
+  "factor_importance": {
+    "trend": 0.5,
+    "volatility": 0.5,
+    "momentum": 0.5,
+    "sentiment_score": 0.5
+  },
+  "baseline_weights": {
+    "trend": 0.7,
+    "volatility": 0.5,
+    "momentum": 0.6,
+    "sentiment_score": 0.45
+  },
+  "regime_specific_weights": {
+    "growth": {
+      "trend": 0.33333333333333337,
+      "momentum": 0.2916666666666667,
+      "volatility": 0.125,
+      "sentiment_score": 0.25
+    },
+    "release": {
+      "trend": 0.15789473684210525,
+      "momentum": 0.2631578947368421,
+      "volatility": 0.4736842105263158,
+      "sentiment_score": 0.10526315789473685
+    }
+  },
+  "cumulative_performance": 0.0,
+  "memory_length": 50,
+  "decision_threshold": 0.55,
+  "quantum_fallback_threshold": 3,
+  "min_probability": 0.001,
+  "max_probability": 0.999,
+  "quantum_failure_count": 3,
+  "factor_quantities": {},
+  "ref_point_mode": "adaptive",
+  "reference_points": {},
+  "reference_weights": {},
+  "_ema_storage": {},
+  "timestamp": 1747165059.9666982
+}

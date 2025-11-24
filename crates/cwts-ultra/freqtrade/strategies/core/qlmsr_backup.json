@@ -1,0 +1,7 @@
+{
+  "liquidity_parameter": 100.0,
+  "min_probability": 0.001,
+  "max_probability": 0.999,
+  "qubits": 8,
+  "layers": 2,
+  "shots": 
