@@ -52,3 +52,5 @@ crates/vendor/
 # Embedded git repositories (external clones)
 crates/cwts-ultra/freqtrade/strategies/core/complex_adaptive_agentic_orchestrator/
 crates/cwts-ultra/freqtrade/strategies/core/tengri/
+*.profraw
+coverage/

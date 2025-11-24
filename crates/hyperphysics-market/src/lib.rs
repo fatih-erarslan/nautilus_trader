@@ -47,6 +47,7 @@ pub use error::MarketError;
 pub use providers::{
     AlpacaProvider,
     BinanceProvider,
+    BinanceWebSocketClient,
     BybitProvider,
     CoinbaseProvider,
     InteractiveBrokersProvider,

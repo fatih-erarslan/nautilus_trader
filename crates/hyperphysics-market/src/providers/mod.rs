@@ -8,6 +8,7 @@ use crate::error::MarketResult;
 
 pub mod alpaca;
 pub mod binance;
+pub mod binance_websocket;
 pub mod bybit;
 pub mod coinbase;
 pub mod interactive_brokers;
@@ -16,6 +17,7 @@ pub mod okx;
 
 pub use alpaca::AlpacaProvider;
 pub use binance::BinanceProvider;
+pub use binance_websocket::BinanceWebSocketClient;
 pub use bybit::BybitProvider;
 pub use coinbase::CoinbaseProvider;
 pub use interactive_brokers::InteractiveBrokersProvider;
