@@ -4,16 +4,67 @@
 //! engine, enabling real-time risk calculation in web applications.
 
 use wasm_bindgen::prelude::*;
-use js_sys::{Array, Date, Object, Reflect};
+use js_sys::{Array, Object, Reflect};
 use web_sys::console;
-use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
+use chrono::{DateTime, Utc};
 
-// Import from core Bayesian VaR engine
-use cwts_ultra::algorithms::{
-    BayesianVaREngine, BayesianVaRResult, BayesianVaRError, BayesianPriors,
-    E2BTrainingConfig, BinanceMarketData, MonteCarloSamples, EmergenceProperties
-};
+// WASM-compatible type definitions (mocked for browser compatibility)
+// The full implementation requires the core library to be WASM-compatible
+
+/// Bayesian VaR error type
+#[derive(Debug, Clone)]
+pub struct BayesianVaRError(pub String);
+
+impl std::fmt::Display for BayesianVaRError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+/// E2B Training results
+#[derive(Debug, Clone)]
+pub struct E2BTrainingResults {
+    pub gelman_rubin_statistic: f64,
+    pub effective_sample_size: f64,
+    pub autocorrelation_time: f64,
+    pub potential_scale_reduction: f64,
+    pub training_duration_seconds: f64,
+    pub convergence_achieved: bool,
+}
+
+/// Bayesian posterior parameters
+#[derive(Debug, Clone)]
+pub struct BayesianPosteriorParams {
+    pub mu_samples: Vec<f64>,
+    pub sigma_samples: Vec<f64>,
+    pub nu_samples: Vec<f64>,
+    pub gelman_rubin_statistic: f64,
+    pub effective_sample_size: f64,
+    pub timestamp: DateTime<Utc>,
+}
+
+/// Emergence properties for complex systems
+#[derive(Debug, Clone)]
+pub struct EmergenceProperties {
+    pub entropy: f64,
+    pub complexity: f64,
+    pub self_organization_index: f64,
+    pub adaptive_capacity: f64,
+    pub resilience_measure: f64,
+}
+
+/// Bayesian VaR result
+#[derive(Debug, Clone)]
+pub struct BayesianVaRResult {
+    pub var_estimate: f64,
+    pub confidence_interval: (f64, f64),
+    pub posterior_parameters: BayesianPosteriorParams,
+    pub kupiec_test_statistic: f64,
+    pub training_metrics: E2BTrainingResults,
+    pub emergence_properties: EmergenceProperties,
+    pub model_validation_passed: bool,
+    pub timestamp: DateTime<Utc>,
+}
 
 /// JavaScript-compatible Bayesian VaR configuration
 #[wasm_bindgen]
@@ -376,11 +427,9 @@ impl JSBayesianVaREngine {
     async fn calculate_var_native(&self) -> Result<BayesianVaRResult, BayesianVaRError> {
         // Mock implementation for WASM compatibility
         // In production, this would interface with the full Rust engine
-        
-        use chrono::Utc;
-        
+
         // Simulate E2B training results
-        let training_results = cwts_ultra::algorithms::E2BTrainingResults {
+        let training_results = E2BTrainingResults {
             gelman_rubin_statistic: 1.05,
             effective_sample_size: 8000.0,
             autocorrelation_time: 10.2,
@@ -388,9 +437,9 @@ impl JSBayesianVaREngine {
             training_duration_seconds: 45.3,
             convergence_achieved: true,
         };
-        
+
         // Simulate posterior parameters
-        let posterior_params = cwts_ultra::algorithms::BayesianPosteriorParams {
+        let posterior_params = BayesianPosteriorParams {
             mu_samples: vec![0.001; 5000], // Mock samples
             sigma_samples: vec![0.02; 5000],
             nu_samples: vec![4.5; 5000],
@@ -398,7 +447,7 @@ impl JSBayesianVaREngine {
             effective_sample_size: 8000.0,
             timestamp: Utc::now(),
         };
-        
+
         // Simulate emergence properties
         let emergence_properties = EmergenceProperties {
             entropy: 2.8,
@@ -407,7 +456,7 @@ impl JSBayesianVaREngine {
             adaptive_capacity: 0.88,
             resilience_measure: 0.92,
         };
-        
+
         // Calculate mock VaR based on configuration
         let var_estimate = match self.config.confidence_level {
             x if x >= 0.99 => -0.08,  // 99% VaR
@@ -415,10 +464,10 @@ impl JSBayesianVaREngine {
             x if x >= 0.90 => -0.03,  // 90% VaR
             _ => -0.02,
         };
-        
+
         // Scale by horizon (square root rule)
         let horizon_scaled_var = var_estimate * (self.config.horizon_days as f64).sqrt();
-        
+
         Ok(BayesianVaRResult {
             var_estimate: horizon_scaled_var,
             confidence_interval: (horizon_scaled_var * 0.8, horizon_scaled_var * 1.2),

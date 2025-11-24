@@ -100,7 +100,6 @@ pub struct AutopoiesisInvariantChecker {
 }
 
 /// Organizational closure validation (system maintains its organization)
-#[derive(Clone)]
 pub struct OrganizationalClosureValidator {
     component_interactions: HashMap<String, Vec<ComponentInteraction>>,
     closure_invariants: Vec<ClosureInvariant>,

@@ -683,8 +683,8 @@ mod tests {
     fn test_pbit_price_level_creation() {
         let entropy_source = Arc::new(MockQuantumEntropySource);
         let gpu_accelerator =
-            Arc::new(crate::gpu::probabilistic_kernels::tests::MockGpuAccelerator);
-        let consensus_engine = Arc::new(crate::quantum::pbit_engine::tests::MockByzantineConsensus);
+            Arc::new(crate::gpu::probabilistic_kernels::MockGpuAccelerator);
+        let consensus_engine = Arc::new(crate::quantum::pbit_engine::MockByzantineConsensus);
         let config = crate::quantum::pbit_engine::PbitEngineConfig::default();
 
         let pbit_engine = PbitQuantumEngine::new_with_gpu(

@@ -42,6 +42,29 @@ impl ProductionHealthMonitor {
         let metrics = self.metrics.read().unwrap();
         metrics.error_rate < 0.05 && metrics.latency_p99_ms < 1000.0
     }
+
+    /// Get comprehensive health report
+    pub fn get_comprehensive_health_report(&self) -> ComprehensiveHealthReport {
+        let metrics = self.metrics.read().unwrap();
+        ComprehensiveHealthReport {
+            metrics: metrics.clone(),
+            is_healthy: metrics.error_rate < 0.05 && metrics.latency_p99_ms < 1000.0,
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+            recommendations: Vec::new(),
+        }
+    }
+}
+
+/// Comprehensive health report
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ComprehensiveHealthReport {
+    pub metrics: HealthMetrics,
+    pub is_healthy: bool,
+    pub timestamp: u64,
+    pub recommendations: Vec<String>,
 }
 
 impl Default for ProductionHealthMonitor {

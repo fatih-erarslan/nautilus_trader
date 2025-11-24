@@ -436,13 +436,14 @@ impl ActivationValidator {
         }
 
         let properties = activation.validate_properties()?;
+        let ieee754_compliant = errors.is_empty() && numerical_issues.is_empty();
 
         Ok(ValidationReport {
             errors,
             numerical_issues,
             properties,
             samples_tested: num_samples,
-            ieee754_compliant: errors.is_empty() && numerical_issues.is_empty(),
+            ieee754_compliant,
         })
     }
 }

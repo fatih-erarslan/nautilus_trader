@@ -1099,6 +1099,50 @@ impl ExecutionEngine {
             .unwrap()
             .as_nanos() as u64
     }
+
+    /// Calculate current market volatility based on recent data
+    fn calculate_market_volatility(&self) -> f64 {
+        // Use a simple rolling volatility measure based on execution metrics
+        let metrics = self.metrics.read();
+        if metrics.is_empty() {
+            return 0.5; // Default moderate volatility
+        }
+
+        // Estimate volatility from slippage patterns
+        let total_slippage: f64 = metrics.values().map(|m| m.total_slippage_bps as f64).sum();
+        let avg_slippage = total_slippage / metrics.len() as f64;
+
+        // Normalize to 0-1 range (100 bps considered high volatility)
+        (avg_slippage / 100.0).clamp(0.0, 1.0)
+    }
+
+    /// Calculate liquidity score based on market data and execution quality
+    pub(crate) fn calculate_liquidity_score(&self) -> f64 {
+        let metrics = self.metrics.read();
+        if metrics.is_empty() {
+            return 0.5; // Default moderate liquidity
+        }
+
+        // Estimate liquidity from fill rates and market impact
+        let total_fill_rate: f64 = metrics.values().map(|m| {
+            if m.total_quantity > 0 {
+                (m.total_quantity - m.remaining_quantity) as f64 / m.total_quantity as f64
+            } else {
+                0.0
+            }
+        }).sum();
+
+        let avg_fill_rate = total_fill_rate / metrics.len() as f64;
+
+        // Low market impact and high fill rate indicates good liquidity
+        // Use slippage as a proxy for market impact
+        let total_impact: f64 = metrics.values().map(|m| m.total_slippage_bps as f64).sum();
+        let avg_impact = total_impact / metrics.len() as f64;
+        let impact_score = 1.0 - (avg_impact / 100.0).clamp(0.0, 1.0);
+
+        // Combine fill rate and impact score
+        ((avg_fill_rate + impact_score) / 2.0).clamp(0.0, 1.0)
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -1657,11 +1657,12 @@ impl PerformanceBenchmarkSuite {
         }
 
         let statistics = self.calculate_latency_statistics(&latencies);
+        let target_compliance = statistics.percentiles.p99_ns <= self.config.target_latency_ns;
 
         SingleThreadedLatencyResults {
             sample_count: sample_size,
             statistics,
-            target_compliance: statistics.percentiles.p99_ns <= self.config.target_latency_ns,
+            target_compliance,
         }
     }
 
@@ -1688,13 +1689,15 @@ impl PerformanceBenchmarkSuite {
             .collect();
 
         let statistics = self.calculate_latency_statistics(&latencies);
+        let target_compliance = statistics.percentiles.p99_ns <= self.config.target_latency_ns;
+        let parallel_efficiency = self.calculate_parallel_efficiency(&latencies);
 
         MultiThreadedLatencyResults {
             thread_count,
             sample_count: latencies.len(),
             statistics,
-            target_compliance: statistics.percentiles.p99_ns <= self.config.target_latency_ns,
-            parallel_efficiency: self.calculate_parallel_efficiency(&latencies),
+            target_compliance,
+            parallel_efficiency,
         }
     }
 
@@ -1723,13 +1726,15 @@ impl PerformanceBenchmarkSuite {
         }
 
         let statistics = self.calculate_latency_statistics(&latencies);
+        let latency_degradation = self.calculate_latency_degradation(&statistics);
+        let target_compliance = statistics.percentiles.p99_ns <= self.config.target_latency_ns;
 
         UnderLoadLatencyResults {
             load_level,
             sample_count: latencies.len(),
             statistics,
-            latency_degradation: self.calculate_latency_degradation(&statistics),
-            target_compliance: statistics.percentiles.p99_ns <= self.config.target_latency_ns,
+            latency_degradation,
+            target_compliance,
         }
     }
 
@@ -1865,10 +1870,12 @@ impl PerformanceBenchmarkSuite {
             });
         }
 
+        let knee_point = self.find_knee_point(&curve_points);
+        let optimal_operating_point = self.find_optimal_operating_point(&curve_points);
         ThroughputLoadCurve {
             curve_points,
-            knee_point: self.find_knee_point(&curve_points),
-            optimal_operating_point: self.find_optimal_operating_point(&curve_points),
+            knee_point,
+            optimal_operating_point,
         }
     }
 
@@ -2146,14 +2153,17 @@ impl PerformanceBenchmarkSuite {
             });
         }
 
+        let average_degradation = results.iter().map(|r| r.degradation_factor).sum::<f64>()
+            / results.len() as f64;
+        let max_degradation = results
+            .iter()
+            .map(|r| r.degradation_factor)
+            .fold(0.0, f64::max);
+
         LatencyUnderPressureResults {
             test_results: results,
-            average_degradation: results.iter().map(|r| r.degradation_factor).sum::<f64>()
-                / results.len() as f64,
-            max_degradation: results
-                .iter()
-                .map(|r| r.degradation_factor)
-                .fold(0.0, f64::max),
+            average_degradation,
+            max_degradation,
             recovery_time_ns: 1_000_000, // 1ms typical recovery
         }
     }
@@ -2177,14 +2187,17 @@ impl PerformanceBenchmarkSuite {
             });
         }
 
+        let average_degradation = results.iter().map(|r| r.degradation_factor).sum::<f64>()
+            / results.len() as f64;
+        let max_degradation = results
+            .iter()
+            .map(|r| r.degradation_factor)
+            .fold(0.0, f64::max);
+
         LatencyUnderPressureResults {
             test_results: results,
-            average_degradation: results.iter().map(|r| r.degradation_factor).sum::<f64>()
-                / results.len() as f64,
-            max_degradation: results
-                .iter()
-                .map(|r| r.degradation_factor)
-                .fold(0.0, f64::max),
+            average_degradation,
+            max_degradation,
             recovery_time_ns: 500_000, // 0.5ms CPU recovery
         }
     }
@@ -2207,14 +2220,17 @@ impl PerformanceBenchmarkSuite {
             });
         }
 
+        let average_degradation = results.iter().map(|r| r.degradation_factor).sum::<f64>()
+            / results.len() as f64;
+        let max_degradation = results
+            .iter()
+            .map(|r| r.degradation_factor)
+            .fold(0.0, f64::max);
+
         LatencyUnderPressureResults {
             test_results: results,
-            average_degradation: results.iter().map(|r| r.degradation_factor).sum::<f64>()
-                / results.len() as f64,
-            max_degradation: results
-                .iter()
-                .map(|r| r.degradation_factor)
-                .fold(0.0, f64::max),
+            average_degradation,
+            max_degradation,
             recovery_time_ns: 100_000, // 0.1ms volatility adaptation
         }
     }
@@ -2244,14 +2260,17 @@ impl PerformanceBenchmarkSuite {
             });
         }
 
+        let average_degradation = results.iter().map(|r| r.degradation_factor).sum::<f64>()
+            / results.len() as f64;
+        let max_degradation = results
+            .iter()
+            .map(|r| r.degradation_factor)
+            .fold(0.0, f64::max);
+
         LatencyUnderPressureResults {
             test_results: results,
-            average_degradation: results.iter().map(|r| r.degradation_factor).sum::<f64>()
-                / results.len() as f64,
-            max_degradation: results
-                .iter()
-                .map(|r| r.degradation_factor)
-                .fold(0.0, f64::max),
+            average_degradation,
+            max_degradation,
             recovery_time_ns: 200_000, // 0.2ms extreme value recovery
         }
     }
@@ -2630,6 +2649,7 @@ pub struct StressTestResult {
     pub target_compliance: bool,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct StressTestResults {
     pub load_stress: LoadStressTestResult,
     pub memory_stress: MemoryStressTestResult,
@@ -3047,21 +3067,13 @@ impl Default for LoadStressTest {
             burst_duration_seconds: 30,
             sustained_load_duration_seconds: 300,
             recovery_time_seconds: 60,
-            stress_results: StressTestResults::default(),
+            stress_results: LegacyStressTestResults::default(),
         }
     }
 }
 
-impl Default for StressTestResults {
-    fn default() -> Self {
-        Self {
-            load_stress: LoadStressTestResult::default(),
-            memory_stress: MemoryStressTestResult::default(),
-            cpu_stress: CPUStressTestResult::default(),
-            concurrent_stress: ConcurrentStressTestResult::default(),
-        }
-    }
-}
+// Note: Default already derived on StressTestResults struct
+// Manual impl removed to avoid E0119 conflict
 
 impl Default for MemoryStressTest {
     fn default() -> Self {

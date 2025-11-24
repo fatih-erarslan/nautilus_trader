@@ -109,6 +109,17 @@ pub struct EmergenceEngine {
     pub global_state: Arc<RwLock<BayesianGlobalState>>,
 }
 
+impl std::fmt::Debug for EmergenceEngine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EmergenceEngine")
+            .field("bayesian_agents", &"Arc<RwLock<Vec<BayesianVaRAgent>>>")
+            .field("monte_carlo_swarm", &"Arc<RwLock<MonteCarloParticleSwarm>>")
+            .field("e2b_training_pipeline", &"Arc<E2BSandboxTrainer>")
+            .field("emergence_metrics", &"Arc<RwLock<EmergenceMonitor>>")
+            .finish()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct BayesianGlobalState {
     pub market_regime: MarketRegime,

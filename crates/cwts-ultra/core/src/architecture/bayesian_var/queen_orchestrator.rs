@@ -83,7 +83,7 @@ pub struct MonteCarloTask {
     pub e2b_sandbox: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum TaskPriority {
     Critical, // Real-time VaR calculations
     High,     // Intraday risk monitoring
@@ -246,6 +246,17 @@ pub struct QueenOrchestrator {
     pub pheromone_space: Arc<AsyncRwLock<ProbabilisticPheromoneSpace>>,
     pub swarm_size: usize,
     pub worker_pool: Arc<AsyncRwLock<Vec<WorkerBee>>>,
+}
+
+impl std::fmt::Debug for QueenOrchestrator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("QueenOrchestrator")
+            .field("swarm_size", &self.swarm_size)
+            .field("global_state", &"Arc<RwLock<BayesianGlobalState>>")
+            .field("consensus_engine", &"Arc<AsyncRwLock<ByzantineBayesianConsensus>>")
+            .field("task_distributor", &"Arc<AsyncRwLock<MonteCarloWorkStealer>>")
+            .finish()
+    }
 }
 
 impl QueenOrchestrator {
@@ -597,7 +608,10 @@ impl QueenOrchestrator {
         consensus: BayesianConsensusResult,
         emergence: EmergentBehavior,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let mut global_state = self.global_state.write()?;
+        let mut global_state = self.global_state.write().map_err(|e| {
+            Box::new(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))
+                as Box<dyn std::error::Error>
+        })?;
 
         global_state.risk_metrics.var_95 = consensus.consensus_var_estimate;
         global_state.risk_metrics.var_99 = consensus.consensus_var_estimate * 1.5;

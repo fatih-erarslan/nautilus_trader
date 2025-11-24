@@ -12,6 +12,8 @@ rapier3d = ["dep:rapier3d"]
 rapier2d = ["dep:rapier2d"]
 parry3d = ["dep:parry3d"]
 parry2d = ["dep:parry2d"]
+avian3d = ["dep:avian3d"]
+avian2d = ["dep:avian2d"]
 simd = []
 parallel = ["rayon"]
 deterministic = []
@@ -19,14 +21,19 @@ gpu = []
 
 [dependencies]
 # Core math
-nalgebra = { version = "0.33", features = ["serde-serialize"] }
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
 simba = "0.9"
 
-# Physics backends (optional)
-rapier3d = { version = "0.22", optional = true }
-rapier2d = { version = "0.22", optional = true }
+# Physics backends (optional) - using vendored versions
+rapier3d = { path = "../../vendor/physics/rapier/crates/rapier3d", optional = true }
+rapier2d = { path = "../../vendor/physics/rapier/crates/rapier2d", optional = true }
+# Parry collision detection (pulled in via rapier dependencies)
 parry3d = { version = "0.17", optional = true }
 parry2d = { version = "0.17", optional = true }
+
+# Avian physics (Bevy integration)
+avian3d = { path = "../../vendor/physics/avian/crates/avian3d", optional = true }
+avian2d = { path = "../../vendor/physics/avian/crates/avian2d", optional = true }
 
 # Memory management
 bumpalo = { version = "3.16", features = ["collections"] }

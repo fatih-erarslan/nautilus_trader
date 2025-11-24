@@ -1,0 +1,180 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#1a1a2e', 'primaryTextColor': '#eee', 'primaryBorderColor': '#7C3AED', 'lineColor': '#F97316', 'secondaryColor': '#16213e', 'tertiaryColor': '#0f3460'}}}%%
+
+flowchart TB
+    subgraph VENDOR["🏭 VENDORED PHYSICS ENGINES (crates/vendor/physics/)"]
+        direction TB
+
+        subgraph RUST_ENGINES["⚙️ Rust-Native Engines"]
+            RAPIER["📦 rapier<br/>v0.30.1<br/>Rust Physics<br/>12MB"]
+            AVIAN["📦 avian<br/>Bevy ECS Physics<br/>15MB"]
+        end
+
+        subgraph CPP_ENGINES["🔧 C++/FFI Engines"]
+            JOLT["📦 JoltPhysics<br/>C++ High-Perf<br/>52MB"]
+            MUJOCO["📦 mujoco<br/>DeepMind Robotics<br/>180MB"]
+            CHRONO["📦 chrono<br/>Project Chrono<br/>Multi-Physics<br/>1.6GB"]
+        end
+
+        subgraph GPU_ENGINES["🎮 GPU-Accelerated Engines"]
+            WARP["📦 warp<br/>NVIDIA CUDA<br/>106MB"]
+            TAICHI["📦 taichi<br/>Parallel Computing<br/>23MB"]
+            GENESIS["📦 Genesis<br/>Neural Physics<br/>296MB"]
+        end
+    end
+
+    subgraph ADAPTERS["🔌 PHYSICS ADAPTERS (crates/physics-engines/)"]
+        direction TB
+        RAPIER_HP["rapier-hyperphysics<br/>━━━━━━━━━━━━━━━<br/>• HFT Market Mapping<br/>• Signal Extraction<br/>• <500μs Latency"]
+        HP_UNIFIED["hyperphysics-unified<br/>━━━━━━━━━━━━━━━<br/>• Backend Abstraction<br/>• Zero-Cost Selection<br/>• PhysicsBackend Trait"]
+        JOLT_HP["jolt-hyperphysics<br/>━━━━━━━━━━━━━━━<br/>• C++ FFI Bindings<br/>• SIMD Optimized<br/>• build.rs Integration"]
+        AVIAN_HP["avian-hyperphysics<br/>━━━━━━━━━━━━━━━<br/>• Bevy ECS Integration<br/>• Entity Component<br/>• Parallel Systems"]
+    end
+
+    subgraph CORE["🧬 CORE FOUNDATION"]
+        direction TB
+        HP_CORE["hyperphysics-core<br/>━━━━━━━━━━━━━━━<br/>• Core Types<br/>• Traits & Errors<br/>• Memory Layout"]
+        HP_GEOM["hyperphysics-geometry<br/>━━━━━━━━━━━━━━━<br/>• Shapes & Transforms<br/>• AABB/BVH<br/>• Collision Primitives"]
+        HP_MARKET["hyperphysics-market<br/>━━━━━━━━━━━━━━━<br/>• Order Types<br/>• Trade Events<br/>• Market State"]
+        HP_PBIT["hyperphysics-pbit<br/>━━━━━━━━━━━━━━━<br/>• Probabilistic Bits<br/>• Quantum-Inspired<br/>• SIMD Operations"]
+    end
+
+    subgraph INTELLIGENCE["🧠 INTELLIGENCE & REASONING"]
+        direction TB
+        REASON_ROUTER["hyperphysics-reasoning-router<br/>━━━━━━━━━━━━━━━━━━━━━<br/>• Hierarchical Routing<br/>• 4 Backend Pools<br/>• HNSW Indexing"]
+        REASON_BACKENDS["hyperphysics-reasoning-backends<br/>━━━━━━━━━━━━━━━━━━━━━<br/>• Frontier Pool (O1/Claude)<br/>• Specialized Pool<br/>• Local/Fast Pools"]
+        NEURAL["hyperphysics-neural<br/>━━━━━━━━━━━━━━━<br/>• Neural Networks<br/>• Pattern Recognition<br/>• Adaptive Learning"]
+        OPTIM["hyperphysics-optimization<br/>━━━━━━━━━━━━━━━━━━<br/>• Gradient Methods<br/>• Evolutionary Algos<br/>• Constraint Solving"]
+    end
+
+    subgraph GPU["⚡ GPU ACCELERATION"]
+        direction TB
+        GPU_UNIFIED["hyperphysics-gpu-unified<br/>━━━━━━━━━━━━━━━━━━<br/>• Multi-Backend GPU<br/>• CUDA/Metal/WebGPU<br/>• Async Compute"]
+        GPU_MARL["gpu-marl<br/>━━━━━━━━━━━━<br/>• Multi-Agent RL<br/>• Parallel Training<br/>• GPU Tensors"]
+        NAPI["hyperphysics-napi<br/>━━━━━━━━━━━━━━━<br/>• Node.js Bindings<br/>• SIMD Ops Export<br/>• GPU Access"]
+    end
+
+    subgraph ACTIVE_INFERENCE["🎯 ACTIVE INFERENCE AGENT (Central Hub)"]
+        direction TB
+        AI_AGENT["active-inference-agent<br/>━━━━━━━━━━━━━━━━━━━━━<br/>• Free Energy Minimization<br/>• Belief Updating<br/>• Action Selection<br/>• Homeostatic Regulation"]
+    end
+
+    subgraph CWTS["📊 CWTS-ULTRA (HFT Trading)"]
+        direction TB
+        CWTS_CORE["cwts-ultra/core<br/>━━━━━━━━━━━━━━━<br/>• Bayesian VAR Engine<br/>• Probabilistic Risk<br/>• Order Matching"]
+        CWTS_WASM["cwts-ultra/wasm<br/>━━━━━━━━━━━━━━━<br/>• Browser Deployment<br/>• WebAssembly<br/>• Real-time Trading"]
+        CWTS_PARASITIC["cwts-ultra/parasitic<br/>━━━━━━━━━━━━━━━━━<br/>• Tardigrade Algorithm<br/>• Cache Structures<br/>• GPU CUDA Backend"]
+    end
+
+    subgraph SWARM["🐝 BIO-INSPIRED SWARM (12 Algorithms)"]
+        direction LR
+        S1["Bee Colony"]
+        S2["Ant Colony"]
+        S3["Firefly"]
+        S4["Wolf Pack"]
+        S5["Particle Swarm"]
+        S6["Cuckoo Search"]
+        S7["Bat Algorithm"]
+        S8["Whale Optimization"]
+        S9["Dragonfly"]
+        S10["Moth Flame"]
+        S11["Salp Swarm"]
+        S12["Harris Hawks"]
+    end
+
+    subgraph CRYPTO["🔐 SECURITY & CRYPTO"]
+        direction TB
+        LMSR["lmsr<br/>━━━━━━━━━<br/>• Market Scoring<br/>• Prediction Markets"]
+        PROSPECT["prospect-theory<br/>━━━━━━━━━━━━━━<br/>• Behavioral Finance<br/>• Risk Assessment"]
+    end
+
+    %% === CONNECTIONS ===
+
+    %% Vendor to Adapters
+    RAPIER -->|"rapier3d crate"| RAPIER_HP
+    RAPIER -->|"path dependency"| HP_UNIFIED
+    AVIAN -->|"avian3d/2d crates"| HP_UNIFIED
+    AVIAN -->|"ECS physics"| AVIAN_HP
+    JOLT -->|"C++ FFI"| JOLT_HP
+
+    %% GPU Engines to GPU Layer
+    WARP -->|"CUDA kernels"| GPU_UNIFIED
+    TAICHI -->|"parallel compute"| GPU_UNIFIED
+    GENESIS -->|"neural physics"| NEURAL
+
+    %% Scientific Engines to Core
+    MUJOCO -->|"robotics sim"| HP_GEOM
+    CHRONO -->|"multi-physics"| HP_CORE
+
+    %% Adapters to Core
+    RAPIER_HP --> HP_CORE
+    RAPIER_HP --> HP_GEOM
+    RAPIER_HP --> HP_MARKET
+    HP_UNIFIED --> HP_CORE
+    HP_UNIFIED --> HP_GEOM
+    JOLT_HP --> HP_CORE
+    AVIAN_HP --> HP_CORE
+
+    %% Core to Intelligence
+    HP_CORE --> REASON_ROUTER
+    HP_PBIT --> REASON_ROUTER
+    REASON_ROUTER --> REASON_BACKENDS
+    REASON_ROUTER --> NEURAL
+    NEURAL --> OPTIM
+
+    %% GPU Layer Connections
+    GPU_UNIFIED --> GPU_MARL
+    GPU_UNIFIED --> NAPI
+    NEURAL --> GPU_UNIFIED
+    HP_PBIT --> GPU_UNIFIED
+
+    %% Active Inference as Central Hub
+    HP_CORE ==>|"core types"| AI_AGENT
+    REASON_ROUTER ==>|"reasoning"| AI_AGENT
+    GPU_MARL ==>|"RL training"| AI_AGENT
+    HP_PBIT ==>|"probabilistic"| AI_AGENT
+    OPTIM ==>|"optimization"| AI_AGENT
+
+    %% Active Inference to Trading
+    AI_AGENT ==>|"trading signals"| CWTS_CORE
+    AI_AGENT ==>|"risk assessment"| CWTS_PARASITIC
+
+    %% CWTS Internal
+    CWTS_CORE --> CWTS_WASM
+    CWTS_CORE --> CWTS_PARASITIC
+
+    %% Swarm to Active Inference
+    S1 & S2 & S3 & S4 & S5 & S6 -->|"swarm intelligence"| AI_AGENT
+    S7 & S8 & S9 & S10 & S11 & S12 -->|"optimization"| OPTIM
+
+    %% Crypto/Security
+    LMSR --> CWTS_CORE
+    PROSPECT --> AI_AGENT
+
+    %% Physics to Trading
+    RAPIER_HP -->|"market dynamics"| CWTS_CORE
+    HP_UNIFIED -->|"simulation"| CWTS_CORE
+
+    %% Styling
+    classDef vendorRust fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
+    classDef vendorCpp fill:#ef4444,stroke:#dc2626,stroke-width:2px,color:#fff
+    classDef vendorGpu fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff
+    classDef adapter fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    classDef core fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+    classDef intelligence fill:#ec4899,stroke:#db2777,stroke-width:2px,color:#fff
+    classDef gpu fill:#06b6d4,stroke:#0891b2,stroke-width:2px,color:#fff
+    classDef activeInf fill:#dc2626,stroke:#b91c1c,stroke-width:3px,color:#fff
+    classDef trading fill:#22c55e,stroke:#16a34a,stroke-width:2px,color:#fff
+    classDef swarm fill:#a855f7,stroke:#9333ea,stroke-width:1px,color:#fff
+    classDef crypto fill:#64748b,stroke:#475569,stroke-width:2px,color:#fff
+
+    class RAPIER,AVIAN vendorRust
+    class JOLT,MUJOCO,CHRONO vendorCpp
+    class WARP,TAICHI,GENESIS vendorGpu
+    class RAPIER_HP,HP_UNIFIED,JOLT_HP,AVIAN_HP adapter
+    class HP_CORE,HP_GEOM,HP_MARKET,HP_PBIT core
+    class REASON_ROUTER,REASON_BACKENDS,NEURAL,OPTIM intelligence
+    class GPU_UNIFIED,GPU_MARL,NAPI gpu
+    class AI_AGENT activeInf
+    class CWTS_CORE,CWTS_WASM,CWTS_PARASITIC trading
+    class S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12 swarm
+    class LMSR,PROSPECT crypto

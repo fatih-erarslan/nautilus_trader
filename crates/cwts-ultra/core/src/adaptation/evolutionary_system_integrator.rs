@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::{mpsc, watch, RwLock as AsyncRwLock};
+use tokio::sync::{mpsc, watch, Mutex, RwLock as AsyncRwLock};
 use tokio::time::{interval, sleep};
 use tracing::{debug, error, info, warn};
 
@@ -122,7 +122,7 @@ pub struct AdaptationTrigger {
     pub constitutional_priority: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum AdaptationTriggerType {
     PerformanceDegradation,
     MarketRegimeShift,
@@ -242,18 +242,15 @@ impl EvolutionarySystemIntegrator {
             *active = true;
         }
 
-        // Start all integration subsystems
-        let integration_tasks = vec![
+        // Start all integration subsystems concurrently using tokio::try_join!
+        tokio::try_join!(
             self.start_adaptation_monitoring(),
             self.start_evolutionary_orchestration(),
             self.start_constitutional_compliance_enforcement(),
             self.start_emergence_evolution_tracking(),
             self.start_production_integration(),
             self.start_system_health_integration(),
-        ];
-
-        // Execute all subsystems concurrently
-        futures::future::try_join_all(integration_tasks).await?;
+        )?;
 
         info!("✅ Evolutionary System Integration active");
         Ok(())
@@ -275,9 +272,9 @@ impl EvolutionarySystemIntegrator {
                 tokio::select! {
                     _ = monitoring_interval.tick() => {
                         // Get current learning state
-                        let learning_state = learning_pipeline.get_learning_state();
-                        let recent_metrics = learning_pipeline.get_recent_metrics(10);
-                        let recent_events = learning_pipeline.get_recent_events(5);
+                        let learning_state = learning_pipeline.get_learning_state().await;
+                        let recent_metrics = learning_pipeline.get_recent_metrics(10).await;
+                        let recent_events = learning_pipeline.get_recent_events(5).await;
 
                         // Analyze for adaptation triggers
                         if let Ok(triggers) = Self::analyze_adaptation_triggers(
@@ -409,7 +406,7 @@ impl EvolutionarySystemIntegrator {
     async fn start_evolutionary_orchestration(&self) -> Result<(), AdaptationError> {
         info!("🧬 Starting evolutionary orchestration subsystem");
 
-        let mut adaptation_receiver = self.adaptation_receiver.lock().unwrap();
+        let adaptation_receiver = self.adaptation_receiver.clone();
         let genetic_optimizer = self.genetic_optimizer.clone();
         let active_optimizations = self.active_optimizations.clone();
         let evolution_state = self.evolution_state.clone();
@@ -418,7 +415,8 @@ impl EvolutionarySystemIntegrator {
         let last_adaptation_time = self.last_adaptation_time.clone();
 
         tokio::spawn(async move {
-            while let Some(trigger) = adaptation_receiver.recv().await {
+            let mut receiver = adaptation_receiver.lock().await;
+            while let Some(trigger) = receiver.recv().await {
                 info!(
                     "🎯 Processing adaptation trigger: {:?}",
                     trigger.trigger_type
@@ -426,7 +424,7 @@ impl EvolutionarySystemIntegrator {
 
                 // Check adaptation rate limiting
                 let should_adapt = {
-                    let last_adapt = last_adaptation_time.lock().unwrap();
+                    let last_adapt = last_adaptation_time.lock().await;
                     match *last_adapt {
                         Some(last_time)
                             if last_time.elapsed() < config.minimum_stability_period =>
@@ -536,7 +534,7 @@ impl EvolutionarySystemIntegrator {
 
         // Execute genetic optimization
         let optimization_result = {
-            let mut optimizer = genetic_optimizer.lock().unwrap();
+            let mut optimizer = genetic_optimizer.lock().await;
             // In real implementation, would configure optimizer with evolution_config
             optimizer.evolve_system().await
         };
@@ -595,7 +593,7 @@ impl EvolutionarySystemIntegrator {
 
                         // Update last adaptation time
                         {
-                            let mut last_time = last_adaptation_time.lock().unwrap();
+                            let mut last_time = last_adaptation_time.lock().await;
                             *last_time = Some(Instant::now());
                         }
 
@@ -726,7 +724,7 @@ impl EvolutionarySystemIntegrator {
                 ),
                 (
                     "load_factor".to_string(),
-                    serde_json::Value::Number(serde_json::Number::from(1.0)),
+                    serde_json::json!(1.0),
                 ),
             ]),
         };
@@ -1168,9 +1166,7 @@ impl EvolutionarySystemIntegrator {
     ) -> Result<(), AdaptationError> {
         // Get production health metrics
         let health_report = production_health
-            .get_comprehensive_health_report()
-            .await
-            .map_err(|e| AdaptationError::ProductionIntegrationFailed(e.to_string()))?;
+            .get_comprehensive_health_report();
 
         // Update adaptation metrics based on production performance
         {

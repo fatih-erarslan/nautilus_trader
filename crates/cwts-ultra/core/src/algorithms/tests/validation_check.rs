@@ -3,6 +3,7 @@
 
 use crate::algorithms::liquidation_engine::*;
 use crate::algorithms::slippage_calculator::*;
+use crate::common_types::TradeSide;
 
 #[cfg(test)]
 mod validation_tests {

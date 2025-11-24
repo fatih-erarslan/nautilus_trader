@@ -239,7 +239,7 @@ fn test_performance_metrics() {
             50.0 + (i as f64 * 0.01),
             49.99 + (i as f64 * 0.01), 
             50.01 + (i as f64 * 0.01),
-            1640995200000 + i * 1000
+            1640995200000i64 + i as i64 * 1000
         );
         
         engine.make_quantum_trading_decision(data.as_bytes());

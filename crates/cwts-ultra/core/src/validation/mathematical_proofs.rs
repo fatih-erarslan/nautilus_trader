@@ -40,7 +40,6 @@ struct ConvergenceCriteria {
 }
 
 /// Lyapunov function for stability analysis
-#[derive(Clone)]
 struct LyapunovFunction {
     function_type: LyapunovType,
     energy_function: Box<dyn Fn(&[f64]) -> f64 + Send + Sync>,
@@ -176,6 +175,7 @@ enum CancellationSeverity {
 }
 
 /// Theoretical bounds for attention system
+#[derive(Debug, Clone)]
 struct TheoreticalBounds {
     attention_bounds: AttentionBounds,
     convergence_bounds: ConvergenceBounds,
@@ -873,7 +873,7 @@ impl MathematicalValidator {
             let convergence_result = self.test_convergence_with_input(market_input);
 
             test.volatility_results
-                .insert(volatility, convergence_result);
+                .insert(OrderedF64(volatility), convergence_result);
         }
 
         // Analyze stability across volatility spectrum
@@ -903,7 +903,7 @@ impl MathematicalValidator {
             let market_input = self.generate_high_volume_input(volume);
             let convergence_result = self.test_convergence_with_input(market_input);
 
-            test.volume_results.insert(volume, convergence_result);
+            test.volume_results.insert(OrderedF64(volume), convergence_result);
         }
 
         test.stability_maintained = test.volume_results.values().all(|result| result.converged);
@@ -923,7 +923,7 @@ impl MathematicalValidator {
             let convergence_result = self.test_convergence_with_input(market_input);
 
             test.price_movement_results
-                .insert(change, convergence_result);
+                .insert(OrderedF64(change), convergence_result);
         }
 
         test.stability_maintained = test
@@ -1040,7 +1040,7 @@ impl MathematicalValidator {
                 (perturbed_result.signal_strength - base_result.signal_strength).abs();
             let sensitivity = output_change / magnitude;
 
-            test.sensitivity_results.insert(magnitude, sensitivity);
+            test.sensitivity_results.insert(OrderedF64(magnitude), sensitivity);
         }
 
         // Check bounded sensitivity
@@ -1073,7 +1073,7 @@ impl MathematicalValidator {
             }
 
             let robustness_rate = convergence_count as f64 / num_trials as f64;
-            test.robustness_rates.insert(noise_level, robustness_rate);
+            test.robustness_rates.insert(OrderedF64(noise_level), robustness_rate);
         }
 
         test.robust_to_noise = test.robustness_rates.values().all(|&rate| rate > 0.95);
@@ -1405,10 +1405,37 @@ impl StabilityProof {
     }
 }
 
-// Test result structures
+// Test result structures - Using BTreeMap since f64 implements PartialOrd but not Hash
+use std::collections::BTreeMap;
+use std::cmp::Ordering;
+
+/// Wrapper for f64 that implements Ord for use as map keys (NaN values sort last)
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct OrderedF64(pub f64);
+
+impl Eq for OrderedF64 {}
+
+impl PartialOrd for OrderedF64 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for OrderedF64 {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.partial_cmp(&other.0).unwrap_or(Ordering::Equal)
+    }
+}
+
+impl From<f64> for OrderedF64 {
+    fn from(v: f64) -> Self {
+        Self(v)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct VolatilityStabilityTest {
-    pub volatility_results: HashMap<f64, ConvergenceResult>,
+    pub volatility_results: BTreeMap<OrderedF64, ConvergenceResult>,
     pub stability_maintained: bool,
     pub max_iterations: usize,
 }
@@ -1416,7 +1443,7 @@ pub struct VolatilityStabilityTest {
 impl VolatilityStabilityTest {
     fn new() -> Self {
         Self {
-            volatility_results: HashMap::new(),
+            volatility_results: BTreeMap::new(),
             stability_maintained: false,
             max_iterations: 0,
         }
@@ -1425,14 +1452,14 @@ impl VolatilityStabilityTest {
 
 #[derive(Debug, Clone)]
 pub struct VolumeStabilityTest {
-    pub volume_results: HashMap<f64, ConvergenceResult>,
+    pub volume_results: BTreeMap<OrderedF64, ConvergenceResult>,
     pub stability_maintained: bool,
 }
 
 impl VolumeStabilityTest {
     fn new() -> Self {
         Self {
-            volume_results: HashMap::new(),
+            volume_results: BTreeMap::new(),
             stability_maintained: false,
         }
     }
@@ -1440,14 +1467,14 @@ impl VolumeStabilityTest {
 
 #[derive(Debug, Clone)]
 pub struct PriceStabilityTest {
-    pub price_movement_results: HashMap<f64, ConvergenceResult>,
+    pub price_movement_results: BTreeMap<OrderedF64, ConvergenceResult>,
     pub stability_maintained: bool,
 }
 
 impl PriceStabilityTest {
     fn new() -> Self {
         Self {
-            price_movement_results: HashMap::new(),
+            price_movement_results: BTreeMap::new(),
             stability_maintained: false,
         }
     }
@@ -1528,14 +1555,14 @@ pub struct CancellationResult {
 
 #[derive(Debug, Clone)]
 pub struct PerturbationStabilityTest {
-    pub sensitivity_results: HashMap<f64, f64>,
+    pub sensitivity_results: BTreeMap<OrderedF64, f64>,
     pub bounded_sensitivity: bool,
 }
 
 impl PerturbationStabilityTest {
     fn new() -> Self {
         Self {
-            sensitivity_results: HashMap::new(),
+            sensitivity_results: BTreeMap::new(),
             bounded_sensitivity: false,
         }
     }
@@ -1543,14 +1570,14 @@ impl PerturbationStabilityTest {
 
 #[derive(Debug, Clone)]
 pub struct NoiseRobustnessTest {
-    pub robustness_rates: HashMap<f64, f64>,
+    pub robustness_rates: BTreeMap<OrderedF64, f64>,
     pub robust_to_noise: bool,
 }
 
 impl NoiseRobustnessTest {
     fn new() -> Self {
         Self {
-            robustness_rates: HashMap::new(),
+            robustness_rates: BTreeMap::new(),
             robust_to_noise: false,
         }
     }

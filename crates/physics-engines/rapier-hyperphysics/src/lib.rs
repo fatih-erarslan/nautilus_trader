@@ -53,8 +53,8 @@ pub struct RapierHyperPhysicsAdapter {
     /// Island manager
     islands: IslandManager,
 
-    /// Broad phase
-    broad_phase: DefaultBroadPhase,
+    /// Broad phase (BVH-based)
+    broad_phase: BroadPhaseBvh,
 
     /// Narrow phase
     narrow_phase: NarrowPhase,
@@ -74,8 +74,6 @@ pub struct RapierHyperPhysicsAdapter {
     /// CCD solver
     ccd_solver: CCDSolver,
 
-    /// Query pipeline
-    _query_pipeline: QueryPipeline,
 }
 
 impl RapierHyperPhysicsAdapter {
@@ -89,14 +87,13 @@ impl RapierHyperPhysicsAdapter {
             gravity,
             integration_params,
             islands: IslandManager::new(),
-            broad_phase: DefaultBroadPhase::new(),
+            broad_phase: BroadPhaseBvh::new(),
             narrow_phase: NarrowPhase::new(),
             rigid_body_set: RigidBodySet::new(),
             collider_set: ColliderSet::new(),
             impulse_joints: ImpulseJointSet::new(),
             multibody_joints: MultibodyJointSet::new(),
             ccd_solver: CCDSolver::new(),
-            _query_pipeline: QueryPipeline::new(),
         }
     }
 
@@ -125,10 +122,35 @@ impl RapierHyperPhysicsAdapter {
             &mut self.impulse_joints,
             &mut self.multibody_joints,
             &mut self.ccd_solver,
-            None, // No query pipeline modification
             &(),  // No hooks
             &(),  // No events
         );
+    }
+
+    /// Get query pipeline for raycasting and spatial queries
+    ///
+    /// Returns a `QueryPipeline` configured with the default `QueryFilter`.
+    /// For custom filtering, use `query_pipeline_with_filter()`.
+    pub fn query_pipeline(&self) -> rapier3d::pipeline::QueryPipeline<'_> {
+        self.broad_phase.as_query_pipeline(
+            self.narrow_phase.query_dispatcher(),
+            &self.rigid_body_set,
+            &self.collider_set,
+            QueryFilter::default(),
+        )
+    }
+
+    /// Get query pipeline with custom filter for raycasting and spatial queries
+    pub fn query_pipeline_with_filter<'a>(
+        &'a self,
+        filter: QueryFilter<'a>,
+    ) -> rapier3d::pipeline::QueryPipeline<'a> {
+        self.broad_phase.as_query_pipeline(
+            self.narrow_phase.query_dispatcher(),
+            &self.rigid_body_set,
+            &self.collider_set,
+            filter,
+        )
     }
 
     /// Get reference to rigid body set
@@ -173,7 +195,7 @@ impl RapierHyperPhysicsAdapter {
         self.impulse_joints = ImpulseJointSet::new();
         self.multibody_joints = MultibodyJointSet::new();
         self.islands = IslandManager::new();
-        self.broad_phase = DefaultBroadPhase::new();
+        self.broad_phase = BroadPhaseBvh::new();
         self.narrow_phase = NarrowPhase::new();
         self.ccd_solver = CCDSolver::new();
     }

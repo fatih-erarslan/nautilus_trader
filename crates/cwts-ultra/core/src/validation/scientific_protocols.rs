@@ -714,7 +714,18 @@ impl ScientificValidationEngine {
             &hypothesis_results,
         )?;
 
-        // 7. Generate final report
+        // 7. Calculate derived values before struct initialization
+        let overall_validity = self.calculate_overall_validity(
+            &hypothesis_results,
+            &significance_analysis,
+            &power_analysis,
+        );
+        let statistical_rigor_score = self
+            .calculate_rigor_score(&hypothesis_results, &monte_carlo_results);
+        let reproducibility_assessment = self.assess_reproducibility(experimental_data);
+        let recommendations = self.generate_recommendations(&hypothesis_results, &power_analysis);
+
+        // 8. Generate final report
         let report = ScientificValidationReport {
             validation_id,
             algorithm_name,
@@ -725,15 +736,10 @@ impl ScientificValidationEngine {
             power_analysis,
             monte_carlo_results,
             peer_review_results,
-            overall_validity: self.calculate_overall_validity(
-                &hypothesis_results,
-                &significance_analysis,
-                &power_analysis,
-            ),
-            statistical_rigor_score: self
-                .calculate_rigor_score(&hypothesis_results, &monte_carlo_results),
-            reproducibility_assessment: self.assess_reproducibility(experimental_data),
-            recommendations: self.generate_recommendations(&hypothesis_results, &power_analysis),
+            overall_validity,
+            statistical_rigor_score,
+            reproducibility_assessment,
+            recommendations,
         };
 
         Ok(report)

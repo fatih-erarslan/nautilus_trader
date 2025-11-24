@@ -81,12 +81,11 @@ impl ScientificallyRigorousSystem {
     pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let validation_framework = Arc::new(RwLock::new(MathematicalValidator::new()));
 
-        let financial_calculator = Arc::new(FinancialCalculator::new()?);
+        let financial_calculator = Arc::new(FinancialCalculator::new());
 
-        let autopoietic_system = Arc::new(RwLock::new(AutopoieticSystem::new()?));
-
-        // Initialize autopoietic system
-        autopoietic_system.write().await.initialize().await?;
+        // Create default system identity for autopoietic system
+        let system_identity = crate::validation::autopoiesis_theory::SystemIdentity::default();
+        let autopoietic_system = Arc::new(RwLock::new(AutopoieticSystem::new(system_identity)?));
 
         let risk_manager = Arc::new(RwLock::new(
             crate::algorithms::risk_management::RiskManager::default(),
@@ -286,7 +285,7 @@ impl ScientificallyRigorousSystem {
         };
 
         let adapted_signal = autopoietic
-            .adapt_to_environment(signal, &environmental_context)
+            .adapt_to_trading_signal(signal, &environmental_context)
             .await?;
 
         Ok(adapted_signal)
@@ -312,11 +311,16 @@ impl ScientificallyRigorousSystem {
             0.99,
         )?;
 
+        // Kelly criterion with win/loss ratio
+        let win_loss_ratio = if signal.average_loss != 0.0 {
+            signal.average_win / signal.average_loss.abs()
+        } else {
+            1.0
+        };
         let kelly_fraction = self.financial_calculator.kelly_criterion(
             signal.win_probability,
-            signal.average_win,
-            signal.average_loss,
-        )?;
+            win_loss_ratio,
+        );
 
         Ok(RiskAssessment {
             value_at_risk_95: var_95,
@@ -452,11 +456,6 @@ pub enum TradingAction {
 
 // Placeholder implementations for missing dependencies
 pub struct IntegrationRiskManager;
-impl Default for RiskManager {
-    fn default() -> Self {
-        Self
-    }
-}
 
 pub struct IntegratedFeeOptimizer;
 
@@ -464,7 +463,7 @@ pub struct IntegratedSlippageCalculator;
 
 // Extend AutopoieticSystem with required methods
 impl AutopoieticSystem {
-    pub async fn adapt_to_environment(
+    pub async fn adapt_to_trading_signal(
         &mut self,
         signal: &TradingSignal,
         _context: &EnvironmentalContext,
@@ -524,40 +523,5 @@ impl FinancialCalculator {
         }
 
         Ok(volatility)
-    }
-
-    pub fn calculate_value_at_risk(
-        &self,
-        expected_return: f64,
-        volatility: f64,
-        confidence_level: f64,
-    ) -> Result<f64, ArithmeticError> {
-        if !expected_return.is_finite() || !volatility.is_finite() || !confidence_level.is_finite()
-        {
-            return Err(ArithmeticError::InvalidInput(
-                "Non-finite inputs".to_string(),
-            ));
-        }
-
-        if confidence_level <= 0.0 || confidence_level >= 1.0 {
-            return Err(ArithmeticError::InvalidInput(
-                "Invalid confidence level".to_string(),
-            ));
-        }
-
-        // Use normal distribution quantile (simplified)
-        let z_score = match confidence_level {
-            x if x >= 0.95 => -1.645, // 95% confidence
-            x if x >= 0.99 => -2.326, // 99% confidence
-            _ => -1.28,               // 90% confidence (default)
-        };
-
-        let var = expected_return + z_score * volatility;
-
-        if !var.is_finite() {
-            return Err(ArithmeticError::InvalidResult("Non-finite VaR".to_string()));
-        }
-
-        Ok(var)
     }
 }

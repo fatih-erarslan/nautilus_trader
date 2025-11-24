@@ -46,3 +46,9 @@ coordination/orchestration/*
 claude-flow
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
+# Vendored external dependencies (cloned from GitHub forks)
+crates/vendor/
+
+# Embedded git repositories (external clones)
+crates/cwts-ultra/freqtrade/strategies/core/complex_adaptive_agentic_orchestrator/
+crates/cwts-ultra/freqtrade/strategies/core/tengri/

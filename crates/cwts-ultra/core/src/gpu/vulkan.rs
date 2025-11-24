@@ -602,8 +602,8 @@ impl VulkanGpu {
                 ptr::null_mut(),
             );
 
-            let mut queue_families =
-                vec![mem::zeroed::<VkQueueFamilyProperties>(); queue_family_count as usize];
+            let mut queue_families: Vec<VkQueueFamilyProperties> =
+                (0..queue_family_count).map(|_| mem::zeroed()).collect();
             vkGetPhysicalDeviceQueueFamilyProperties(
                 physical_device,
                 &mut queue_family_count,

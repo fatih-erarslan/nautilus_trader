@@ -173,16 +173,25 @@ impl BinanceWebSocketClient {
 
     /// Process REAL market data stream (NO mock generation allowed)
     pub async fn process_real_market_data(&mut self) -> Result<MarketDataStream, DataSourceError> {
-        let ws_stream = self
-            .websocket_stream
-            .as_mut()
-            .ok_or(DataSourceError::NotConnected)?;
+        // First check if connected
+        if self.websocket_stream.is_none() {
+            return Err(DataSourceError::NotConnected);
+        }
 
         let mut market_data_stream = Vec::new();
         let max_messages = 1000; // Configurable limit
 
         for _ in 0..max_messages {
-            match ws_stream.next().await {
+            // Take ownership of stream temporarily to avoid borrow conflict
+            let mut ws_stream = self.websocket_stream.take()
+                .ok_or(DataSourceError::NotConnected)?;
+
+            let message_result = ws_stream.next().await;
+
+            // Put stream back
+            self.websocket_stream = Some(ws_stream);
+
+            match message_result {
                 Some(Ok(message)) => {
                     self.metrics.messages_received += 1;
 

@@ -223,8 +223,11 @@ impl Order {
             let new_avg_price = if current_filled == 0 {
                 fill_price
             } else {
-                ((current_avg_price * current_filled) + (fill_price * fill_qty))
-                    / (current_filled + fill_qty)
+                // Use u128 to prevent overflow during calculation
+                let total_value = (current_avg_price as u128 * current_filled as u128)
+                    + (fill_price as u128 * fill_qty as u128);
+                let total_qty = (current_filled + fill_qty) as u128;
+                (total_value / total_qty) as u64
             };
 
             match self.average_fill_price.compare_exchange_weak(

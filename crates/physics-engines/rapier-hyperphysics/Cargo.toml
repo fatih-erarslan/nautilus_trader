@@ -15,11 +15,11 @@ hyperphysics-core = { path = "../../hyperphysics-core" }
 hyperphysics-geometry = { path = "../../hyperphysics-geometry" }
 hyperphysics-market = { path = "../../hyperphysics-market" }
 
-# Rapier physics engine
-rapier3d = { version = "0.22", features = ["simd-stable", "parallel", "serde-serialize"] }
+# Rapier physics engine - vendored
+rapier3d = { path = "../../vendor/physics/rapier/crates/rapier3d", features = ["simd-stable", "parallel", "serde-serialize"] }
 
 # Math
-nalgebra = { version = "0.33", features = ["serde-serialize"] }
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
 
 # Parallelism
 rayon = "1.10"

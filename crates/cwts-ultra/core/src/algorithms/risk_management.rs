@@ -79,11 +79,17 @@ impl Default for RiskParameters {
 }
 
 pub struct RiskManager {
-    parameters: RiskParameters,
-    positions: HashMap<String, Position>,
-    historical_returns: HashMap<String, Vec<f64>>,
-    portfolio_history: Vec<f64>,
-    high_water_mark: f64,
+    pub(crate) parameters: RiskParameters,
+    pub(crate) positions: HashMap<String, Position>,
+    pub(crate) historical_returns: HashMap<String, Vec<f64>>,
+    pub(crate) portfolio_history: Vec<f64>,
+    pub(crate) high_water_mark: f64,
+}
+
+impl Default for RiskManager {
+    fn default() -> Self {
+        Self::new(RiskParameters::default())
+    }
 }
 
 impl RiskManager {
@@ -232,6 +238,12 @@ impl RiskManager {
         }
 
         Ok(reward / risk)
+    }
+
+    /// Validate position size for a given symbol
+    pub fn validate_position_size(&self, _symbol: &str, size: f64) -> bool {
+        // Check if position size is within allowed limits
+        size.abs() <= self.parameters.max_position_size_pct
     }
 
     /// Update position and check risk limits

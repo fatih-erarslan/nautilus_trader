@@ -18,13 +18,13 @@ pub trait CwtsResultExt<T> {
     fn map_context(self, context: &str) -> CwtsResult<T>;
 
     /// Log error and continue with default value
-    fn or_log_default<D: Default>(self, operation: &str) -> T;
+    fn or_log_default(self, operation: &str) -> T;
 
     /// Convert to Option, logging error
     fn ok_or_log(self, operation: &str) -> Option<T>;
 }
 
-impl<T> CwtsResultExt<T> for CwtsResult<T> {
+impl<T: Default> CwtsResultExt<T> for CwtsResult<T> {
     fn with_context<F>(self, f: F) -> CwtsResult<T>
     where
         F: FnOnce() -> String,
@@ -36,12 +36,12 @@ impl<T> CwtsResultExt<T> for CwtsResult<T> {
         self.map_err(|e| CwtsError::operation_failed(context, e.to_string()))
     }
 
-    fn or_log_default<D: Default>(self, operation: &str) -> T {
+    fn or_log_default(self, operation: &str) -> T {
         match self {
             Ok(value) => value,
             Err(e) => {
                 tracing::error!("Operation '{}' failed: {}", operation, e);
-                Default::default()
+                T::default()
             }
         }
     }

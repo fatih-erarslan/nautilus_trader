@@ -1,4 +1,5 @@
 use crate::algorithms::slippage_calculator::*;
+use crate::common_types::TradeSide;
 use std::collections::{HashMap, VecDeque};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -6,9 +7,83 @@ use std::time::{SystemTime, UNIX_EPOCH};
 /// order book depth analysis, large order slippage calculation, and liquidity pool testing.
 /// Tests model realistic market conditions with no mocks - using real order book data patterns.
 
+// Shared helper functions for all test modules
+#[cfg(test)]
+fn create_deep_order_book() -> OrderBook {
+    OrderBook {
+        symbol: "BTCUSD".to_string(),
+        bids: vec![
+            OrderBookLevel { price: 44_995.0, quantity: 0.5, timestamp: 0 },
+            OrderBookLevel { price: 44_990.0, quantity: 1.2, timestamp: 0 },
+            OrderBookLevel { price: 44_985.0, quantity: 2.1, timestamp: 0 },
+            OrderBookLevel { price: 44_980.0, quantity: 1.8, timestamp: 0 },
+            OrderBookLevel { price: 44_975.0, quantity: 3.5, timestamp: 0 },
+            OrderBookLevel { price: 44_970.0, quantity: 5.2, timestamp: 0 },
+            OrderBookLevel { price: 44_965.0, quantity: 4.1, timestamp: 0 },
+            OrderBookLevel { price: 44_960.0, quantity: 7.3, timestamp: 0 },
+            OrderBookLevel { price: 44_955.0, quantity: 6.8, timestamp: 0 },
+            OrderBookLevel { price: 44_950.0, quantity: 12.5, timestamp: 0 },
+            OrderBookLevel { price: 44_945.0, quantity: 15.2, timestamp: 0 },
+            OrderBookLevel { price: 44_940.0, quantity: 20.8, timestamp: 0 },
+            OrderBookLevel { price: 44_935.0, quantity: 25.3, timestamp: 0 },
+            OrderBookLevel { price: 44_930.0, quantity: 18.7, timestamp: 0 },
+            OrderBookLevel { price: 44_925.0, quantity: 30.5, timestamp: 0 },
+        ],
+        asks: vec![
+            OrderBookLevel { price: 45_005.0, quantity: 0.6, timestamp: 0 },
+            OrderBookLevel { price: 45_010.0, quantity: 1.5, timestamp: 0 },
+            OrderBookLevel { price: 45_015.0, quantity: 2.3, timestamp: 0 },
+            OrderBookLevel { price: 45_020.0, quantity: 1.9, timestamp: 0 },
+            OrderBookLevel { price: 45_025.0, quantity: 3.8, timestamp: 0 },
+            OrderBookLevel { price: 45_030.0, quantity: 5.5, timestamp: 0 },
+            OrderBookLevel { price: 45_035.0, quantity: 4.5, timestamp: 0 },
+            OrderBookLevel { price: 45_040.0, quantity: 7.8, timestamp: 0 },
+            OrderBookLevel { price: 45_045.0, quantity: 7.2, timestamp: 0 },
+            OrderBookLevel { price: 45_050.0, quantity: 13.0, timestamp: 0 },
+            OrderBookLevel { price: 45_055.0, quantity: 16.0, timestamp: 0 },
+            OrderBookLevel { price: 45_060.0, quantity: 22.0, timestamp: 0 },
+            OrderBookLevel { price: 45_065.0, quantity: 27.0, timestamp: 0 },
+            OrderBookLevel { price: 45_070.0, quantity: 20.0, timestamp: 0 },
+            OrderBookLevel { price: 45_075.0, quantity: 32.0, timestamp: 0 },
+        ],
+        timestamp: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64,
+    }
+}
+
+#[cfg(test)]
+fn create_thin_order_book() -> OrderBook {
+    OrderBook {
+        symbol: "ALTCOIN".to_string(),
+        bids: vec![
+            OrderBookLevel { price: 9.95, quantity: 50.0, timestamp: 0 },
+            OrderBookLevel { price: 9.90, quantity: 100.0, timestamp: 0 },
+            OrderBookLevel { price: 9.85, quantity: 75.0, timestamp: 0 },
+            OrderBookLevel { price: 9.80, quantity: 200.0, timestamp: 0 },
+            OrderBookLevel { price: 9.70, quantity: 300.0, timestamp: 0 },
+        ],
+        asks: vec![
+            OrderBookLevel { price: 10.05, quantity: 45.0, timestamp: 0 },
+            OrderBookLevel { price: 10.10, quantity: 80.0, timestamp: 0 },
+            OrderBookLevel { price: 10.15, quantity: 120.0, timestamp: 0 },
+            OrderBookLevel { price: 10.20, quantity: 90.0, timestamp: 0 },
+            OrderBookLevel { price: 10.30, quantity: 250.0, timestamp: 0 },
+        ],
+        timestamp: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64,
+    }
+}
+
 #[cfg(test)]
 mod market_impact_tests {
     use super::*;
+
+    // Local helper (kept for backward compatibility with existing tests)
+    fn _create_deep_order_book() -> OrderBook {
+        super::create_deep_order_book()
+    }
+
+    fn _create_thin_order_book() -> OrderBook {
+        super::create_thin_order_book()
+    }
 
     fn create_deep_order_book() -> OrderBook {
         OrderBook {
@@ -1272,11 +1347,12 @@ mod liquidity_pool_depth_tests {
 
         for (scenario_name, order_book) in stress_scenarios {
             println!("\n=== {} Scenario ===", scenario_name);
+            let symbol = order_book.symbol.clone();
             calculator.update_order_book(order_book);
 
             for order_size in &stress_order_sizes {
                 let analysis_result = calculator.calculate_slippage(
-                    &order_book.symbol,
+                    &symbol,
                     *order_size,
                     TradeSide::Buy,
                     Some(45_000.0),

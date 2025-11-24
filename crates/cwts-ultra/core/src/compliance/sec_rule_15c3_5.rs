@@ -8,6 +8,7 @@
 //! Audit Requirements: Complete immutable trail with nanosecond precision
 
 use rust_decimal::Decimal;
+use rust_decimal::prelude::FromStr;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{
@@ -182,7 +183,7 @@ pub struct EmergencyAlert {
     pub requires_immediate_action: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum AlertSeverity {
     Critical,
     High,
@@ -409,6 +410,7 @@ impl PreTradeRiskEngine {
         }
         self.kill_switch_active.store(false, Ordering::SeqCst);
 
+        let cryptographic_hash = self.calculate_deactivation_hash(&authorized_by, &timestamp);
         self.log_audit_event(AuditEvent {
             event_id: Uuid::new_v4(),
             event_type: AuditEventType::SystemAlert,
@@ -417,7 +419,7 @@ impl PreTradeRiskEngine {
             user_id: authorized_by,
             order_id: None,
             details: serde_json::json!({"action": "kill_switch_deactivated"}),
-            cryptographic_hash: self.calculate_deactivation_hash(&authorized_by, &timestamp),
+            cryptographic_hash,
         })
         .await;
 
@@ -775,7 +777,7 @@ impl PreTradeRiskEngine {
             );
         }
 
-        hex::encode(hasher.finalize().as_bytes())
+        hex::encode(hasher.finalize())
     }
 
     fn calculate_kill_switch_hash(&self, event: &KillSwitchEvent) -> String {
@@ -798,7 +800,7 @@ impl PreTradeRiskEngine {
             hasher.update(order_id.as_bytes());
         }
 
-        hex::encode(hasher.finalize().as_bytes())
+        hex::encode(hasher.finalize())
     }
 
     fn calculate_limits_hash(&self, client_id: &str, limits: &RiskLimits) -> String {
@@ -806,9 +808,10 @@ impl PreTradeRiskEngine {
         use std::hash::{Hash, Hasher};
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         client_id.hash(&mut hasher);
-        limits.maximum_order_value.to_bits().hash(&mut hasher);
-        limits.maximum_position_value.to_bits().hash(&mut hasher);
-        limits.maximum_daily_loss.to_bits().hash(&mut hasher);
+        // Use mantissa/scale for Decimal hashing since it doesn't implement to_bits()
+        limits.max_order_size.mantissa().hash(&mut hasher);
+        limits.max_position_size.mantissa().hash(&mut hasher);
+        limits.max_daily_loss.mantissa().hash(&mut hasher);
         limits
             .updated_at
             .duration_since(SystemTime::UNIX_EPOCH)
@@ -823,9 +826,10 @@ impl PreTradeRiskEngine {
         use std::hash::{Hash, Hasher};
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         instrument_id.hash(&mut hasher);
-        position.quantity.to_bits().hash(&mut hasher);
-        position.average_price.to_bits().hash(&mut hasher);
-        position.unrealized_pnl.to_bits().hash(&mut hasher);
+        // Use mantissa() for Decimal hashing since it doesn't implement to_bits()
+        position.quantity.mantissa().hash(&mut hasher);
+        position.avg_price.mantissa().hash(&mut hasher);
+        position.unrealized_pnl.mantissa().hash(&mut hasher);
         position
             .last_updated
             .duration_since(SystemTime::UNIX_EPOCH)
@@ -862,6 +866,37 @@ impl PreTradeRiskEngine {
             SystemHealth::Warning
         }
     }
+
+    /// Get all pending orders awaiting execution
+    async fn get_all_pending_orders(&self) -> Vec<Uuid> {
+        // In production, this would query the order management system
+        // For now return empty - orders are typically tracked externally
+        Vec::new()
+    }
+
+    /// Validate authorization for kill switch operations
+    async fn validate_authorization(&self, authorized_by: &str) -> bool {
+        // Check if the user has required authorization level
+        // In production, this would check against an auth system
+        !authorized_by.is_empty() && authorized_by.len() > 2
+    }
+
+    /// Calculate cryptographic hash for deactivation records
+    fn calculate_deactivation_hash(&self, authorized_by: &str, timestamp: &SystemTime) -> String {
+        use sha2::{Digest, Sha256};
+        let mut hasher = Sha256::new();
+
+        hasher.update(authorized_by.as_bytes());
+        hasher.update(
+            &timestamp
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+                .to_le_bytes(),
+        );
+
+        hex::encode(hasher.finalize())
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -879,6 +914,8 @@ pub enum SystemHealth {
     Warning,
     Critical,
     Halted,
+    Emergency,
+    Starting,
 }
 
 #[cfg(test)]
@@ -978,6 +1015,7 @@ mod tests {
     #[tokio::test]
     async fn test_concurrent_validation() {
         let (engine, _audit_rx, _emergency_rx) = PreTradeRiskEngine::new();
+        let engine = std::sync::Arc::new(engine);
 
         // Configure test limits
         engine
@@ -1000,7 +1038,7 @@ mod tests {
         let mut handles = vec![];
 
         for i in 0..1000 {
-            let engine_clone = engine.clone();
+            let engine_clone = std::sync::Arc::clone(&engine);
             let handle = tokio::spawn(async move {
                 let order = Order {
                     order_id: Uuid::new_v4(),

@@ -106,11 +106,11 @@ impl Default for SlippageParameters {
 }
 
 pub struct SlippageCalculator {
-    parameters: SlippageParameters,
-    order_books: HashMap<String, OrderBook>,
-    trade_history: HashMap<String, VecDeque<Trade>>,
-    volume_profile: HashMap<String, VecDeque<f64>>,
-    volatility_cache: HashMap<String, f64>,
+    pub(crate) parameters: SlippageParameters,
+    pub(crate) order_books: HashMap<String, OrderBook>,
+    pub(crate) trade_history: HashMap<String, VecDeque<Trade>>,
+    pub(crate) volume_profile: HashMap<String, VecDeque<f64>>,
+    pub(crate) volatility_cache: HashMap<String, f64>,
 }
 
 impl SlippageCalculator {
@@ -159,7 +159,7 @@ impl SlippageCalculator {
         &self,
         symbol: &str,
         order_size: f64,
-        side: &TradeSide,
+        side: TradeSide,
         expected_price: Option<f64>,
     ) -> Result<SlippageAnalysis, SlippageError> {
         if order_size <= 0.0 {
@@ -171,7 +171,7 @@ impl SlippageCalculator {
             .get(symbol)
             .ok_or(SlippageError::InsufficientData)?;
 
-        let levels = match *side {
+        let levels = match side {
             TradeSide::Buy => &order_book.asks,
             TradeSide::Sell => &order_book.bids,
         };
@@ -217,7 +217,7 @@ impl SlippageCalculator {
 
         // Calculate market impact
         let market_impact =
-            self.calculate_market_impact(symbol, order_size, side, reference_price)?;
+            self.calculate_market_impact(symbol, order_size, &side, reference_price)?;
 
         // Calculate price improvement (negative slippage is improvement)
         let price_improvement = if slippage_amount < 0.0 {
@@ -258,7 +258,7 @@ impl SlippageCalculator {
     }
 
     /// Calculate volume-weighted average price for order execution
-    fn calculate_vwap_execution(
+    pub(crate) fn calculate_vwap_execution(
         &self,
         levels: &[OrderBookLevel],
         order_size: f64,
@@ -333,7 +333,7 @@ impl SlippageCalculator {
     }
 
     /// Calculate confidence interval for slippage estimate
-    fn calculate_confidence_interval(
+    pub(crate) fn calculate_confidence_interval(
         &self,
         symbol: &str,
         slippage_percentage: f64,
@@ -383,7 +383,7 @@ impl SlippageCalculator {
     }
 
     /// Calculate liquidity score based on order book depth
-    fn calculate_liquidity_score(&self, levels: &[OrderBookLevel], order_size: f64) -> f64 {
+    pub(crate) fn calculate_liquidity_score(&self, levels: &[OrderBookLevel], order_size: f64) -> f64 {
         if levels.is_empty() {
             return 0.0;
         }
@@ -411,7 +411,7 @@ impl SlippageCalculator {
         side: TradeSide,
         time_horizon_ms: u64,
     ) -> Result<SlippageAnalysis, SlippageError> {
-        let base_analysis = self.calculate_slippage(symbol, order_size, &side, None)?;
+        let base_analysis = self.calculate_slippage(symbol, order_size, side, None)?;
 
         // Adjust for time horizon - longer execution time = more slippage
         let time_factor = (time_horizon_ms as f64 / 1000.0).sqrt(); // Square root of seconds

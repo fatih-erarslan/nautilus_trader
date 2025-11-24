@@ -65,6 +65,70 @@ impl FinancialCalculator {
             precision_mode: precision,
         }
     }
+
+    /// Kelly Criterion for optimal position sizing
+    ///
+    /// Formula: f* = (bp - q) / b
+    /// where:
+    /// - f* = fraction of capital to bet
+    /// - b = odds received on the wager (b to 1)
+    /// - p = probability of winning
+    /// - q = probability of losing (1 - p)
+    ///
+    /// # Arguments
+    /// * `win_probability` - Probability of winning (0-1)
+    /// * `win_loss_ratio` - Ratio of average win to average loss
+    pub fn kelly_criterion(&self, win_probability: f64, win_loss_ratio: f64) -> f64 {
+        if win_probability <= 0.0 || win_probability >= 1.0 {
+            return 0.0;
+        }
+        if win_loss_ratio <= 0.0 {
+            return 0.0;
+        }
+
+        let lose_probability = 1.0 - win_probability;
+
+        // Kelly formula: f* = (bp - q) / b = p - q/b
+        let kelly_fraction = win_probability - (lose_probability / win_loss_ratio);
+
+        // Clamp to [0, 1] - never bet more than 100% or negative amounts
+        kelly_fraction.clamp(0.0, 1.0)
+    }
+
+    /// Calculate Value at Risk (VaR) using parametric method
+    ///
+    /// Uses normal distribution assumption for quick calculation
+    /// Formula: VaR = μ - z_α * σ
+    ///
+    /// # Arguments
+    /// * `expected_return` - Expected return (mean)
+    /// * `volatility` - Standard deviation of returns
+    /// * `confidence_level` - Confidence level (e.g., 0.95 for 95%)
+    pub fn calculate_value_at_risk(
+        &self,
+        expected_return: f64,
+        volatility: f64,
+        confidence_level: f64,
+    ) -> Result<f64, ArithmeticError> {
+        if volatility < 0.0 {
+            return Err(ArithmeticError::InvalidOperation(
+                "Volatility must be non-negative".to_string(),
+            ));
+        }
+        if confidence_level <= 0.0 || confidence_level >= 1.0 {
+            return Err(ArithmeticError::InvalidOperation(
+                "Confidence level must be between 0 and 1".to_string(),
+            ));
+        }
+
+        // Z-score for given confidence level (using inverse normal approximation)
+        let z_score = IEEE754Arithmetic::inverse_normal_cdf(confidence_level)?;
+
+        // VaR = Expected loss at given confidence
+        let var = expected_return - z_score * volatility;
+
+        Ok(-var.min(0.0)) // Return positive loss value
+    }
 }
 
 impl IEEE754Arithmetic {
@@ -183,6 +247,70 @@ impl IEEE754Arithmetic {
 
         let result = 0.5 * (1.0 + sign * y);
         Self::validate_result(result)?;
+        Ok(result)
+    }
+
+    /// Inverse of standard normal CDF using Rational approximation
+    /// Based on Abramowitz and Stegun 26.2.23
+    pub fn inverse_normal_cdf(p: f64) -> Result<f64, ArithmeticError> {
+        if p <= 0.0 || p >= 1.0 {
+            return Err(ArithmeticError::InvalidOperation(
+                "Probability must be between 0 and 1 exclusive".to_string(),
+            ));
+        }
+
+        // Coefficients for rational approximation
+        const A: [f64; 6] = [
+            -3.969683028665376e+01,
+            2.209460984245205e+02,
+            -2.759285104469687e+02,
+            1.383577518672690e+02,
+            -3.066479806614716e+01,
+            2.506628277459239e+00,
+        ];
+        const B: [f64; 5] = [
+            -5.447609879822406e+01,
+            1.615858368580409e+02,
+            -1.556989798598866e+02,
+            6.680131188771972e+01,
+            -1.328068155288572e+01,
+        ];
+        const C: [f64; 6] = [
+            -7.784894002430293e-03,
+            -3.223964580411365e-01,
+            -2.400758277161838e+00,
+            -2.549732539343734e+00,
+            4.374664141464968e+00,
+            2.938163982698783e+00,
+        ];
+        const D: [f64; 4] = [
+            7.784695709041462e-03,
+            3.224671290700398e-01,
+            2.445134137142996e+00,
+            3.754408661907416e+00,
+        ];
+
+        const P_LOW: f64 = 0.02425;
+        const P_HIGH: f64 = 1.0 - P_LOW;
+
+        let result = if p < P_LOW {
+            // Lower tail
+            let q = (-2.0 * p.ln()).sqrt();
+            (((((C[0] * q + C[1]) * q + C[2]) * q + C[3]) * q + C[4]) * q + C[5])
+                / ((((D[0] * q + D[1]) * q + D[2]) * q + D[3]) * q + 1.0)
+        } else if p <= P_HIGH {
+            // Central region
+            let q = p - 0.5;
+            let r = q * q;
+            (((((A[0] * r + A[1]) * r + A[2]) * r + A[3]) * r + A[4]) * r + A[5]) * q
+                / (((((B[0] * r + B[1]) * r + B[2]) * r + B[3]) * r + B[4]) * r + 1.0)
+        } else {
+            // Upper tail
+            let q = (-2.0 * (1.0 - p).ln()).sqrt();
+            -(((((C[0] * q + C[1]) * q + C[2]) * q + C[3]) * q + C[4]) * q + C[5])
+                / ((((D[0] * q + D[1]) * q + D[2]) * q + D[3]) * q + 1.0)
+        };
+
         Ok(result)
     }
 

@@ -7,15 +7,22 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-wasm-bindgen = "0.2"
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = ["console", "Performance", "Window"] }
 console_error_panic_hook = "0.1"
 js-sys = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde-wasm-bindgen = "0.6"
+rand = { version = "0.8", features = ["std", "std_rng"] }
 rand_distr = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 getrandom = { version = "0.2", features = ["js"] }
+
+# Note: Core library is not directly imported for WASM compatibility
+# The WASM module uses self-contained mock implementations
+# In production, consider using wasm-bindgen feature gates or conditional compilation
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

@@ -283,9 +283,8 @@ impl TradingSystemCoordinator {
 
         // Step 3: Risk management check
         let risk_check = {
-            let mut risk_mgr = self.risk_manager.lock().unwrap();
-            let position_size_check = risk_mgr.validate_position_size(symbol, size);
-            position_size_check.is_ok()
+            let risk_mgr = self.risk_manager.lock().unwrap();
+            risk_mgr.validate_position_size(symbol, size)
         };
 
         if !risk_check {
@@ -921,7 +920,7 @@ fn test_market_data_integration() {
 
         // Check that prices vary over time (market simulation working)
         if let Some(prev_price) = previous_prices.get("BTCUSDT") {
-            let price_change_pct = ((result.price - prev_price) / prev_price).abs();
+            let price_change_pct = (((result.price as f64) - (*prev_price as f64)) / (*prev_price as f64)).abs();
 
             // Prices should change but not by huge amounts per tick
             if i > 5 {

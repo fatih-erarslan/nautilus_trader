@@ -97,7 +97,7 @@ impl Default for PbitEngineConfig {
 
 /// Probabilistic Bit (pBit) with quantum-inspired properties
 #[repr(C, align(64))]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Pbit {
     /// Unique identifier
     pub id: u64,
@@ -116,6 +116,20 @@ pub struct Pbit {
 
     /// Entanglement relationships
     entangled_pbits: Arc<Mutex<Vec<u64>>>,
+}
+
+impl Clone for Pbit {
+    fn clone(&self) -> Self {
+        use std::sync::atomic::Ordering;
+        Self {
+            id: self.id,
+            state: CachePadded::new(AtomicU64::new(self.state.load(Ordering::Acquire))),
+            correlation_strength: CachePadded::new(AtomicU64::new(self.correlation_strength.load(Ordering::Acquire))),
+            gpu_handle: self.gpu_handle,
+            creation_time: self.creation_time,
+            entangled_pbits: Arc::clone(&self.entangled_pbits),
+        }
+    }
 }
 
 impl Pbit {
@@ -181,6 +195,26 @@ impl Pbit {
         }
         Ok(())
     }
+
+    /// Get the raw state bits (for GPU kernel access)
+    pub fn get_state_bits(&self, ordering: std::sync::atomic::Ordering) -> u64 {
+        self.state.load(ordering)
+    }
+
+    /// Get the correlation strength bits (for GPU kernel access)
+    pub fn get_correlation_strength_bits(&self, ordering: std::sync::atomic::Ordering) -> u64 {
+        self.correlation_strength.load(ordering)
+    }
+
+    /// Set the correlation strength (for GPU kernel updates)
+    pub fn set_correlation_strength(&self, value: f64, ordering: std::sync::atomic::Ordering) {
+        self.correlation_strength.store(value.to_bits(), ordering);
+    }
+
+    /// Set the state bits (for GPU kernel updates)
+    pub fn set_state_bits(&self, bits: u64, ordering: std::sync::atomic::Ordering) {
+        self.state.store(bits, ordering);
+    }
 }
 
 /// pBit State Measurement Result
@@ -204,23 +238,47 @@ pub struct PbitState {
 
 /// GPU-Accelerated Correlation Matrix
 #[repr(C, align(64))]
-#[derive(Debug, Clone)]
 pub struct CorrelationMatrix {
     /// Matrix data stored in GPU-optimized format
-    data: Vec<Vec<f64>>,
+    pub data: Vec<Vec<f64>>,
 
     /// Matrix dimensions
-    rows: usize,
-    cols: usize,
+    pub rows: usize,
+    pub cols: usize,
 
     /// GPU memory buffer handle
-    gpu_buffer: Option<Arc<dyn GpuMemoryBuffer>>,
+    pub gpu_buffer: Option<Arc<dyn GpuMemoryBuffer>>,
 
     /// Computation timestamp
-    computed_at: u64,
+    pub computed_at: u64,
 
     /// Computation performance metrics
-    computation_time_ns: u64,
+    pub computation_time_ns: u64,
+}
+
+impl std::fmt::Debug for CorrelationMatrix {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CorrelationMatrix")
+            .field("rows", &self.rows)
+            .field("cols", &self.cols)
+            .field("computed_at", &self.computed_at)
+            .field("computation_time_ns", &self.computation_time_ns)
+            .field("gpu_buffer", &self.gpu_buffer.is_some())
+            .finish()
+    }
+}
+
+impl Clone for CorrelationMatrix {
+    fn clone(&self) -> Self {
+        Self {
+            data: self.data.clone(),
+            rows: self.rows,
+            cols: self.cols,
+            gpu_buffer: None, // GPU buffers cannot be cloned
+            computed_at: self.computed_at,
+            computation_time_ns: self.computation_time_ns,
+        }
+    }
 }
 
 impl CorrelationMatrix {
@@ -799,6 +857,26 @@ pub fn get_nanosecond_timestamp() -> u64 {
         .as_nanos() as u64
 }
 
+// Mock types for testing - made pub(crate) for cross-module test use
+#[cfg(test)]
+pub(crate) struct MockByzantineConsensus;
+
+#[cfg(test)]
+impl ByzantineConsensus for MockByzantineConsensus {
+    fn achieve_consensus(
+        &self,
+        transactions: &[Transaction],
+        _config: &PbitEngineConfig,
+    ) -> Result<ConsensusResult, PbitError> {
+        Ok(ConsensusResult {
+            status: ConsensusStatus::Achieved,
+            confirmed_transactions: transactions.to_vec(),
+            consensus_time_ns: 100,
+            participating_nodes: 7,
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -812,23 +890,6 @@ mod tests {
 
         fn generate_entropy_batch(&self, count: usize) -> Result<Vec<u64>, PbitError> {
             Ok((0..count).map(|i| (i as u64) << 32).collect())
-        }
-    }
-
-    struct MockByzantineConsensus;
-
-    impl ByzantineConsensus for MockByzantineConsensus {
-        fn achieve_consensus(
-            &self,
-            transactions: &[Transaction],
-            _config: &PbitEngineConfig,
-        ) -> Result<ConsensusResult, PbitError> {
-            Ok(ConsensusResult {
-                status: ConsensusStatus::Achieved,
-                confirmed_transactions: transactions.to_vec(),
-                consensus_time_ns: 100,
-                participating_nodes: 7,
-            })
         }
     }
 

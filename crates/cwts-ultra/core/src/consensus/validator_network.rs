@@ -390,7 +390,7 @@ mod tests {
             sequence: 1,
             sender: ValidatorId(1),
             payload: b"test".to_vec(),
-            quantum_signature: super::byzantine_consensus::QuantumSignature {
+            quantum_signature: crate::consensus::byzantine_consensus::QuantumSignature {
                 signature: vec![], // Empty signature should trigger detection
                 public_key: vec![1, 2, 3],
                 quantum_proof: vec![4, 5, 6],
@@ -399,6 +399,7 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 50,
         };
 
         let is_valid = network.process_message(&suspicious_message).await.unwrap();

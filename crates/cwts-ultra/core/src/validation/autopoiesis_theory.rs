@@ -24,7 +24,7 @@ pub enum AutopoiesisError {
 }
 
 /// Core autopoietic system implementing Maturana-Varela principles
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct AutopoieticSystem {
     /// System identity and boundary definition
     identity: SystemIdentity,
@@ -129,6 +129,47 @@ pub enum CausationType {
     Final,     // Teleological causation
 }
 
+impl Default for CausationType {
+    fn default() -> Self {
+        CausationType::Efficient
+    }
+}
+
+impl Default for PatternType {
+    fn default() -> Self {
+        PatternType::Hierarchical
+    }
+}
+
+impl Default for Criticality {
+    fn default() -> Self {
+        Criticality::Medium
+    }
+}
+
+impl Default for OrganizationPattern {
+    fn default() -> Self {
+        OrganizationPattern {
+            pattern_type: PatternType::default(),
+            structure_matrix: Vec::new(),
+            connectivity_graph: Vec::new(),
+            hierarchical_levels: Vec::new(),
+        }
+    }
+}
+
+impl Default for SystemIdentity {
+    fn default() -> Self {
+        SystemIdentity {
+            id: uuid::Uuid::new_v4().to_string(),
+            invariants: Vec::new(),
+            organization_pattern: OrganizationPattern::default(),
+            identity_stability: 1.0,
+            identity_history: VecDeque::new(),
+        }
+    }
+}
+
 /// Identity snapshot for historical tracking
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IdentitySnapshot {
@@ -141,7 +182,7 @@ pub struct IdentitySnapshot {
 }
 
 /// Network of production processes
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ProductionNetwork {
     /// Production processes that create system components
     pub processes: HashMap<String, ProductionProcess>,
@@ -157,7 +198,6 @@ pub struct ProductionNetwork {
 }
 
 /// Individual production process
-#[derive(Clone)]
 pub struct ProductionProcess {
     pub process_id: String,
     pub inputs: Vec<ComponentType>,
@@ -166,6 +206,20 @@ pub struct ProductionProcess {
     pub efficiency: f64,
     pub energy_requirement: f64,
     pub process_function: Box<dyn Fn(&[f64]) -> Vec<f64> + Send + Sync>,
+}
+
+impl std::fmt::Debug for ProductionProcess {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ProductionProcess")
+            .field("process_id", &self.process_id)
+            .field("inputs", &self.inputs)
+            .field("outputs", &self.outputs)
+            .field("catalysts", &self.catalysts)
+            .field("efficiency", &self.efficiency)
+            .field("energy_requirement", &self.energy_requirement)
+            .field("process_function", &"<fn>")
+            .finish()
+    }
 }
 
 /// Component graph showing system architecture
@@ -325,7 +379,7 @@ pub struct AutopoieticFunction {
 }
 
 /// Boundary maintenance system
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct BoundaryMaintenance {
     /// Boundary definition and integrity
     pub boundary_definition: SystemBoundary,
@@ -360,7 +414,7 @@ pub enum BoundaryType {
 }
 
 /// Permeability control system
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PermeabilityControl {
     pub control_mechanisms: Vec<ControlMechanism>,
     pub transport_processes: Vec<TransportProcess>,
@@ -368,7 +422,6 @@ pub struct PermeabilityControl {
     pub active_transport: Vec<ActiveTransport>,
 }
 
-#[derive(Clone)]
 pub struct ControlMechanism {
     pub mechanism_id: String,
     pub control_variable: String,
@@ -376,6 +429,19 @@ pub struct ControlMechanism {
     pub sensitivity: f64,
     pub response_time: Duration,
     pub control_function: Box<dyn Fn(f64, f64) -> f64 + Send + Sync>,
+}
+
+impl std::fmt::Debug for ControlMechanism {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ControlMechanism")
+            .field("mechanism_id", &self.mechanism_id)
+            .field("control_variable", &self.control_variable)
+            .field("setpoint", &self.setpoint)
+            .field("sensitivity", &self.sensitivity)
+            .field("response_time", &self.response_time)
+            .field("control_function", &"<fn>")
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -1017,7 +1083,7 @@ pub struct SustainabilityMetric {
 }
 
 /// Structural coupling with environment
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct StructuralCoupling {
     /// Environmental interfaces
     pub environmental_interfaces: Vec<EnvironmentalInterface>,
@@ -1142,7 +1208,7 @@ pub enum AdaptationScope {
 }
 
 /// Co-evolution processes
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CoEvolution {
     pub co_evolution_partners: Vec<CoEvolutionPartner>,
     pub co_evolution_dynamics: CoEvolutionDynamics,
@@ -1196,13 +1262,24 @@ pub struct FeedbackLoop {
     pub gain: f64,
 }
 
-#[derive(Clone)]
 pub struct FitnessLandscape {
     pub landscape_dimension: usize,
     pub fitness_function: Box<dyn Fn(&[f64]) -> f64 + Send + Sync>,
     pub peaks: Vec<FitnessPeak>,
     pub valleys: Vec<FitnessValley>,
     pub landscape_ruggedness: f64,
+}
+
+impl std::fmt::Debug for FitnessLandscape {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FitnessLandscape")
+            .field("landscape_dimension", &self.landscape_dimension)
+            .field("fitness_function", &"<fn>")
+            .field("peaks", &self.peaks)
+            .field("valleys", &self.valleys)
+            .field("landscape_ruggedness", &self.landscape_ruggedness)
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -1816,25 +1893,35 @@ impl AutopoieticSystem {
 
     /// Check if system identity is preserved
     fn check_identity_preservation(&mut self) -> Result<(), AutopoiesisError> {
-        for invariant in &mut self.identity.invariants {
-            let current_value = self.measure_invariant(&invariant.name)?;
-            let deviation = (current_value - invariant.value).abs();
+        // Collect invariant data first to avoid borrow conflicts
+        let invariant_checks: Vec<(String, f64, f64, Criticality)> = self
+            .identity
+            .invariants
+            .iter()
+            .map(|inv| (inv.name.clone(), inv.value, inv.tolerance, inv.criticality.clone()))
+            .collect();
 
-            if deviation > invariant.tolerance {
-                match invariant.criticality {
+        for (idx, (name, value, tolerance, criticality)) in invariant_checks.into_iter().enumerate() {
+            let current_value = self.measure_invariant(&name)?;
+            let deviation = (current_value - value).abs();
+
+            if deviation > tolerance {
+                match criticality {
                     Criticality::Critical => {
                         return Err(AutopoiesisError::IdentityCrisis(format!(
                             "Critical invariant '{}' violated: {} (tolerance: {})",
-                            invariant.name, deviation, invariant.tolerance
+                            name, deviation, tolerance
                         )));
                     }
                     Criticality::High => {
                         // Attempt immediate repair
-                        self.repair_invariant_violation(invariant)?;
+                        self.repair_invariant_violation_by_index(idx)?;
                     }
                     _ => {
                         // Log violation for future attention
-                        invariant.last_violation = Some(Instant::now());
+                        if let Some(invariant) = self.identity.invariants.get_mut(idx) {
+                            invariant.last_violation = Some(Instant::now());
+                        }
                     }
                 }
             }
@@ -1882,6 +1969,41 @@ impl AutopoieticSystem {
                 return Err(AutopoiesisError::MaintenanceFailure(format!(
                     "No repair mechanism for invariant: {}",
                     invariant.name
+                )));
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Repair invariant violation by index (avoids borrow conflicts)
+    fn repair_invariant_violation_by_index(
+        &mut self,
+        idx: usize,
+    ) -> Result<(), AutopoiesisError> {
+        let invariant_name = self
+            .identity
+            .invariants
+            .get(idx)
+            .map(|inv| inv.name.clone())
+            .ok_or_else(|| {
+                AutopoiesisError::MaintenanceFailure(format!("Invalid invariant index: {}", idx))
+            })?;
+
+        match invariant_name.as_str() {
+            "boundary_integrity" => {
+                self.boundary_maintenance.emergency_boundary_repair()?;
+            }
+            "production_efficiency" => {
+                self.production_network.optimize_production()?;
+            }
+            "organization_stability" => {
+                self.organization.stabilize_organization()?;
+            }
+            _ => {
+                return Err(AutopoiesisError::MaintenanceFailure(format!(
+                    "No repair mechanism for invariant: {}",
+                    invariant_name
                 )));
             }
         }
@@ -1950,7 +2072,12 @@ impl AutopoieticSystem {
             Ok(AdaptationResult {
                 adapted: true,
                 mechanism_used: mechanism.mechanism_id.clone(),
-                outcome: adaptation_outcome,
+                outcome: AdaptationOutcome {
+                    success: adaptation_outcome.success,
+                    performance_change: adaptation_outcome.performance_impact,
+                    side_effects: vec![],
+                    lessons_learned: vec![format!("Adaptation completed in {:?}", adaptation_outcome.time_taken)],
+                },
                 performance_change: self.measure_performance_change(),
             })
         } else {
@@ -2326,6 +2453,27 @@ impl AutopoieticSystem {
         let adaptation_capability = self.calculate_adaptation_capability();
 
         (current_efficiency + boundary_health + adaptation_capability) / 3.0 - 0.5
+    }
+
+    /// Async validation of boundary maintenance for scientifically rigorous integration
+    pub async fn validate_boundary_maintenance(&mut self) -> Result<bool, AutopoiesisError> {
+        // Check boundary integrity
+        self.boundary_maintenance.check_boundary_integrity()?;
+
+        // Verify boundary integrity exceeds threshold
+        let integrity = self.boundary_maintenance.boundary_definition.boundary_integrity;
+
+        // Return true if boundary is well-maintained (above 80%)
+        Ok(integrity > 0.8)
+    }
+
+    /// Async validation of identity preservation for scientifically rigorous integration
+    pub async fn validate_identity_preservation(&mut self) -> Result<bool, AutopoiesisError> {
+        // Check identity preservation
+        self.check_identity_preservation()?;
+
+        // Return true if identity is stable (above 70%)
+        Ok(self.identity.identity_stability > 0.7)
     }
 
     /// Get system health report

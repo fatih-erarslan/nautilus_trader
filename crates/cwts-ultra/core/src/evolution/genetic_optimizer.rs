@@ -1,4 +1,5 @@
-use rand::{seq::SliceRandom, thread_rng, Rng};
+use rand::{seq::SliceRandom, thread_rng, Rng, SeedableRng};
+use rand::rngs::StdRng;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -40,7 +41,7 @@ pub struct PerformanceMetrics {
     pub emergence_complexity: f64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EvolutionConfig {
     pub population_size: usize,
     pub mutation_rate: f64,
@@ -189,7 +190,7 @@ impl GeneticOptimizer {
         );
 
         self.current_population.clear();
-        let mut rng = thread_rng();
+        let mut rng = StdRng::from_entropy();  // Use Send-safe RNG
 
         for i in 0..self.config.population_size {
             let genome = self.create_random_genome(i as u64, &mut rng).await?;
@@ -304,27 +305,37 @@ impl GeneticOptimizer {
 
         // Evaluate all genomes in parallel chunks
         let chunk_size = 5;
-        for (chunk_idx, genome_chunk) in self.current_population.chunks_mut(chunk_size).enumerate()
-        {
+        let num_chunks = (total_genomes + chunk_size - 1) / chunk_size;
+
+        for chunk_idx in 0..num_chunks {
             info!(
                 "Evaluating chunk {} of {}",
                 chunk_idx + 1,
-                (total_genomes + chunk_size - 1) / chunk_size
+                num_chunks
             );
 
-            let mut evaluation_tasks = Vec::new();
+            let start = chunk_idx * chunk_size;
+            let end = (start + chunk_size).min(total_genomes);
 
-            for genome in genome_chunk.iter() {
+            // Clone genomes for evaluation to avoid borrow conflict
+            let genomes_to_eval: Vec<_> = self.current_population[start..end]
+                .iter()
+                .cloned()
+                .collect();
+
+            let mut evaluation_tasks = Vec::new();
+            for genome in genomes_to_eval {
                 let use_e2b = chunk_idx * chunk_size < e2b_validation_count;
-                let task = self.evaluate_genome_fitness(genome.clone(), use_e2b);
+                let task = self.evaluate_genome_fitness(genome, use_e2b);
                 evaluation_tasks.push(task);
             }
 
             // Execute evaluations in parallel
             let results = futures::future::try_join_all(evaluation_tasks).await?;
 
-            for (genome, result) in genome_chunk.iter_mut().zip(results) {
-                *genome = result;
+            // Update the population with results
+            for (i, result) in results.into_iter().enumerate() {
+                self.current_population[start + i] = result;
             }
 
             // Brief pause between chunks

@@ -3,6 +3,15 @@ name = "active-inference-agent"
 version = "0.1.0"
 edition = "2021"
 description = "Active Inference agents implementing the Free Energy Principle for HyperPhysics"
+keywords = ["active-inference", "consciousness", "free-energy", "pbRTCA", "hoffman"]
+categories = ["science", "simulation", "algorithms"]
+
+[features]
+default = []
+full = ["gpu", "verification", "crypto"]
+gpu = ["hyperphysics-gpu-unified"]
+verification = ["hyperphysics-verify"]
+crypto = ["hyperphysics-homomorphic", "hyperphysics-dilithium"]
 
 [dependencies]
 nalgebra = { workspace = true }
@@ -14,5 +23,29 @@ tracing = "0.1"
 rand = "0.8"
 rand_distr = "0.4"
 
+# HyperPhysics core integrations
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+hyperphysics-thermo = { path = "../hyperphysics-thermo" }
+hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-syntergic = { path = "../hyperphysics-syntergic" }
+
+# Optimization and reasoning
+hyperphysics-optimization = { path = "../hyperphysics-optimization" }
+hyperphysics-reasoning-router = { path = "../hyperphysics-reasoning-router" }
+hyperphysics-reasoning-backends = { path = "../hyperphysics-reasoning-backends" }
+
+# Neural and GPU (optional)
+hyperphysics-neural = { path = "../hyperphysics-neural", optional = true }
+hyperphysics-gpu-unified = { path = "../hyperphysics-gpu-unified", optional = true }
+gpu-marl = { path = "../gpu-marl", optional = true }
+
+# Security (optional)
+hyperphysics-verify = { path = "../hyperphysics-verify", optional = true }
+hyperphysics-homomorphic = { path = "../hyperphysics-homomorphic", optional = true }
+hyperphysics-dilithium = { path = "../hyperphysics-dilithium", optional = true }
+
 [dev-dependencies]
 approx = "0.5"
+rand_chacha = "0.3"
+criterion = { workspace = true }

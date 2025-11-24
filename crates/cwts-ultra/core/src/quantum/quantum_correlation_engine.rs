@@ -491,7 +491,7 @@ impl QuantumEntanglementDetector {
         // Eigenvalues of R in decreasing order
         let mut eigenvals: Vec<f64> = r_matrix
             .eigenvalues()
-            .map_err(|_| QuantumCorrelationError::EigenvalueDecompositionFailed)?
+            .ok_or(QuantumCorrelationError::EigenvalueDecompositionFailed)?
             .iter()
             .map(|&e| e.norm())
             .collect();
@@ -1579,10 +1579,10 @@ impl QuantumCorrelationEngine {
         let mut bell_results = Vec::new();
         for i in 0..pbits.len() {
             for j in (i + 1)..pbits.len() {
-                let pbit_pair = (&pbits[i], &pbits[j]);
+                let pbit_pair = (pbits[i].clone(), pbits[j].clone());
                 let bell_result = self
                     .bell_validator
-                    .compute_chsh_value(pbit_pair, self.config.measurement_samples)?;
+                    .compute_chsh_value(&pbit_pair, self.config.measurement_samples)?;
                 bell_results.push(bell_result);
             }
         }
@@ -1591,10 +1591,10 @@ impl QuantumCorrelationEngine {
         let mut entanglement_results = Vec::new();
         for i in 0..pbits.len() {
             for j in (i + 1)..pbits.len() {
-                let pbit_pair = (&pbits[i], &pbits[j]);
+                let pbit_pair = (pbits[i].clone(), pbits[j].clone());
                 let entanglement_result = self
                     .entanglement_detector
-                    .detect_entanglement(pbit_pair, self.config.measurement_samples)?;
+                    .detect_entanglement(&pbit_pair, self.config.measurement_samples)?;
                 entanglement_results.push(entanglement_result);
             }
         }
@@ -1613,10 +1613,10 @@ impl QuantumCorrelationEngine {
         let mut mutual_info_results = Vec::new();
         for i in 0..pbits.len() {
             for j in (i + 1)..pbits.len() {
-                let pbit_pair = (&pbits[i], &pbits[j]);
+                let pbit_pair = (pbits[i].clone(), pbits[j].clone());
                 let mi_result = self
                     .mutual_info_calculator
-                    .compute_mutual_information(pbit_pair, self.config.measurement_samples)?;
+                    .compute_mutual_information(&pbit_pair, self.config.measurement_samples)?;
                 mutual_info_results.push(mi_result);
             }
         }
@@ -1655,6 +1655,10 @@ impl QuantumCorrelationEngine {
             self.performance_metrics.total_computation_time_ns
                 / self.performance_metrics.correlations_computed;
 
+        // Calculate boolean flags before moving vectors into struct
+        let quantum_advantage_detected = bell_results.iter().any(|r| r.quantum_violation);
+        let entanglement_detected = entanglement_results.iter().any(|r| r.is_entangled);
+
         Ok(QuantumCorrelationResult {
             correlation_matrix,
             bell_results,
@@ -1665,8 +1669,8 @@ impl QuantumCorrelationEngine {
             significance_result,
             tomography_result,
             symbols_analyzed: symbols.to_vec(),
-            quantum_advantage_detected: bell_results.iter().any(|r| r.quantum_violation),
-            entanglement_detected: entanglement_results.iter().any(|r| r.is_entangled),
+            quantum_advantage_detected,
+            entanglement_detected,
             computation_time_ns: computation_time,
         })
     }
@@ -1923,7 +1927,7 @@ mod tests {
     async fn test_quantum_correlation_engine_creation() {
         let entropy_source = Arc::new(MockQuantumEntropySource);
         let gpu_accelerator =
-            Arc::new(crate::gpu::probabilistic_kernels::tests::MockGpuAccelerator);
+            Arc::new(crate::gpu::probabilistic_kernels::MockGpuAccelerator);
         let consensus_engine = Arc::new(MockByzantineConsensus);
         let pbit_config = crate::quantum::pbit_engine::PbitEngineConfig::default();
 

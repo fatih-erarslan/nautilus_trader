@@ -27,7 +27,7 @@ dashmap = "6.1"
 # SIMD and math libraries with unified versions
 wide = "0.7"
 ndarray = { version = "0.15", features = ["serde"] }
-nalgebra.workspace = true
+nalgebra = { version = "0.33", features = ["serde-serialize", "rayon"] }
 rayon = "1.10"
 
 # Random number generation - unified to rand 0.8 to avoid conflicts

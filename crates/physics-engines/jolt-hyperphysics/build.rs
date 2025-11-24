@@ -19,8 +19,8 @@ fn main() {
         .file("src/jolt_wrapper.cpp")
         .include("include");
 
-    // If Jolt source is present, we would add it here.
-    // build.include("third_party/JoltPhysics");
+    // Use vendored JoltPhysics from crates/vendor/physics/JoltPhysics
+    build.include("../../vendor/physics/JoltPhysics/Jolt");
 
     build.compile("jolt_wrapper");
 

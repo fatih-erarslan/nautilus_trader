@@ -1,6 +1,7 @@
 use super::*;
 
 mod quantum_trading_tests;
+mod wasm_tests;
 
 // Add your tests here
 #[cfg(test)]

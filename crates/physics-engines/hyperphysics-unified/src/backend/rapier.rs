@@ -34,14 +34,13 @@ pub struct RapierBackend {
     integration_params: IntegrationParameters,
     physics_pipeline: PhysicsPipeline,
     islands: IslandManager,
-    broad_phase: DefaultBroadPhase,
+    broad_phase: BroadPhaseBvh,
     narrow_phase: NarrowPhase,
     rigid_body_set: RigidBodySet,
     collider_set: ColliderSet,
     impulse_joints: ImpulseJointSet,
     multibody_joints: MultibodyJointSet,
     ccd_solver: CCDSolver,
-    query_pipeline: QueryPipeline,
     contacts: Vec<ContactManifold>,
     stats: SimulationStats,
     handle_map: HashMap<RigidBodyHandle, crate::body::BodyHandle>,
@@ -60,6 +59,7 @@ impl RapierBackend {
             }
             Shape::TriMesh { vertices, indices } => {
                 SharedShape::trimesh(vertices.clone(), indices.clone())
+                    .unwrap_or_else(|_| SharedShape::ball(0.1))
             }
             Shape::HeightField { heights, rows, cols, scale } => {
                 let matrix = nalgebra::DMatrix::from_row_slice(*rows as usize, *cols as usize, heights);
@@ -88,14 +88,13 @@ impl PhysicsBackend for RapierBackend {
             integration_params: IntegrationParameters::default(),
             physics_pipeline: PhysicsPipeline::new(),
             islands: IslandManager::new(),
-            broad_phase: DefaultBroadPhase::new(),
+            broad_phase: BroadPhaseBvh::new(),
             narrow_phase: NarrowPhase::new(),
             rigid_body_set: RigidBodySet::new(),
             collider_set: ColliderSet::new(),
             impulse_joints: ImpulseJointSet::new(),
             multibody_joints: MultibodyJointSet::new(),
             ccd_solver: CCDSolver::new(),
-            query_pipeline: QueryPipeline::new(),
             contacts: Vec::new(),
             stats: SimulationStats::default(),
             handle_map: HashMap::new(),
@@ -144,9 +143,8 @@ impl PhysicsBackend for RapierBackend {
             &mut self.impulse_joints,
             &mut self.multibody_joints,
             &mut self.ccd_solver,
-            Some(&mut self.query_pipeline),
-            &(),
-            &(),
+            &(),  // No hooks
+            &(),  // No events
         );
 
         self.stats.total_us = start.elapsed().as_micros() as u64;
@@ -269,6 +267,7 @@ impl PhysicsBackend for RapierBackend {
             .collision_groups(InteractionGroups::new(
                 Group::from_bits_truncate(desc.collision_groups),
                 Group::from_bits_truncate(desc.collision_filter),
+                InteractionTestMode::default(),
             ))
             .user_data(desc.user_data as u128)
             .build();
@@ -314,9 +313,15 @@ impl PhysicsBackend for RapierBackend {
     fn ray_cast(&self, ray: &RayCast) -> Option<RayHit<Self::BodyHandle>> {
         let rapier_ray = Ray::new(ray.origin, *ray.direction);
         let filter = QueryFilter::default();
+        let query_pipeline = self.broad_phase.as_query_pipeline(
+            self.narrow_phase.query_dispatcher(),
+            &self.rigid_body_set,
+            &self.collider_set,
+            filter,
+        );
 
-        self.query_pipeline
-            .cast_ray(&self.rigid_body_set, &self.collider_set, &rapier_ray, ray.max_distance, true, filter)
+        query_pipeline
+            .cast_ray(&rapier_ray, ray.max_distance, true)
             .map(|(handle, toi)| {
                 let collider = &self.collider_set[handle];
                 let point = rapier_ray.point_at(toi);
@@ -332,28 +337,24 @@ impl PhysicsBackend for RapierBackend {
     fn ray_cast_all(&self, ray: &RayCast) -> Vec<RayHit<Self::BodyHandle>> {
         let rapier_ray = Ray::new(ray.origin, *ray.direction);
         let filter = QueryFilter::default();
-        let mut hits = Vec::new();
-
-        self.query_pipeline.intersections_with_ray(
+        let query_pipeline = self.broad_phase.as_query_pipeline(
+            self.narrow_phase.query_dispatcher(),
             &self.rigid_body_set,
             &self.collider_set,
-            &rapier_ray,
-            ray.max_distance,
-            true,
             filter,
-            |handle, intersection| {
-                let collider = &self.collider_set[handle];
-                if let Some(parent) = collider.parent() {
-                    hits.push(RayHit {
-                        body: parent,
-                        point: rapier_ray.point_at(intersection.time_of_impact),
-                        normal: intersection.normal,
-                        distance: intersection.time_of_impact,
-                    });
-                }
-                true
-            },
         );
+        let mut hits = Vec::new();
+
+        for (_handle, collider, intersection) in query_pipeline.intersect_ray(rapier_ray, ray.max_distance, true) {
+            if let Some(parent) = collider.parent() {
+                hits.push(RayHit {
+                    body: parent,
+                    point: rapier_ray.point_at(intersection.time_of_impact),
+                    normal: intersection.normal,
+                    distance: intersection.time_of_impact,
+                });
+            }
+        }
         hits
     }
 
@@ -363,16 +364,20 @@ impl PhysicsBackend for RapierBackend {
 
     fn query_aabb(&self, aabb: &AABB) -> Vec<Self::BodyHandle> {
         let rapier_aabb = rapier3d::prelude::Aabb::new(aabb.min, aabb.max);
+        let filter = QueryFilter::default();
+        let query_pipeline = self.broad_phase.as_query_pipeline(
+            self.narrow_phase.query_dispatcher(),
+            &self.rigid_body_set,
+            &self.collider_set,
+            filter,
+        );
         let mut bodies = Vec::new();
 
-        self.query_pipeline.colliders_with_aabb_intersecting_aabb(&rapier_aabb, |handle| {
-            if let Some(collider) = self.collider_set.get(*handle) {
-                if let Some(parent) = collider.parent() {
-                    bodies.push(parent);
-                }
+        for (_, collider) in query_pipeline.intersect_aabb_conservative(rapier_aabb) {
+            if let Some(parent) = collider.parent() {
+                bodies.push(parent);
             }
-            true
-        });
+        }
         bodies
     }
 
@@ -394,10 +399,9 @@ impl PhysicsBackend for RapierBackend {
         self.impulse_joints = ImpulseJointSet::new();
         self.multibody_joints = MultibodyJointSet::new();
         self.islands = IslandManager::new();
-        self.broad_phase = DefaultBroadPhase::new();
+        self.broad_phase = BroadPhaseBvh::new();
         self.narrow_phase = NarrowPhase::new();
         self.ccd_solver = CCDSolver::new();
-        self.query_pipeline = QueryPipeline::new();
         self.contacts.clear();
     }
 
@@ -405,9 +409,10 @@ impl PhysicsBackend for RapierBackend {
         self.stats.clone()
     }
 
-    fn set_solver_iterations(&mut self, velocity: u32, position: u32) {
-        self.integration_params.num_solver_iterations = std::num::NonZeroUsize::new(velocity as usize).unwrap();
-        self.integration_params.num_additional_friction_iterations = position as usize;
+    fn set_solver_iterations(&mut self, velocity: u32, _position: u32) {
+        // In rapier 0.30, num_solver_iterations is just usize
+        self.integration_params.num_solver_iterations = velocity as usize;
+        // num_additional_friction_iterations no longer exists in rapier 0.30
     }
 
     fn set_ccd_enabled(&mut self, _enabled: bool) {

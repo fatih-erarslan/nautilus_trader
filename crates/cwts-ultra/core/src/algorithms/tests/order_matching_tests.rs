@@ -169,7 +169,7 @@ fn test_atomic_operations_consistency() {
         OrderType::Limit,
         TimeInForce::GoodTillCancel,
         50000_000000,
-        operations_per_thread * num_threads,
+        (operations_per_thread * num_threads) as u64,
         harness.get_timestamp_ns(),
     ));
 
@@ -187,7 +187,7 @@ fn test_atomic_operations_consistency() {
 
             for i in 0..operations_per_thread {
                 let fill_qty = 1;
-                let fill_price = 50000_000000 + (thread_id * 1000) + i; // Unique price per fill
+                let fill_price = 50000_000000u64 + (thread_id as u64 * 1000) + i as u64; // Unique price per fill
 
                 let start = Instant::now();
                 match order.try_fill(fill_qty, fill_price) {
@@ -788,7 +788,7 @@ fn test_race_condition_detection() {
         OrderType::Limit,
         TimeInForce::GoodTillCancel,
         50000_000000,
-        num_threads * iterations, // Enough quantity for all threads
+        (num_threads * iterations) as u64, // Enough quantity for all threads
         harness.get_timestamp_ns(),
     ));
 

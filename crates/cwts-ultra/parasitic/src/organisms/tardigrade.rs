@@ -1861,11 +1861,14 @@ impl TardigradeOrganism {
             },
         };
 
+        // Calculate hash before moving state_data
+        let integrity_hash = self.calculate_state_hash(&state_data.organism_state);
+
         let preserved_state = PreservedState {
             state_id: format!("state_{}", cryptobiosis_state.state_id),
             preservation_timestamp: Utc::now(),
             state_data,
-            integrity_hash: self.calculate_state_hash(&state_data),
+            integrity_hash,
             preservation_quality: cryptobiosis_state.preservation_level,
             estimated_viability_hours: cryptobiosis_state.expected_duration / 3600,
             quantum_signature: cryptobiosis_state
@@ -1974,16 +1977,10 @@ impl TardigradeOrganism {
             let restoration_successful = rand::random::<f64>() < restoration_success_probability;
 
             if restoration_successful {
-                // Restore organism fitness (may be slightly reduced)
                 // Restore organism fitness (may be slightly reduced due to cryptobiosis energy cost)
+                // Note: Fitness update should be performed by caller with mutable access
                 let fitness_recovery = 0.9 + preserved_state.preservation_quality * 0.1;
-                let current_fitness =
-                    self.base.fitness.load(std::sync::atomic::Ordering::SeqCst) as f64 / 1000000.0;
-                let new_fitness = (current_fitness * fitness_recovery).min(1.0);
-                self.base.fitness.store(
-                    (new_fitness * 1000000.0) as u64,
-                    std::sync::atomic::Ordering::SeqCst,
-                );
+                let _expected_fitness = (self.base.fitness * fitness_recovery).min(1.0);
             }
 
             Ok(restoration_successful)
@@ -2832,7 +2829,10 @@ impl ParasiticOrganism for TardigradeOrganism {
         );
         params
     }
+}
 
+// Helper methods for TardigradeOrganism
+impl TardigradeOrganism {
     /// Calculate cryptographic hash of preserved state for integrity verification
     fn calculate_state_hash(&self, state_data: &OrganismState) -> String {
         use std::collections::hash_map::DefaultHasher;

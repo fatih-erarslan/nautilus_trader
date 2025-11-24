@@ -120,7 +120,7 @@ impl EmergentArchitectureCoordinator {
 
         // Initialize E2B Sandbox Coordinator
         println!("   🏗️  Initializing E2B Sandbox Coordinator...");
-        let e2b_coordinator = Arc::new(E2BSandboxCoordinator::new().await?);
+        let e2b_coordinator = Arc::new(E2BSandboxCoordinator::new());
 
         // Initialize Swarm Intelligence Monitor
         println!("   🧠 Initializing Swarm Intelligence Monitor...");
@@ -200,7 +200,7 @@ impl EmergentArchitectureCoordinator {
         // Step 2: Validate emergence in E2B sandboxes
         println!("   🏗️  Validating emergence in E2B sandboxes...");
         let training_metrics = {
-            let emergence = self.emergence_engine.write().await;
+            let mut emergence = self.emergence_engine.write().await;
             let bayesian_training = emergence
                 .train_in_e2b_sandbox(E2B_BAYESIAN_TRAINING)
                 .await?;
@@ -337,32 +337,37 @@ impl EmergentArchitectureCoordinator {
             SystemHealth::Degraded
         };
 
+        let recommendations = self.generate_health_recommendations(&overall_health);
+        let emergence_active = emergence_health.emergence_active;
+        let overall_health_clone = overall_health.clone();
+        let math_rigor_score = mathematical_health.rigor_score;
+
         let comprehensive_report = ComprehensiveHealthReport {
             e2b_health,
             emergence_health,
             mathematical_health,
             swarm_health,
             overall_health,
-            recommendations: self.generate_health_recommendations(&overall_health),
+            recommendations,
             timestamp: std::time::SystemTime::now(),
         };
 
         // Update system status
         {
             let mut status = self.system_status.write().await;
-            status.emergence_active = emergence_health.emergence_active;
+            status.emergence_active = emergence_active;
             status.e2b_sandboxes_healthy = comprehensive_report
                 .e2b_health
                 .unhealthy_sandboxes
                 .is_empty();
-            status.mathematical_proofs_validated = mathematical_health.theorems_validated;
-            status.swarm_intelligence_operational = swarm_health.operational;
-            status.overall_system_health = overall_health.clone();
+            status.mathematical_proofs_validated = comprehensive_report.mathematical_health.theorems_validated;
+            status.swarm_intelligence_operational = comprehensive_report.swarm_health.operational;
+            status.overall_system_health = overall_health_clone.clone();
             status.last_updated = std::time::SystemTime::now();
         }
 
         println!("📋 Health check completed:");
-        println!("   • Overall Health: {:?}", overall_health);
+        println!("   • Overall Health: {:?}", overall_health_clone);
         println!(
             "   • E2B Sandboxes: {}/{} healthy",
             comprehensive_report.e2b_health.healthy_sandboxes,
@@ -370,7 +375,7 @@ impl EmergentArchitectureCoordinator {
         );
         println!(
             "   • Emergence: {}",
-            if emergence_health.emergence_active {
+            if emergence_active {
                 "Active"
             } else {
                 "Inactive"
@@ -378,7 +383,7 @@ impl EmergentArchitectureCoordinator {
         );
         println!(
             "   • Mathematical Rigor: {:.3}",
-            mathematical_health.rigor_score
+            math_rigor_score
         );
 
         Ok(comprehensive_report)

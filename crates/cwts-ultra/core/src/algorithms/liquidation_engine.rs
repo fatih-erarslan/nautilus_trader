@@ -85,10 +85,10 @@ impl Default for LiquidationParameters {
 }
 
 pub struct LiquidationEngine {
-    parameters: LiquidationParameters,
-    accounts: Arc<RwLock<HashMap<String, MarginAccount>>>,
-    price_feed: Arc<RwLock<HashMap<String, f64>>>,
-    liquidation_queue: Arc<Mutex<Vec<(String, String)>>>, // (account_id, symbol)
+    pub(crate) parameters: LiquidationParameters,
+    pub(crate) accounts: Arc<RwLock<HashMap<String, MarginAccount>>>,
+    pub(crate) price_feed: Arc<RwLock<HashMap<String, f64>>>,
+    pub(crate) liquidation_queue: Arc<Mutex<Vec<(String, String)>>>, // (account_id, symbol)
 }
 
 impl LiquidationEngine {
@@ -268,6 +268,22 @@ impl LiquidationEngine {
             .get_mut(account_id)
             .ok_or_else(|| LiquidationError::PositionNotFound(account_id.to_string()))?;
 
+        // First, determine margin mode and calculate cross margin price if needed
+        // This avoids borrow conflicts when updating position
+        let margin_mode = account
+            .positions
+            .get(symbol)
+            .ok_or_else(|| LiquidationError::PositionNotFound(symbol.to_string()))?
+            .margin_mode
+            .clone();
+
+        let cross_liq_price = if matches!(margin_mode, MarginMode::Cross) {
+            Some(self.calculate_liquidation_price_cross_locked(&*account, symbol)?)
+        } else {
+            None
+        };
+
+        // Now get mutable reference to position
         let position = account
             .positions
             .get_mut(symbol)
@@ -302,29 +318,14 @@ impl LiquidationEngine {
 
         // Update liquidation price
         // CRITICAL FIX: Use locked version to prevent TOCTOU race condition (CVSS 9.8)
-        // We must NOT drop the write lock between reading account state and updating position
-        let margin_mode = position.margin_mode.clone();
+        // We calculated cross margin price before getting mutable position borrow
         match margin_mode {
             MarginMode::Isolated => {
                 position.liquidation_price = self.calculate_liquidation_price_isolated(position)?;
             }
             MarginMode::Cross => {
-                // Use locked version to maintain atomicity - no lock release/reacquire
-                // This ensures Byzantine consensus nodes see consistent state
-                let account = accounts
-                    .get(account_id)
-                    .ok_or_else(|| LiquidationError::PositionNotFound(account_id.to_string()))?;
-
-                let liquidation_price =
-                    self.calculate_liquidation_price_cross_locked(account, symbol)?;
-
-                // Update position with calculated price while still holding lock
-                let position = accounts
-                    .get_mut(account_id)
-                    .and_then(|acc| acc.positions.get_mut(symbol))
-                    .ok_or_else(|| LiquidationError::PositionNotFound(symbol.to_string()))?;
-
-                position.liquidation_price = liquidation_price;
+                // Use pre-calculated price to avoid borrow conflict
+                position.liquidation_price = cross_liq_price.unwrap();
             }
         }
 

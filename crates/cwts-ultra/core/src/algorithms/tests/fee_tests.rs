@@ -14,6 +14,7 @@ use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use crate::algorithms::fee_optimizer::*;
+use crate::common_types::OrderType;
 
 /// Real-world fee test scenarios based on actual exchange data
 struct RealFeeScenarios {

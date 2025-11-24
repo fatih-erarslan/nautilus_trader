@@ -115,7 +115,7 @@ struct AlphaSignalAggregator {
     confidence_score: f64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 struct AlphaSource {
     name: String,
     signal_value: f64,
@@ -149,7 +149,7 @@ struct RegimeClassifier {
     regime_indicators: RegimeIndicators,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, serde::Serialize)]
 enum MarketRegime {
     BullMarket,
     BearMarket,
@@ -355,18 +355,26 @@ impl MacroAttention {
     ) -> AttentionResult<StrategicDecision> {
         let start = Instant::now();
 
-        // Parallel analysis of different strategic components
-        let analysis_results: Vec<AnalysisResult> = [
-            || self.analyze_portfolio_optimization(input),
-            || self.analyze_risk_factors(input),
-            || self.analyze_alpha_signals(input),
-            || self.analyze_market_regime(input),
-            || self.analyze_sentiment_factors(input),
-            || self.analyze_execution_context(input),
-        ]
-        .par_iter()
-        .map(|f| f())
-        .collect::<Result<Vec<_>, _>>()?;
+        // Parallel analysis of different strategic components using rayon join
+        let ((portfolio, risk), ((alpha, regime), (sentiment, execution))) = rayon::join(
+            || rayon::join(
+                || self.analyze_portfolio_optimization(input),
+                || self.analyze_risk_factors(input),
+            ),
+            || rayon::join(
+                || rayon::join(
+                    || self.analyze_alpha_signals(input),
+                    || self.analyze_market_regime(input),
+                ),
+                || rayon::join(
+                    || self.analyze_sentiment_factors(input),
+                    || self.analyze_execution_context(input),
+                ),
+            ),
+        );
+        let analysis_results: Vec<AnalysisResult> = vec![
+            portfolio?, risk?, alpha?, regime?, sentiment?, execution?
+        ];
 
         // Combine analysis results
         let strategic_decision = self.combine_strategic_factors(analysis_results)?;
@@ -683,7 +691,7 @@ impl MacroAttention {
 }
 
 impl AttentionLayer for MacroAttention {
-    fn process(&self, input: &MarketInput) -> AttentionResult<AttentionOutput> {
+    fn process(&mut self, input: &MarketInput) -> AttentionResult<AttentionOutput> {
         let start = Instant::now();
 
         // Perform strategic analysis
@@ -1073,7 +1081,7 @@ mod tests {
 
     #[test]
     fn test_strategic_decision_processing() {
-        let attention = MacroAttention::new(0.3, 0.25).unwrap();
+        let mut attention = MacroAttention::new(0.3, 0.25).unwrap();
         let input = MarketInput {
             timestamp: 1640995200000,
             price: 45000.0,

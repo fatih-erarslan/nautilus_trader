@@ -1,6 +1,6 @@
 // HFT Algorithms Comprehensive Tests - Real Performance Validation
 use crate::algorithms::hft_algorithms::*;
-use crate::algorithms::order_matching::OrderBook;
+use crate::common_types::OrderType;
 use std::collections::HashMap;
 use std::sync::{
     atomic::{AtomicU64, Ordering},
@@ -8,6 +8,9 @@ use std::sync::{
 };
 use std::thread;
 use std::time::{Duration, Instant};
+
+// Use LegacyOrderBook from hft_algorithms (aliased as OrderBook for test compatibility)
+type OrderBook = LegacyOrderBook;
 
 #[cfg(test)]
 mod tests {
@@ -199,11 +202,15 @@ mod tests {
 
         for (pa, pb) in prices_a.iter().zip(prices_b.iter()) {
             engine.update_tick(TickData {
+                symbol: "BTC/USD".to_string(),
                 price: *pa,
+                quantity: 1000.0,
                 volume: 1000.0,
-                bid: pa - 0.05,
-                ask: pa + 0.05,
-                timestamp: std::time::SystemTime::now(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos() as u64,
+                exchange: "TestExchange".to_string(),
             });
 
             let signal = engine.calculate_stat_arb_signal(*pa, *pb, 2.0);
@@ -222,11 +229,15 @@ mod tests {
         // Process multiple ticks
         for i in 0..20 {
             let tick = TickData {
+                symbol: "BTC/USD".to_string(),
                 price: 100.0 + i as f64 * 0.1,
+                quantity: 1000.0 + i as f64 * 100.0,
                 volume: 1000.0 + i as f64 * 100.0,
-                bid: 100.0 + i as f64 * 0.1 - 0.05,
-                ask: 100.0 + i as f64 * 0.1 + 0.05,
-                timestamp: std::time::SystemTime::now(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos() as u64,
+                exchange: "TestExchange".to_string(),
             };
 
             engine.update_tick(tick);
@@ -327,11 +338,15 @@ mod tests {
                 // Process orders for 10ms
                 while start.elapsed() < Duration::from_millis(10) {
                     let tick = TickData {
+                        symbol: "BTC/USD".to_string(),
                         price: 100.0 + thread_id as f64,
+                        quantity: 1000.0,
                         volume: 1000.0,
-                        bid: 99.95 + thread_id as f64,
-                        ask: 100.05 + thread_id as f64,
-                        timestamp: std::time::SystemTime::now(),
+                        timestamp: std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .unwrap()
+                            .as_nanos() as u64,
+                        exchange: "TestExchange".to_string(),
                     };
 
                     // Simulate order processing
@@ -367,11 +382,15 @@ mod tests {
         // Simulate high-frequency operations
         for _ in 0..10000 {
             let tick = TickData {
+                symbol: "BTC/USD".to_string(),
                 price: 100.0,
+                quantity: 1000.0,
                 volume: 1000.0,
-                bid: 99.95,
-                ask: 100.05,
-                timestamp: std::time::SystemTime::now(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos() as u64,
+                exchange: "TestExchange".to_string(),
             };
 
             engine.update_tick(tick);
@@ -451,13 +470,17 @@ mod tests {
             (100.3, 1000.0),
         ];
 
-        for (price, volume) in ticks {
+        for (price, vol) in ticks {
             engine.update_tick(TickData {
+                symbol: "BTC/USD".to_string(),
                 price,
-                volume,
-                bid: price - 0.05,
-                ask: price + 0.05,
-                timestamp: std::time::SystemTime::now(),
+                quantity: vol,
+                volume: vol,
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos() as u64,
+                exchange: "TestExchange".to_string(),
             });
         }
 
@@ -482,11 +505,15 @@ mod tests {
         for i in 0..20 {
             let price = 100.0 + i as f64 * 0.5;
             engine.update_tick(TickData {
+                symbol: "BTC/USD".to_string(),
                 price,
+                quantity: 1000.0,
                 volume: 1000.0,
-                bid: price - 0.05,
-                ask: price + 0.05,
-                timestamp: std::time::SystemTime::now(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos() as u64,
+                exchange: "TestExchange".to_string(),
             });
         }
 
@@ -497,11 +524,15 @@ mod tests {
         for i in 0..20 {
             let price = 110.0 - i as f64 * 0.5;
             engine.update_tick(TickData {
+                symbol: "BTC/USD".to_string(),
                 price,
+                quantity: 1000.0,
                 volume: 1000.0,
-                bid: price - 0.05,
-                ask: price + 0.05,
-                timestamp: std::time::SystemTime::now(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos() as u64,
+                exchange: "TestExchange".to_string(),
             });
         }
 
@@ -533,19 +564,8 @@ mod tests {
     }
 }
 
-// Extension methods for parallel processing
+// Extension methods for test-only functions
 impl HFTEngine {
-    fn process_tick_parallel(&self, tick: &TickData) -> bool {
-        // Simulate parallel tick processing
-        let _price = tick.price;
-        let _volume = tick.volume;
-
-        // Would update internal state in real implementation
-        // Using atomics or lock-free structures
-
-        true
-    }
-
     fn calculate_vwap(&self) -> f64 {
         if self.tick_buffer.is_empty() {
             return 0.0;

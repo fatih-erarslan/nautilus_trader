@@ -105,6 +105,28 @@ impl E2BTrainingClient {
         tokio::time::sleep(tokio::time::Duration::from_millis(30)).await;
         Ok(rand::random::<f64>() > 0.1) // 90% success rate
     }
+
+    /// Submit a training task to E2B sandbox
+    pub async fn submit_training_task(&self, task_type: &str, config: &str) -> Result<TrainingTaskResult, String> {
+        // Simulate task submission and execution
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+
+        Ok(TrainingTaskResult {
+            task_id: format!("task_{}_{}", task_type, uuid::Uuid::new_v4()),
+            output: format!(r#"{{"var_accuracy": 0.92, "latency_p99_ms": 15.0, "error_rate": 0.02, "throughput_ops_sec": 50000.0, "memory_efficiency": 0.85, "emergence_score": 0.7}}"#),
+            success: true,
+            execution_time_ms: 100,
+        })
+    }
+}
+
+/// Result from a training task submission
+#[derive(Debug, Clone)]
+pub struct TrainingTaskResult {
+    pub task_id: String,
+    pub output: String,
+    pub success: bool,
+    pub execution_time_ms: u64,
 }
 
 impl Default for E2BTrainingClient {

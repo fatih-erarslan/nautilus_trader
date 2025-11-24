@@ -37,6 +37,17 @@ pub struct ByzantineConsensusSystem {
     atomic_commit: Arc<AtomicCommit>,
 }
 
+impl std::fmt::Debug for ByzantineConsensusSystem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ByzantineConsensusSystem")
+            .field("consensus", &"Arc<ByzantineConsensus>")
+            .field("validator_network", &"Arc<ValidatorNetwork>")
+            .field("quantum_verifier", &"Arc<QuantumVerification>")
+            .field("atomic_commit", &"Arc<AtomicCommit>")
+            .finish()
+    }
+}
+
 impl ByzantineConsensusSystem {
     pub async fn new(
         validator_count: usize,
@@ -222,6 +233,7 @@ mod tests {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 20,
         };
 
         let result = system.handle_consensus_message(message).await;

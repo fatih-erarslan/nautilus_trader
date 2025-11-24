@@ -460,6 +460,7 @@ impl AttractorFormationTheorem {
 }
 
 /// Comprehensive mathematical validation framework
+#[derive(Debug)]
 pub struct MathematicalValidationFramework;
 
 impl MathematicalValidationFramework {

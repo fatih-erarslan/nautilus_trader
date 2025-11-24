@@ -304,7 +304,7 @@ impl AuditLogger {
     pub fn get_audit_stats(&self) -> AuditStats {
         AuditStats {
             service_name: self.service_name.clone(),
-            channel_capacity: self.sender.capacity(),
+            channel_capacity: None, // UnboundedSender has no capacity limit
             is_closed: self.sender.is_closed(),
         }
     }

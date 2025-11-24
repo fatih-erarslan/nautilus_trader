@@ -60,7 +60,7 @@ struct MarketData {
     timestamp: u64,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 struct PerformanceMonitor {
     total_arbitrage_requests: u64,
     successful_arbitrage_ops: u64,
@@ -248,6 +248,7 @@ impl ConsensusIntegratedTrader {
         let consensus_status = self.consensus_system.get_system_status().await;
         let performance_monitor = self.performance_monitor.lock().await.clone();
         let active_ops_count = self.active_arbitrage_ops.read().await.len();
+        let sub_ms_perf = performance_monitor.consensus_overhead_ns < 1_000_000;
 
         ConsensusPerformanceReport {
             consensus_status,
@@ -256,7 +257,7 @@ impl ConsensusIntegratedTrader {
             integration_health: IntegrationHealth {
                 websocket_connections: 5, // Simplified
                 quantum_enhancements_active: true,
-                sub_millisecond_performance: performance_monitor.consensus_overhead_ns < 1_000_000,
+                sub_millisecond_performance: sub_ms_perf,
                 byzantine_fault_tolerance: true,
             },
         }

@@ -30,6 +30,10 @@ hyperphysics-risk = { path = "../hyperphysics-risk" }
 # Async runtime
 tokio = { version = "1.35", features = ["rt-multi-thread", "sync"] }
 
+# GPU compute (wgpu with Metal backend for macOS)
+wgpu = { version = "25", features = ["metal"] }
+pollster = "0.4"
+
 # System info
 num_cpus = "1.16"
 

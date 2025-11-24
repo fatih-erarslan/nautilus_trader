@@ -21,9 +21,90 @@ use thiserror::Error;
 use tokio::sync::{Mutex, RwLock};
 
 pub mod correlation_matrix;
+#[cfg(feature = "cuda")]
 pub mod cuda_backend;
 pub mod organism_vector;
 pub mod simd_backend;
+
+// Provide stub types when CUDA is disabled
+#[cfg(not(feature = "cuda"))]
+pub mod cuda_backend {
+    //! Stub module when CUDA is disabled
+    use super::*;
+
+    #[derive(Debug)]
+    pub struct GpuDeviceInfo {
+        pub device_name: String,
+        pub memory_size: usize,
+        pub compute_capability: (u32, u32),
+        pub is_available: bool,
+        pub multiprocessor_count: u32,
+        pub max_threads_per_block: u32,
+        pub warp_size: u32,
+    }
+
+    #[derive(Debug)]
+    pub struct CudaContext {
+        _device_info: GpuDeviceInfo,
+    }
+
+    impl CudaContext {
+        pub fn new(device_info: &GpuDeviceInfo) -> Result<Self, CorrelationError> {
+            Ok(Self { _device_info: GpuDeviceInfo {
+                device_name: device_info.device_name.clone(),
+                memory_size: device_info.memory_size,
+                compute_capability: device_info.compute_capability,
+                is_available: false, // CUDA disabled
+                multiprocessor_count: 0,
+                max_threads_per_block: 0,
+                warp_size: 0,
+            }})
+        }
+
+        pub async fn upload_organisms(&self, _buffer: &GpuInputBuffer, _organisms: &[OrganismVector]) -> Result<(), CorrelationError> {
+            Err(CorrelationError::CudaError("CUDA disabled at compile time".to_string()))
+        }
+
+        pub async fn launch_correlation_kernel(&self, _params: &CorrelationKernelParams, _input: &GpuInputBuffer, _output: &GpuOutputBuffer) -> Result<(), CorrelationError> {
+            Err(CorrelationError::CudaError("CUDA disabled at compile time".to_string()))
+        }
+
+        pub async fn download_correlation_matrix(&self, _buffer: &GpuOutputBuffer, _size: usize) -> Result<Vec<f32>, CorrelationError> {
+            Err(CorrelationError::CudaError("CUDA disabled at compile time".to_string()))
+        }
+
+        pub fn cleanup(&mut self) -> Result<(), CorrelationError> {
+            Ok(())
+        }
+    }
+
+    #[derive(Debug)]
+    pub struct GpuInputBuffer;
+
+    #[derive(Debug)]
+    pub struct GpuOutputBuffer;
+
+    #[derive(Debug)]
+    pub struct GpuMemoryPool {
+        _size: usize,
+    }
+
+    impl GpuMemoryPool {
+        pub fn new(size: usize) -> Result<Self, CorrelationError> {
+            Ok(Self { _size: size })
+        }
+
+        pub fn allocate_input_buffer(&mut self, _organisms: &[OrganismVector], _ctx: &CudaContext) -> Result<GpuInputBuffer, CorrelationError> {
+            Err(CorrelationError::CudaError("CUDA disabled at compile time".to_string()))
+        }
+
+        pub fn allocate_output_buffer(&mut self, _size: usize, _ctx: &CudaContext) -> Result<GpuOutputBuffer, CorrelationError> {
+            Err(CorrelationError::CudaError("CUDA disabled at compile time".to_string()))
+        }
+
+        pub fn cleanup(&mut self) {}
+    }
+}
 
 #[cfg(test)]
 pub mod tests;

@@ -257,12 +257,13 @@ impl TemporalBridge {
         // Non-blocking collection from micro attention channel
         while let Ok(output) = self.micro_receiver.try_recv() {
             if output.timestamp >= window_start {
+                let ts = output.timestamp;
+                let confidence_decay = self.calculate_confidence_decay(current_time, ts);
                 micro_signals.push(TimestampedSignal {
-                    timestamp: output.timestamp,
+                    timestamp: ts,
                     output,
                     weight: 1.0,
-                    confidence_decay: self
-                        .calculate_confidence_decay(current_time, output.timestamp),
+                    confidence_decay,
                 });
             }
         }
@@ -270,12 +271,13 @@ impl TemporalBridge {
         // Non-blocking collection from milli attention channel
         while let Ok(output) = self.milli_receiver.try_recv() {
             if output.timestamp >= window_start {
+                let ts = output.timestamp;
+                let confidence_decay = self.calculate_confidence_decay(current_time, ts);
                 milli_signals.push(TimestampedSignal {
-                    timestamp: output.timestamp,
+                    timestamp: ts,
                     output,
                     weight: 1.0,
-                    confidence_decay: self
-                        .calculate_confidence_decay(current_time, output.timestamp),
+                    confidence_decay,
                 });
             }
         }
@@ -283,12 +285,13 @@ impl TemporalBridge {
         // Non-blocking collection from macro attention channel
         while let Ok(output) = self.macro_receiver.try_recv() {
             if output.timestamp >= window_start {
+                let ts = output.timestamp;
+                let confidence_decay = self.calculate_confidence_decay(current_time, ts);
                 macro_signals.push(TimestampedSignal {
-                    timestamp: output.timestamp,
+                    timestamp: ts,
                     output,
                     weight: 1.0,
-                    confidence_decay: self
-                        .calculate_confidence_decay(current_time, output.timestamp),
+                    confidence_decay,
                 });
             }
         }

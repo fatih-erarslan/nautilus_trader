@@ -1,5 +1,6 @@
 use crate::algorithms::liquidation_engine::*;
 use std::collections::HashMap;
+use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time::{sleep, Duration};
 
@@ -1022,7 +1023,7 @@ mod real_market_simulation_tests {
         // High leverage traders should be liquidated first
         let degenerate_liquidated = liquidation_events
             .iter()
-            .any(|(trader, _, _)| trader == "degenerate_trader");
+            .any(|(trader, _, _)| *trader == "degenerate_trader");
         assert!(
             degenerate_liquidated,
             "50x leverage trader should be liquidated"
@@ -1031,7 +1032,7 @@ mod real_market_simulation_tests {
         // Conservative trader should survive
         let conservative_liquidated = liquidation_events
             .iter()
-            .any(|(trader, _, _)| trader == "conservative_trader");
+            .any(|(trader, _, _)| *trader == "conservative_trader");
         assert!(
             !conservative_liquidated,
             "5x leverage trader should survive"
@@ -1044,6 +1045,7 @@ mod real_market_simulation_tests {
             funding_rate: 0.001, // 0.1% hourly funding rate (very high)
             ..LiquidationParameters::default()
         };
+        let funding_rate = parameters.funding_rate;
         let engine = LiquidationEngine::new(parameters);
 
         let account_id = "funding_test";
@@ -1085,7 +1087,7 @@ mod real_market_simulation_tests {
         // Calculate funding payments over time
         let position_value = 10.0 * 45_000.0; // $450K notional
         let hourly_funding =
-            engine.calculate_funding_payment(10.0, 45_000.0, parameters.funding_rate);
+            engine.calculate_funding_payment(10.0, 45_000.0, funding_rate);
 
         println!("Hourly funding payment: ${:.2}", hourly_funding);
         assert!(hourly_funding > 0.0);

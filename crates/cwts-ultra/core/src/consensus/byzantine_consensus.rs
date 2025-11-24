@@ -145,13 +145,14 @@ impl ByzantineConsensus {
         let nonce = self.next_nonce.fetch_add(1, Ordering::AcqRel);
 
         // Create PrePrepare message
+        let quantum_sig = self.generate_quantum_signature(&transaction).await?;
         let message = ByzantineMessage {
             message_type: MessageType::PrePrepare,
             view,
             sequence,
             sender: self.validator_id.clone(),
             payload: transaction,
-            quantum_signature: self.generate_quantum_signature(&transaction).await?,
+            quantum_signature: quantum_sig,
             timestamp: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
@@ -537,10 +538,7 @@ impl QuantumVerification {
                 Err(_) => return Err(ConsensusError::MalformedSignature),
             };
 
-        let signature = match Signature::from_bytes(&signature_bytes) {
-            Ok(sig) => sig,
-            Err(_) => return Err(ConsensusError::MalformedSignature),
-        };
+        let signature = Signature::from_bytes(&signature_bytes);
 
         // Verify the signature against the message payload
         match verifying_key.verify(&message.payload, &signature) {
@@ -624,6 +622,7 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 1,
         };
 
         // Verify the signature - should succeed
@@ -652,6 +651,7 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 2,
         };
 
         // Verify the signature - should fail
@@ -679,6 +679,7 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 3,
         };
 
         let result = verifier.verify_signature(&message).await;
@@ -708,6 +709,7 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 4,
         };
 
         let result = verifier.verify_signature(&message).await;
@@ -737,6 +739,7 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 5,
         };
 
         let result = verifier.verify_signature(&message).await;
@@ -763,6 +766,7 @@ mod tests {
             view: 0,
             sequence: 1,
             sender: ValidatorId(0),
+            nonce: 6,
             payload: payload.clone(),
             quantum_signature: quantum_sig,
             timestamp: SystemTime::now()
@@ -798,6 +802,7 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 100,
         };
 
         // Add enough votes to trigger commit
@@ -846,6 +851,7 @@ mod tests {
                         .duration_since(UNIX_EPOCH)
                         .unwrap()
                         .as_nanos() as u64,
+                    nonce: 200 + i as u64,
                 };
 
                 // Add votes

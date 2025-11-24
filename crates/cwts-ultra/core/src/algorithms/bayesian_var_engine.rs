@@ -762,6 +762,7 @@ impl BayesianVaREngine {
         let emergence_properties = self.measure_emergence_properties()?;
 
         // Postcondition verification
+        let convergence_achieved = training_results.convergence_achieved;
         let result = BayesianVaRResult {
             var_estimate: var_samples.mean(),
             confidence_interval: var_samples.confidence_interval(0.95),
@@ -770,7 +771,7 @@ impl BayesianVaREngine {
             training_metrics: training_results,
             emergence_properties,
             model_validation_passed: kupiec_test.test_passes
-                && training_results.convergence_achieved,
+                && convergence_achieved,
             timestamp: Utc::now(),
         };
 

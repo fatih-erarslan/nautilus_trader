@@ -379,7 +379,7 @@ void main() {
         let state_data: Vec<f64> = pbits
             .iter()
             .map(|pbit| {
-                let state_bits = pbit.state.load(std::sync::atomic::Ordering::Acquire);
+                let state_bits = pbit.get_state_bits(std::sync::atomic::Ordering::Acquire);
                 f64::from_bits(state_bits)
             })
             .collect();
@@ -577,7 +577,7 @@ void main() {
         let mut state_data: Vec<f64> = pbits
             .iter()
             .map(|pbit| {
-                let state_bits = pbit.state.load(std::sync::atomic::Ordering::Acquire);
+                let state_bits = pbit.get_state_bits(std::sync::atomic::Ordering::Acquire);
                 f64::from_bits(state_bits)
             })
             .collect();
@@ -644,7 +644,7 @@ void main() {
                     .map_err(|e| PbitError::DataConversionError(format!("{:?}", e)))?,
             );
 
-            pbit.state.store(
+            pbit.set_state_bits(
                 evolved_state.to_bits(),
                 std::sync::atomic::Ordering::Release,
             );
@@ -740,68 +740,80 @@ impl CorrelationMatrix {
     }
 }
 
+// Mock types for testing - made pub(crate) for cross-module test use
+#[cfg(test)]
+pub(crate) struct MockGpuAccelerator;
+
+#[cfg(test)]
+impl GpuAccelerator for MockGpuAccelerator {
+    fn allocate_buffer(&self, size: usize) -> Result<Arc<dyn GpuMemoryBuffer>, String> {
+        Ok(Arc::new(MockGpuBuffer::new(size)))
+    }
+
+    fn create_kernel(&self, _name: &str) -> Result<Arc<dyn GpuKernel>, String> {
+        Ok(Arc::new(MockGpuKernel))
+    }
+
+    fn compile_kernel(&self, _name: &str, _source: &str) -> Result<Arc<dyn GpuKernel>, String> {
+        Ok(Arc::new(MockGpuKernel))
+    }
+}
+
+#[cfg(test)]
+pub(crate) struct MockGpuBuffer {
+    data: Vec<u8>,
+}
+
+#[cfg(test)]
+impl MockGpuBuffer {
+    pub(crate) fn new(size: usize) -> Self {
+        Self {
+            data: vec![0; size],
+        }
+    }
+}
+
+#[cfg(test)]
+impl GpuMemoryBuffer for MockGpuBuffer {
+    fn write(&self, _data: &[u8]) -> Result<(), String> {
+        Ok(())
+    }
+
+    fn read(&self) -> Result<Vec<u8>, String> {
+        Ok(self.data.clone())
+    }
+
+    fn write_at_offset(&self, _data: &[u8], _offset: usize) -> Result<(), String> {
+        Ok(())
+    }
+
+    fn size(&self) -> usize {
+        self.data.len()
+    }
+}
+
+#[cfg(test)]
+pub(crate) struct MockGpuKernel;
+
+#[cfg(test)]
+impl GpuKernel for MockGpuKernel {
+    fn execute(
+        &self,
+        _buffers: &[&dyn GpuMemoryBuffer],
+        _work_groups: (u32, u32, u32),
+    ) -> Result<(), String> {
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::quantum::pbit_engine::{Pbit, QuantumEntropySource};
 
-    struct MockGpuAccelerator;
-
-    impl GpuAccelerator for MockGpuAccelerator {
-        fn allocate_buffer(&self, size: usize) -> Result<Arc<dyn GpuMemoryBuffer>, String> {
-            Ok(Arc::new(MockGpuBuffer::new(size)))
-        }
-
-        fn create_kernel(&self, _name: &str) -> Result<Arc<dyn GpuKernel>, String> {
-            Ok(Arc::new(MockGpuKernel))
-        }
-
-        fn compile_kernel(&self, _name: &str, _source: &str) -> Result<Arc<dyn GpuKernel>, String> {
-            Ok(Arc::new(MockGpuKernel))
-        }
-    }
-
-    struct MockGpuBuffer {
-        data: Vec<u8>,
-    }
-
-    impl MockGpuBuffer {
-        fn new(size: usize) -> Self {
-            Self {
-                data: vec![0; size],
-            }
-        }
-    }
-
-    impl GpuMemoryBuffer for MockGpuBuffer {
-        fn write(&self, data: &[u8]) -> Result<(), String> {
-            Ok(())
-        }
-
-        fn read(&self) -> Result<Vec<u8>, String> {
-            Ok(self.data.clone())
-        }
-
-        fn write_at_offset(&self, _data: &[u8], _offset: usize) -> Result<(), String> {
-            Ok(())
-        }
-
-        fn size(&self) -> usize {
-            self.data.len()
-        }
-    }
-
-    struct MockGpuKernel;
-
-    impl GpuKernel for MockGpuKernel {
-        fn execute(
-            &self,
-            _buffers: &[&dyn GpuMemoryBuffer],
-            _work_groups: (u32, u32, u32),
-        ) -> Result<(), String> {
-            Ok(())
-        }
-    }
+    // Use pub(crate) mocks from parent module
+    #[allow(dead_code)]
+    type TestGpuAccelerator = super::MockGpuAccelerator;
 
     struct MockQuantumEntropySource;
 

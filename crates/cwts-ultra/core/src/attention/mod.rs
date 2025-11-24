@@ -124,7 +124,7 @@ pub type AttentionResult<T> = Result<T, AttentionError>;
 
 /// Trait for attention layer implementations
 pub trait AttentionLayer: Send + Sync {
-    fn process(&self, input: &MarketInput) -> AttentionResult<AttentionOutput>;
+    fn process(&mut self, input: &MarketInput) -> AttentionResult<AttentionOutput>;
     fn get_metrics(&self) -> AttentionMetrics;
     fn reset_metrics(&mut self);
     fn validate_performance(&self) -> AttentionResult<()>;

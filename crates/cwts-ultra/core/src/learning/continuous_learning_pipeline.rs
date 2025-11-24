@@ -1,7 +1,8 @@
 use futures::stream::{self, StreamExt};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::Arc;
+use tokio::sync::{Mutex, RwLock};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tokio::sync::{mpsc, watch};
 use tokio::time::{interval, sleep};
@@ -209,23 +210,20 @@ impl ContinuousLearningPipeline {
         info!("🚀 Starting Continuous Learning Pipeline");
 
         {
-            let mut state = self.pipeline_state.write().unwrap();
+            let mut state = self.pipeline_state.write().await;
             state.is_active = true;
             state.current_phase = LearningPhase::Monitoring;
         }
 
-        // Start all pipeline components concurrently
-        let pipeline_tasks = vec![
+        // Start all pipeline components concurrently using tokio::try_join!
+        tokio::try_join!(
             self.start_metrics_collection(),
             self.start_performance_monitoring(),
             self.start_event_processing(),
             self.start_evolutionary_cycles(),
             self.start_emergency_response(),
             self.start_constitutional_compliance_monitor(),
-        ];
-
-        // Execute all tasks concurrently
-        futures::future::try_join_all(pipeline_tasks).await?;
+        )?;
 
         info!("✅ Continuous Learning Pipeline started successfully");
         Ok(())
@@ -357,17 +355,18 @@ impl ContinuousLearningPipeline {
     async fn start_performance_monitoring(&self) -> Result<(), LearningError> {
         info!("🔍 Starting performance monitoring subsystem");
 
-        let mut metrics_receiver = self.metrics_receiver.lock().await;
+        let metrics_receiver = self.metrics_receiver.clone();
         let metrics_history = self.metrics_history.clone();
         let event_sender = self.event_sender.clone();
         let config = self.config.clone();
         let current_baseline = self.current_performance_baseline.clone();
 
         tokio::spawn(async move {
-            while let Some(metrics) = metrics_receiver.recv().await {
+            let mut receiver = metrics_receiver.lock().await;
+            while let Some(metrics) = receiver.recv().await {
                 // Store metrics in history
                 {
-                    let mut history = metrics_history.write().unwrap();
+                    let mut history = metrics_history.write().await;
                     history.push_back(metrics.clone());
 
                     // Maintain rolling window
@@ -401,7 +400,7 @@ impl ContinuousLearningPipeline {
         config: &LearningConfiguration,
     ) -> Result<Vec<LearningEvent>, LearningError> {
         let mut events = Vec::new();
-        let baseline_read = baseline.read().unwrap();
+        let baseline_read = baseline.read().await;
 
         // Performance degradation detection
         if metrics.var_accuracy < baseline_read.var_accuracy * config.adaptation_trigger_threshold {
@@ -537,7 +536,7 @@ impl ContinuousLearningPipeline {
         // Exponential moving average update
         let alpha = 0.1; // Learning rate
 
-        let mut baseline_write = baseline.write().unwrap();
+        let mut baseline_write = baseline.write().await;
         baseline_write.var_accuracy =
             baseline_write.var_accuracy * (1.0 - alpha) + metrics.var_accuracy * alpha;
         baseline_write.latency_p99 =
@@ -553,7 +552,7 @@ impl ContinuousLearningPipeline {
     async fn start_event_processing(&self) -> Result<(), LearningError> {
         info!("⚡ Starting event processing subsystem");
 
-        let mut event_receiver = self.event_receiver.lock().await;
+        let event_receiver = self.event_receiver.clone();
         let learning_events = self.learning_events.clone();
         let active_session = self.active_learning_session.clone();
         let genetic_optimizer = self.genetic_optimizer.clone();
@@ -561,10 +560,11 @@ impl ContinuousLearningPipeline {
         let adaptation_counter = self.adaptation_counter.clone();
 
         tokio::spawn(async move {
-            while let Some(event) = event_receiver.recv().await {
+            let mut receiver = event_receiver.lock().await;
+            while let Some(event) = receiver.recv().await {
                 // Store event in history
                 {
-                    let mut events = learning_events.write().unwrap();
+                    let mut events = learning_events.write().await;
                     events.push_back(event.clone());
 
                     // Maintain reasonable event history size
@@ -617,7 +617,7 @@ impl ContinuousLearningPipeline {
 
         if should_adapt {
             // Check if there's already an active learning session
-            let has_active_session = { active_session.read().unwrap().is_some() };
+            let has_active_session = { active_session.read().await.is_some() };
 
             if !has_active_session {
                 info!(
@@ -629,19 +629,19 @@ impl ContinuousLearningPipeline {
                 let learning_session = Self::create_learning_session(event.clone()).await?;
 
                 {
-                    let mut session_guard = active_session.write().unwrap();
+                    let mut session_guard = active_session.write().await;
                     *session_guard = Some(learning_session);
                 }
 
                 // Update pipeline state
                 {
-                    let mut state = pipeline_state.write().unwrap();
+                    let mut state = pipeline_state.write().await;
                     state.current_phase = LearningPhase::Evolution;
                 }
 
                 // Increment adaptation counter
                 {
-                    let mut counter = adaptation_counter.lock().unwrap();
+                    let mut counter = adaptation_counter.lock().await;
                     *counter += 1;
                 }
 
@@ -743,7 +743,7 @@ impl ContinuousLearningPipeline {
 
                                 // Update last cycle time
                                 {
-                                    let mut last = last_cycle.lock().unwrap();
+                                    let mut last = last_cycle.lock().await;
                                     *last = Instant::now();
                                 }
                             }
@@ -771,13 +771,13 @@ impl ContinuousLearningPipeline {
 
         // Update pipeline state
         {
-            let mut state = pipeline_state.write().unwrap();
+            let mut state = pipeline_state.write().await;
             state.current_phase = LearningPhase::Evolution;
         }
 
         // Run evolutionary optimization
         let optimization_result = {
-            let mut optimizer = genetic_optimizer.lock().unwrap();
+            let mut optimizer = genetic_optimizer.lock().await;
             optimizer.evolve_system().await
         };
 
@@ -788,7 +788,7 @@ impl ContinuousLearningPipeline {
 
                 // Update learning session with results
                 {
-                    let mut session_guard = active_session.write().unwrap();
+                    let mut session_guard = active_session.write().await;
                     if let Some(session) = session_guard.as_mut() {
                         session.best_candidate_genome = Some(best_genome.clone());
                         session.current_generation += 1;
@@ -799,7 +799,7 @@ impl ContinuousLearningPipeline {
 
                             // Move to validation phase
                             {
-                                let mut state = pipeline_state.write().unwrap();
+                                let mut state = pipeline_state.write().await;
                                 state.current_phase = LearningPhase::Validation;
                             }
 
@@ -816,7 +816,7 @@ impl ContinuousLearningPipeline {
                                 // Complete the learning session
                                 *session_guard = None;
 
-                                let mut state = pipeline_state.write().unwrap();
+                                let mut state = pipeline_state.write().await;
                                 state.current_phase = LearningPhase::Monitoring;
                                 state.successful_adaptations += 1;
                                 state.last_adaptation_time = Some(Instant::now());
@@ -832,13 +832,13 @@ impl ContinuousLearningPipeline {
 
                 // Update pipeline state to reflect failure
                 {
-                    let mut state = pipeline_state.write().unwrap();
+                    let mut state = pipeline_state.write().await;
                     state.current_phase = LearningPhase::Monitoring;
                 }
 
                 // Reset learning session
                 {
-                    let mut session_guard = active_session.write().unwrap();
+                    let mut session_guard = active_session.write().await;
                     *session_guard = None;
                 }
             }
@@ -856,7 +856,7 @@ impl ContinuousLearningPipeline {
 
         // Update state to validation phase
         {
-            let mut state = pipeline_state.write().unwrap();
+            let mut state = pipeline_state.write().await;
             state.current_phase = LearningPhase::Validation;
         }
 
@@ -882,7 +882,7 @@ impl ContinuousLearningPipeline {
 
         // Update state to deployment phase
         {
-            let mut state = pipeline_state.write().unwrap();
+            let mut state = pipeline_state.write().await;
             state.current_phase = LearningPhase::Deployment;
         }
 
@@ -956,7 +956,7 @@ impl ContinuousLearningPipeline {
         current_baseline: &Arc<RwLock<PerformanceMetrics>>,
         config: &LearningConfiguration,
     ) -> Result<(), LearningError> {
-        let baseline = current_baseline.read().unwrap();
+        let baseline = current_baseline.read().await;
 
         // Check for critical performance degradation
         let emergency_accuracy_threshold = 0.75; // 75% accuracy is emergency threshold
@@ -987,7 +987,7 @@ impl ContinuousLearningPipeline {
 
             // Update pipeline state to emergency mode
             {
-                let mut state = pipeline_state.write().unwrap();
+                let mut state = pipeline_state.write().await;
                 state.emergency_mode = true;
                 state.current_phase = LearningPhase::Emergency;
             }
@@ -1078,7 +1078,7 @@ impl ContinuousLearningPipeline {
     async fn check_constitutional_compliance(
         pipeline_state: &Arc<RwLock<PipelineState>>,
     ) -> Result<(), LearningError> {
-        let mut state = pipeline_state.write().unwrap();
+        let mut state = pipeline_state.write().await;
 
         // Constitutional Prime Directive compliance checks
         let mut compliance_violations = Vec::new();
@@ -1126,7 +1126,7 @@ impl ContinuousLearningPipeline {
 
         // Update pipeline state
         {
-            let mut state = self.pipeline_state.write().unwrap();
+            let mut state = self.pipeline_state.write().await;
             state.is_active = false;
             state.current_phase = LearningPhase::Monitoring;
         }
@@ -1138,21 +1138,21 @@ impl ContinuousLearningPipeline {
         Ok(())
     }
 
-    pub fn get_learning_state(&self) -> PipelineState {
-        self.pipeline_state.read().unwrap().clone()
+    pub async fn get_learning_state(&self) -> PipelineState {
+        self.pipeline_state.read().await.clone()
     }
 
-    pub fn get_recent_metrics(&self, count: usize) -> Vec<LearningMetrics> {
-        let history = self.metrics_history.read().unwrap();
+    pub async fn get_recent_metrics(&self, count: usize) -> Vec<LearningMetrics> {
+        let history = self.metrics_history.read().await;
         history.iter().rev().take(count).cloned().collect()
     }
 
-    pub fn get_recent_events(&self, count: usize) -> Vec<LearningEvent> {
-        let events = self.learning_events.read().unwrap();
+    pub async fn get_recent_events(&self, count: usize) -> Vec<LearningEvent> {
+        let events = self.learning_events.read().await;
         events.iter().rev().take(count).cloned().collect()
     }
 
-    pub fn get_active_learning_session(&self) -> Option<LearningSession> {
-        self.active_learning_session.read().unwrap().clone()
+    pub async fn get_active_learning_session(&self) -> Option<LearningSession> {
+        self.active_learning_session.read().await.clone()
     }
 }

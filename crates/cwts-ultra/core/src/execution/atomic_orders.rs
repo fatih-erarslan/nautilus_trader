@@ -388,7 +388,7 @@ impl AtomicOrderQueue {
                         self.size.fetch_sub(1, Ordering::AcqRel);
 
                         // Convert to owned
-                        guard.defer_destroy(head);
+                        // Convert to owned
                         return Some(head.into_owned());
                     }
                     Err(_) => continue,

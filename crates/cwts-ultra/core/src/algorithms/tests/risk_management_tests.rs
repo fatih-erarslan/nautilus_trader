@@ -77,7 +77,7 @@ mod kelly_criterion_tests {
         let risk_manager = RiskManager::new(RiskParameters::default());
 
         // Test various Kelly scenarios with mathematical precision
-        let test_cases = vec![
+        let test_cases: Vec<(f64, f64, f64, f64)> = vec![
             // (win_rate, avg_win, avg_loss, expected_kelly_fraction)
             (0.55, 100.0, 100.0, 0.10),  // f = (1*0.55 - 0.45) / 1 = 0.10
             (0.45, 150.0, 100.0, 0.175), // f = (1.5*0.45 - 0.55) / 1.5 = 0.175
@@ -90,7 +90,7 @@ mod kelly_criterion_tests {
                 .unwrap();
 
             let actual_fraction = position_size / 100_000.0;
-            let capped_expected = expected_fraction.min(0.02); // 2% cap
+            let capped_expected: f64 = expected_fraction.min(0.02); // 2% cap
 
             assert!(
                 (actual_fraction - capped_expected).abs() < 0.001,

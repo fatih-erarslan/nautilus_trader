@@ -143,7 +143,7 @@ fn test_concurrent_order_fill() {
 
             for i in 0..fills_per_thread {
                 let fill_qty = 1_000000; // 1 BTC per fill
-                let fill_price = 50000_000000 + (thread_id * 1000) + i;
+                let fill_price = 50000_000000u64 + (thread_id as u64 * 1000) + i as u64;
 
                 match order.try_fill(fill_qty, fill_price) {
                     Ok(filled) => {
@@ -372,7 +372,7 @@ fn test_memory_ordering_validation() {
 
             for i in 0..1000 {
                 let fill_qty = 1000; // Small fills
-                let fill_price = 50000_000000 + (thread_id * 1000) + i;
+                let fill_price = 50000_000000u64 + (thread_id as u64 * 1000) + i as u64;
 
                 if let Ok(_filled) = order.try_fill(fill_qty, fill_price) {
                     // Immediately check consistency with acquire ordering
@@ -515,7 +515,7 @@ fn test_high_frequency_operations() {
                 match i % 4 {
                     0 => {
                         // Try fill
-                        let _ = order.try_fill(1, 50000_000000 + (thread_id * 1000) + i);
+                        let _ = order.try_fill(1, 50000_000000u64 + (thread_id as u64 * 1000) + i as u64);
                     }
                     1 => {
                         // Read remaining quantity

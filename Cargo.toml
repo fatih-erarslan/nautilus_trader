@@ -34,6 +34,12 @@ members = [
     "crates/hyperphysics-reasoning-router",
     # Backend adapters for reasoning router
     "crates/hyperphysics-reasoning-backends",
+    # Central neural intelligence layer
+    "crates/hyperphysics-neural",
+    # Enterprise bio-inspired optimization algorithms
+    "crates/hyperphysics-optimization",
+    # Unified GPU orchestration layer
+    "crates/hyperphysics-gpu-unified",
 ]
 resolver = "2"
 
@@ -149,7 +155,7 @@ harness = false
 [workspace.dependencies]
 # Mathematical libraries
 ndarray = { version = "0.15", features = ["rayon", "serde"] }
-nalgebra = { version = "0.33", features = ["serde-serialize", "rayon"] }
+nalgebra = { version = "0.34", features = ["serde-serialize", "rayon"] }
 num-traits = "0.2"
 num-complex = "0.4"
 approx = "0.5"
@@ -179,6 +185,7 @@ log = "0.4"
 
 # Concurrency
 dashmap = "6.1"
+parking_lot = "0.12"
 
 # Statistics
 statrs = "0.16"
@@ -188,3 +195,8 @@ criterion = "0.5"
 
 # Testing
 proptest = "1.4"
+
+# Vector database (ruvector)
+ruvector-core = { path = "crates/vendor/ruvector/crates/ruvector-core", default-features = false, features = ["simd"] }
+hnsw_rs = "0.3"
+simsimd = "5.9"

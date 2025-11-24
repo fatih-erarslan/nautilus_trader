@@ -44,6 +44,9 @@ pub mod router;
 pub mod selector;
 pub mod synthesis;
 
+#[cfg(feature = "hnsw")]
+pub mod hnsw_index;
+
 pub mod prelude {
     //! Convenience re-exports
     pub use crate::backend::{
@@ -54,6 +57,9 @@ pub mod prelude {
     pub use crate::router::{ReasoningRouter, RouterConfig};
     pub use crate::selector::{BackendSelector, SelectionStrategy, ThompsonSampler};
     pub use crate::synthesis::{ResultSynthesizer, SynthesisStrategy};
+
+    #[cfg(feature = "hnsw")]
+    pub use crate::hnsw_index::{HnswSimilarityConfig, HnswSimilarityIndex, HnswProblemRecord};
 }
 
 use serde::{Deserialize, Serialize};

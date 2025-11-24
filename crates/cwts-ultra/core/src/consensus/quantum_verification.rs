@@ -204,10 +204,7 @@ impl QuantumVerification {
             Err(_) => return Ok(false),
         };
 
-        let ed_signature = match ed25519_dalek::Signature::from_bytes(&sig_bytes) {
-            Ok(sig) => sig,
-            Err(_) => return Ok(false),
-        };
+        let ed_signature = ed25519_dalek::Signature::from_bytes(&sig_bytes);
 
         // Parse Ed25519 public key
         let key_bytes: [u8; 32] = match signature.public_key[..32].try_into() {
@@ -476,6 +473,7 @@ mod tests {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 10,
         };
 
         let is_valid = verifier.verify_signature(&message).await.unwrap();
@@ -509,6 +507,7 @@ mod tests {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos() as u64,
+            nonce: 11,
         };
 
         let _is_valid = verifier.verify_signature(&message).await.unwrap();

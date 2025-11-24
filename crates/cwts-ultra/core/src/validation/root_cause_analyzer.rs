@@ -82,6 +82,7 @@ pub enum CauseType {
     ResourceExhaustion,
     ConcurrencyIssue,
     ConfigurationError,
+    StatisticalAnomaly,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -131,7 +132,7 @@ pub struct ImpactAssessment {
     pub regulatory_risk: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Severity {
     Critical,   // System failure imminent
     High,       // Significant impact on operations
@@ -1093,6 +1094,7 @@ impl std::fmt::Display for CauseType {
             CauseType::ResourceExhaustion => write!(f, "Resource Exhaustion"),
             CauseType::ConcurrencyIssue => write!(f, "Concurrency Issue"),
             CauseType::ConfigurationError => write!(f, "Configuration Error"),
+            CauseType::StatisticalAnomaly => write!(f, "Statistical Anomaly"),
         }
     }
 }

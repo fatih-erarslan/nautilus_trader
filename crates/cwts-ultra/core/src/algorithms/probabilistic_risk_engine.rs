@@ -394,10 +394,11 @@ impl ProbabilisticRiskEngine {
         // Calculate uncertainty score
         let uncertainty_score = self.calculate_uncertainty_score()?;
 
-        // Bayesian VaR
-        let (bayesian_mean, bayesian_std) = self.bayesian_parameter_estimation(
-            &self.historical_returns[self.historical_returns.len().saturating_sub(30)..],
-        )?;
+        // Bayesian VaR - extract slice first to avoid borrow conflict
+        let recent_returns: Vec<f64> = self.historical_returns
+            [self.historical_returns.len().saturating_sub(30)..]
+            .to_vec();
+        let (bayesian_mean, bayesian_std) = self.bayesian_parameter_estimation(&recent_returns)?;
         let bayesian_var = portfolio_value * (bayesian_mean - 2.33 * bayesian_std); // 99% VaR
 
         Ok(ProbabilisticRiskMetrics {

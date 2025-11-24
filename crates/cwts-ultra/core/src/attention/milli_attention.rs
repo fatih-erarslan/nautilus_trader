@@ -179,7 +179,7 @@ impl MilliAttention {
     }
 
     /// Parallel pattern recognition with attention weighting
-    fn recognize_patterns(&self, input: &MarketInput) -> AttentionResult<Vec<f64>> {
+    fn recognize_patterns(&mut self, input: &MarketInput) -> AttentionResult<Vec<f64>> {
         let start = Instant::now();
 
         if self.parallel_processing {
@@ -291,7 +291,7 @@ impl MilliAttention {
     }
 
     /// Momentum pattern analysis with attention weighting
-    fn analyze_momentum_patterns(&self, input: &MarketInput) -> f64 {
+    fn analyze_momentum_patterns(&mut self, input: &MarketInput) -> f64 {
         // RSI momentum
         self.rsi.update(input.price);
         let rsi_value = self.rsi.get_value();
@@ -558,7 +558,7 @@ impl MilliAttention {
 }
 
 impl AttentionLayer for MilliAttention {
-    fn process(&self, input: &MarketInput) -> AttentionResult<AttentionOutput> {
+    fn process(&mut self, input: &MarketInput) -> AttentionResult<AttentionOutput> {
         let start = Instant::now();
 
         // Update history buffers
@@ -798,7 +798,7 @@ mod tests {
 
     #[test]
     fn test_pattern_recognition() {
-        let attention = MilliAttention::new(50, false).unwrap();
+        let mut attention = MilliAttention::new(50, false).unwrap();
         let input = MarketInput {
             timestamp: 1640995200000,
             price: 45000.0,

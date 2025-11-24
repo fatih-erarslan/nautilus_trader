@@ -186,7 +186,7 @@ impl MicroAttention {
 }
 
 impl AttentionLayer for MicroAttention {
-    fn process(&self, input: &MarketInput) -> AttentionResult<AttentionOutput> {
+    fn process(&mut self, input: &MarketInput) -> AttentionResult<AttentionOutput> {
         let start = Instant::now();
 
         // Convert input to SIMD-friendly format
@@ -359,7 +359,7 @@ mod tests {
 
     #[test]
     fn test_micro_attention_processing() {
-        let attention = MicroAttention::new(16, false).unwrap();
+        let mut attention = MicroAttention::new(16, false).unwrap();
         let input = MarketInput {
             timestamp: 1640995200000,
             price: 45000.0,
