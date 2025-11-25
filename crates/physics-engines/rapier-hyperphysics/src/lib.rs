@@ -163,6 +163,14 @@ impl RapierHyperPhysicsAdapter {
         &mut self.rigid_body_set
     }
 
+    /// Get mutable references to both rigid body set and collider set
+    ///
+    /// This method allows borrowing both sets mutably at once, which is required
+    /// for mapping market state to physics where both sets need to be modified.
+    pub fn bodies_and_colliders_mut(&mut self) -> (&mut RigidBodySet, &mut ColliderSet) {
+        (&mut self.rigid_body_set, &mut self.collider_set)
+    }
+
     /// Get reference to collider set
     pub fn colliders(&self) -> &ColliderSet {
         &self.collider_set

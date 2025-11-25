@@ -81,6 +81,16 @@ impl MarketMapper {
         }
     }
 
+    /// Get the volume scaling factor
+    pub fn volume_scale(&self) -> f32 {
+        self.volume_scale
+    }
+
+    /// Get the price scaling factor
+    pub fn price_scale(&self) -> f32 {
+        self.price_scale
+    }
+
     /// Map market state to rigid bodies and colliders
     pub fn map_to_physics(
         &self,

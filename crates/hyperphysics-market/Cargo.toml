@@ -48,6 +48,9 @@ sha2 = "0.10"
 hex = "0.4"
 base64 = "0.21"
 
+# Rate limiting
+governor = { version = "0.6", default-features = false, features = ["std", "jitter"] }
+
 # Linear algebra for topology mapping
 
 [dev-dependencies]
