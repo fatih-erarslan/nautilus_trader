@@ -11,7 +11,7 @@ use crate::Result;
 // use std::sync::Arc;
 
 /// Physics engine selection
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PhysicsEngine {
     /// JoltPhysics (deterministic, <100μs)
     Jolt,
@@ -35,7 +35,7 @@ pub struct PhysicsEngineRouter {
     engine: PhysicsEngine,
 
     /// Determinism required
-    deterministic: bool,
+    pub deterministic: bool,
 }
 
 impl PhysicsEngineRouter {
@@ -85,11 +85,8 @@ impl PhysicsEngineRouter {
 
         // Map market to physics
         let mapper = MarketMapper::new();
-        let mapping = mapper.map_to_physics(
-            &market_state,
-            adapter.rigid_bodies_mut(),
-            adapter.colliders_mut(),
-        )?;
+        let (bodies, colliders) = adapter.bodies_and_colliders_mut();
+        let mapping = mapper.map_to_physics(&market_state, bodies, colliders)?;
 
         // Run physics simulation
         let simulator = PhysicsSimulator::with_config(SimulatorConfig {

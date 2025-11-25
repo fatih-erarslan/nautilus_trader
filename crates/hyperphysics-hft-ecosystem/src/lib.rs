@@ -123,6 +123,14 @@ pub enum EcosystemError {
 /// Result type for the HFT ecosystem
 pub type Result<T> = std::result::Result<T, EcosystemError>;
 
+// Implement From for RapierHyperPhysicsError when physics-rapier feature is enabled
+#[cfg(feature = "physics-rapier")]
+impl From<rapier_hyperphysics::RapierHyperPhysicsError> for EcosystemError {
+    fn from(err: rapier_hyperphysics::RapierHyperPhysicsError) -> Self {
+        EcosystemError::PhysicsEngine(err.to_string())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

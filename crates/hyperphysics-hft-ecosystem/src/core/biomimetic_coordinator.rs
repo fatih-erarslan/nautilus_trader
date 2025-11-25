@@ -7,7 +7,7 @@ use crate::swarms::tier1_execution::{MarketState, Tier1SwarmExecutor};
 use crate::Result;
 
 /// Biomimetic algorithm tier
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BiomimeticTier {
     /// Tier 1: <1ms execution (Whale, Bat, Firefly, Cuckoo, PSO)
     Tier1,

@@ -22,7 +22,7 @@ pub struct HFTEcosystem {
     pub biomimetic_coord: Arc<tokio::sync::RwLock<BiomimeticCoordinator>>,
 
     /// Configuration
-    config: EcosystemConfig,
+    pub config: EcosystemConfig,
 }
 
 /// Ecosystem configuration

@@ -5,9 +5,10 @@
 use crate::{PhysicsMapping, RapierHyperPhysicsAdapter, Result};
 use nalgebra::Vector3;
 use rapier3d::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// Trading signal derived from physics
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum TradingSignal {
     StrongBuy,
     Buy,
@@ -17,7 +18,7 @@ pub enum TradingSignal {
 }
 
 /// Signal with confidence and metadata
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SignalResult {
     /// Primary trading signal
     pub signal: TradingSignal,
@@ -39,7 +40,7 @@ pub struct SignalResult {
 }
 
 /// Market regime classification
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MarketRegime {
     HighVolatility,
     LowVolatility,
