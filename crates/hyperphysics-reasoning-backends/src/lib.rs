@@ -35,6 +35,9 @@
 #[cfg(feature = "physics")]
 pub mod physics;
 
+#[cfg(feature = "rapier-market")]
+pub mod rapier_market;
+
 #[cfg(feature = "optimization")]
 pub mod optimization;
 
@@ -59,6 +62,9 @@ pub(crate) mod problem {
 #[cfg(feature = "physics")]
 pub use physics::PhysicsBackendAdapter;
 
+#[cfg(feature = "rapier-market")]
+pub use rapier_market::{RapierMarketBackend, RapierMarketConfig};
+
 #[cfg(feature = "optimization")]
 pub use optimization::{GeneticAlgorithmBackend, PSOBackend};
 
@@ -74,6 +80,11 @@ pub mod prelude {
 /// Create a default set of backends for a full reasoning system
 pub fn create_default_backends() -> Vec<std::sync::Arc<dyn ReasoningBackend>> {
     let mut backends: Vec<std::sync::Arc<dyn ReasoningBackend>> = Vec::new();
+
+    #[cfg(feature = "rapier-market")]
+    {
+        backends.push(std::sync::Arc::new(rapier_market::RapierMarketBackend::new()));
+    }
 
     #[cfg(feature = "optimization")]
     {
