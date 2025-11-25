@@ -39,6 +39,7 @@ pub mod error;
 pub mod providers;
 pub mod risk;
 pub mod topology;
+pub mod validation;
 
 // Re-export commonly used types
 pub use data::{Bar, Tick, Timeframe};
@@ -79,4 +80,10 @@ pub use risk::{
     Position as RiskPosition,
     PortfolioMetrics,
     RiskViolation,
+};
+pub use validation::{
+    DataValidator,
+    ValidationConfig,
+    ValidationError,
+    SymbolValidationRules,
 };

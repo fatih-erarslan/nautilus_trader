@@ -3,7 +3,7 @@
 use thiserror::Error;
 
 /// Errors that can occur during market data operations
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum MarketError {
     /// API request failed with provider-specific error
     #[error("API request failed: {0}")]
@@ -60,6 +60,10 @@ pub enum MarketError {
     /// Timeout error
     #[error("Request timeout: {0}")]
     TimeoutError(String),
+
+    /// Data validation error (timestamp, price, volume validation)
+    #[error("Validation error: {0}")]
+    ValidationError(String),
 }
 
 // Implement conversions for common error types
