@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/fetch_filtered_news.json",
+  "title": "fetch_filtered_news",
+  "description": "Fetch news with advanced filtering options.",
+  "category": "news",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sentiment_filter": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "negative",
+            "neutral",
+            "all"
+          ]
+        },
+        "relevance_threshold": {
+          "type": "number",
+          "default": 0.5,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "limit": {
+          "type": "integer",
+          "default": 50,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "symbols"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "articles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "sentiment": {
+                "type": "number"
+              },
+              "relevance": {
+                "type": "number"
+              },
+              "published_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "total_found": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

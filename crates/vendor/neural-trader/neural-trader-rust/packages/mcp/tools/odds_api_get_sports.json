@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/odds_api_get_sports.json",
+  "title": "odds_api_get_sports",
+  "description": "Get list of available sports from The Odds API.",
+  "category": "odds_api",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "sports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "group": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

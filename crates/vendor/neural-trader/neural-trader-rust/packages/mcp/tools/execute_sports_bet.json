@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/execute_sports_bet.json",
+  "title": "execute_sports_bet",
+  "description": "Execute sports bet with validation.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "selection": {
+          "type": "string"
+        },
+        "stake": {
+          "type": "number",
+          "minimum": 0
+        },
+        "odds": {
+          "type": "number"
+        },
+        "bet_type": {
+          "type": "string",
+          "default": "back",
+          "enum": [
+            "back",
+            "lay"
+          ]
+        },
+        "validate_only": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "market_id",
+        "selection",
+        "stake",
+        "odds"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "bet_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "validation": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

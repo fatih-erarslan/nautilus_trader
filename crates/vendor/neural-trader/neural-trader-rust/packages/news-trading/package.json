@@ -1,0 +1,56 @@
+{
+  "name": "@neural-trader/news-trading",
+  "version": "2.1.1",
+  "description": "News-driven trading for Neural Trader - real-time sentiment analysis and event-driven strategies",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "load-binary.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "native"
+  ],
+  "scripts": {
+    "build": "napi build --platform --release --cargo-cwd ../../crates/napi-bindings --cargo-name nt-napi-bindings",
+    "clean": "rm -f *.node"
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "sentiment-analysis",
+    "news-trading",
+    "event-driven",
+    "nlp"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/news-trading"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "detect-libc": "^2.0.2"
+  },
+  "peerDependencies": {
+    "@neural-trader/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "homepage": "https://neural-trader.ruv.io"
+}

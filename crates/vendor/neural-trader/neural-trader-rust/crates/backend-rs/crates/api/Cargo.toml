@@ -1,0 +1,42 @@
+[package]
+name = "neural-trader-api"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "neural-trader-api"
+path = "src/main.rs"
+
+[dependencies]
+neural-trader-common = { path = "../common" }
+
+tokio.workspace = true
+axum.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+jsonwebtoken.workspace = true
+hyper.workspace = true
+anyhow.workspace = true
+chrono.workspace = true
+reqwest.workspace = true
+futures.workspace = true
+thiserror.workspace = true
+
+# Auth dependencies
+axum-extra = { version = "0.9", features = ["typed-header"] }
+
+# SQLite database
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# YAML parsing for OpenAPI specs
+serde_yaml = "0.9"
+
+[dev-dependencies]
+mockall.workspace = true
+rstest.workspace = true
+tempfile = "3.8"

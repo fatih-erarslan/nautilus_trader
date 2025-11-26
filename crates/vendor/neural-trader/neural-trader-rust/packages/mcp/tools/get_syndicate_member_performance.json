@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_syndicate_member_performance.json",
+  "title": "get_syndicate_member_performance",
+  "description": "Get detailed performance metrics for a member.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "member_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "member_id": {
+          "type": "string"
+        },
+        "member_name": {
+          "type": "string"
+        },
+        "capital_contributed": {
+          "type": "number"
+        },
+        "current_value": {
+          "type": "number"
+        },
+        "total_returns": {
+          "type": "number"
+        },
+        "roi": {
+          "type": "number"
+        },
+        "equity_share": {
+          "type": "number"
+        },
+        "performance_rank": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "member_id",
+        "capital_contributed",
+        "roi"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

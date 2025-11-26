@@ -1,0 +1,17 @@
+{
+  "strategy_name": "GOAP_Mirror_Trading_Enhanced",
+  "confidence_threshold": 0.78,
+  "base_position_size": 0.02,
+  "stop_loss_base": -0.06,
+  "profit_threshold": 0.25,
+  "correlation_limit": 0.35,
+  "kelly_fraction_range": [
+    0.1,
+    0.5
+  ],
+  "regime_detection": true,
+  "volatility_scalar": true,
+  "initial_capital": 95000,
+  "max_positions": 8,
+  "activated_at": "2025-09-23T15:26:53.176623"
+}

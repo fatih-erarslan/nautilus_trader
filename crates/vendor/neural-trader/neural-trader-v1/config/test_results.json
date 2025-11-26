@@ -1,0 +1,179 @@
+{
+  "timestamp": "2025-08-15T03:17:39.862802",
+  "platform": "Neural Trader MCP v2.5.0",
+  "total_tests": 22,
+  "passed": 9,
+  "failed": 13,
+  "categories": {
+    "MCP Servers": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Enhanced MCP Server",
+          "status": "passed",
+          "details": "Server responsive"
+        },
+        {
+          "name": "Fantasy MCP Server",
+          "status": "passed",
+          "details": "Server responsive"
+        },
+        {
+          "name": "Fantasy Original",
+          "status": "passed",
+          "details": "Server responsive"
+        }
+      ]
+    },
+    "Neural Forecasting": {
+      "passed": 0,
+      "failed": 3,
+      "tests": [
+        {
+          "name": "NHITS Model",
+          "status": "failed",
+          "details": "Library not installed"
+        },
+        {
+          "name": "NBEATSx Model",
+          "status": "failed",
+          "details": "Library not installed"
+        },
+        {
+          "name": "GPU Acceleration",
+          "status": "failed",
+          "details": ""
+        }
+      ]
+    },
+    "Fantasy Collective": {
+      "passed": 2,
+      "failed": 3,
+      "tests": [
+        {
+          "name": "Database Init",
+          "status": "passed",
+          "details": ""
+        },
+        {
+          "name": "Server Ping",
+          "status": "failed",
+          "details": "'FunctionTool' object is not callable"
+        },
+        {
+          "name": "User Creation",
+          "status": "passed",
+          "details": ""
+        },
+        {
+          "name": "League Creation",
+          "status": "failed",
+          "details": "'FunctionTool' object is not callable"
+        },
+        {
+          "name": "Achievement System",
+          "status": "failed",
+          "details": "'FunctionTool' object is not callable"
+        }
+      ]
+    },
+    "Sports Betting": {
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "Module Import",
+          "status": "failed",
+          "details": "No module named 'src.sports_betting.providers'"
+        }
+      ]
+    },
+    "Syndicate": {
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "Module Import",
+          "status": "failed",
+          "details": "No module named 'src.syndicate.profit_distribution'"
+        }
+      ]
+    },
+    "Polymarket": {
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "Module Import",
+          "status": "failed",
+          "details": "No module named 'src.polymarket.client'"
+        }
+      ]
+    },
+    "MCP Tools": {
+      "passed": 0,
+      "failed": 3,
+      "tests": [
+        {
+          "name": "Enhanced Server",
+          "status": "failed",
+          "details": "0 tools"
+        },
+        {
+          "name": "Fantasy Server",
+          "status": "failed",
+          "details": "0 tools"
+        },
+        {
+          "name": "Total Count",
+          "status": "failed",
+          "details": "0 tools"
+        }
+      ]
+    },
+    "Trading Strategies": {
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "Module Import",
+          "status": "failed",
+          "details": "No module named 'src.trading.strategies.momentum'"
+        }
+      ]
+    },
+    "Database": {
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Fantasy Tables",
+          "status": "passed",
+          "details": "10 tables"
+        },
+        {
+          "name": "Fantasy Indexes",
+          "status": "passed",
+          "details": "20 indexes"
+        }
+      ]
+    },
+    "Performance": {
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Inference Speed",
+          "status": "passed",
+          "details": "1.90ms"
+        },
+        {
+          "name": "Memory Usage",
+          "status": "passed",
+          "details": "290MB"
+        }
+      ]
+    }
+  }
+}

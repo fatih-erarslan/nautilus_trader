@@ -1,0 +1,9 @@
+{
+  "model_path": "/tmp/tmpqjyugetd/test_model.json",
+  "environment": "production",
+  "traffic_percentage": 10,
+  "deployment_time": "2025-06-26T20:23:02.228172",
+  "rollback_threshold": 0.1,
+  "status": "active",
+  "endpoint": "https://api.production.example.com/neural-forecast"
+}

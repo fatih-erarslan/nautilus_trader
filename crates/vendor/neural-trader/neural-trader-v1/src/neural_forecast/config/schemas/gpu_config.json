@@ -1,0 +1,426 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GPU Configuration Schema",
+  "description": "Configuration schema for GPU acceleration and hardware management",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version"
+    },
+    "gpu": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable GPU acceleration"
+        },
+        "auto_detect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically detect available GPUs"
+        },
+        "device_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "default": [0],
+          "description": "GPU device IDs to use"
+        },
+        "memory_fraction": {
+          "type": "number",
+          "gpu_memory": true,
+          "default": 0.8,
+          "description": "Fraction of GPU memory to allocate"
+        },
+        "enable_growth": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow GPU memory to grow dynamically"
+        },
+        "force_gpu": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force GPU usage even if not optimal"
+        },
+        "fallback_to_cpu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Fallback to CPU if GPU not available"
+        },
+        "mixed_precision": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable mixed precision training (FP16/FP32)"
+        },
+        "benchmark_mode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable cuDNN benchmark mode for consistent input sizes"
+        }
+      },
+      "required": ["enabled"],
+      "additionalProperties": false
+    },
+    "cuda": {
+      "type": "object",
+      "properties": {
+        "version_required": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+$",
+          "default": "11.8",
+          "description": "Minimum CUDA version required"
+        },
+        "cache_dir": {
+          "type": "string",
+          "default": "./cuda_cache",
+          "description": "Directory for CUDA kernel cache"
+        },
+        "enable_cache": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable CUDA kernel caching"
+        },
+        "async_execution": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable asynchronous CUDA execution"
+        },
+        "stream_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "default": 4,
+          "description": "Number of CUDA streams for parallel execution"
+        }
+      },
+      "additionalProperties": false
+    },
+    "rapids": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable RAPIDS GPU acceleration"
+        },
+        "cudf_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable cuDF for GPU DataFrame operations"
+        },
+        "cuml_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable cuML for GPU machine learning"
+        },
+        "memory_pool_size": {
+          "type": "string",
+          "pattern": "^\\d+[KMGT]?B?$",
+          "default": "2GB",
+          "description": "Memory pool size for RAPIDS (e.g., '2GB', '512MB')"
+        },
+        "spill_to_disk": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow spilling to disk when GPU memory is full"
+        }
+      },
+      "additionalProperties": false
+    },
+    "optimization": {
+      "type": "object",
+      "properties": {
+        "tensor_cores": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Tensor Core optimization (RTX/V100+)"
+        },
+        "graph_optimization": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable computation graph optimization"
+        },
+        "kernel_fusion": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable kernel fusion for better performance"
+        },
+        "memory_optimization": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable memory usage optimization"
+        },
+        "batch_size_scaling": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically scale batch size based on GPU memory"
+        },
+        "gradient_accumulation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable gradient accumulation for large effective batch sizes"
+        },
+        "accumulation_steps": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32,
+          "default": 4,
+          "description": "Number of steps for gradient accumulation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "monitoring": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable GPU monitoring"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["utilization", "memory", "temperature", "power", "clock_speed"]
+          },
+          "default": ["utilization", "memory", "temperature"],
+          "description": "GPU metrics to monitor"
+        },
+        "sampling_interval": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300,
+          "default": 10,
+          "description": "Monitoring sampling interval in seconds"
+        },
+        "alert_thresholds": {
+          "type": "object",
+          "properties": {
+            "memory_usage": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 1.0,
+              "default": 0.9,
+              "description": "Memory usage threshold for alerts"
+            },
+            "temperature": {
+              "type": "integer",
+              "minimum": 60,
+              "maximum": 100,
+              "default": 85,
+              "description": "Temperature threshold in Celsius"
+            },
+            "utilization": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "default": 0.95,
+              "description": "GPU utilization threshold"
+            }
+          },
+          "additionalProperties": false
+        },
+        "log_metrics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Log GPU metrics to file"
+        },
+        "metrics_file": {
+          "type": "string",
+          "default": "gpu_metrics.log",
+          "description": "File for GPU metrics logging"
+        }
+      },
+      "additionalProperties": false
+    },
+    "hardware_requirements": {
+      "type": "object",
+      "properties": {
+        "min_compute_capability": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+$",
+          "default": "6.0",
+          "description": "Minimum GPU compute capability required"
+        },
+        "min_memory_gb": {
+          "type": "number",
+          "minimum": 2.0,
+          "maximum": 80.0,
+          "default": 4.0,
+          "description": "Minimum GPU memory in GB"
+        },
+        "recommended_memory_gb": {
+          "type": "number",
+          "minimum": 4.0,
+          "maximum": 80.0,
+          "default": 8.0,
+          "description": "Recommended GPU memory in GB"
+        },
+        "supported_architectures": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["Pascal", "Volta", "Turing", "Ampere", "Ada Lovelace", "Hopper"]
+          },
+          "default": ["Pascal", "Volta", "Turing", "Ampere", "Ada Lovelace"],
+          "description": "Supported GPU architectures"
+        }
+      },
+      "additionalProperties": false
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "benchmarking": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable performance benchmarking on startup"
+        },
+        "warmup_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10,
+          "description": "Number of warmup iterations for benchmarking"
+        },
+        "benchmark_iterations": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 1000,
+          "default": 100,
+          "description": "Number of benchmark iterations"
+        },
+        "expected_speedup": {
+          "type": "object",
+          "properties": {
+            "training": {
+              "type": "number",
+              "minimum": 1.0,
+              "maximum": 100.0,
+              "default": 5.0,
+              "description": "Expected training speedup vs CPU"
+            },
+            "inference": {
+              "type": "number",
+              "minimum": 1.0,
+              "maximum": 100.0,
+              "default": 10.0,
+              "description": "Expected inference speedup vs CPU"
+            },
+            "data_processing": {
+              "type": "number",
+              "minimum": 1.0,
+              "maximum": 100.0,
+              "default": 20.0,
+              "description": "Expected data processing speedup vs CPU"
+            }
+          },
+          "additionalProperties": false
+        },
+        "performance_targets": {
+          "type": "object",
+          "properties": {
+            "training_time_per_epoch_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 60000,
+              "default": 5000,
+              "description": "Target training time per epoch in milliseconds"
+            },
+            "inference_time_ms": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 100,
+              "description": "Target inference time in milliseconds"
+            },
+            "throughput_samples_per_second": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 10000,
+              "default": 1000,
+              "description": "Target throughput in samples per second"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "debugging": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable GPU debugging mode"
+        },
+        "synchronize_cuda": {
+          "type": "boolean",
+          "default": false,
+          "description": "Synchronize CUDA operations for debugging"
+        },
+        "detect_anomaly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable PyTorch anomaly detection"
+        },
+        "print_memory_usage": {
+          "type": "boolean",
+          "default": false,
+          "description": "Print detailed memory usage information"
+        },
+        "save_memory_snapshots": {
+          "type": "boolean",
+          "default": false,
+          "description": "Save memory snapshots for debugging"
+        },
+        "profiling": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable CUDA profiling"
+        },
+        "profiler_output_dir": {
+          "type": "string",
+          "default": "./profiler_output",
+          "description": "Directory for profiler output files"
+        }
+      },
+      "additionalProperties": false
+    },
+    "compatibility": {
+      "type": "object",
+      "properties": {
+        "check_compatibility": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check GPU compatibility on startup"
+        },
+        "compatibility_warnings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show compatibility warnings"
+        },
+        "strict_version_check": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enforce strict version compatibility"
+        },
+        "driver_version_check": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check GPU driver version compatibility"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["version", "gpu"],
+  "additionalProperties": false
+}

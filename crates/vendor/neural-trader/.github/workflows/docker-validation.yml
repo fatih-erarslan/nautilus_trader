@@ -1,0 +1,260 @@
+name: Docker Validation
+
+on:
+  push:
+    branches: [ main, develop, rust-port ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  RUST_VERSION: 1.75
+  NODE_VERSION: 18
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # =============================================================================
+  # Docker Build and Test - Multi-platform
+  # =============================================================================
+  docker-build:
+    name: Docker Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux/amd64
+          - os: ubuntu-latest
+            platform: linux/arm64
+          - os: macos-latest
+            platform: darwin/amd64
+          - os: macos-latest
+            platform: darwin/arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.platform }}-${{ hashFiles('**/Cargo.lock', '**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.platform }}-
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.validation
+          target: testing
+          platforms: ${{ matrix.platform }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          tags: neural-trader:${{ matrix.platform }}-${{ github.sha }}
+          outputs: type=docker,dest=/tmp/neural-trader-${{ matrix.platform }}.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-image-${{ matrix.platform }}
+          path: /tmp/neural-trader-${{ matrix.platform }}.tar
+          retention-days: 1
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  # =============================================================================
+  # Run Test Suite in Docker
+  # =============================================================================
+  docker-test:
+    name: Docker Test Suite
+    needs: docker-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image-linux/amd64
+
+      - name: Load Docker image
+        run: docker load --input neural-trader-linux/amd64.tar
+
+      - name: Run test suite
+        run: |
+          chmod +x ./scripts/docker-test.sh
+          ./scripts/docker-test.sh --skip-validation
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
+
+  # =============================================================================
+  # MCP 2025-11 Validation
+  # =============================================================================
+  mcp-validation:
+    name: MCP 2025-11 Compliance
+    needs: docker-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image-linux/amd64
+
+      - name: Load Docker image
+        run: docker load --input neural-trader-linux/amd64.tar
+
+      - name: Start MCP server
+        run: docker-compose up -d mcp-server
+
+      - name: Wait for server
+        run: |
+          timeout 60 bash -c 'until docker-compose ps mcp-server | grep -q healthy; do sleep 2; done'
+
+      - name: Run validation
+        run: |
+          chmod +x ./scripts/validate-docker.sh
+          docker-compose run --rm validation
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-report
+          path: reports/
+          retention-days: 30
+
+      - name: Check validation results
+        run: |
+          if [ ! -f "reports/results.txt" ]; then
+            echo "Validation failed - no results file"
+            exit 1
+          fi
+
+          if grep -q "FAILED" reports/results.txt; then
+            echo "Validation checks failed"
+            cat reports/results.txt
+            exit 1
+          fi
+
+          echo "All validation checks passed!"
+
+  # =============================================================================
+  # Performance Benchmarks
+  # =============================================================================
+  performance-benchmark:
+    name: Performance Benchmarks
+    needs: docker-build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image-linux/amd64
+
+      - name: Load Docker image
+        run: docker load --input neural-trader-linux/amd64.tar
+
+      - name: Run benchmarks
+        run: docker-compose run --rm benchmark
+
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: benchmark-results/
+          retention-days: 30
+
+  # =============================================================================
+  # Security Scan
+  # =============================================================================
+  security-scan:
+    name: Security Scan
+    needs: docker-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image-linux/amd64
+
+      - name: Load Docker image
+        run: docker load --input neural-trader-linux/amd64.tar
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'neural-trader:linux/amd64-${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # =============================================================================
+  # Final Status Check
+  # =============================================================================
+  validation-status:
+    name: Validation Status
+    needs: [docker-test, mcp-validation, performance-benchmark, security-scan]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check job results
+        run: |
+          if [ "${{ needs.docker-test.result }}" != "success" ]; then
+            echo "Docker tests failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.mcp-validation.result }}" != "success" ]; then
+            echo "MCP validation failed"
+            exit 1
+          fi
+
+          echo "✅ All validation checks passed!"
+
+      - name: Post summary
+        run: |
+          echo "## Docker Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Docker build: ${{ needs.docker-build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Test suite: ${{ needs.docker-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ MCP validation: ${{ needs.mcp-validation.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Performance: ${{ needs.performance-benchmark.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Security: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY

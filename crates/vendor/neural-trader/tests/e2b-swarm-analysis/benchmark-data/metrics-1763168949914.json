@@ -1,0 +1,5261 @@
+{
+  "operations": [
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1801.08702,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:48:52.947Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1130.1872625,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:48:55.208Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 2174.4139029999997,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:48:57.382Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1694.9983890000003,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:48:59.326Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 981.6454089999997,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:49:01.289Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 2658.9918500000003,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:49:03.948Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1295.4717359999995,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:49:05.672Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1322.2186710000005,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:49:08.316Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 2848.024111999999,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:49:11.164Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1160.3930440000004,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:49:12.655Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 690.2631964999982,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:49:14.036Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 2388.1559039999993,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:49:16.424Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1266.4976439999991,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:49:17.893Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 933.7885920000008,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:49:19.761Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 2436.113720000001,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:49:22.197Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 1680.8677570000036,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:49:24.220Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 530.4470913333329,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:49:25.812Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 2891.972059000007,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:49:28.704Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 1755.603986000002,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:49:30.804Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 764.1931486666703,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:49:33.097Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 2572.9986779999963,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:49:35.670Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 1906.223801,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:49:37.969Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 686.5044713333336,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:49:40.028Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 2514.429479999999,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:49:42.543Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 1439.7384139999995,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:49:44.388Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 974.8752923333353,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:49:47.313Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 2115.3219249999966,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:49:49.428Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 1079.6296890000012,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:49:50.786Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 923.3540243333337,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:49:53.556Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 1546.861524,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:49:55.103Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 1668.831865,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:49:57.148Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 833.1513939999955,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:49:59.647Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 2597.5038449999993,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:50:02.245Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 1722.7596699999995,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:50:04.277Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 879.6609199999997,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:50:06.916Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 1083.0129330000054,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:50:07.999Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 510.2647159999906,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:50:08.864Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 967.6621339999983,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:50:11.767Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 1363.523039000007,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:50:13.130Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 1692.7414900000003,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:50:15.284Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 1252.3274296666689,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:50:19.041Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 2051.9690439999977,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:50:21.093Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 956.0468089999922,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:50:22.433Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 1276.3276473333292,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:50:26.262Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 2741.978130999996,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:50:29.004Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 532.2602689999912,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:50:29.744Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1192.7271353333392,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:50:33.322Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 2514.8009429999947,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:50:35.837Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1857.0036030000047,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:50:38.013Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1056.3519669999998,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:50:41.182Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1027.8491709999944,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:50:42.210Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 694.7088340000046,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:50:43.295Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 852.670491333333,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:50:45.853Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1214.9572409999964,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:50:47.068Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 522.2469170000113,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:50:47.903Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1051.337270999992,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:50:51.057Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1228.029899000001,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:50:52.285Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 1768.7304830000066,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:50:54.351Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 864.990214999998,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:50:56.946Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 2659.984148000003,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:50:59.606Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 1916.1852209999925,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:51:01.760Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 978.6622659999945,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:51:04.696Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 2426.977499999979,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:51:07.123Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 536.12062099998,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:51:07.998Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 1000.7370556666574,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:51:11.001Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 1969.9725479999906,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:51:12.971Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 1137.3996050000133,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:51:14.378Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 637.2130706666698,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:51:16.289Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 2802.7339299999876,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:51:19.092Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 1820.7417910000077,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:51:21.402Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 857.6703099999964,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:51:23.975Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 1437.9952159999812,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:51:25.413Z"
+    },
+    {
+      "operation": "init",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 1268.1007879999815,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:51:27.053Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 818.6552940000062,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:51:29.509Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 2837.004993999988,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:51:32.346Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1151.2815399999963,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:51:33.864Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1047.987393000003,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:51:35.960Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 3001.997578999988,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:51:38.962Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1881.1329109999933,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:51:41.264Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 449.00591899998835,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:51:42.162Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1418.9763509999902,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:51:43.581Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 607.5761979999952,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:51:44.531Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 405.3836714999925,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:51:45.342Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 2920.961802999984,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:51:48.263Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 838.2131510000036,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:51:49.358Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 680.3590414999926,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:51:50.719Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1003.4710090000008,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:51:51.723Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1477.227534000005,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:51:53.633Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1379.6084445000015,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:51:56.392Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1834.7663410000096,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:51:58.227Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 776.573212999996,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:51:59.375Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 904.3126810000007,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:52:02.088Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 2141.9879969999893,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:52:04.230Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 1298.9593739999982,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:52:06.049Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 1116.8029663333339,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:52:09.399Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 2578.541032999987,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:52:11.978Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 1874.236281999998,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:52:14.073Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 882.9924573333313,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:52:16.722Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 1187.978935000021,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:52:17.910Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 1592.4447860000073,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:52:19.746Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 521.4936083333354,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:52:21.310Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 2532.621125000005,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:52:23.843Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 592.7633880000212,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:52:24.842Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 721.3733213333375,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:52:27.007Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 1768.081624000013,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:52:28.775Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 691.8256019999972,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:52:29.826Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 1093.324955999987,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:52:33.106Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 2687.2201249999925,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:52:35.793Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 917.2056589999993,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:52:37.120Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 1046.2834110000015,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:52:40.259Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 2579.91719800001,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:52:42.839Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 510.2703969999857,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:52:43.746Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 1201.9922886666707,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:52:47.352Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 2233.9950549999776,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:52:49.586Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 1721.5624700000044,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:52:51.676Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 880.3975986666628,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:52:54.317Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 1626.483137000003,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:52:55.944Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 1060.8127490000043,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:52:57.207Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 962.5779476666648,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:53:00.094Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 1597.2388890000002,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:53:01.692Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1950.9517480000213,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:53:04.037Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 808.9169459999927,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:53:06.463Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 2749.235211000021,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:53:09.213Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1888.9483330000076,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:53:11.306Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1299.996780666678,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:53:15.206Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1132.253115999978,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:53:16.338Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1989.988812000025,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:53:18.730Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 814.6873843333257,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:53:21.174Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 2362.8949910000083,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:53:23.537Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 772.821483000007,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:53:24.789Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 822.0025696666756,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:53:27.255Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1780.961381000001,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:53:29.036Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1073.2738670000108,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:53:30.489Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 680.5869343333179,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:53:32.530Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 1982.2450240000035,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:53:34.513Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 598.8014180000173,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:53:35.457Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 1099.3967686666874,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:53:38.755Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 1329.9689520000247,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:53:40.085Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 821.6878509999951,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:53:41.356Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 992.4364663333205,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:53:44.334Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 2540.9815730000264,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:53:46.875Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 867.9900420000195,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:53:48.080Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 536.0045716666694,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:53:49.688Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 1565.9443109999993,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:53:51.254Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 1238.3774370000465,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:53:52.801Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 792.9901646666889,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:53:55.180Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 1463.9911320000538,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:53:56.644Z"
+    },
+    {
+      "operation": "init",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 610.2110059999977,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:53:57.692Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 774.674328333349,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:54:00.016Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 1914.9470740000252,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:54:01.931Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1972.841162000026,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:54:04.137Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 981.5111040000047,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:54:06.100Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1877.925455999968,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:54:07.978Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 624.4626300000236,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:54:08.819Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 682.8147369999788,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:54:10.184Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1696.3461460000253,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:54:11.881Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1635.2857580000418,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:54:13.906Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1241.015162500029,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:54:16.388Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 2682.937004999956,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:54:19.071Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1010.4651009999798,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:54:20.313Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1368.4994660000084,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:54:23.050Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 2931.9757439999958,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:54:25.982Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1083.187436999986,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:54:27.563Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1236.49784549998,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:54:30.036Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 2131.969271000009,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:54:32.168Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1085.058143000002,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:54:33.712Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 796.6629639999979,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:54:36.102Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 2420.9723419999937,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:54:38.523Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1916.7345270000515,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:54:40.729Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 821.780750666648,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:54:43.194Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 2353.617946000013,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:54:45.548Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 760.3485130000045,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:54:46.612Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 669.3257630000007,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:54:48.620Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1739.9940410000272,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:54:50.360Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1311.3609009999782,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:54:52.094Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1153.3209503333394,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:54:55.554Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1576.9971050000167,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:54:57.131Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1451.8392199999653,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:54:58.809Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 692.5236886666584,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:55:00.886Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 1330.3411049999995,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:55:02.217Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1952.9518149999785,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:55:04.651Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 821.000606333313,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:55:07.114Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1589.9665389999864,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:55:08.704Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1539.9876180000138,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:55:10.543Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 931.3412706666859,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:55:13.337Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 2032.942984000023,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:55:15.370Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1711.466809000005,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:55:17.326Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1046.9830513333243,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:55:20.467Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1272.9967610000167,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:55:21.740Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1852.7703770000371,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:55:23.963Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 911.8429410000099,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:55:26.699Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 2630.9822919999715,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:55:29.330Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1505.2272729999968,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:55:31.242Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 1046.6664746666793,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:55:34.382Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 2378.852614000032,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:55:36.761Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1556.90545999998,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:55:38.662Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 690.9589066666862,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:55:40.735Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1452.4602569999988,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:55:42.188Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 539.7080560000031,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:55:43.065Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 951.9247579999695,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:55:45.920Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 2000.196249999979,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:55:47.921Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1071.090858999989,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:55:49.426Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 999.3297103332976,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:55:52.424Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1762.9739450000343,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:55:54.187Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1353.8399860000354,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:55:55.978Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1129.7047353333328,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:55:59.367Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1998.8791760000167,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:56:01.366Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1069.2373979999684,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:56:02.649Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 863.7314083333282,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:56:05.240Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 1581.0035219999845,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:56:06.821Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1007.1803780000191,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:56:08.299Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 848.6646573333225,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:56:10.845Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1395.5576360000414,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:56:12.241Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1020.1596909999498,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:56:13.713Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 806.4503113333291,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:56:16.133Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1079.8300290000043,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:56:17.213Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1534.2461410000105,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:56:19.131Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1053.6773553333478,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:56:22.292Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1640.9784419999924,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:56:23.933Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1333.455270000035,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:56:25.664Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 859.55392299998,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:56:28.243Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 2787.159134000016,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:56:31.030Z"
+    },
+    {
+      "operation": "init",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 541.6874010000029,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:56:31.918Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1078.2102076666586,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:56:35.153Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 1871.9687479999848,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:56:37.025Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 1408.2572609999916,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:56:38.746Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 624.2739674999902,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:56:39.994Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 2959.429044999997,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:56:42.954Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 1304.3904859999893,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:56:44.586Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 830.477793500002,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:56:46.247Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 2788.9416329999804,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:56:49.036Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 1650.4970389999798,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:56:50.963Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 930.918353999994,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:56:52.825Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 2965.135276999965,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:56:55.790Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 1846.2640239999746,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:56:57.850Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 825.7885965000023,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:56:59.502Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 1764.6428470000392,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:57:01.267Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 1240.3916750000208,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:57:02.768Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 606.9974174999807,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 2,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:57:03.982Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 2007.9586030000355,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:57:05.990Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1719.0641139999498,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:57:08.190Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1225.7028366666443,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:57:11.867Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1394.8796529999818,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:57:13.262Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1441.3602390000015,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:57:15.030Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1080.2300100000186,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:57:18.270Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1296.861818000034,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:57:19.567Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 727.8534059999511,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:57:20.641Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 764.0754363333302,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:57:22.934Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1763.0434870000463,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:57:24.697Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 854.7381799999857,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:57:25.918Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 994.9914793333155,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:57:28.903Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 2886.98766600003,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:57:31.790Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 564.4056219999911,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:57:32.678Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 772.3239376666606,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:57:34.995Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 1477.0000399999553,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:57:36.472Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 566.7440310000675,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:57:37.521Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 825.5296196666701,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:57:39.998Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 1121.0227200000081,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:57:41.119Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 824.1863209999865,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:57:42.328Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 899.3349789999969,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:57:45.026Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 2255.967995000072,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:57:47.282Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 1974.2931899999967,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:57:49.658Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 922.6632643333093,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:57:52.426Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 2950.977841999964,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:57:55.377Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 1218.250063000014,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:57:56.956Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 853.6340243332864,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:57:59.517Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 1946.0130559999961,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:58:01.463Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 664.4298870000057,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:58:02.359Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 942.6326573333548,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:58:05.187Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 1751.9861360000214,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:58:06.939Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 1731.9869169999147,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:58:09.133Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 582.394376333376,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:58:10.880Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 2040.699845999945,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:58:12.921Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 1588.9856020000298,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:58:14.857Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 991.2430293333406,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:58:17.830Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 1075.2080100000603,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:58:18.906Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 1357.4887550000567,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:58:20.465Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 841.1970629999802,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:58:22.989Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 1710.9711349999998,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:58:24.700Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 1598.0014290000545,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:58:26.592Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 652.3991990000164,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:58:28.549Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 1464.7347169999266,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:58:30.014Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 663.2715489999391,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:58:31.099Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 716.8811560000371,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:58:33.249Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 2519.3374580000527,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:58:35.769Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 841.2904179999605,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:58:37.028Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 813.6270813333103,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:58:39.469Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1895.6509340000339,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 0
+      },
+      "timestamp": "2025-11-15T00:58:41.364Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 573.7437829999253,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:58:42.207Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 958.5245026666283,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:58:45.082Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1474.4429329999257,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 1
+      },
+      "timestamp": "2025-11-15T00:58:46.557Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 727.7973060000222,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:58:47.596Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1192.8641429999843,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:58:51.175Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1294.4327370000537,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 2
+      },
+      "timestamp": "2025-11-15T00:58:52.469Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1135.279222000041,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:58:53.828Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1185.90068333336,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:58:57.386Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 2300.4499960000394,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 3
+      },
+      "timestamp": "2025-11-15T00:58:59.686Z"
+    },
+    {
+      "operation": "init",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1844.2261870000511,
+      "success": true,
+      "metadata": {
+        "strategy": "balanced",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:59:01.776Z"
+    },
+    {
+      "operation": "deploy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1188.2539696666256,
+      "success": true,
+      "metadata": {
+        "agentsDeployed": 3,
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:59:05.341Z"
+    },
+    {
+      "operation": "strategy",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 1254.9808960000519,
+      "success": true,
+      "metadata": {
+        "coordination": "parallel",
+        "iteration": 4
+      },
+      "timestamp": "2025-11-15T00:59:06.596Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 5043.541345999925,
+      "success": true,
+      "metadata": {
+        "from": 2,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T00:59:16.406Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 4586.011356999981,
+      "success": true,
+      "metadata": {
+        "from": 2,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T00:59:24.565Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 3720.0153299999656,
+      "success": true,
+      "metadata": {
+        "from": 2,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T00:59:30.892Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 3745.406010000035,
+      "success": true,
+      "metadata": {
+        "from": 2,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T00:59:36.837Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 6171.518094000057,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T00:59:50.769Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 7429.841874000034,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:00:03.431Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 7112.057099000085,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:00:16.351Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 5987.757225999958,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:00:28.036Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "mesh",
+      "agentCount": 15,
+      "duration": 8057.046534999972,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 15,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:00:47.340Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "hierarchical",
+      "agentCount": 15,
+      "duration": 7432.8817360000685,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 15,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:01:05.959Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "ring",
+      "agentCount": 15,
+      "duration": 7017.764673999976,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 15,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:01:24.571Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "star",
+      "agentCount": 15,
+      "duration": 6571.034566999995,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 15,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:01:44.583Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "mesh",
+      "agentCount": 20,
+      "duration": 7707.216363999993,
+      "success": true,
+      "metadata": {
+        "from": 15,
+        "to": 20,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:02:08.294Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "hierarchical",
+      "agentCount": 20,
+      "duration": 6689.983188000042,
+      "success": true,
+      "metadata": {
+        "from": 15,
+        "to": 20,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:02:31.188Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "ring",
+      "agentCount": 20,
+      "duration": 6978.121148000006,
+      "success": true,
+      "metadata": {
+        "from": 15,
+        "to": 20,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:02:55.177Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "star",
+      "agentCount": 20,
+      "duration": 7852.738829000038,
+      "success": true,
+      "metadata": {
+        "from": 15,
+        "to": 20,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:03:17.535Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "mesh",
+      "agentCount": 10,
+      "duration": 5003.798124999972,
+      "success": true,
+      "metadata": {
+        "from": 20,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:03:40.967Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "hierarchical",
+      "agentCount": 10,
+      "duration": 5000.214520999929,
+      "success": true,
+      "metadata": {
+        "from": 20,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:04:08.678Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "ring",
+      "agentCount": 10,
+      "duration": 5005.153515000013,
+      "success": true,
+      "metadata": {
+        "from": 20,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:04:32.877Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "star",
+      "agentCount": 10,
+      "duration": 5005.1375640000915,
+      "success": true,
+      "metadata": {
+        "from": 20,
+        "to": 10,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:04:55.178Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "mesh",
+      "agentCount": 5,
+      "duration": 2501.7721209999872,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:05:08.769Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "hierarchical",
+      "agentCount": 5,
+      "duration": 2502.620075999992,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:05:21.360Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "ring",
+      "agentCount": 5,
+      "duration": 2502.6138829999836,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:05:34.821Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "star",
+      "agentCount": 5,
+      "duration": 2501.994655000046,
+      "success": true,
+      "metadata": {
+        "from": 10,
+        "to": 5,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:05:49.596Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "mesh",
+      "agentCount": 2,
+      "duration": 1501.606175999972,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 2,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:05:57.342Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "hierarchical",
+      "agentCount": 2,
+      "duration": 1501.6567789999535,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 2,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:06:04.647Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "ring",
+      "agentCount": 2,
+      "duration": 1501.6448800000362,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 2,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:06:10.258Z"
+    },
+    {
+      "operation": "scale",
+      "topology": "star",
+      "agentCount": 2,
+      "duration": 1501.651818000013,
+      "success": true,
+      "metadata": {
+        "from": 5,
+        "to": 2,
+        "mode": "gradual"
+      },
+      "timestamp": "2025-11-15T01:06:16.477Z"
+    }
+  ],
+  "topology": {
+    "mesh": [
+      {
+        "agentCount": 2,
+        "init": {
+          "times": [
+            1801.08702,
+            1694.9983890000003,
+            1295.4717359999995,
+            1160.3930440000004,
+            1266.4976439999991
+          ],
+          "avg": 1443.6895665999998
+        },
+        "deploy": {
+          "times": [
+            1130.1872625,
+            981.6454089999997,
+            1322.2186710000005,
+            690.2631964999982,
+            933.7885920000008
+          ],
+          "avg": 1011.6206262
+        },
+        "strategy": {
+          "times": [
+            2174.4139029999997,
+            2658.9918500000003,
+            2848.024111999999,
+            2388.1559039999993,
+            2436.113720000001
+          ],
+          "avg": 2501.1398977999997
+        },
+        "health": {
+          "times": [
+            147.83235199999945,
+            327.3795449999998,
+            230.47321100000045,
+            102.33994000000166,
+            241.82110199999806
+          ],
+          "avg": 209.96922999999987
+        },
+        "communication": {
+          "latency": 314.9538449999998,
+          "overhead": 1.5
+        },
+        "timestamp": "2025-11-15T00:49:22.539Z"
+      },
+      {
+        "agentCount": 5,
+        "init": {
+          "times": [
+            1680.8677570000036,
+            1755.603986000002,
+            1906.223801,
+            1439.7384139999995,
+            1079.6296890000012
+          ],
+          "avg": 1572.4127294000014
+        },
+        "deploy": {
+          "times": [
+            530.4470913333329,
+            764.1931486666703,
+            686.5044713333336,
+            974.8752923333353,
+            923.3540243333337
+          ],
+          "avg": 775.8748056000011
+        },
+        "strategy": {
+          "times": [
+            2891.972059000007,
+            2572.9986779999963,
+            2514.429479999999,
+            2115.3219249999966,
+            1546.861524
+          ],
+          "avg": 2328.3167332
+        },
+        "health": {
+          "times": [
+            244.4532760000002,
+            292.46614399999817,
+            305.5393320000003,
+            177.46979699999793,
+            275.4966460000069
+          ],
+          "avg": 259.0850390000007
+        },
+        "communication": {
+          "latency": 388.627558500001,
+          "overhead": 1.5
+        },
+        "timestamp": "2025-11-15T00:49:55.479Z"
+      },
+      {
+        "agentCount": 10,
+        "init": {
+          "times": [
+            1668.831865,
+            1722.7596699999995,
+            510.2647159999906,
+            1692.7414900000003,
+            956.0468089999922
+          ],
+          "avg": 1310.1289099999965
+        },
+        "deploy": {
+          "times": [
+            833.1513939999955,
+            879.6609199999997,
+            967.6621339999983,
+            1252.3274296666689,
+            1276.3276473333292
+          ],
+          "avg": 1041.8259049999983
+        },
+        "strategy": {
+          "times": [
+            2597.5038449999993,
+            1083.0129330000054,
+            1363.523039000007,
+            2051.9690439999977,
+            2741.978130999996
+          ],
+          "avg": 1967.597398400001
+        },
+        "health": {
+          "times": [
+            208.39693600000464,
+            254.44006900000386,
+            360.45662399999856,
+            283.6022789999988,
+            107.27616700000362
+          ],
+          "avg": 242.8344150000019
+        },
+        "communication": {
+          "latency": 364.2516225000029,
+          "overhead": 1.5
+        },
+        "timestamp": "2025-11-15T00:50:29.211Z"
+      },
+      {
+        "agentCount": 15,
+        "init": {
+          "times": [
+            532.2602689999912,
+            1857.0036030000047,
+            694.7088340000046,
+            522.2469170000113,
+            1768.7304830000066
+          ],
+          "avg": 1074.9900212000036
+        },
+        "deploy": {
+          "times": [
+            1192.7271353333392,
+            1056.3519669999998,
+            852.670491333333,
+            1051.337270999992,
+            864.990214999998
+          ],
+          "avg": 1003.6154159333324
+        },
+        "strategy": {
+          "times": [
+            2514.8009429999947,
+            1027.8491709999944,
+            1214.9572409999964,
+            1228.029899000001,
+            2659.984148000003
+          ],
+          "avg": 1729.124280399998
+        },
+        "health": {
+          "times": [
+            213.40459599999303,
+            290.01629899999534,
+            212.4089709999971,
+            196.9728000000032,
+            136.9948790000053
+          ],
+          "avg": 209.9595089999988
+        },
+        "communication": {
+          "latency": 314.9392634999982,
+          "overhead": 1.5
+        },
+        "timestamp": "2025-11-15T00:50:59.843Z"
+      },
+      {
+        "agentCount": 20,
+        "init": {
+          "times": [
+            1916.1852209999925,
+            536.12062099998,
+            1137.3996050000133,
+            1820.7417910000077,
+            1268.1007879999815
+          ],
+          "avg": 1335.709605199995
+        },
+        "deploy": {
+          "times": [
+            978.6622659999945,
+            1000.7370556666574,
+            637.2130706666698,
+            857.6703099999964,
+            818.6552940000062
+          ],
+          "avg": 858.5875992666648
+        },
+        "strategy": {
+          "times": [
+            2426.977499999979,
+            1969.9725479999906,
+            2802.7339299999876,
+            1437.9952159999812,
+            2837.004993999988
+          ],
+          "avg": 2294.936837599985
+        },
+        "health": {
+          "times": [
+            239.39791699999478,
+            169.35370999999577,
+            388.5782600000093,
+            271.4621890000126,
+            265.4298290000006
+          ],
+          "avg": 266.8443810000026
+        },
+        "communication": {
+          "latency": 400.2665715000039,
+          "overhead": 1.5
+        },
+        "timestamp": "2025-11-15T00:51:32.712Z"
+      }
+    ],
+    "hierarchical": [
+      {
+        "agentCount": 2,
+        "init": {
+          "times": [
+            1151.2815399999963,
+            1881.1329109999933,
+            607.5761979999952,
+            838.2131510000036,
+            1477.227534000005
+          ],
+          "avg": 1191.0862667999986
+        },
+        "deploy": {
+          "times": [
+            1047.987393000003,
+            449.00591899998835,
+            405.3836714999925,
+            680.3590414999926,
+            1379.6084445000015
+          ],
+          "avg": 792.4688938999956
+        },
+        "strategy": {
+          "times": [
+            3001.997578999988,
+            1418.9763509999902,
+            2920.961802999984,
+            1003.4710090000008,
+            1834.7663410000096
+          ],
+          "avg": 2036.0346165999945
+        },
+        "health": {
+          "times": [
+            320.6041029999906,
+            242.4105200000049,
+            157.3208100000047,
+            332.51088500002516,
+            269.42227799998363
+          ],
+          "avg": 264.4537192000018
+        },
+        "communication": {
+          "latency": 290.89909112000197,
+          "overhead": 1.1
+        },
+        "timestamp": "2025-11-15T00:51:58.598Z"
+      },
+      {
+        "agentCount": 5,
+        "init": {
+          "times": [
+            776.573212999996,
+            1298.9593739999982,
+            1874.236281999998,
+            1592.4447860000073,
+            592.7633880000212
+          ],
+          "avg": 1226.995408600004
+        },
+        "deploy": {
+          "times": [
+            904.3126810000007,
+            1116.8029663333339,
+            882.9924573333313,
+            521.4936083333354,
+            721.3733213333375
+          ],
+          "avg": 829.3950068666678
+        },
+        "strategy": {
+          "times": [
+            2141.9879969999893,
+            2578.541032999987,
+            1187.978935000021,
+            2532.621125000005,
+            1768.081624000013
+          ],
+          "avg": 2041.842142800003
+        },
+        "health": {
+          "times": [
+            394.5622699999949,
+            120.2999729999865,
+            143.2973720000009,
+            304.49552699999185,
+            256.42655500001274
+          ],
+          "avg": 243.8163393999974
+        },
+        "communication": {
+          "latency": 268.19797333999713,
+          "overhead": 1.1
+        },
+        "timestamp": "2025-11-15T00:52:29.134Z"
+      },
+      {
+        "agentCount": 10,
+        "init": {
+          "times": [
+            691.8256019999972,
+            917.2056589999993,
+            510.2703969999857,
+            1721.5624700000044,
+            1060.8127490000043
+          ],
+          "avg": 980.3353753999982
+        },
+        "deploy": {
+          "times": [
+            1093.324955999987,
+            1046.2834110000015,
+            1201.9922886666707,
+            880.3975986666628,
+            962.5779476666648
+          ],
+          "avg": 1036.9152403999974
+        },
+        "strategy": {
+          "times": [
+            2687.2201249999925,
+            2579.91719800001,
+            2233.9950549999776,
+            1626.483137000003,
+            1597.2388890000002
+          ],
+          "avg": 2144.970880799997
+        },
+        "health": {
+          "times": [
+            309.47034600001643,
+            296.464994000009,
+            268.44098000001395,
+            101.90680299999076,
+            293.46593599999323
+          ],
+          "avg": 253.94981180000468
+        },
+        "communication": {
+          "latency": 279.3447929800052,
+          "overhead": 1.1
+        },
+        "timestamp": "2025-11-15T00:53:02.085Z"
+      },
+      {
+        "agentCount": 15,
+        "init": {
+          "times": [
+            1950.9517480000213,
+            1888.9483330000076,
+            1989.988812000025,
+            772.821483000007,
+            1073.2738670000108
+          ],
+          "avg": 1535.1968486000144
+        },
+        "deploy": {
+          "times": [
+            808.9169459999927,
+            1299.996780666678,
+            814.6873843333257,
+            822.0025696666756,
+            680.5869343333179
+          ],
+          "avg": 885.238122999998
+        },
+        "strategy": {
+          "times": [
+            2749.235211000021,
+            1132.253115999978,
+            2362.8949910000083,
+            1780.961381000001,
+            1982.2450240000035
+          ],
+          "avg": 2001.5179446000025
+        },
+        "health": {
+          "times": [
+            101.97426899999846,
+            301.46558199997526,
+            375.5335860000341,
+            279.43851999996696,
+            244.42019400000572
+          ],
+          "avg": 260.5664301999961
+        },
+        "communication": {
+          "latency": 286.6230732199957,
+          "overhead": 1.1
+        },
+        "timestamp": "2025-11-15T00:53:34.857Z"
+      },
+      {
+        "agentCount": 20,
+        "init": {
+          "times": [
+            598.8014180000173,
+            821.6878509999951,
+            867.9900420000195,
+            1238.3774370000465,
+            610.2110059999977
+          ],
+          "avg": 827.4135508000152
+        },
+        "deploy": {
+          "times": [
+            1099.3967686666874,
+            992.4364663333205,
+            536.0045716666694,
+            792.9901646666889,
+            774.674328333349
+          ],
+          "avg": 839.1004599333431
+        },
+        "strategy": {
+          "times": [
+            1329.9689520000247,
+            2540.9815730000264,
+            1565.9443109999993,
+            1463.9911320000538,
+            1914.9470740000252
+          ],
+          "avg": 1763.1666084000258
+        },
+        "health": {
+          "times": [
+            346.50200400000904,
+            233.39637399994535,
+            208.378721999994,
+            337.51893600000767,
+            129.2994310000213
+          ],
+          "avg": 251.01909339999548
+        },
+        "communication": {
+          "latency": 276.12100273999505,
+          "overhead": 1.1
+        },
+        "timestamp": "2025-11-15T00:54:02.164Z"
+      }
+    ],
+    "ring": [
+      {
+        "agentCount": 2,
+        "init": {
+          "times": [
+            1972.841162000026,
+            624.4626300000236,
+            1635.2857580000418,
+            1010.4651009999798,
+            1083.187436999986
+          ],
+          "avg": 1265.2484176000114
+        },
+        "deploy": {
+          "times": [
+            981.5111040000047,
+            682.8147369999788,
+            1241.015162500029,
+            1368.4994660000084,
+            1236.49784549998
+          ],
+          "avg": 1102.0676630000003
+        },
+        "strategy": {
+          "times": [
+            1877.925455999968,
+            1696.3461460000253,
+            2682.937004999956,
+            2931.9757439999958,
+            2131.969271000009
+          ],
+          "avg": 2264.230724399991
+        },
+        "health": {
+          "times": [
+            116.28009299997939,
+            289.4438519999967,
+            131.29380699998,
+            397.55920399999013,
+            358.5072919999948
+          ],
+          "avg": 258.6168495999882
+        },
+        "communication": {
+          "latency": 258.6168495999882,
+          "overhead": 1
+        },
+        "timestamp": "2025-11-15T00:54:32.626Z"
+      },
+      {
+        "agentCount": 5,
+        "init": {
+          "times": [
+            1085.058143000002,
+            1916.7345270000515,
+            760.3485130000045,
+            1311.3609009999782,
+            1451.8392199999653
+          ],
+          "avg": 1305.0682608000002
+        },
+        "deploy": {
+          "times": [
+            796.6629639999979,
+            821.780750666648,
+            669.3257630000007,
+            1153.3209503333394,
+            692.5236886666584
+          ],
+          "avg": 826.7228233333287
+        },
+        "strategy": {
+          "times": [
+            2420.9723419999937,
+            2353.617946000013,
+            1739.9940410000272,
+            1576.9971050000167,
+            1330.3411049999995
+          ],
+          "avg": 1884.38450780001
+        },
+        "health": {
+          "times": [
+            189.03193499997724,
+            202.35867499996675,
+            320.4797590000089,
+            125.99111599999014,
+            380.546474999981
+          ],
+          "avg": 243.68159199998482
+        },
+        "communication": {
+          "latency": 243.68159199998482,
+          "overhead": 1
+        },
+        "timestamp": "2025-11-15T00:55:02.698Z"
+      },
+      {
+        "agentCount": 10,
+        "init": {
+          "times": [
+            1952.9518149999785,
+            1539.9876180000138,
+            1711.466809000005,
+            1852.7703770000371,
+            1505.2272729999968
+          ],
+          "avg": 1712.4807784000063
+        },
+        "deploy": {
+          "times": [
+            821.000606333313,
+            931.3412706666859,
+            1046.9830513333243,
+            911.8429410000099,
+            1046.6664746666793
+          ],
+          "avg": 951.5668688000026
+        },
+        "strategy": {
+          "times": [
+            1589.9665389999864,
+            2032.942984000023,
+            1272.9967610000167,
+            2630.9822919999715,
+            2378.852614000032
+          ],
+          "avg": 1981.148238000006
+        },
+        "health": {
+          "times": [
+            198.83002100000158,
+            144.30350699997507,
+            270.42480600002455,
+            306.5202590000117,
+            244.40487600001507
+          ],
+          "avg": 232.8966938000056
+        },
+        "communication": {
+          "latency": 232.8966938000056,
+          "overhead": 1
+        },
+        "timestamp": "2025-11-15T00:55:37.105Z"
+      },
+      {
+        "agentCount": 15,
+        "init": {
+          "times": [
+            1556.90545999998,
+            539.7080560000031,
+            1071.090858999989,
+            1353.8399860000354,
+            1069.2373979999684
+          ],
+          "avg": 1118.1563517999953
+        },
+        "deploy": {
+          "times": [
+            690.9589066666862,
+            951.9247579999695,
+            999.3297103332976,
+            1129.7047353333328,
+            863.7314083333282
+          ],
+          "avg": 927.1299037333229
+        },
+        "strategy": {
+          "times": [
+            1452.4602569999988,
+            2000.196249999979,
+            1762.9739450000343,
+            1998.8791760000167,
+            1581.0035219999845
+          ],
+          "avg": 1759.1026300000026
+        },
+        "health": {
+          "times": [
+            237.026017999975,
+            333.5951360000181,
+            334.32409599999664,
+            113.26823200000217,
+            370.53844499995466
+          ],
+          "avg": 277.75038539998934
+        },
+        "communication": {
+          "latency": 277.75038539998934,
+          "overhead": 1
+        },
+        "timestamp": "2025-11-15T00:56:07.292Z"
+      },
+      {
+        "agentCount": 20,
+        "init": {
+          "times": [
+            1007.1803780000191,
+            1020.1596909999498,
+            1534.2461410000105,
+            1333.455270000035,
+            541.6874010000029
+          ],
+          "avg": 1087.3457762000035
+        },
+        "deploy": {
+          "times": [
+            848.6646573333225,
+            806.4503113333291,
+            1053.6773553333478,
+            859.55392299998,
+            1078.2102076666586
+          ],
+          "avg": 929.3112909333274
+        },
+        "strategy": {
+          "times": [
+            1395.5576360000414,
+            1079.8300290000043,
+            1640.9784419999924,
+            2787.159134000016,
+            1871.9687479999848
+          ],
+          "avg": 1755.0987978000078
+        },
+        "health": {
+          "times": [
+            352.53189799998654,
+            283.45930200000294,
+            297.4382769999793,
+            246.41385700000683,
+            212.36101699998835
+          ],
+          "avg": 278.4408701999928
+        },
+        "communication": {
+          "latency": 278.4408701999928,
+          "overhead": 1
+        },
+        "timestamp": "2025-11-15T00:56:37.337Z"
+      }
+    ],
+    "star": [
+      {
+        "agentCount": 2,
+        "init": {
+          "times": [
+            1408.2572609999916,
+            1304.3904859999893,
+            1650.4970389999798,
+            1846.2640239999746,
+            1240.3916750000208
+          ],
+          "avg": 1489.9600969999913
+        },
+        "deploy": {
+          "times": [
+            624.2739674999902,
+            830.477793500002,
+            930.918353999994,
+            825.7885965000023,
+            606.9974174999807
+          ],
+          "avg": 763.6912257999938
+        },
+        "strategy": {
+          "times": [
+            2959.429044999997,
+            2788.9416329999804,
+            2965.135276999965,
+            1764.6428470000392,
+            2007.9586030000355
+          ],
+          "avg": 2497.221481000003
+        },
+        "health": {
+          "times": [
+            227.38193600001978,
+            176.30737600004068,
+            114.24489400000311,
+            160.34026299999095,
+            380.5297540000174
+          ],
+          "avg": 211.7608446000144
+        },
+        "communication": {
+          "latency": 254.11301352001726,
+          "overhead": 1.2
+        },
+        "timestamp": "2025-11-15T00:57:06.470Z"
+      },
+      {
+        "agentCount": 5,
+        "init": {
+          "times": [
+            1719.0641139999498,
+            1441.3602390000015,
+            727.8534059999511,
+            854.7381799999857,
+            564.4056219999911
+          ],
+          "avg": 1061.4843121999759
+        },
+        "deploy": {
+          "times": [
+            1225.7028366666443,
+            1080.2300100000186,
+            764.0754363333302,
+            994.9914793333155,
+            772.3239376666606
+          ],
+          "avg": 967.464739999994
+        },
+        "strategy": {
+          "times": [
+            1394.8796529999818,
+            1296.861818000034,
+            1763.0434870000463,
+            2886.98766600003,
+            1477.0000399999553
+          ],
+          "avg": 1763.7545328000094
+        },
+        "health": {
+          "times": [
+            226.39031099999556,
+            246.03280899999663,
+            265.41683800000465,
+            223.3503469999996,
+            382.5198500000406
+          ],
+          "avg": 268.7420310000074
+        },
+        "communication": {
+          "latency": 322.49043720000884,
+          "overhead": 1.2
+        },
+        "timestamp": "2025-11-15T00:57:36.954Z"
+      },
+      {
+        "agentCount": 10,
+        "init": {
+          "times": [
+            566.7440310000675,
+            824.1863209999865,
+            1974.2931899999967,
+            1218.250063000014,
+            664.4298870000057
+          ],
+          "avg": 1049.5806984000142
+        },
+        "deploy": {
+          "times": [
+            825.5296196666701,
+            899.3349789999969,
+            922.6632643333093,
+            853.6340243332864,
+            942.6326573333548
+          ],
+          "avg": 888.7589089333235
+        },
+        "strategy": {
+          "times": [
+            1121.0227200000081,
+            2255.967995000072,
+            2950.977841999964,
+            1946.0130559999961,
+            1751.9861360000214
+          ],
+          "avg": 2005.1935498000123
+        },
+        "health": {
+          "times": [
+            283.95936099998653,
+            301.45352900004946,
+            259.97589199990034,
+            131.31256899994332,
+            361.7248260000488
+          ],
+          "avg": 267.6852353999857
+        },
+        "communication": {
+          "latency": 321.2222824799828,
+          "overhead": 1.2
+        },
+        "timestamp": "2025-11-15T00:58:07.401Z"
+      },
+      {
+        "agentCount": 15,
+        "init": {
+          "times": [
+            1731.9869169999147,
+            1588.9856020000298,
+            1357.4887550000567,
+            1598.0014290000545,
+            663.2715489999391
+          ],
+          "avg": 1387.946850399999
+        },
+        "deploy": {
+          "times": [
+            582.394376333376,
+            991.2430293333406,
+            841.1970629999802,
+            652.3991990000164,
+            716.8811560000371
+          ],
+          "avg": 756.8229647333501
+        },
+        "strategy": {
+          "times": [
+            2040.699845999945,
+            1075.2080100000603,
+            1710.9711349999998,
+            1464.7347169999266,
+            2519.3374580000527
+          ],
+          "avg": 1762.1902331999968
+        },
+        "health": {
+          "times": [
+            246.76130100002047,
+            101.25129099993501,
+            191.5849450000096,
+            321.47722600004636,
+            317.44056300004013
+          ],
+          "avg": 235.70306520001031
+        },
+        "communication": {
+          "latency": 282.84367824001237,
+          "overhead": 1.2
+        },
+        "timestamp": "2025-11-15T00:58:36.186Z"
+      },
+      {
+        "agentCount": 20,
+        "init": {
+          "times": [
+            841.2904179999605,
+            573.7437829999253,
+            727.7973060000222,
+            1135.279222000041,
+            1844.2261870000511
+          ],
+          "avg": 1024.4673832
+        },
+        "deploy": {
+          "times": [
+            813.6270813333103,
+            958.5245026666283,
+            1192.8641429999843,
+            1185.90068333336,
+            1188.2539696666256
+          ],
+          "avg": 1067.8340759999817
+        },
+        "strategy": {
+          "times": [
+            1895.6509340000339,
+            1474.4429329999257,
+            1294.4327370000537,
+            2300.4499960000394,
+            1254.9808960000519
+          ],
+          "avg": 1643.9914992000208
+        },
+        "health": {
+          "times": [
+            168.3205120000057,
+            211.34184999996796,
+            123.27943500003312,
+            145.2974089999916,
+            223.37126599997282
+          ],
+          "avg": 174.32209439999423
+        },
+        "communication": {
+          "latency": 209.18651327999308,
+          "overhead": 1.2
+        },
+        "timestamp": "2025-11-15T00:59:06.919Z"
+      }
+    ]
+  },
+  "scaling": {
+    "2-5": [
+      {
+        "topology": "mesh",
+        "time": 5043.541345999925,
+        "throughput": 0.5948201460426858,
+        "from": 2,
+        "to": 5,
+        "timestamp": "2025-11-15T00:59:16.506Z"
+      },
+      {
+        "topology": "hierarchical",
+        "time": 4586.011356999981,
+        "throughput": 0.6541632295395147,
+        "from": 2,
+        "to": 5,
+        "timestamp": "2025-11-15T00:59:24.665Z"
+      },
+      {
+        "topology": "ring",
+        "time": 3720.0153299999656,
+        "throughput": 0.8064482895558465,
+        "from": 2,
+        "to": 5,
+        "timestamp": "2025-11-15T00:59:30.992Z"
+      },
+      {
+        "topology": "star",
+        "time": 3745.406010000035,
+        "throughput": 0.8009812532980829,
+        "from": 2,
+        "to": 5,
+        "timestamp": "2025-11-15T00:59:36.938Z"
+      }
+    ],
+    "5-10": [
+      {
+        "topology": "mesh",
+        "time": 6171.518094000057,
+        "throughput": 0.8101734328318658,
+        "from": 5,
+        "to": 10,
+        "timestamp": "2025-11-15T00:59:50.869Z"
+      },
+      {
+        "topology": "hierarchical",
+        "time": 7429.841874000034,
+        "throughput": 0.6729618321349455,
+        "from": 5,
+        "to": 10,
+        "timestamp": "2025-11-15T01:00:03.531Z"
+      },
+      {
+        "topology": "ring",
+        "time": 7112.057099000085,
+        "throughput": 0.7030314760412949,
+        "from": 5,
+        "to": 10,
+        "timestamp": "2025-11-15T01:00:16.451Z"
+      },
+      {
+        "topology": "star",
+        "time": 5987.757225999958,
+        "throughput": 0.8350371952772346,
+        "from": 5,
+        "to": 10,
+        "timestamp": "2025-11-15T01:00:28.136Z"
+      }
+    ],
+    "10-15": [
+      {
+        "topology": "mesh",
+        "time": 8057.046534999972,
+        "throughput": 0.6205747947811769,
+        "from": 10,
+        "to": 15,
+        "timestamp": "2025-11-15T01:00:47.441Z"
+      },
+      {
+        "topology": "hierarchical",
+        "time": 7432.8817360000685,
+        "throughput": 0.6726866076427983,
+        "from": 10,
+        "to": 15,
+        "timestamp": "2025-11-15T01:01:06.060Z"
+      },
+      {
+        "topology": "ring",
+        "time": 7017.764673999976,
+        "throughput": 0.7124775811483725,
+        "from": 10,
+        "to": 15,
+        "timestamp": "2025-11-15T01:01:24.671Z"
+      },
+      {
+        "topology": "star",
+        "time": 6571.034566999995,
+        "throughput": 0.760915187558167,
+        "from": 10,
+        "to": 15,
+        "timestamp": "2025-11-15T01:01:44.683Z"
+      }
+    ],
+    "15-20": [
+      {
+        "topology": "mesh",
+        "time": 7707.216363999993,
+        "throughput": 0.6487426541383657,
+        "from": 15,
+        "to": 20,
+        "timestamp": "2025-11-15T01:02:08.394Z"
+      },
+      {
+        "topology": "hierarchical",
+        "time": 6689.983188000042,
+        "throughput": 0.7473860336403537,
+        "from": 15,
+        "to": 20,
+        "timestamp": "2025-11-15T01:02:31.289Z"
+      },
+      {
+        "topology": "ring",
+        "time": 6978.121148000006,
+        "throughput": 0.7165252499855275,
+        "from": 15,
+        "to": 20,
+        "timestamp": "2025-11-15T01:02:55.278Z"
+      },
+      {
+        "topology": "star",
+        "time": 7852.738829000038,
+        "throughput": 0.636720526287603,
+        "from": 15,
+        "to": 20,
+        "timestamp": "2025-11-15T01:03:17.635Z"
+      }
+    ],
+    "20-10": [
+      {
+        "topology": "mesh",
+        "time": 5003.798124999972,
+        "throughput": 1.998481903184305,
+        "from": 20,
+        "to": 10,
+        "timestamp": "2025-11-15T01:03:41.067Z"
+      },
+      {
+        "topology": "hierarchical",
+        "time": 5000.214520999929,
+        "throughput": 1.999914195281411,
+        "from": 20,
+        "to": 10,
+        "timestamp": "2025-11-15T01:04:08.778Z"
+      },
+      {
+        "topology": "ring",
+        "time": 5005.153515000013,
+        "throughput": 1.9979407165096663,
+        "from": 20,
+        "to": 10,
+        "timestamp": "2025-11-15T01:04:32.977Z"
+      },
+      {
+        "topology": "star",
+        "time": 5005.1375640000915,
+        "throughput": 1.997947083797639,
+        "from": 20,
+        "to": 10,
+        "timestamp": "2025-11-15T01:04:55.279Z"
+      }
+    ],
+    "10-5": [
+      {
+        "topology": "mesh",
+        "time": 2501.7721209999872,
+        "throughput": 1.9985833074202783,
+        "from": 10,
+        "to": 5,
+        "timestamp": "2025-11-15T01:05:08.869Z"
+      },
+      {
+        "topology": "hierarchical",
+        "time": 2502.620075999992,
+        "throughput": 1.9979061336356099,
+        "from": 10,
+        "to": 5,
+        "timestamp": "2025-11-15T01:05:21.461Z"
+      },
+      {
+        "topology": "ring",
+        "time": 2502.6138829999836,
+        "throughput": 1.99791107767943,
+        "from": 10,
+        "to": 5,
+        "timestamp": "2025-11-15T01:05:34.922Z"
+      },
+      {
+        "topology": "star",
+        "time": 2501.994655000046,
+        "throughput": 1.9984055481525034,
+        "from": 10,
+        "to": 5,
+        "timestamp": "2025-11-15T01:05:49.696Z"
+      }
+    ],
+    "5-2": [
+      {
+        "topology": "mesh",
+        "time": 1501.606175999972,
+        "throughput": 1.9978607227039373,
+        "from": 5,
+        "to": 2,
+        "timestamp": "2025-11-15T01:05:57.443Z"
+      },
+      {
+        "topology": "hierarchical",
+        "time": 1501.6567789999535,
+        "throughput": 1.9977933985673388,
+        "from": 5,
+        "to": 2,
+        "timestamp": "2025-11-15T01:06:04.749Z"
+      },
+      {
+        "topology": "ring",
+        "time": 1501.6448800000362,
+        "throughput": 1.9978092290368465,
+        "from": 5,
+        "to": 2,
+        "timestamp": "2025-11-15T01:06:10.358Z"
+      },
+      {
+        "topology": "star",
+        "time": 1501.651818000013,
+        "throughput": 1.9977999986678496,
+        "from": 5,
+        "to": 2,
+        "timestamp": "2025-11-15T01:06:16.577Z"
+      }
+    ]
+  },
+  "reliability": {
+    "agent_failure": [
+      {
+        "recoveryTime": 4470.018681999994,
+        "successRate": 0.95,
+        "timestamp": "2025-11-15T01:08:18.934Z"
+      }
+    ],
+    "auto_healing": [
+      {
+        "recoveryTime": 240.43889600015245,
+        "successRate": 1,
+        "timestamp": "2025-11-15T01:08:30.337Z"
+      }
+    ],
+    "state_persistence": [
+      {
+        "recoveryTime": 600.8163020000793,
+        "successRate": 1,
+        "stateSize": 51200,
+        "timestamp": "2025-11-15T01:08:42.319Z"
+      }
+    ],
+    "network_partition": [
+      {
+        "recoveryTime": 859.9428886183234,
+        "successRate": 0.9,
+        "timestamp": "2025-11-15T01:08:51.397Z"
+      }
+    ],
+    "graceful_degradation": [
+      {
+        "recoveryTime": 8327.949525000062,
+        "successRate": 0.92,
+        "timestamp": "2025-11-15T01:09:09.913Z"
+      }
+    ]
+  },
+  "reasoningBank": {
+    "topology": "star",
+    "learningTime": 20253.540960999904,
+    "patternSharingLatency": 190.3802040000446,
+    "lastUpdate": "2025-11-15T01:08:04.466Z",
+    "learningCoordination": {
+      "mesh": {
+        "time": 21017.01263100002,
+        "episodesPerSecond": 0.4758050145171458
+      },
+      "hierarchical": {
+        "time": 21561.781325000105,
+        "episodesPerSecond": 0.46378357378132584
+      },
+      "ring": {
+        "time": 19154.92916300008,
+        "episodesPerSecond": 0.5220588348254576
+      },
+      "star": {
+        "time": 20253.540960999904,
+        "episodesPerSecond": 0.4937408238517867
+      }
+    },
+    "patternSharing": {
+      "mesh": {
+        "latency": 178.70127700013109,
+        "throughput": 27.979654560590145
+      },
+      "hierarchical": {
+        "latency": 241.43637500004843,
+        "throughput": 20.709389792648256
+      },
+      "ring": {
+        "latency": 195.34987899987027,
+        "throughput": 25.595101597187682
+      },
+      "star": {
+        "latency": 190.3802040000446,
+        "throughput": 26.263234805646224
+      }
+    },
+    "knowledgeSync": {},
+    "distributedLearning": {}
+  },
+  "communication": {}
+}

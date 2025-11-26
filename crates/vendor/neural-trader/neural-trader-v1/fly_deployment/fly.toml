@@ -1,0 +1,216 @@
+# Fly.io configuration for GPU-optimized AI News Trading Platform
+app = "ruvtrade-gpu-optimized"
+primary_region = "ord"
+
+# Build configuration with GPU optimization
+[build]
+  dockerfile = "Dockerfile.gpu-optimized"
+
+# HTTP service configuration
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+# GPU machine configuration - Optimized for A100
+[vm]
+  size = "performance-8x"
+  memory = "40gb"
+  cpus = 8
+  gpu_kind = "a100-40gb"
+
+# Advanced GPU environment variables
+[env]
+  # CUDA Configuration
+  CUDA_VISIBLE_DEVICES = "0"
+  RAPIDS_NO_INITIALIZE = "1"
+  CUPY_CACHE_DIR = "/tmp/.cupy"
+  CUDA_CACHE_PATH = "/tmp/cuda_cache"
+  
+  # GPU Memory Management
+  GPU_MEMORY_FRACTION = "0.85"
+  GPU_MEMORY_GROWTH = "true"
+  CUDA_DEVICE_ORDER = "PCI_BUS_ID"
+  
+  # Mixed Precision Configuration
+  PRECISION_MODE = "mixed"
+  ENABLE_TENSOR_CORES = "true"
+  USE_FP16 = "true"
+  LOSS_SCALE = "65536"
+  
+  # Batch Processing Optimization
+  ADAPTIVE_BATCH_SIZE = "true"
+  INITIAL_BATCH_SIZE = "50000"
+  MAX_BATCH_SIZE = "500000"
+  MIN_BATCH_SIZE = "1000"
+  
+  # Performance Optimization
+  CUDA_THREADS_PER_BLOCK = "512"
+  CUDA_BLOCKS_PER_GRID = "256"
+  MAX_CONCURRENT_KERNELS = "32"
+  
+  # Monitoring and Profiling
+  ENABLE_GPU_MONITORING = "true"
+  ENABLE_PERFORMANCE_PROFILING = "true"
+  GPU_HEALTH_CHECK_INTERVAL = "30"
+  
+  # Auto-fallback Configuration
+  ENABLE_CPU_FALLBACK = "true"
+  FALLBACK_THRESHOLD_GPU_UTIL = "95"
+  FALLBACK_THRESHOLD_MEMORY = "90"
+  FALLBACK_THRESHOLD_TEMP = "80"
+  
+  # Fly.io Optimization
+  ENABLE_FLY_OPTIMIZATION = "true"
+  WORKLOAD_TYPE = "trading"
+  ENABLE_AUTO_SCALING = "true"
+  ENABLE_COST_OPTIMIZATION = "true"
+  
+  # Application Configuration
+  PYTHONPATH = "/app"
+  LOG_LEVEL = "INFO"
+  TRADING_MODE = "production"
+  MAX_CONCURRENT_TRADES = "25"
+  RISK_MULTIPLIER = "0.8"
+
+# Secrets (to be set via flyctl secrets)
+# flyctl secrets set API_KEY=xxx REDIS_URL=xxx DATABASE_URL=xxx
+
+# Primary region configuration
+primary_region = "ord"
+
+# Advanced scaling configuration with GPU optimization
+[scaling]
+  min_instances = 1
+  max_instances = 5
+
+# Comprehensive health checks
+[checks]
+  [checks.health]
+    grace_period = "45s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    port = 8080
+    protocol = "http"
+    timeout = "15s"
+    tls_skip_verify = false
+
+  [checks.gpu_health]
+    grace_period = "60s"
+    interval = "30s"
+    method = "GET"
+    path = "/gpu-health"
+    port = 8080
+    protocol = "http"
+    timeout = "20s"
+
+  [checks.gpu_memory]
+    grace_period = "60s"
+    interval = "45s"
+    method = "GET"
+    path = "/gpu-memory"
+    port = 8080
+    protocol = "http"
+    timeout = "15s"
+
+  [checks.performance]
+    grace_period = "90s"
+    interval = "60s"
+    method = "GET"
+    path = "/performance-metrics"
+    port = 8080
+    protocol = "http"
+    timeout = "25s"
+
+# GPU-optimized process configuration
+[[processes]]
+  name = "app"
+  cmd = ["python", "-m", "src.main", "--gpu-optimized", "--fly-mode", "--port", "8080"]
+
+[[processes]]
+  name = "gpu-monitor"
+  cmd = ["python", "-m", "gpu_acceleration.gpu_monitor", "--daemon"]
+
+# Volume mounts for persistent data and GPU optimization
+[[mounts]]
+  source = "ruvtrade_data"
+  destination = "/app/data"
+  initial_size = "20gb"
+
+[[mounts]]
+  source = "gpu_cache"
+  destination = "/tmp/cuda_cache"
+  initial_size = "5gb"
+
+# Memory optimization for GPU workloads
+[memory]
+  limit = "36gb"  # Increased for GPU optimization, leave 4GB for system
+
+# Advanced logging configuration
+[logging]
+  structured = true
+  level = "info"
+
+# Comprehensive metrics and monitoring
+[metrics]
+  port = 9090
+  path = "/metrics"
+
+[prometheus]
+  scrape_interval = "30s"
+  metrics_path = "/metrics"
+
+# GPU-aware auto-scaling configuration
+[services.concurrency]
+  type = "connections"
+  hard_limit = 50
+  soft_limit = 40
+
+# Advanced GPU auto-scaling policies
+[[autoscaling]]
+  metric = "gpu_utilization"
+  target = 80
+  min_instances = 1
+  max_instances = 5
+  scale_up_cooldown = "5m"
+  scale_down_cooldown = "10m"
+
+[[autoscaling]]
+  metric = "memory_utilization"
+  target = 85
+  min_instances = 1
+  max_instances = 5
+  scale_up_cooldown = "3m"
+  scale_down_cooldown = "8m"
+
+# Network optimization for trading latency
+[network]
+  ipv6 = true
+  dedicated_ipv4 = true
+
+# Restart policy for GPU workloads
+[restart]
+  policy = "on-failure"
+  max_retries = 3
+  delay = "30s"
+
+# Resource limits and reservations
+[resources]
+  cpu_limit = "8000m"
+  memory_limit = "36Gi"
+  gpu_limit = "1"
+  
+[resources.requests]
+  cpu = "4000m"
+  memory = "20Gi"
+  gpu = "1"
+
+# GPU-specific configurations
+[experimental]
+  enable_gpu_monitoring = true
+  enable_performance_profiling = true
+  gpu_health_checks = true

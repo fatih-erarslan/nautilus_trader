@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/neural_evaluate.json",
+  "title": "neural_evaluate",
+  "description": "Evaluate trained neural model on test data.",
+  "category": "neural",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "description": "Model ID to evaluate"
+        },
+        "test_data": {
+          "type": "string",
+          "description": "Path to test data"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "mae",
+            "rmse",
+            "mape",
+            "r2_score"
+          ]
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "model_id",
+        "test_data"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "model_id": {
+          "type": "string"
+        },
+        "evaluation_metrics": {
+          "type": "object",
+          "properties": {
+            "mae": {
+              "type": "number"
+            },
+            "rmse": {
+              "type": "number"
+            },
+            "mape": {
+              "type": "number"
+            },
+            "r2_score": {
+              "type": "number"
+            }
+          }
+        },
+        "predictions_vs_actual": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "actual": {
+                "type": "number"
+              },
+              "predicted": {
+                "type": "number"
+              },
+              "error": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

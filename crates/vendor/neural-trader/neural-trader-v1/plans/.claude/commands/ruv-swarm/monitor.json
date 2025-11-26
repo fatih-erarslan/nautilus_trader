@@ -1,0 +1,391 @@
+{
+  "$schema": "https://claude.ai/schema/commands/v1.0.0",
+  "name": "monitor",
+  "description": "Real-time monitoring and observability for swarm execution and agent health",
+  "version": "1.0.0",
+  "category": "swarm-observability",
+  "tags": ["monitoring", "observability", "metrics", "health", "performance"],
+  
+  "command": {
+    "syntax": "monitor [options] <swarm-id> | --all",
+    "aliases": ["watch", "observe", "track"],
+    "examples": [
+      {
+        "description": "Monitor specific swarm with live dashboard",
+        "command": "monitor --dashboard trading-swarm-01"
+      },
+      {
+        "description": "Monitor all swarms with custom metrics",
+        "command": "monitor --all --metrics cpu,memory,trades --interval 5"
+      },
+      {
+        "description": "Monitor with alerts and logging",
+        "command": "monitor --alerts critical --log-level debug swarm-prod-001"
+      }
+    ]
+  },
+  
+  "parameters": {
+    "required": [
+      {
+        "name": "target",
+        "type": "string",
+        "description": "Swarm ID to monitor or --all for all swarms",
+        "validation": {
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9-_]+$"
+            },
+            {
+              "const": "--all"
+            }
+          ]
+        }
+      }
+    ],
+    
+    "optional": [
+      {
+        "name": "dashboard",
+        "type": "boolean",
+        "short": "d",
+        "long": "dashboard",
+        "description": "Enable interactive dashboard UI",
+        "default": false
+      },
+      {
+        "name": "metrics",
+        "type": "array",
+        "short": "m",
+        "long": "metrics",
+        "description": "Specific metrics to monitor",
+        "default": ["health", "performance", "trades"],
+        "elementType": "string",
+        "choices": [
+          "health", "performance", "trades", "cpu", "memory", 
+          "network", "errors", "latency", "throughput", "pnl"
+        ]
+      },
+      {
+        "name": "interval",
+        "type": "integer",
+        "short": "i",
+        "long": "interval",
+        "description": "Update interval in seconds",
+        "default": 10,
+        "validation": {
+          "min": 1,
+          "max": 300
+        }
+      },
+      {
+        "name": "duration",
+        "type": "string",
+        "long": "duration",
+        "description": "Monitoring duration (e.g., 1h, 30m, infinite)",
+        "default": "infinite"
+      },
+      {
+        "name": "alerts",
+        "type": "string",
+        "short": "a",
+        "long": "alerts",
+        "description": "Alert level threshold",
+        "default": "warning",
+        "choices": ["none", "critical", "warning", "info"]
+      },
+      {
+        "name": "export",
+        "type": "string",
+        "short": "e",
+        "long": "export",
+        "description": "Export metrics to file or service",
+        "choices": ["json", "csv", "prometheus", "grafana"]
+      },
+      {
+        "name": "log-level",
+        "type": "string",
+        "long": "log-level",
+        "description": "Logging verbosity",
+        "default": "info",
+        "choices": ["debug", "info", "warning", "error"]
+      },
+      {
+        "name": "filter",
+        "type": "object",
+        "short": "f",
+        "long": "filter",
+        "description": "Filter monitoring data",
+        "properties": {
+          "agents": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "idle", "error", "all"]
+          },
+          "performance": {
+            "type": "string",
+            "enum": ["optimal", "degraded", "critical", "all"]
+          }
+        }
+      }
+    ]
+  },
+  
+  "monitoring": {
+    "categories": {
+      "health": {
+        "description": "Agent and system health metrics",
+        "metrics": [
+          "agent_status",
+          "heartbeat_frequency",
+          "error_rate",
+          "restart_count",
+          "uptime"
+        ]
+      },
+      "performance": {
+        "description": "Performance and efficiency metrics",
+        "metrics": [
+          "task_latency",
+          "throughput",
+          "queue_depth",
+          "processing_time",
+          "success_rate"
+        ]
+      },
+      "resources": {
+        "description": "System resource utilization",
+        "metrics": [
+          "cpu_usage",
+          "memory_usage",
+          "gpu_utilization",
+          "network_bandwidth",
+          "disk_io"
+        ]
+      },
+      "trading": {
+        "description": "Trading-specific metrics",
+        "metrics": [
+          "trades_executed",
+          "pnl_realtime",
+          "position_risk",
+          "order_latency",
+          "strategy_performance"
+        ]
+      },
+      "communication": {
+        "description": "Inter-agent communication metrics",
+        "metrics": [
+          "message_rate",
+          "message_latency",
+          "connection_status",
+          "bandwidth_usage",
+          "protocol_errors"
+        ]
+      }
+    },
+    
+    "aggregations": [
+      {
+        "name": "average",
+        "window": "1m",
+        "metrics": ["cpu_usage", "memory_usage", "latency"]
+      },
+      {
+        "name": "sum",
+        "window": "5m",
+        "metrics": ["trades_executed", "errors", "messages"]
+      },
+      {
+        "name": "percentiles",
+        "values": [50, 90, 95, 99],
+        "metrics": ["task_latency", "order_latency"]
+      }
+    ]
+  },
+  
+  "alerting": {
+    "rules": [
+      {
+        "name": "high_cpu_usage",
+        "condition": "cpu_usage > 90",
+        "duration": "5m",
+        "severity": "warning",
+        "action": "notify"
+      },
+      {
+        "name": "agent_failure",
+        "condition": "agent_status == 'failed'",
+        "duration": "0s",
+        "severity": "critical",
+        "action": "alert_and_restart"
+      },
+      {
+        "name": "high_error_rate",
+        "condition": "error_rate > 0.1",
+        "duration": "2m",
+        "severity": "warning",
+        "action": "notify"
+      },
+      {
+        "name": "trading_loss_threshold",
+        "condition": "pnl_realtime < -1000",
+        "duration": "0s",
+        "severity": "critical",
+        "action": "halt_trading"
+      }
+    ],
+    
+    "actions": {
+      "notify": {
+        "channels": ["console", "log", "webhook"],
+        "throttle": "5m"
+      },
+      "alert_and_restart": {
+        "channels": ["console", "email", "pagerduty"],
+        "auto_restart": true
+      },
+      "halt_trading": {
+        "channels": ["all"],
+        "immediate": true,
+        "escalation": true
+      }
+    }
+  },
+  
+  "visualization": {
+    "dashboard": {
+      "layout": "grid",
+      "refresh_rate": 1000,
+      "components": [
+        {
+          "type": "overview",
+          "position": {"row": 0, "col": 0, "width": 12, "height": 3},
+          "metrics": ["swarm_health", "total_agents", "active_tasks"]
+        },
+        {
+          "type": "agent_grid",
+          "position": {"row": 3, "col": 0, "width": 8, "height": 6},
+          "display": ["status", "cpu", "memory", "tasks"]
+        },
+        {
+          "type": "metrics_chart",
+          "position": {"row": 3, "col": 8, "width": 4, "height": 6},
+          "charts": ["performance", "resources", "errors"]
+        },
+        {
+          "type": "activity_log",
+          "position": {"row": 9, "col": 0, "width": 12, "height": 3},
+          "filters": ["errors", "warnings", "trades"]
+        }
+      ]
+    },
+    
+    "charts": {
+      "time_series": {
+        "metrics": ["cpu", "memory", "latency", "throughput"],
+        "resolution": "1m",
+        "retention": "24h"
+      },
+      "heatmap": {
+        "metrics": ["agent_load", "task_distribution"],
+        "buckets": 20
+      },
+      "gauge": {
+        "metrics": ["health_score", "performance_score"],
+        "thresholds": {
+          "good": 80,
+          "warning": 60,
+          "critical": 40
+        }
+      }
+    }
+  },
+  
+  "export": {
+    "formats": {
+      "json": {
+        "structure": "nested",
+        "timestamp": "iso8601",
+        "compression": "optional"
+      },
+      "csv": {
+        "headers": true,
+        "delimiter": ",",
+        "timestamp_format": "unix"
+      },
+      "prometheus": {
+        "endpoint": "/metrics",
+        "port": 9090,
+        "labels": ["swarm_id", "agent_id", "strategy"]
+      },
+      "grafana": {
+        "datasource": "prometheus",
+        "dashboards": ["swarm-overview", "agent-detail", "trading-performance"]
+      }
+    }
+  },
+  
+  "output": {
+    "console": {
+      "format": "table",
+      "colors": true,
+      "update_mode": "refresh",
+      "sections": [
+        "summary",
+        "agents",
+        "metrics",
+        "alerts"
+      ]
+    },
+    "streaming": {
+      "format": "jsonl",
+      "buffer_size": 100,
+      "compression": "gzip"
+    }
+  },
+  
+  "integration": {
+    "mcp_tools": [
+      "mcp__ai-news-trader__get_system_metrics",
+      "mcp__ai-news-trader__monitor_strategy_health",
+      "mcp__ai-news-trader__get_execution_analytics",
+      "mcp__ai-news-trader__get_portfolio_status"
+    ],
+    "external": {
+      "prometheus": {
+        "scrape_interval": "15s",
+        "metric_prefix": "swarm_"
+      },
+      "datadog": {
+        "api_key": "${DATADOG_API_KEY}",
+        "tags": ["swarm", "trading"]
+      },
+      "elasticsearch": {
+        "index": "swarm-metrics",
+        "type": "metric"
+      }
+    }
+  },
+  
+  "performance": {
+    "optimization": {
+      "sampling": {
+        "enabled": true,
+        "rate": 0.1,
+        "adaptive": true
+      },
+      "batching": {
+        "size": 1000,
+        "timeout": 5000
+      },
+      "caching": {
+        "ttl": 60,
+        "max_size": "100MB"
+      }
+    }
+  }
+}

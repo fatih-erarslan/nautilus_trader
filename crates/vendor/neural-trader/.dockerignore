@@ -1,0 +1,55 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+npm-debug.log
+package-lock.json
+yarn.lock
+
+# Build artifacts (will be rebuilt)
+neural-trader-rust/target/
+neural-trader-rust/crates/napi-bindings/target/
+*.node
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+coverage/
+.nyc_output/
+tests/docker/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.Python
+
+# Rust
+*.rlib
+*.pdb
+
+# Temporary files
+*.tmp
+*.log
+*.cache

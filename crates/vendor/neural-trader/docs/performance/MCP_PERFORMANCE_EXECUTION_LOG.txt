@@ -1,0 +1,189 @@
+
+================================================================================
+🚀 NEURAL TRADER MCP TOOLS - COMPREHENSIVE PERFORMANCE EVALUATION
+================================================================================
+
+⚠️  USING REAL DATA - NO MOCKS OR STUBS
+
+
+📋 Validating API Credentials...
+
+✅ alpaca: Configured
+✅ theOddsApi: Configured
+✅ e2b: Configured
+✅ newsApi: Configured
+✅ finnhub: Configured
+✅ anthropic: Configured
+
+🦀 Loading Rust NAPI Module...
+
+✅ Found NAPI module: /workspaces/neural-trader/neural-trader-rust/crates/napi-bindings/neural-trader.linux-x64-gnu.node
+✅ NAPI module loaded successfully
+📦 Available functions: 128
+
+🧪 Testing Core Trading (6 tools)...
+
+  ✅ ping (1ms)
+  ✅ listStrategies (0ms)
+  ✅ getStrategyInfo (1ms)
+  ✅ getPortfolioStatus (0ms)
+  ✅ quickAnalysis (0ms)
+  ✅ getMarketStatus (0ms)
+
+🧪 Testing Backtesting & Optimization (6 tools)...
+
+  ❌ runBacktest failed: Failed to convert JavaScript value `Boolean true ` into rust type `String`
+  ❌ optimizeStrategy failed: Failed to convert JavaScript value `Undefined` into rust type `String`
+  ✅ quickBacktest (0ms)
+  ✅ runBenchmark (0ms)
+
+🧪 Testing Neural Networks (7 tools)...
+
+  ❌ neuralForecast failed: Failed to convert napi value into rust type `bool`
+  ❌ neuralTrain failed: Failed to convert napi value into rust type `bool`
+  ✅ neuralEvaluate (0ms)
+  ✅ neuralBacktest (0ms)
+  ✅ neuralModelStatus (0ms)
+  ❌ neuralOptimize failed: Failed to convert JavaScript value `Object {"learning_rate":[0.001,0.01],"batch_size":[16,64]}` into rust type `String`
+  ❌ neuralPredict failed: Failed to convert JavaScript value `Object ["AAPL"]` into rust type `String`
+
+🧪 Testing News Trading (6 tools)...
+
+  ✅ analyzeNews (0ms)
+  ✅ getNewsSentiment (0ms)
+  ❌ controlNewsCollection failed: Given napi value is not an array
+  ✅ getNewsProviderStatus (0ms)
+  ✅ fetchFilteredNews (0ms)
+  ✅ getNewsTrends (0ms)
+
+🧪 Testing Sports Betting (7 tools)...
+
+  ✅ getSportsEvents (0ms)
+  ✅ getSportsOdds (0ms)
+  ✅ findSportsArbitrage (0ms)
+  ✅ analyzeBettingMarketDepth (0ms)
+  ✅ calculateKellyCriterion (0ms)
+  ✅ getBettingPortfolioStatus (0ms)
+  ✅ getSportsBettingPerformance (1ms)
+
+🧪 Testing Odds API Integration (6 tools)...
+
+  ✅ oddsApiGetSports (0ms)
+  ✅ oddsApiGetLiveOdds (0ms)
+  ✅ oddsApiGetEventOdds (0ms)
+  ✅ oddsApiFindArbitrage (0ms)
+  ✅ oddsApiGetBookmakerOdds (0ms)
+  ✅ oddsApiAnalyzeMovement (0ms)
+
+🧪 Testing Prediction Markets (5 tools)...
+
+  ✅ getPredictionMarkets (0ms)
+  ✅ analyzeMarketSentiment (1ms)
+  ✅ getMarketOrderbook (0ms)
+  ✅ getPredictionPositions (0ms)
+  ✅ calculateExpectedValue (0ms)
+
+🧪 Testing Syndicates (5 tools)...
+
+  ✅ createSyndicate (0ms)
+  ✅ addSyndicateMember (0ms)
+  ✅ getSyndicateStatus (0ms)
+  ✅ allocateSyndicateFunds (1ms)
+  ✅ distributeSyndicateProfits (0ms)
+
+🧪 Testing E2B Cloud (5 tools)...
+
+
+🧪 Testing System & Monitoring (4 tools)...
+
+  ✅ getSystemMetrics (0ms)
+  ✅ getExecutionAnalytics (0ms)
+  ✅ performanceReport (0ms)
+  ✅ correlationAnalysis (0ms)
+
+================================================================================
+📊 PERFORMANCE EVALUATION REPORT
+================================================================================
+
+SUMMARY:
+  Total Tests: 57
+  ✅ Passed: 43
+  ❌ Failed: 7
+  ⏭️  Skipped: 7
+  ⏱️  Average Latency: 0.12ms
+  ⏰ Total Duration: 0.01s
+
+CATEGORY BREAKDOWN:
+
+Core Trading:
+  Total: 6
+  Passed: 6
+  Failed: 0
+  Avg Latency: 0.33ms
+
+Backtesting & Optimization:
+  Total: 6
+  Passed: 2
+  Failed: 2
+  Avg Latency: 0.00ms
+
+Neural Networks:
+  Total: 7
+  Passed: 3
+  Failed: 4
+  Avg Latency: 0.00ms
+
+News Trading:
+  Total: 6
+  Passed: 5
+  Failed: 1
+  Avg Latency: 0.00ms
+
+Sports Betting:
+  Total: 7
+  Passed: 7
+  Failed: 0
+  Avg Latency: 0.14ms
+
+Odds API Integration:
+  Total: 6
+  Passed: 6
+  Failed: 0
+  Avg Latency: 0.00ms
+
+Prediction Markets:
+  Total: 5
+  Passed: 5
+  Failed: 0
+  Avg Latency: 0.20ms
+
+Syndicates:
+  Total: 5
+  Passed: 5
+  Failed: 0
+  Avg Latency: 0.20ms
+
+E2B Cloud:
+  Total: 5
+  Passed: 0
+  Failed: 0
+  Avg Latency: 0.00ms
+
+System & Monitoring:
+  Total: 4
+  Passed: 4
+  Failed: 0
+  Avg Latency: 0.00ms
+
+API CREDENTIALS:
+  ✅ alpaca: Configured
+  ✅ theOddsApi: Configured
+  ✅ e2b: Configured
+  ✅ newsApi: Configured
+  ✅ finnhub: Configured
+  ✅ anthropic: Configured
+
+📄 Detailed report saved to: /workspaces/neural-trader/docs/MCP_PERFORMANCE_EVALUATION.md
+
+✅ Performance evaluation completed successfully!
+

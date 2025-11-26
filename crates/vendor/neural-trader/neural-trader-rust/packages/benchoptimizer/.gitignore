@@ -1,0 +1,11 @@
+node_modules/
+*.log
+coverage/
+.DS_Store
+*.swp
+dist/
+build/
+.env
+.env.local
+reports/
+*.json.backup

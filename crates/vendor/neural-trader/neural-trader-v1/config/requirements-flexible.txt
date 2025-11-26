@@ -1,0 +1,82 @@
+# AI News Trading Platform - Core Requirements (Flexible versions)
+
+# Core dependencies
+fastapi[all]
+uvicorn[standard]
+pydantic
+numpy
+pandas
+scipy
+scikit-learn
+requests
+aiohttp
+asyncio-mqtt
+
+# Data processing
+polars
+pyarrow
+orjson
+
+# Financial libraries
+yfinance
+alpha-vantage
+finnhub-python
+
+# News and sentiment
+newsapi-python
+textblob
+vadersentiment
+
+# Database
+asyncpg
+redis
+
+# Configuration and environment
+python-dotenv
+pyyaml
+
+# Authentication
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Logging and monitoring
+structlog
+prometheus-client
+
+# HTTP client
+httpx
+
+# Utility
+python-dateutil
+pytz
+
+# Trading APIs - Let pip resolve versions
+polygon-api-client
+websocket-client
+alpaca-py
+alpaca-trade-api
+
+# Performance & Low Latency
+msgpack  # Binary serialization
+uvloop  # High-performance event loop
+
+# Monitoring & Metrics  
+psutil
+colorlog
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov
+pytest-mock
+
+# Development Tools
+black
+flake8
+mypy
+pre-commit
+
+# Type Hints
+types-requests
+types-PyYAML

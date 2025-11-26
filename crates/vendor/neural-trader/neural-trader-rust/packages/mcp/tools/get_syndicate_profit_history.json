@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_syndicate_profit_history.json",
+  "title": "get_syndicate_profit_history",
+  "description": "Get profit distribution history.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "days": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 1,
+          "maximum": 365
+        }
+      },
+      "required": [
+        "syndicate_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "distributions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "distribution_id": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "total_profit": {
+                "type": "number"
+              },
+              "member_count": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "total_distributed": {
+          "type": "number"
+        },
+        "average_per_distribution": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "distributions"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

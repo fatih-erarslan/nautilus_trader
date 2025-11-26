@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-06-23T21:28:50.443561",
+  "market_conditions": {
+    "bull": {
+      "strategy_name": "swing",
+      "total_return": 0.16775219015665532,
+      "annualized_return": 0.16775219015665543,
+      "sharpe_ratio": 2.8659835406181635,
+      "sortino_ratio": 5.1035223741284845,
+      "max_drawdown": 0.11953927911322831,
+      "win_rate": 0.8,
+      "profit_factor": 2.4805046983082337,
+      "total_trades": 10,
+      "avg_trade_duration": 6.2,
+      "volatility": 0.05155374692933051,
+      "beta": 0.0052411175392323974,
+      "alpha": 0.14892881939870906,
+      "calmar_ratio": 1.4033227521621539
+    },
+    "bear": {
+      "strategy_name": "swing",
+      "total_return": 0.6157185331027296,
+      "annualized_return": 0.6157185331027297,
+      "sharpe_ratio": 3.7319257913574395,
+      "sortino_ratio": 7.38199707970616,
+      "max_drawdown": 0.12336517410676782,
+      "win_rate": 0.75,
+      "profit_factor": 3.277523861982158,
+      "total_trades": 20,
+      "avg_trade_duration": 6.1,
+      "volatility": 0.15962764706691684,
+      "beta": 0.00014306913345764168,
+      "alpha": 0.5956866541218525,
+      "calmar_ratio": 4.991023905740602
+    },
+    "sideways": {
+      "strategy_name": "swing",
+      "total_return": 0.01277979943187385,
+      "annualized_return": 0.012779799431873906,
+      "sharpe_ratio": -0.342797071369762,
+      "sortino_ratio": -0.4970612930799649,
+      "max_drawdown": 0.043146479931822225,
+      "win_rate": 0.625,
+      "profit_factor": 1.1699017543738854,
+      "total_trades": 8,
+      "avg_trade_duration": 9.875,
+      "volatility": 0.021062608671874976,
+      "beta": -0.0021820365414404654,
+      "alpha": -0.007303318181979136,
+      "calmar_ratio": 0.29619564451301394
+    },
+    "volatile": {
+      "strategy_name": "swing",
+      "total_return": -0.6490223083962494,
+      "annualized_return": -0.6490223083962494,
+      "sharpe_ratio": -1.9526008104126065,
+      "sortino_ratio": -1.6767019316303393,
+      "max_drawdown": 0.7886502502254328,
+      "win_rate": 0.4411764705882353,
+      "profit_factor": 0.5696310251784285,
+      "total_trades": 34,
+      "avg_trade_duration": 3.5588235294117645,
+      "volatility": 0.3426313790450991,
+      "beta": 0.009029711117918941,
+      "alpha": -0.6676102902562331,
+      "calmar_ratio": -0.8229532777181378
+    }
+  },
+  "summary": {
+    "avg_annual_return": 0.03680705357375241,
+    "avg_sharpe_ratio": 1.0756278625483087,
+    "avg_max_drawdown": 0.2686752958443128,
+    "avg_win_rate": 0.6540441176470588
+  }
+}

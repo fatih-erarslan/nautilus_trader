@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_news_sentiment.json",
+  "title": "get_news_sentiment",
+  "description": "Get real-time news sentiment for a symbol.",
+  "category": "news",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "News sources to query"
+        }
+      },
+      "required": [
+        "symbol"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "overall_sentiment": {
+          "type": "number"
+        },
+        "by_source": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "sentiment": {
+                "type": "number"
+              },
+              "article_count": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

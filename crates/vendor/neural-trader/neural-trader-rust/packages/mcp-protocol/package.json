@@ -1,0 +1,46 @@
+{
+  "name": "@neural-trader/mcp-protocol",
+  "version": "2.0.0",
+  "description": "Model Context Protocol (MCP) JSON-RPC 2.0 protocol types for Neural Trader",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo \"Run tests in Rust crate\" && exit 0"
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "json-rpc",
+    "protocol",
+    "model-context-protocol",
+    "ai-integration"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/mcp-protocol"
+  },
+  "homepage": "https://neural-trader.ruv.io",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@neural-trader/core": "^1.0.0"
+  }
+}

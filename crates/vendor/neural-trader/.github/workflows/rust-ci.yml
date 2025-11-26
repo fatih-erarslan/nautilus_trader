@@ -1,0 +1,230 @@
+name: Rust CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: neural-trader-rust/target
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check formatting
+        run: cd neural-trader-rust && cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cd neural-trader-rust && cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  test:
+    name: Test Suite
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable, nightly]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust ${{ matrix.rust }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            neural-trader-rust/target
+          key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build
+        run: cd neural-trader-rust && cargo build --workspace --all-features
+
+      - name: Run unit tests
+        run: cd neural-trader-rust && cargo test --workspace --lib --all-features
+
+      - name: Run integration tests
+        run: cd neural-trader-rust && cargo test --workspace --test '*' --all-features
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+
+      - name: Run doc tests
+        run: cd neural-trader-rust && cargo test --workspace --doc --all-features
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install tarpaulin
+        run: cargo install cargo-tarpaulin
+
+      - name: Generate coverage
+        run: cd neural-trader-rust && cargo tarpaulin --workspace --all-features --timeout 300 --out xml --output-dir coverage
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./neural-trader-rust/coverage/cobertura.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(grep -oP 'line-rate="\K[^"]+' neural-trader-rust/coverage/cobertura.xml | head -1)
+          COVERAGE_PERCENT=$(echo "$COVERAGE * 100" | bc)
+          echo "Coverage: $COVERAGE_PERCENT%"
+          if (( $(echo "$COVERAGE < 0.90" | bc -l) )); then
+            echo "Coverage $COVERAGE_PERCENT% is below 90% threshold"
+            exit 1
+          fi
+
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run benchmarks
+        run: cd neural-trader-rust && cargo bench --workspace --all-features -- --output-format bencher | tee benchmark_results.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'cargo'
+          output-file-path: neural-trader-rust/benchmark_results.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          alert-threshold: '150%'
+          comment-on-alert: true
+          fail-on-alert: false
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run security audit
+        run: cd neural-trader-rust && cargo audit
+
+      - name: Run cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v1
+        with:
+          manifest-path: neural-trader-rust/Cargo.toml
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build documentation
+        run: cd neural-trader-rust && cargo doc --workspace --all-features --no-deps
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: neural-trader-rust/target/doc/
+
+  napi-build:
+    name: Build NAPI Bindings
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install napi-cli
+        run: npm install -g @napi-rs/cli
+
+      - name: Build NAPI bindings
+        run: cd neural-trader-rust/crates/napi-bindings && napi build --platform --release --target ${{ matrix.target }}
+
+      - name: Upload bindings artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.target }}
+          path: neural-trader-rust/crates/napi-bindings/*.node
+
+  quality-gate:
+    name: Quality Gate Check
+    runs-on: ubuntu-latest
+    needs: [lint, test, coverage, docs, napi-build]
+    steps:
+      - name: All checks passed
+        run: echo "✅ All quality gates passed!"

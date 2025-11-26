@@ -1,0 +1,162 @@
+name: Build Alpine Linux (musl) Binaries
+
+on:
+  push:
+    tags:
+      - 'v2.1.1*'
+      - 'v2.2.*'
+      - 'v2.3.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 2.1.1)'
+        required: true
+        default: '2.1.1'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-musl:
+    name: Build musl binary for Alpine Linux
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apk add --no-cache python3 make gcc g++ musl-dev
+
+      - name: Setup Rust
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          rustc --version
+          cargo --version
+
+      - name: Build NAPI bindings for musl
+        working-directory: neural-trader-rust/crates/napi-bindings
+        run: |
+          cargo build --release --target x86_64-unknown-linux-musl
+          ls -lh ../../target/x86_64-unknown-linux-musl/release/
+
+      - name: Copy musl binary to all packages
+        working-directory: neural-trader-rust
+        run: |
+          BINARY_PATH="target/x86_64-unknown-linux-musl/release/libnt_napi_bindings.so"
+
+          if [ -f "$BINARY_PATH" ]; then
+            for pkg in packages/{backtesting,brokers,execution,features,market-data,neural,news-trading,portfolio,prediction-markets,risk,sports-betting,strategies}/native; do
+              mkdir -p "$pkg"
+              cp "$BINARY_PATH" "$pkg/neural-trader.linux-x64-musl.node"
+              chmod +x "$pkg/neural-trader.linux-x64-musl.node"
+              ls -lh "$pkg/"
+            done
+          else
+            echo "Error: Binary not found at $BINARY_PATH"
+            exit 1
+          fi
+
+      - name: Upload musl binaries as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: musl-binaries
+          path: |
+            neural-trader-rust/packages/*/native/*.musl.node
+          retention-days: 30
+
+      - name: Test musl binary in Alpine
+        run: |
+          cd neural-trader-rust/packages/backtesting
+          npm install --ignore-scripts
+          node -e "console.log(require('./native/neural-trader.linux-x64-musl.node').getVersionInfo())"
+
+  publish-musl-packages:
+    name: Publish packages with musl binaries
+    needs: build-musl
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download musl binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: musl-binaries
+          path: neural-trader-rust/packages
+
+      - name: Update package versions
+        working-directory: neural-trader-rust/packages
+        run: |
+          VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          VERSION="${VERSION#v}"  # Remove 'v' prefix
+
+          for pkg in backtesting brokers execution features market-data neural news-trading portfolio prediction-markets risk sports-betting strategies; do
+            cd $pkg
+            npm version $VERSION --no-git-tag-version
+            cd ..
+          done
+
+      - name: Publish packages to npm
+        working-directory: neural-trader-rust/packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for pkg in backtesting brokers execution features market-data neural news-trading portfolio prediction-markets risk sports-betting strategies; do
+            echo "📦 Publishing @neural-trader/$pkg..."
+            cd $pkg
+            npm publish --access public
+            cd ..
+            sleep 3  # Rate limiting
+          done
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Neural Trader ${{ github.ref_name }}
+          body: |
+            ## Neural Trader ${{ github.ref_name }}
+
+            ### ✨ New Features
+            - ✅ Alpine Linux (musl) support added
+            - ✅ All packages now include both glibc and musl binaries
+            - ✅ Docker compatibility with `node:20-alpine` images
+
+            ### 📦 Published Packages
+            All 14 packages updated with musl binaries:
+            - @neural-trader/backtesting
+            - @neural-trader/brokers
+            - @neural-trader/execution
+            - @neural-trader/features
+            - @neural-trader/market-data
+            - @neural-trader/neural
+            - @neural-trader/news-trading
+            - @neural-trader/portfolio
+            - @neural-trader/prediction-markets
+            - @neural-trader/risk
+            - @neural-trader/sports-betting
+            - @neural-trader/strategies
+
+            ### 🐧 Platform Support
+            - ✅ Linux x86_64 (glibc) - Ubuntu, Debian, CentOS, RHEL
+            - ✅ Linux x86_64 (musl) - Alpine Linux
+
+            ### 📚 Documentation
+            - [Alpine Linux Support Guide](https://github.com/ruvnet/neural-trader/blob/main/neural-trader-rust/docs/ALPINE_LINUX_SUPPORT.md)
+            - [Platform Compatibility Matrix](https://github.com/ruvnet/neural-trader/blob/main/neural-trader-rust/docs/PLATFORM_COMPATIBILITY.md)
+          draft: false
+          prerelease: false

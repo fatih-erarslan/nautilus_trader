@@ -1,0 +1,280 @@
+# Parameter definitions for strategy optimization
+# Defines the search space for each strategy parameter
+
+strategies:
+  momentum:
+    # Lookback period for momentum calculation
+    lookback_period:
+      type: int
+      min: 5
+      max: 100
+      default: 20
+      description: "Number of periods to look back for momentum calculation"
+    
+    # Signal threshold
+    threshold:
+      type: float
+      min: 0.001
+      max: 0.2
+      default: 0.05
+      description: "Minimum momentum threshold to generate signal"
+    
+    # Position sizing
+    position_size:
+      type: float
+      min: 0.01
+      max: 0.5
+      default: 0.1
+      description: "Fraction of portfolio per position"
+    
+    # Stop loss level
+    stop_loss:
+      type: float
+      min: 0.01
+      max: 0.1
+      default: 0.05
+      description: "Stop loss as fraction of entry price"
+      
+    # Take profit level
+    take_profit:
+      type: float
+      min: 0.02
+      max: 0.3
+      default: 0.1
+      description: "Take profit as fraction of entry price"
+
+  mean_reversion:
+    # Moving average window
+    window_size:
+      type: int
+      min: 10
+      max: 200
+      default: 50
+      description: "Window size for moving average calculation"
+    
+    # Z-score threshold for entry
+    z_score_threshold:
+      type: float
+      min: 1.0
+      max: 4.0
+      default: 2.0
+      description: "Z-score threshold for mean reversion signal"
+    
+    # Maximum holding period
+    hold_period:
+      type: int
+      min: 1
+      max: 20
+      default: 5
+      description: "Maximum periods to hold position"
+    
+    # Position sizing
+    position_size:
+      type: float
+      min: 0.01
+      max: 0.3
+      default: 0.05
+      description: "Fraction of portfolio per position"
+    
+    # Exit threshold (fraction of z-score)
+    exit_threshold:
+      type: float
+      min: 0.1
+      max: 0.9
+      default: 0.5
+      description: "Exit when z-score reaches this fraction of entry threshold"
+
+  arbitrage:
+    # Minimum spread to capture
+    min_spread:
+      type: float
+      min: 0.0001
+      max: 0.01
+      default: 0.001
+      description: "Minimum spread to consider for arbitrage"
+    
+    # Maximum position size
+    max_position:
+      type: float
+      min: 0.05
+      max: 1.0
+      default: 0.2
+      description: "Maximum position size as fraction of portfolio"
+    
+    # Execution delay tolerance
+    execution_delay:
+      type: float
+      min: 0.01
+      max: 1.0
+      default: 0.1
+      description: "Maximum acceptable execution delay in seconds"
+    
+    # Minimum profit margin
+    min_profit_margin:
+      type: float
+      min: 0.0001
+      max: 0.005
+      default: 0.0005
+      description: "Minimum profit margin after costs"
+    
+    # Risk limit per trade
+    risk_limit:
+      type: float
+      min: 0.001
+      max: 0.02
+      default: 0.005
+      description: "Maximum risk per arbitrage trade"
+
+  ml_enhanced:
+    # LSTM specific parameters
+    lstm_units:
+      type: int
+      min: 32
+      max: 512
+      default: 128
+      description: "Number of LSTM units"
+    
+    # Lookback window for features
+    lookback_window:
+      type: int
+      min: 20
+      max: 500
+      default: 100
+      description: "Number of periods for feature calculation"
+    
+    # Prediction horizon
+    prediction_horizon:
+      type: int
+      min: 1
+      max: 10
+      default: 1
+      description: "Number of periods ahead to predict"
+    
+    # Confidence threshold
+    confidence_threshold:
+      type: float
+      min: 0.5
+      max: 0.95
+      default: 0.7
+      description: "Minimum confidence to act on prediction"
+    
+    # Learning rate
+    learning_rate:
+      type: float
+      min: 0.0001
+      max: 0.01
+      default: 0.001
+      description: "Learning rate for model training"
+    
+    # Dropout rate
+    dropout_rate:
+      type: float
+      min: 0.0
+      max: 0.5
+      default: 0.2
+      description: "Dropout rate for regularization"
+    
+    # Batch size
+    batch_size:
+      type: int
+      min: 16
+      max: 256
+      default: 64
+      description: "Training batch size"
+    
+    # Training epochs
+    epochs:
+      type: int
+      min: 10
+      max: 200
+      default: 50
+      description: "Number of training epochs"
+
+# Global constraints that apply to all strategies
+global_constraints:
+  # Portfolio level constraints
+  max_total_exposure:
+    type: float
+    max: 1.0
+    description: "Maximum total portfolio exposure"
+  
+  # Risk management
+  max_daily_loss:
+    type: float
+    max: 0.05
+    description: "Maximum acceptable daily loss"
+  
+  # Liquidity constraints
+  min_daily_volume:
+    type: float
+    min: 1000000
+    description: "Minimum daily volume for traded assets"
+
+# Parameter relationships and dependencies
+parameter_constraints:
+  # Momentum strategy constraints
+  momentum:
+    # Stop loss should be less than take profit
+    - condition: "stop_loss < take_profit"
+      description: "Stop loss must be smaller than take profit"
+    
+    # Position size should be reasonable for threshold
+    - condition: "position_size * 10 < threshold"
+      description: "Position size should be conservative relative to threshold"
+
+  # Mean reversion constraints
+  mean_reversion:
+    # Exit threshold should be reasonable
+    - condition: "exit_threshold < 1.0"
+      description: "Exit threshold must be less than 1.0"
+    
+    # Position size vs z-score threshold
+    - condition: "position_size * z_score_threshold < 0.5"
+      description: "Higher z-score allows larger positions"
+
+  # Arbitrage constraints
+  arbitrage:
+    # Profit margin should exceed minimum spread
+    - condition: "min_profit_margin > min_spread"
+      description: "Profit margin must exceed spread requirement"
+
+# Optimization objectives
+objectives:
+  sharpe_ratio:
+    weight: 1.0
+    direction: maximize
+    description: "Risk-adjusted returns"
+  
+  total_return:
+    weight: 0.5
+    direction: maximize
+    description: "Absolute returns"
+  
+  max_drawdown:
+    weight: -0.3
+    direction: minimize
+    description: "Maximum portfolio drawdown"
+  
+  win_rate:
+    weight: 0.2
+    direction: maximize
+    description: "Percentage of profitable trades"
+  
+  profit_factor:
+    weight: 0.4
+    direction: maximize
+    description: "Ratio of gross profits to gross losses"
+  
+  volatility:
+    weight: -0.1
+    direction: minimize
+    description: "Portfolio volatility"
+
+# Multi-objective optimization settings
+multi_objective:
+  method: pareto  # pareto, weighted_sum, goal_programming
+  pareto_settings:
+    population_size: 100
+    generations: 50
+    crossover_prob: 0.9
+    mutation_prob: 0.1

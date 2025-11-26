@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_strategy_info.json",
+  "title": "get_strategy_info",
+  "description": "Get detailed information about a trading strategy.",
+  "category": "trading",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "description": "Strategy name (e.g., mirror_trading, momentum_trading)"
+        }
+      },
+      "required": [
+        "strategy"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string"
+        },
+        "details": {
+          "type": "object",
+          "properties": {
+            "performance_metrics": {
+              "type": "object",
+              "properties": {
+                "sharpe_ratio": {
+                  "type": "number"
+                },
+                "total_return": {
+                  "type": "number"
+                },
+                "max_drawdown": {
+                  "type": "number"
+                },
+                "win_rate": {
+                  "type": "number"
+                },
+                "total_trades": {
+                  "type": "integer"
+                }
+              }
+            },
+            "parameters": {
+              "type": "object"
+            },
+            "gpu_accelerated": {
+              "type": "boolean"
+            }
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy",
+        "details",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

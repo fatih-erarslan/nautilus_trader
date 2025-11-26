@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/calculate_syndicate_tax_liability.json",
+  "title": "calculate_syndicate_tax_liability",
+  "description": "Calculate estimated tax liability for member's earnings.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "default": "US"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "member_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "member_id": {
+          "type": "string"
+        },
+        "gross_earnings": {
+          "type": "number"
+        },
+        "estimated_tax": {
+          "type": "number"
+        },
+        "net_earnings": {
+          "type": "number"
+        },
+        "tax_rate": {
+          "type": "number"
+        },
+        "jurisdiction": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "member_id",
+        "gross_earnings",
+        "estimated_tax"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

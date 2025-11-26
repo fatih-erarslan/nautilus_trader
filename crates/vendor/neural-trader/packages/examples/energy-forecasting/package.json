@@ -1,0 +1,96 @@
+{
+  "name": "@neural-trader/example-energy-forecasting",
+  "version": "1.0.0",
+  "description": "Neural AI energy forecasting with conformal prediction, swarm ensemble models, and uncertainty quantification for solar, wind, and demand prediction with LSTM/Transformer architectures",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "dev": "ts-node src/index.ts",
+    "example:solar": "ts-node examples/solar-generation.ts",
+    "example:wind": "ts-node examples/wind-power.ts",
+    "example:demand": "ts-node examples/electricity-demand.ts",
+    "example:temperature": "ts-node examples/temperature-prediction.ts",
+    "lint": "eslint src tests examples --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "neural-trader",
+    "energy-forecasting",
+    "solar-power",
+    "wind-power",
+    "electricity-demand",
+    "conformal-prediction",
+    "machine-learning",
+    "swarm-intelligence",
+    "time-series",
+    "uncertainty-quantification",
+    "arima",
+    "lstm",
+    "transformer",
+    "prophet",
+    "ai",
+    "neural-network",
+    "self-learning",
+    "optimization",
+    "typescript",
+    "agentdb",
+    "agentic-flow",
+    "renewable-energy",
+    "real-time",
+    "prediction",
+    "deep-learning",
+    "ensemble-learning",
+    "forecasting"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "homepage": "https://github.com/ruvnet/neural-trader#readme",
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "packages/examples/energy-forecasting"
+  },
+  "dependencies": {
+    "@neural-trader/predictor": "workspace:*",
+    "agentdb": "^2.0.0",
+    "claude-flow": "^2.0.0",
+    "openrouter": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

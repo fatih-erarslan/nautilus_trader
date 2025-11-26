@@ -1,0 +1,71 @@
+# Alpaca Trading Requirements
+# Core dependencies for Alpaca trading functionality
+
+# Data manipulation and analysis
+pandas>=1.5.0
+numpy>=1.24.0
+
+# HTTP requests and WebSocket communication
+requests>=2.28.0
+websocket-client>=1.4.0
+
+# Environment variable management
+python-dotenv>=0.19.0
+
+# Date and time handling
+python-dateutil>=2.8.0
+
+# Optional: Enhanced data analysis
+scipy>=1.9.0
+scikit-learn>=1.1.0
+
+# Optional: Plotting and visualization
+matplotlib>=3.6.0
+plotly>=5.11.0
+
+# Optional: Technical analysis indicators
+ta-lib>=0.4.25
+pandas-ta>=0.3.14b
+
+# Optional: Backtesting frameworks
+backtrader>=1.9.76.123
+vectorbt>=0.25.0
+
+# Optional: Machine learning
+tensorflow>=2.10.0
+torch>=1.13.0
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+
+# Code quality
+black>=22.0.0
+flake8>=5.0.0
+mypy>=0.991
+
+# Development
+jupyter>=1.0.0
+ipython>=8.0.0
+
+# Production deployment
+gunicorn>=20.1.0
+uvicorn>=0.20.0
+
+# Monitoring and logging
+sentry-sdk>=1.12.0
+prometheus-client>=0.15.0
+
+# Security
+cryptography>=38.0.0
+
+# API rate limiting
+ratelimit>=2.2.1
+
+# Configuration management
+pydantic>=1.10.0
+
+# Async support
+aiohttp>=3.8.0
+asyncio-throttle>=1.0.0

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/cast_syndicate_vote.json",
+  "title": "cast_syndicate_vote",
+  "description": "Cast a vote on a syndicate proposal.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "vote_id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "option": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "vote_id",
+        "member_id",
+        "option"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "vote_id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "option": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "current_results": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        }
+      },
+      "required": [
+        "vote_id",
+        "option",
+        "timestamp"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

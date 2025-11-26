@@ -1,0 +1,285 @@
+version: '3.8'
+
+services:
+  # Main benchmark service
+  benchmark:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: ai-news-benchmark
+    ports:
+      - "8000:8000"  # Main API
+      - "8080:8080"  # Web UI
+    volumes:
+      - benchmark_data:/app/data
+      - benchmark_results:/app/results
+      - benchmark_logs:/app/logs
+      - ./configs:/app/configs:ro
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_URL=postgresql://benchmark:password@postgres:5432/benchmark
+      - MONITORING_ENABLED=true
+    depends_on:
+      - redis
+      - postgres
+      - monitoring
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for caching and message queuing
+  redis:
+    image: redis:7-alpine
+    container_name: benchmark-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL for persistent data storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: benchmark-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    environment:
+      - POSTGRES_DB=benchmark
+      - POSTGRES_USER=benchmark
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U benchmark -d benchmark"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Monitoring and metrics
+  monitoring:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: monitoring
+    container_name: benchmark-monitoring
+    ports:
+      - "9090:9090"  # Prometheus
+      - "9100:9100"  # Node exporter
+    volumes:
+      - monitoring_data:/app/monitoring_data
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    environment:
+      - PROMETHEUS_RETENTION_TIME=30d
+      - ALERT_MANAGER_URL=http://alertmanager:9093
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: benchmark-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_DATASOURCE_PROMETHEUS_URL=http://monitoring:9090
+    depends_on:
+      - monitoring
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+
+  # Data pipeline worker
+  pipeline-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: benchmark-pipeline-worker
+    command: ["python", "-m", "benchmark.integration.data_pipeline", "--worker"]
+    volumes:
+      - benchmark_data:/app/data
+      - pipeline_data:/app/pipeline_data
+    environment:
+      - ENVIRONMENT=production
+      - WORKER_TYPE=pipeline
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      - redis
+      - benchmark
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+
+  # Optimization worker
+  optimization-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: benchmark-optimization-worker
+    command: ["python", "-m", "benchmark.optimization.optimizer", "--worker"]
+    volumes:
+      - benchmark_data:/app/data
+      - benchmark_results:/app/results
+    environment:
+      - ENVIRONMENT=production
+      - WORKER_TYPE=optimization
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      - redis
+      - benchmark
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+
+  # Simulation worker
+  simulation-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: benchmark-simulation-worker
+    command: ["python", "-m", "benchmark.simulation.simulator", "--worker"]
+    volumes:
+      - benchmark_data:/app/data
+      - benchmark_results:/app/results
+    environment:
+      - ENVIRONMENT=production
+      - WORKER_TYPE=simulation
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      - redis
+      - benchmark
+    networks:
+      - benchmark_network
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+
+  # CLI interface
+  cli:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: cli
+    container_name: benchmark-cli
+    volumes:
+      - benchmark_data:/app/data
+      - benchmark_results:/app/results
+      - ./configs:/app/configs:ro
+    environment:
+      - ENVIRONMENT=production
+      - BENCHMARK_SERVER_URL=http://benchmark:8000
+    depends_on:
+      - benchmark
+    networks:
+      - benchmark_network
+    profiles:
+      - cli
+
+  # Development environment
+  dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: benchmark-dev
+    ports:
+      - "8888:8888"  # Jupyter
+      - "8001:8000"  # Dev server
+    volumes:
+      - ..:/app:delegated
+      - benchmark_dev_data:/app/data
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - JUPYTER_ENABLE_LAB=yes
+    command: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+    networks:
+      - benchmark_network
+    profiles:
+      - dev
+
+  # Testing service
+  test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: testing
+    container_name: benchmark-test
+    volumes:
+      - ..:/app:delegated
+      - test_results:/app/test-results
+    environment:
+      - ENVIRONMENT=testing
+      - PYTEST_ARGS=-v --tb=short --junitxml=/app/test-results/results.xml
+    networks:
+      - benchmark_network
+    profiles:
+      - test
+
+# Named volumes for persistent data
+volumes:
+  benchmark_data:
+    driver: local
+  benchmark_results:
+    driver: local
+  benchmark_logs:
+    driver: local
+  benchmark_dev_data:
+    driver: local
+  redis_data:
+    driver: local
+  postgres_data:
+    driver: local
+  monitoring_data:
+    driver: local
+  grafana_data:
+    driver: local
+  pipeline_data:
+    driver: local
+  test_results:
+    driver: local
+
+# Network configuration
+networks:
+  benchmark_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

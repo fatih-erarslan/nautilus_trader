@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-11-14T20:58:20.574Z",
+  "e2bCredentials": {
+    "apiKey": "✅ Configured",
+    "accessToken": "✅ Configured"
+  },
+  "tests": [
+    {
+      "name": "NAPI - Create E2B Sandbox",
+      "success": false,
+      "latency": 0,
+      "error": "Tool not exported from NAPI module",
+      "response": null,
+      "skipped": true
+    },
+    {
+      "name": "NAPI - List E2B Sandboxes",
+      "success": false,
+      "latency": 0,
+      "error": "Tool not exported from NAPI module",
+      "response": null,
+      "skipped": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 2,
+    "realApiCalls": 0
+  }
+}

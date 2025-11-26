@@ -1,0 +1,404 @@
+#!/usr/bin/env node
+
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const {
+  benchmarkPackage,
+  validatePackage,
+  optimizePackage,
+  benchmarkAll,
+  generateReport,
+  version,
+  nativeVersion
+} = require('..');
+
+const fs = require('fs');
+const path = require('path');
+
+// ANSI color codes
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m'
+};
+
+function colorize(text, color) {
+  return process.stdout.isTTY ? `${color}${text}${colors.reset}` : text;
+}
+
+function log(message, color = colors.reset) {
+  console.log(colorize(message, color));
+}
+
+function error(message) {
+  console.error(colorize(`Error: ${message}`, colors.red));
+}
+
+function success(message) {
+  log(message, colors.green);
+}
+
+function warning(message) {
+  log(message, colors.yellow);
+}
+
+function formatDuration(ms) {
+  if (ms < 1) return `${(ms * 1000).toFixed(2)}µs`;
+  if (ms < 1000) return `${ms.toFixed(2)}ms`;
+  return `${(ms / 1000).toFixed(2)}s`;
+}
+
+function formatBytes(bytes) {
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let size = bytes;
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+  return `${size.toFixed(2)} ${units[unitIndex]}`;
+}
+
+async function benchmarkCommand(argv) {
+  try {
+    const packagePath = argv.path || process.cwd();
+    const iterations = argv.iterations || 100;
+    const format = argv.format || 'console';
+
+    log(`\nBenchmarking package at: ${packagePath}`, colors.cyan);
+    log(`Iterations: ${iterations}\n`, colors.cyan);
+
+    const result = await benchmarkPackage(packagePath, iterations);
+
+    if (format === 'json') {
+      console.log(JSON.stringify(result, null, 2));
+    } else if (format === 'markdown' || format === 'html' || format === 'csv') {
+      console.log(generateReport(result, format));
+    } else {
+      // Console output
+      log(`\n${colorize('Benchmark Results', colors.bright)}`, colors.green);
+      log(`Package: ${result.packageName}`);
+      log(`\n${colorize('Timing:', colors.bright)}`);
+      log(`  Mean:   ${formatDuration(result.mean)}`);
+      log(`  Median: ${formatDuration(result.median)}`);
+      log(`  StdDev: ${formatDuration(result.stddev)}`);
+      log(`  Min:    ${formatDuration(result.min)}`);
+      log(`  Max:    ${formatDuration(result.max)}`);
+      log(`  P95:    ${formatDuration(result.p95)}`);
+      log(`  P99:    ${formatDuration(result.p99)}`);
+      log(`\n${colorize('Resources:', colors.bright)}`);
+      log(`  Memory:      ${formatBytes(result.memoryUsage)}`);
+      log(`  Bundle Size: ${formatBytes(result.bundleSize)}`);
+      log(`\n${colorize('Metadata:', colors.bright)}`);
+      log(`  Iterations: ${result.iterations}`);
+      log(`  Duration:   ${result.duration.toFixed(2)}s`);
+      log(`  Timestamp:  ${result.timestamp}\n`);
+    }
+
+    if (argv.output) {
+      const outputFormat = argv.output.endsWith('.json') ? 'json' :
+                          argv.output.endsWith('.md') ? 'markdown' :
+                          argv.output.endsWith('.html') ? 'html' :
+                          argv.output.endsWith('.csv') ? 'csv' : 'json';
+      const content = outputFormat === 'json' ?
+        JSON.stringify(result, null, 2) :
+        generateReport(result, outputFormat);
+      fs.writeFileSync(argv.output, content);
+      success(`Report saved to: ${argv.output}`);
+    }
+  } catch (err) {
+    error(err.message);
+    process.exit(1);
+  }
+}
+
+async function validateCommand(argv) {
+  try {
+    const packagePath = argv.path || process.cwd();
+
+    log(`\nValidating package at: ${packagePath}\n`, colors.cyan);
+
+    const result = await validatePackage(packagePath);
+
+    if (argv.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
+
+    log(`${colorize('Validation Results', colors.bright)}`, result.valid ? colors.green : colors.red);
+    log(`Status: ${result.valid ? colorize('VALID', colors.green) : colorize('INVALID', colors.red)}\n`);
+
+    if (result.errors.length > 0) {
+      log(`${colorize('Errors:', colors.red)}`);
+      result.errors.forEach(issue => {
+        log(`  ${colorize('✗', colors.red)} [${issue.category}] ${issue.message}`);
+        if (issue.location) log(`    Location: ${issue.location}`);
+        if (issue.suggestion) log(`    Suggestion: ${issue.suggestion}`);
+      });
+      log('');
+    }
+
+    if (result.warnings.length > 0) {
+      log(`${colorize('Warnings:', colors.yellow)}`);
+      result.warnings.forEach(issue => {
+        log(`  ${colorize('⚠', colors.yellow)} [${issue.category}] ${issue.message}`);
+        if (issue.location) log(`    Location: ${issue.location}`);
+        if (issue.suggestion) log(`    Suggestion: ${issue.suggestion}`);
+      });
+      log('');
+    }
+
+    if (result.info.length > 0 && argv.verbose) {
+      log(`${colorize('Info:', colors.cyan)}`);
+      result.info.forEach(issue => {
+        log(`  ${colorize('ℹ', colors.cyan)} [${issue.category}] ${issue.message}`);
+      });
+      log('');
+    }
+
+    log(`${colorize('Package Metadata:', colors.bright)}`);
+    log(`  Name:        ${result.metadata.name}`);
+    log(`  Version:     ${result.metadata.version}`);
+    log(`  Has Tests:   ${result.metadata.hasTests ? colorize('Yes', colors.green) : colorize('No', colors.red)}`);
+    log(`  Has Docs:    ${result.metadata.hasDocs ? colorize('Yes', colors.green) : colorize('No', colors.yellow)}`);
+    log(`  Has Benches: ${result.metadata.hasBenchmarks ? colorize('Yes', colors.green) : colorize('No', colors.yellow)}\n`);
+
+    process.exit(result.valid ? 0 : 1);
+  } catch (err) {
+    error(err.message);
+    process.exit(1);
+  }
+}
+
+async function optimizeCommand(argv) {
+  try {
+    const packagePath = argv.path || process.cwd();
+
+    log(`\nAnalyzing package at: ${packagePath}\n`, colors.cyan);
+
+    const suggestions = await optimizePackage(packagePath);
+
+    if (argv.json) {
+      console.log(JSON.stringify(suggestions, null, 2));
+      return;
+    }
+
+    if (suggestions.length === 0) {
+      success('No optimization suggestions found. Package is already well-optimized!');
+      return;
+    }
+
+    log(`${colorize('Optimization Suggestions', colors.bright)}\n`);
+
+    const grouped = {
+      critical: suggestions.filter(s => s.severity === 'critical'),
+      high: suggestions.filter(s => s.severity === 'high'),
+      medium: suggestions.filter(s => s.severity === 'medium'),
+      low: suggestions.filter(s => s.severity === 'low')
+    };
+
+    for (const [severity, items] of Object.entries(grouped)) {
+      if (items.length === 0) continue;
+
+      const severityColor = severity === 'critical' ? colors.red :
+                           severity === 'high' ? colors.yellow :
+                           severity === 'medium' ? colors.cyan : colors.reset;
+
+      log(`${colorize(severity.toUpperCase() + ' Priority:', severityColor)}`);
+      items.forEach((suggestion, index) => {
+        log(`\n  ${index + 1}. [${suggestion.type}] ${suggestion.description}`);
+        log(`     Estimated Improvement: ${colorize(suggestion.estimatedImprovement, colors.green)}`);
+        if (suggestion.currentValue) {
+          log(`     Current: ${suggestion.currentValue} → Target: ${suggestion.targetValue}`);
+        }
+        if (suggestion.steps && argv.verbose) {
+          log(`     Steps:`);
+          suggestion.steps.forEach(step => log(`       - ${step}`));
+        }
+        if (suggestion.references && argv.verbose) {
+          log(`     References:`);
+          suggestion.references.forEach(ref => log(`       - ${ref}`));
+        }
+      });
+      log('');
+    }
+
+    log(`Total suggestions: ${suggestions.length}\n`);
+  } catch (err) {
+    error(err.message);
+    process.exit(1);
+  }
+}
+
+async function benchmarkAllCommand(argv) {
+  try {
+    const packagesDir = argv.path || process.cwd();
+
+    log(`\nBenchmarking all packages in: ${packagesDir}\n`, colors.cyan);
+
+    const results = await benchmarkAll(packagesDir);
+
+    if (argv.format === 'json') {
+      console.log(JSON.stringify(results, null, 2));
+    } else if (['markdown', 'html', 'csv'].includes(argv.format)) {
+      console.log(generateReport(results, argv.format));
+    } else {
+      log(`${colorize('Benchmark Results Summary', colors.bright)}\n`);
+      log(`${colorize('Package'.padEnd(30) + 'Mean'.padEnd(15) + 'Memory'.padEnd(15) + 'Bundle', colors.bright)}`);
+      log('─'.repeat(75));
+
+      results.forEach(result => {
+        log(
+          result.packageName.padEnd(30) +
+          formatDuration(result.mean).padEnd(15) +
+          formatBytes(result.memoryUsage).padEnd(15) +
+          formatBytes(result.bundleSize)
+        );
+      });
+      log('');
+    }
+
+    if (argv.output) {
+      const format = argv.output.endsWith('.json') ? 'json' :
+                    argv.output.endsWith('.md') ? 'markdown' :
+                    argv.output.endsWith('.html') ? 'html' :
+                    argv.output.endsWith('.csv') ? 'csv' : 'json';
+      const content = format === 'json' ?
+        JSON.stringify(results, null, 2) :
+        generateReport(results, format);
+      fs.writeFileSync(argv.output, content);
+      success(`Report saved to: ${argv.output}`);
+    }
+  } catch (err) {
+    error(err.message);
+    process.exit(1);
+  }
+}
+
+// CLI definition
+yargs(hideBin(process.argv))
+  .scriptName('benchoptimizer')
+  .usage('$0 <command> [options]')
+  .command(
+    'benchmark [path]',
+    'Run benchmark on a package',
+    (yargs) => {
+      return yargs
+        .positional('path', {
+          describe: 'Path to package directory',
+          type: 'string',
+          default: '.'
+        })
+        .option('iterations', {
+          alias: 'i',
+          describe: 'Number of iterations',
+          type: 'number',
+          default: 100
+        })
+        .option('format', {
+          alias: 'f',
+          describe: 'Output format',
+          choices: ['console', 'json', 'markdown', 'html', 'csv'],
+          default: 'console'
+        })
+        .option('output', {
+          alias: 'o',
+          describe: 'Output file path',
+          type: 'string'
+        });
+    },
+    benchmarkCommand
+  )
+  .command(
+    'validate [path]',
+    'Validate package structure',
+    (yargs) => {
+      return yargs
+        .positional('path', {
+          describe: 'Path to package directory',
+          type: 'string',
+          default: '.'
+        })
+        .option('json', {
+          describe: 'Output as JSON',
+          type: 'boolean',
+          default: false
+        })
+        .option('verbose', {
+          alias: 'v',
+          describe: 'Show detailed information',
+          type: 'boolean',
+          default: false
+        });
+    },
+    validateCommand
+  )
+  .command(
+    'optimize [path]',
+    'Suggest optimizations',
+    (yargs) => {
+      return yargs
+        .positional('path', {
+          describe: 'Path to package directory',
+          type: 'string',
+          default: '.'
+        })
+        .option('json', {
+          describe: 'Output as JSON',
+          type: 'boolean',
+          default: false
+        })
+        .option('verbose', {
+          alias: 'v',
+          describe: 'Show detailed suggestions',
+          type: 'boolean',
+          default: false
+        });
+    },
+    optimizeCommand
+  )
+  .command(
+    'all [path]',
+    'Benchmark all packages in directory',
+    (yargs) => {
+      return yargs
+        .positional('path', {
+          describe: 'Path to packages directory',
+          type: 'string',
+          default: '.'
+        })
+        .option('format', {
+          alias: 'f',
+          describe: 'Output format',
+          choices: ['console', 'json', 'markdown', 'html', 'csv'],
+          default: 'console'
+        })
+        .option('output', {
+          alias: 'o',
+          describe: 'Output file path',
+          type: 'string'
+        });
+    },
+    benchmarkAllCommand
+  )
+  .command(
+    'version',
+    'Show version information',
+    {},
+    () => {
+      console.log(`@neural-trader/benchoptimizer v${version}`);
+      console.log(`Native binding v${nativeVersion}`);
+    }
+  )
+  .demandCommand(1, 'You must specify a command')
+  .help()
+  .alias('h', 'help')
+  .version(version)
+  .alias('v', 'version')
+  .strict()
+  .parse();

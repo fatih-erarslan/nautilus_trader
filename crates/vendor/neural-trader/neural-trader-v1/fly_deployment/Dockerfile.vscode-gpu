@@ -1,0 +1,97 @@
+# VS Code Server with GPU support for AI Trading Platform
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    sudo \
+    build-essential \
+    libta-lib0-dev \
+    ta-lib-bin \
+    htop \
+    vim \
+    nano \
+    tree \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+
+# Install Python packages for trading platform
+RUN pip install --no-cache-dir \
+    TA-Lib \
+    'neuralforecast[gpu]>=1.6.4' \
+    jupyter \
+    ipython \
+    fastapi \
+    uvicorn \
+    pandas \
+    numpy \
+    scipy \
+    scikit-learn \
+    yfinance \
+    matplotlib \
+    seaborn \
+    plotly \
+    streamlit \
+    'mcp[cli]>=1.9.4' \
+    pytest
+
+# Create user with same name as environment variable will provide
+RUN useradd -m -s /bin/bash trader && \
+    echo "trader ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Create workspace directory
+RUN mkdir -p /home/trader/workspace && \
+    chown -R trader:trader /home/trader
+
+USER trader
+WORKDIR /home/trader
+
+# Create startup script
+RUN cat > /home/trader/start-vscode.sh << 'EOF'
+#!/bin/bash
+# Create config directory
+mkdir -p ~/.config/code-server
+
+# Set password from environment
+if [ -n "$VSCODE_PASSWORD" ]; then
+    echo "Using password authentication"
+    exec code-server \
+        --bind-addr 0.0.0.0:8080 \
+        --auth password \
+        --disable-telemetry \
+        --disable-update-check \
+        /home/trader/workspace
+else
+    echo "No password set, using no authentication"
+    exec code-server \
+        --bind-addr 0.0.0.0:8080 \
+        --auth none \
+        --disable-telemetry \
+        --disable-update-check \
+        /home/trader/workspace
+fi
+EOF
+
+RUN chmod +x /home/trader/start-vscode.sh
+
+# Set environment for GPU
+ENV CUDA_VISIBLE_DEVICES=0
+ENV NVIDIA_VISIBLE_DEVICES=all
+
+# Expose code-server port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080 || exit 1
+
+# Start code-server with configuration
+CMD ["/home/trader/start-vscode.sh"]

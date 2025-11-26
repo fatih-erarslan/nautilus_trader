@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # =============================================================================
+  # MCP Server Service - Production MCP server
+  # =============================================================================
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.validation
+      target: mcp-server
+      args:
+        - RUST_VERSION=1.75
+        - NODE_VERSION=18
+    container_name: neural-trader-mcp
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MCP_PORT=3000
+      - RUST_LOG=info
+      - RUST_BACKTRACE=1
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - neural-trader-net
+    restart: unless-stopped
+
+  # =============================================================================
+  # Testing Service - Comprehensive test suite
+  # =============================================================================
+  testing:
+    build:
+      context: .
+      dockerfile: Dockerfile.validation
+      target: testing
+    container_name: neural-trader-test
+    environment:
+      - NODE_ENV=test
+      - RUST_BACKTRACE=full
+      - RUST_LOG=debug
+      - CI=true
+    volumes:
+      - ./neural-trader-rust:/app/neural-trader-rust:ro
+      - ./tests:/app/tests:ro
+      - ./scripts:/app/scripts:ro
+      - test-results:/app/test-results
+      - coverage-reports:/app/coverage
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+    networks:
+      - neural-trader-net
+    command: >
+      sh -c "
+        echo '🧪 Running comprehensive test suite...' &&
+        npm test &&
+        echo '✅ Tests passed!' &&
+        cp -r ./test-results /app/test-results/ || true
+      "
+
+  # =============================================================================
+  # Validation Service - MCP 2025-11 compliance checks
+  # =============================================================================
+  validation:
+    build:
+      context: .
+      dockerfile: Dockerfile.validation
+      target: validation
+    container_name: neural-trader-validation
+    environment:
+      - MCP_VALIDATION=true
+      - MCP_PROTOCOL_VERSION=2025-11
+      - MCP_SERVER_URL=http://mcp-server:3000
+      - RUST_BACKTRACE=1
+    volumes:
+      - ./scripts:/app/scripts:ro
+      - ./tests:/app/tests:ro
+      - validation-reports:/app/reports
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+    networks:
+      - neural-trader-net
+    command: >
+      sh -c "
+        echo '🔍 Starting MCP 2025-11 validation...' &&
+        ./scripts/validate-docker.sh &&
+        echo '✅ Validation complete!' &&
+        cp -r ./reports /app/reports/ || true
+      "
+
+  # =============================================================================
+  # Benchmark Service - Performance testing
+  # =============================================================================
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile.validation
+      target: testing
+    container_name: neural-trader-benchmark
+    environment:
+      - NODE_ENV=test
+      - BENCHMARK_MODE=true
+    volumes:
+      - ./benches:/app/benches:ro
+      - benchmark-results:/app/benchmark-results
+    networks:
+      - neural-trader-net
+    command: >
+      sh -c "
+        echo '📊 Running performance benchmarks...' &&
+        cd neural-trader-rust &&
+        cargo bench --workspace &&
+        echo '✅ Benchmarks complete!'
+      "
+
+  # =============================================================================
+  # Documentation Generator - API docs
+  # =============================================================================
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile.validation
+      target: testing
+    container_name: neural-trader-docs
+    volumes:
+      - ./docs:/app/docs
+      - ./neural-trader-rust:/app/neural-trader-rust:ro
+    command: >
+      sh -c "
+        echo '📚 Generating documentation...' &&
+        cd neural-trader-rust &&
+        cargo doc --no-deps --workspace &&
+        echo '✅ Documentation generated!'
+      "
+
+networks:
+  neural-trader-net:
+    driver: bridge
+
+volumes:
+  test-results:
+  coverage-reports:
+  validation-reports:
+  benchmark-results:

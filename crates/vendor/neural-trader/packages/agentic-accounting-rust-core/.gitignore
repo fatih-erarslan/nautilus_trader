@@ -1,0 +1,13 @@
+target/
+.cargo/
+*.node
+*.d.ts
+index.js
+index.d.ts
+Cargo.lock
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

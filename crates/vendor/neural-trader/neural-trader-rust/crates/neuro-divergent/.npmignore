@@ -1,0 +1,42 @@
+# Rust build artifacts
+target/
+**/*.rs.bk
+*.pdb
+
+# Cargo files
+Cargo.lock
+
+# Development files
+.git/
+.github/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test files
+tests/
+benches/
+examples/
+
+# Documentation source (keep compiled docs)
+docs/*.md
+!docs/README.md
+
+# Build scripts
+scripts/
+.cargo/
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+appveyor.yml
+
+# Large files
+*.tar.gz
+*.zip
+*.dmg
+*.deb
+*.rpm
+
+# Keep only essential files

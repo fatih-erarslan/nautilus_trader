@@ -1,0 +1,26 @@
+{
+  "name": "midstreamer-benchmarks",
+  "version": "1.0.0",
+  "description": "Comprehensive performance benchmarking suite for midstreamer WASM acceleration",
+  "main": "midstreamer-benchmarks.js",
+  "scripts": {
+    "benchmark": "node midstreamer-benchmarks.js",
+    "benchmark:dtw": "node -e \"require('./midstreamer-benchmarks').DTWBenchmarks.run(new (require('./midstreamer-benchmarks').BenchmarkRunner)())\"",
+    "benchmark:lcs": "node -e \"require('./midstreamer-benchmarks').LCSBenchmarks.run(new (require('./midstreamer-benchmarks').BenchmarkRunner)())\"",
+    "benchmark:e2e": "node -e \"require('./midstreamer-benchmarks').E2EBenchmarks.run(new (require('./midstreamer-benchmarks').BenchmarkRunner)())\"",
+    "benchmark:load": "node -e \"require('./midstreamer-benchmarks').LoadTesting.run()\"",
+    "benchmark:compare": "node scripts/compare-results.js",
+    "benchmark:visualize": "node scripts/visualize-results.js"
+  },
+  "keywords": [
+    "benchmark",
+    "performance",
+    "wasm",
+    "dtw",
+    "lcs",
+    "pattern-matching",
+    "optimization"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT"
+}

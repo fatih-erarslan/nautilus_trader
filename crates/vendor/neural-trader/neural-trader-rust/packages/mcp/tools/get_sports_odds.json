@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_sports_odds.json",
+  "title": "get_sports_odds",
+  "description": "Get real-time sports betting odds with market analysis.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sport": {
+          "type": "string"
+        },
+        "market_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "sport"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "odds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event_id": {
+                "type": "string"
+              },
+              "bookmaker": {
+                "type": "string"
+              },
+              "market_type": {
+                "type": "string"
+              },
+              "odds": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

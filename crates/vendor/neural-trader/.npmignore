@@ -1,0 +1,54 @@
+# Development files
+.git
+.github
+.vscode
+.idea
+
+# Tests
+tests/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Documentation (except README)
+/docs/
+*.md
+!README.md
+!neural-trader-rust/crates/napi-bindings/README.md
+
+# Build artifacts to exclude
+neural-trader-rust/target/
+node_modules/
+**/node_modules/
+packages/*/node_modules/
+
+# Source files (we only want built artifacts)
+*.rs
+Cargo.toml
+Cargo.lock
+
+# But DO include .node binaries
+!*.node
+
+# Development configs
+.editorconfig
+.eslintrc*
+.prettierrc*
+tsconfig.json
+jest.config.js
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+.circleci/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store

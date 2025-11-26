@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/deploy_e2b_template.json",
+  "title": "deploy_e2b_template",
+  "description": "Deploy a pre-configured E2B template.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "template_name": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "trading",
+            "analytics",
+            "ml",
+            "custom"
+          ]
+        },
+        "configuration": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "template_name",
+        "category",
+        "configuration"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "deployment_id": {
+          "type": "string"
+        },
+        "sandbox_id": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "deployment_id",
+        "sandbox_id"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

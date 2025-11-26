@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_syndicate_withdrawal_history.json",
+  "title": "get_syndicate_withdrawal_history",
+  "description": "Get withdrawal history for syndicate or member.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string",
+          "description": "Optional: filter by member"
+        }
+      },
+      "required": [
+        "syndicate_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "withdrawals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "withdrawal_id": {
+                "type": "string"
+              },
+              "member_id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "total_withdrawn": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "withdrawals"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

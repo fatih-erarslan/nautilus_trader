@@ -1,0 +1,111 @@
+{
+  "timestamp": "2025-09-23T15:33:19",
+  "portfolio_composition": {
+    "oil_majors": 0.3,
+    "oil_services": 0.15,
+    "lng_companies": 0.2,
+    "refiners": 0.15,
+    "pipelines": 0.1,
+    "renewables": 0.1
+  },
+  "mcp_integration": {
+    "available": true,
+    "solver_version": "sublinear_v1.0"
+  },
+  "risk_optimization": {
+    "status": "solved",
+    "solver": "mcp_sublinear",
+    "original_weights": [
+      0.3,
+      0.15,
+      0.2,
+      0.15,
+      0.1,
+      0.1
+    ],
+    "optimized_weights": [
+      0.25173683561353477,
+      0.09826076513786629,
+      0.1703066448876359,
+      0.08395935455709405,
+      0.0175217262779125,
+      0.3782146735259565
+    ],
+    "portfolio_volatility": 0.25629037315027725,
+    "portfolio_variance": 0.06568475536950835,
+    "convergence": true,
+    "matrix_condition": 3.5899958912029,
+    "diagonal_dominance": true
+  },
+  "scenario_vars": {
+    "oil_crash": {
+      "portfolio_impact": -0.2235,
+      "var_95": -0.033492557367256676,
+      "cvar_95": -0.036543319434211595,
+      "expected_loss": 0.07601187351797324,
+      "worst_case": -0.036543319434211595,
+      "solver_status": "solved"
+    },
+    "recession": {
+      "portfolio_impact": -0.32875000000000004,
+      "var_95": 0.08384885727378583,
+      "cvar_95": 0.0727876319541418,
+      "expected_loss": 0.181563484236298,
+      "worst_case": 0.0727876319541418,
+      "solver_status": "solved"
+    },
+    "opec_cut": {
+      "portfolio_impact": 0.138,
+      "var_95": -0.009363400089364137,
+      "cvar_95": -0.010701395607906032,
+      "expected_loss": 0.029752082884509094,
+      "worst_case": -0.010701395607906032,
+      "solver_status": "solved"
+    },
+    "clean_disruption": {
+      "portfolio_impact": -0.18599999999999994,
+      "var_95": -0.20161328043588844,
+      "cvar_95": -0.2612153176235412,
+      "expected_loss": 0.034247279444675725,
+      "worst_case": -0.2612153176235412,
+      "solver_status": "solved"
+    }
+  },
+  "survival_analysis": {
+    "oil_crash": {
+      "survival_probability": 0.0,
+      "expected_return": -0.22347170087712784,
+      "volatility": 0.021717247976137243,
+      "var_95": -0.25975785742459184,
+      "cvar_95": -0.26854627937518283
+    },
+    "recession": {
+      "survival_probability": 0.0,
+      "expected_return": -0.32894337326323714,
+      "volatility": 0.021616754139662315,
+      "var_95": -0.36436714792578917,
+      "cvar_95": -0.3734374211355089
+    },
+    "opec_cut": {
+      "survival_probability": 1.0,
+      "expected_return": 0.13807106292752028,
+      "volatility": 0.02181515070423906,
+      "var_95": 0.10140555536307687,
+      "cvar_95": 0.09247860625264673
+    },
+    "clean_disruption": {
+      "survival_probability": 0.0,
+      "expected_return": -0.18608608091956122,
+      "volatility": 0.021755514762215926,
+      "var_95": -0.22244025841931972,
+      "cvar_95": -0.23126096881102012
+    }
+  },
+  "executive_summary": {
+    "average_survival_probability": 0.25,
+    "worst_case_var_95": -0.36436714792578917,
+    "optimization_successful": true,
+    "risk_level": "HIGH",
+    "recommendation": "Portfolio at severe risk of losses. Urgent restructuring required."
+  }
+}

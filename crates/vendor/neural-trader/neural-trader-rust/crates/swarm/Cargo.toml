@@ -1,0 +1,69 @@
+[package]
+name = "neural-trader-swarm"
+version = "2.1.0"
+edition = "2021"
+authors = ["Neural Trader Team"]
+license = "MIT OR Apache-2.0"
+description = "QUIC-based swarm coordination for Neural Trader with ReasoningBank integration"
+repository = "https://github.com/ruvnet/neural-trader"
+
+[dependencies]
+# QUIC protocol
+quinn = "0.11"
+rustls = "0.23"
+rustls-pemfile = "2.0"
+rcgen = "0.13"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full", "rt-multi-thread", "macros", "sync", "time"] }
+tokio-util = { version = "0.7", features = ["codec"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+# Synchronization
+parking_lot = "0.12"
+dashmap = "6.0"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Crypto
+uuid = { version = "1.6", features = ["v4", "serde"] }
+sha2 = "0.10"
+
+# Metrics
+prometheus = { version = "0.13", optional = true }
+
+# Internal crates (optional dependencies for now)
+# neural-trader-core = { path = "../core", optional = true }
+# neural-trader-memory = { path = "../memory", optional = true }
+
+# Native certificates for TLS
+rustls-native-certs = "0.8.2"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["async_tokio"] }
+tempfile = "3.8"
+proptest = "1.4"
+
+[features]
+default = []
+metrics = ["prometheus"]
+benchmarks = []
+
+# Benchmarks disabled until created
+# [[bench]]
+# name = "quic_coordinator"
+# harness = false
+# required-features = ["benchmarks"]

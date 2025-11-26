@@ -1,0 +1,22 @@
+{
+  "name": "@neural-trader/mcp-tests",
+  "version": "1.0.0",
+  "description": "MCP 2025-11 compliance test suite for Neural Trader MCP Server",
+  "private": true,
+  "scripts": {
+    "test": "node test-runner.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:protocol": "jest protocol/",
+    "test:discovery": "jest discovery/",
+    "test:transport": "jest transport/",
+    "test:logging": "jest logging/",
+    "test:integration": "jest integration/"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

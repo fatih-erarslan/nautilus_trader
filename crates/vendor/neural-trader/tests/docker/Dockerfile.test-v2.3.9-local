@@ -1,0 +1,38 @@
+# Test neural-trader@2.3.9 with local installation
+FROM node:20-slim
+
+WORKDIR /app
+
+# Initialize a package.json for local install
+RUN npm init -y
+
+# Install neural-trader locally (prebuilt binaries should work without build tools)
+RUN npm install neural-trader@2.3.9
+
+# Test that the package can load its NAPI bindings
+RUN node -e "console.log('Testing NAPI bindings load...'); \
+  try { \
+    const nt = require('neural-trader'); \
+    console.log('✅ Module loaded successfully'); \
+    console.log('Available exports:', Object.keys(nt).join(', ')); \
+    console.log(''); \
+    console.log('Testing a function call...'); \
+    console.log('Module type:', typeof nt); \
+    console.log('fetchMarketData type:', typeof nt.fetchMarketData); \
+  } catch (e) { \
+    console.error('❌ Module load failed:', e.message); \
+    console.error('Stack:', e.stack); \
+    process.exit(1); \
+  }"
+
+# Test that main functions are available
+RUN node -e "const nt = require('neural-trader'); \
+  const requiredFuncs = ['fetchMarketData', 'streamMarketData', 'runStrategy', 'backtest']; \
+  const missing = requiredFuncs.filter(f => typeof nt[f] !== 'function'); \
+  if (missing.length > 0) { \
+    console.error('❌ Missing functions:', missing.join(', ')); \
+    process.exit(1); \
+  } \
+  console.log('✅ All core functions available');"
+
+CMD echo "✅ neural-trader@2.3.9 local install test PASSED!"

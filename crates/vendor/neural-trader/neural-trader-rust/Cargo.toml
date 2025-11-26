@@ -1,0 +1,119 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/core",
+    "crates/market-data",
+    "crates/features",
+    "crates/strategies",  # Re-enabled - fixing type errors
+    "crates/execution",
+    "crates/portfolio",
+    "crates/risk",
+    "crates/backtesting",
+    "crates/neural",  # Re-enabled with candle feature gates
+    "crates/agentdb-client",
+    "crates/streaming",
+    "crates/governance",
+    "crates/cli",  # Re-enabled - strategies crate is fixed
+    "crates/napi-bindings",
+    "crates/utils",
+    "crates/mcp-protocol",
+    "crates/mcp-server",
+    # "crates/memory",  # Commented out - crate doesn't exist
+    "crates/distributed",
+    "crates/integration",
+    "crates/multi-market",
+    "crates/sports-betting",  # NEW: Sports betting with syndicate management
+    "crates/prediction-markets",  # NEW: Polymarket integration
+    "crates/news-trading",  # NEW: News trading system
+    "crates/canadian-trading",  # NEW: Canadian broker integrations
+    "crates/e2b-integration",  # NEW: E2B sandbox integration
+    "crates/hive-mind",  # NEW: Hive Mind multi-agent coordination
+    "crates/nt-benchoptimizer",  # NEW: High-performance benchmarking and optimization toolkit
+    "crates/nt-syndicate",  # NEW: Syndicate management for collaborative sports betting
+    "crates/nt-napi",
+    "crates/neuro-divergent",  # NEW: Neural forecasting library with 27+ models
+    "crates/neuro-divergent-napi",  # NEW: NAPI-RS bindings for neuro-divergent
+    "crates/reasoning",  # NEW: ReasoningBank self-learning pattern engine
+    "crates/swarm", "crates/conformal-prediction",  # NEW: QUIC-based swarm coordination
+]
+
+[workspace.package]
+version = "2.1.0"
+edition = "2021"
+authors = ["Neural Trader Team"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ruvnet/neural-trader"
+keywords = ["trading", "neural", "finance", "algorithmic"]
+documentation = "https://docs.rs/"
+homepage = "https://github.com/ruvnet/neural-trader"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Decimal precision for financial calculations
+rust_decimal = { version = "1.33", features = ["serde-with-arbitrary-precision"] }
+
+# Date/Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID generation
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# HTTP client/server
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["trace", "cors"] }
+
+# WebSocket
+tokio-tungstenite = { version = "0.21", features = ["rustls-tls-native-roots"] }
+
+# DataFrame processing
+polars = { version = "0.36", features = ["lazy", "temporal", "serde"] }
+
+# Testing
+proptest = "1.4"
+mockall = "0.12"
+tokio-test = "0.4"
+tempfile = "3.8"
+
+# Benchmarking
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+
+# Additional dependencies for backend-rs
+futures = "0.3"
+jsonwebtoken = "9.2"
+hyper = "1.0"
+rstest = "0.18"
+dotenvy = "0.15"
+bcrypt = "0.15"
+validator = "0.16"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.bench]
+inherits = "release"
+debug = true

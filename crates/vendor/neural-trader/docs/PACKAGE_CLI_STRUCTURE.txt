@@ -1,0 +1,126 @@
+Neural Trader CLI - Package Management Structure
+================================================
+
+src/cli/
+├── commands/
+│   └── package/
+│       ├── index.js          (Main router - 6.5KB, 233 lines)
+│       ├── list.js           (List command - 5KB, 166 lines)
+│       ├── info.js           (Info command - 5.8KB, 207 lines)
+│       ├── install.js        (Install command - 6.4KB, 238 lines)
+│       ├── update.js         (Update command - 7.3KB, 271 lines)
+│       ├── remove.js         (Remove command - 5.5KB, 214 lines)
+│       └── search.js         (Search command - 3.2KB, 109 lines)
+├── lib/
+│   ├── package-manager.js    (Core logic - 11KB, 425 lines)
+│   ├── package-validator.js  (Validation - 9.1KB, 347 lines)
+│   ├── package-cache.js      (Caching - 7KB, 258 lines)
+│   └── dependency-resolver.js (Dependencies - 11KB, 425 lines)
+└── data/
+    └── packages.js           (Registry - 9.4KB, 305 lines)
+
+Total: 11 files, ~3,000 lines of code
+
+COMMAND STRUCTURE
+=================
+
+neural-trader package <subcommand> [args] [options]
+
+Subcommands:
+  list [category]     - List packages (filter by category)
+  info <name>         - Show detailed package information
+  install <name>      - Install package with dependencies
+  update [name]       - Update one or all packages
+  remove <name>       - Remove package (with dep checking)
+  search <query>      - Search packages by keyword
+
+Aliases:
+  package → pkg
+  list → ls
+  info → show
+  install → add, i
+  update → upgrade, up
+  remove → uninstall, rm
+  search → find
+
+KEY FEATURES
+============
+
+✓ Rich UI with chalk colors and cli-table3 tables
+✓ Progress bars with listr2 for installations
+✓ Comprehensive validation before operations
+✓ Dependency resolution with circular detection
+✓ Installation size estimates
+✓ Metadata caching (24h TTL)
+✓ Dry-run mode for safe testing
+✓ Force mode for overrides
+✓ Conflict detection
+✓ Disk space validation
+✓ System requirements checking
+✓ Error handling with helpful messages
+✓ JSDoc documentation throughout
+
+PACKAGE REGISTRY
+================
+
+Categories:
+  - trading (4 packages)
+  - betting (1 package)
+  - markets (1 package)
+  - accounting (1 package)
+  - prediction (1 package)
+  - data (1 package)
+  - example (9 packages)
+
+Total: 18 packages
+
+Each package includes:
+  - name, description, category
+  - version, size
+  - npm packages list
+  - dependencies
+  - features list
+  - example status
+
+INTEGRATION
+===========
+
+To integrate with main CLI (bin/cli.js):
+
+const packageCommand = require('../src/cli/commands/package');
+
+const commands = {
+  // existing commands...
+  
+  package: async (...args) => {
+    const options = parseOptions(args);
+    await packageCommand(args.filter(a => !a.startsWith('--')), options);
+  },
+  
+  pkg: async (...args) => {
+    // Alias for package
+    return commands.package(...args);
+  }
+};
+
+TESTING
+=======
+
+Quick tests:
+  neural-trader package help
+  neural-trader package list
+  neural-trader package list trading
+  neural-trader package search portfolio
+  neural-trader package info trading
+  neural-trader package install --dry-run trading
+
+DEPENDENCIES
+============
+
+Required npm packages:
+  - chalk (already installed)
+  - cli-table3 (already installed)
+  - listr2 (newly installed)
+
+Node.js: >= 18.0.0
+

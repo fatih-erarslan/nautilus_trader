@@ -1,0 +1,54 @@
+{
+  "name": "@neural-trader/agentic-accounting-rust-core",
+  "version": "0.1.0",
+  "description": "High-performance Rust addon for crypto tax calculations",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "agentic-accounting-rust-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-linux-android",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "aarch64-pc-windows-msvc",
+        "armv7-unknown-linux-gnueabihf",
+        "x86_64-unknown-linux-musl",
+        "x86_64-unknown-freebsd",
+        "i686-pc-windows-msvc",
+        "armv7-linux-androideabi",
+        "universal-apple-darwin"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "bench": "cargo bench",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test --all-features",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neural-trader/agentic-accounting.git"
+  },
+  "keywords": [
+    "rust",
+    "napi",
+    "crypto",
+    "tax",
+    "accounting",
+    "performance"
+  ]
+}

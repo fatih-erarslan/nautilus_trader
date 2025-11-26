@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/odds_api_get_bookmaker_odds.json",
+  "title": "odds_api_get_bookmaker_odds",
+  "description": "Get odds from a specific bookmaker.",
+  "category": "odds_api",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sport": {
+          "type": "string"
+        },
+        "bookmaker": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "string",
+          "default": "us"
+        },
+        "markets": {
+          "type": "string",
+          "default": "h2h"
+        }
+      },
+      "required": [
+        "sport",
+        "bookmaker"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

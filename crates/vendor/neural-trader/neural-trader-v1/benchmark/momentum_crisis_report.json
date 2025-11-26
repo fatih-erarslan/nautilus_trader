@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-06-23T21:00:00Z",
+  "crisis_metrics": {
+    "annual_return": 0.0,
+    "sharpe_ratio": 0.0,
+    "max_drawdown": 0.0,
+    "win_rate": 0.0
+  },
+  "market_condition_analysis": {
+    "momentum_bull": {
+      "annual_return": -0.32966927059272966,
+      "sharpe_ratio": -4.473596249228193,
+      "max_drawdown": 0.33149727934265716
+    },
+    "momentum_bear": {
+      "annual_return": -0.02038140929529708,
+      "sharpe_ratio": -0.4838432909360516,
+      "max_drawdown": 0.2427898970453254
+    },
+    "momentum_sideways": {
+      "annual_return": -0.16205636899273068,
+      "sharpe_ratio": -4.237788806864658,
+      "max_drawdown": 0.20199953992668995
+    },
+    "momentum_volatile": {
+      "annual_return": 0.6008164199130996,
+      "sharpe_ratio": 4.75681962868974,
+      "max_drawdown": 0.20694528258940004
+    }
+  },
+  "comparison_with_successful": {
+    "momentum": {
+      "annual_return": 0.0,
+      "sharpe_ratio": 0.0
+    },
+    "mirror": {
+      "annual_return": 0.0,
+      "sharpe_ratio": 0.0
+    },
+    "mean_reversion": {
+      "annual_return": 0.0,
+      "sharpe_ratio": 0.0
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "@neural-trader/agentic-accounting-cli",
+  "version": "0.1.0",
+  "description": "Command-line interface for the agentic accounting system",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "accounting": "./bin/accounting-cli.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "cli",
+    "accounting",
+    "tools"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "dependencies": {
+    "@neural-trader/agentic-accounting-core": "workspace:*",
+    "@neural-trader/agentic-accounting-types": "workspace:*",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "chalk": "^5.6.2",
+    "ora": "^9.0.0",
+    "cli-table3": "^0.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.25",
+    "@types/inquirer": "^9.0.7",
+    "typescript": "^5.3.3",
+    "jest": "^29.7.0"
+  }
+}

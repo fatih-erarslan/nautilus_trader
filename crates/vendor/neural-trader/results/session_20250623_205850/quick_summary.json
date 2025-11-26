@@ -1,0 +1,14 @@
+{
+  "total_tests": 8,
+  "passed_tests": 5,
+  "failed_tests": 3,
+  "performance_targets_met": false,
+  "key_metrics": {
+    "signal_latency_p95_ms": 8.140231350057547,
+    "signal_throughput_ops_sec": 0.0
+  },
+  "recommendations": [
+    "Address 3 failed tests",
+    "Performance targets not met - consider optimization"
+  ]
+}

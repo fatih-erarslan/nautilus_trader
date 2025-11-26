@@ -1,0 +1,544 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Neural Forecast Model Configuration Schema",
+  "description": "Configuration schema for neural forecasting models including NHITS, NBEATS, TFT, and PatchTST",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["development", "staging", "production"],
+      "default": "development"
+    },
+    "models": {
+      "type": "object",
+      "properties": {
+        "NBEATS": {
+          "type": "object",
+          "properties": {
+            "input_size": {
+              "type": "integer",
+              "minimum": 24,
+              "maximum": 720,
+              "default": 168,
+              "description": "Input window size in hours"
+            },
+            "h": {
+              "type": "integer",
+              "forecast_horizon": true,
+              "default": 24,
+              "description": "Forecast horizon"
+            },
+            "max_steps": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 5000,
+              "default": 500,
+              "description": "Maximum training steps"
+            },
+            "learning_rate": {
+              "type": "number",
+              "learning_rate": true,
+              "default": 0.001,
+              "description": "Learning rate for optimization"
+            },
+            "batch_size": {
+              "type": "integer",
+              "batch_size": true,
+              "default": 32,
+              "description": "Training batch size"
+            },
+            "windows_batch_size": {
+              "type": "integer",
+              "minimum": 32,
+              "maximum": 512,
+              "default": 128,
+              "description": "Windows batch size for training"
+            },
+            "stack_types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["trend", "seasonality", "generic"]
+              },
+              "default": ["trend", "seasonality"],
+              "description": "NBEATS stack types"
+            },
+            "n_blocks": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "default": [1, 1],
+              "description": "Number of blocks per stack"
+            },
+            "hidden_size": {
+              "type": "integer",
+              "minimum": 32,
+              "maximum": 1024,
+              "default": 512,
+              "description": "Hidden layer size"
+            },
+            "dropout": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 0.5,
+              "default": 0.0,
+              "description": "Dropout rate"
+            }
+          },
+          "required": ["input_size", "h", "max_steps", "learning_rate", "batch_size"],
+          "additionalProperties": false
+        },
+        "NHITS": {
+          "type": "object",
+          "properties": {
+            "input_size": {
+              "type": "integer",
+              "minimum": 24,
+              "maximum": 720,
+              "default": 168,
+              "description": "Input window size in hours"
+            },
+            "h": {
+              "type": "integer",
+              "forecast_horizon": true,
+              "default": 24,
+              "description": "Forecast horizon"
+            },
+            "max_steps": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 5000,
+              "default": 500,
+              "description": "Maximum training steps"
+            },
+            "learning_rate": {
+              "type": "number",
+              "learning_rate": true,
+              "default": 0.001,
+              "description": "Learning rate for optimization"
+            },
+            "batch_size": {
+              "type": "integer",
+              "batch_size": true,
+              "default": 32,
+              "description": "Training batch size"
+            },
+            "windows_batch_size": {
+              "type": "integer",
+              "minimum": 32,
+              "maximum": 512,
+              "default": 128,
+              "description": "Windows batch size for training"
+            },
+            "n_freq_downsample": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "default": [24, 12, 1],
+              "description": "Frequency downsampling factors"
+            },
+            "pooling_sizes": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "default": [2, 2, 1],
+              "description": "Pooling sizes for each frequency"
+            },
+            "n_pool_kernel_size": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "default": [2, 2, 1],
+              "description": "Pool kernel sizes"
+            },
+            "interpolation_mode": {
+              "type": "string",
+              "enum": ["linear", "nearest", "cubic"],
+              "default": "linear",
+              "description": "Interpolation mode for upsampling"
+            },
+            "dropout": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 0.5,
+              "default": 0.0,
+              "description": "Dropout rate"
+            }
+          },
+          "required": ["input_size", "h", "max_steps", "learning_rate", "batch_size"],
+          "additionalProperties": false
+        },
+        "TFT": {
+          "type": "object",
+          "properties": {
+            "input_size": {
+              "type": "integer",
+              "minimum": 24,
+              "maximum": 720,
+              "default": 168,
+              "description": "Input window size in hours"
+            },
+            "h": {
+              "type": "integer",
+              "forecast_horizon": true,
+              "default": 24,
+              "description": "Forecast horizon"
+            },
+            "max_steps": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 5000,
+              "default": 500,
+              "description": "Maximum training steps"
+            },
+            "learning_rate": {
+              "type": "number",
+              "learning_rate": true,
+              "default": 0.001,
+              "description": "Learning rate for optimization"
+            },
+            "batch_size": {
+              "type": "integer",
+              "batch_size": true,
+              "default": 32,
+              "description": "Training batch size"
+            },
+            "hidden_size": {
+              "type": "integer",
+              "minimum": 32,
+              "maximum": 512,
+              "default": 128,
+              "description": "Hidden state size"
+            },
+            "n_heads": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16,
+              "default": 4,
+              "description": "Number of attention heads"
+            },
+            "dropout": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 0.5,
+              "default": 0.1,
+              "description": "Dropout rate"
+            },
+            "add_relative_index": {
+              "type": "boolean",
+              "default": false,
+              "description": "Add relative temporal index"
+            }
+          },
+          "required": ["input_size", "h", "max_steps", "learning_rate", "batch_size", "hidden_size", "n_heads"],
+          "additionalProperties": false
+        },
+        "PatchTST": {
+          "type": "object",
+          "properties": {
+            "input_size": {
+              "type": "integer",
+              "minimum": 24,
+              "maximum": 720,
+              "default": 168,
+              "description": "Input window size in hours"
+            },
+            "h": {
+              "type": "integer",
+              "forecast_horizon": true,
+              "default": 24,
+              "description": "Forecast horizon"
+            },
+            "max_steps": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 5000,
+              "default": 500,
+              "description": "Maximum training steps"
+            },
+            "learning_rate": {
+              "type": "number",
+              "learning_rate": true,
+              "default": 0.001,
+              "description": "Learning rate for optimization"
+            },
+            "batch_size": {
+              "type": "integer",
+              "batch_size": true,
+              "default": 32,
+              "description": "Training batch size"
+            },
+            "patch_len": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24,
+              "default": 16,
+              "description": "Patch length for time series patching"
+            },
+            "stride": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16,
+              "default": 8,
+              "description": "Stride for patching"
+            },
+            "hidden_size": {
+              "type": "integer",
+              "minimum": 32,
+              "maximum": 512,
+              "default": 128,
+              "description": "Hidden dimension of transformer"
+            },
+            "n_heads": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16,
+              "default": 4,
+              "description": "Number of attention heads"
+            },
+            "e_layers": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8,
+              "default": 3,
+              "description": "Number of encoder layers"
+            },
+            "dropout": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 0.5,
+              "default": 0.1,
+              "description": "Dropout rate"
+            }
+          },
+          "required": ["input_size", "h", "max_steps", "learning_rate", "batch_size", "patch_len", "stride"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "ensemble": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable ensemble forecasting"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["NBEATS", "NHITS", "TFT", "PatchTST"]
+          },
+          "minItems": 2,
+          "default": ["NBEATS", "NHITS"],
+          "description": "Models to include in ensemble"
+        },
+        "weighting_strategy": {
+          "type": "string",
+          "enum": ["equal", "performance", "dynamic"],
+          "default": "equal",
+          "description": "Strategy for combining model predictions"
+        },
+        "performance_window": {
+          "type": "integer",
+          "minimum": 24,
+          "maximum": 720,
+          "default": 168,
+          "description": "Window for performance-based weighting (hours)"
+        }
+      },
+      "required": ["enabled"],
+      "additionalProperties": false
+    },
+    "training": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "enum": ["H", "D", "M", "S"],
+          "default": "H",
+          "description": "Data frequency (H=hourly, D=daily, M=monthly, S=seconds)"
+        },
+        "validation_split": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.4,
+          "default": 0.2,
+          "description": "Fraction of data for validation"
+        },
+        "early_stopping": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable early stopping"
+        },
+        "early_stopping_patience": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 100,
+          "default": 20,
+          "description": "Early stopping patience"
+        },
+        "enable_progress_bar": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show training progress bar"
+        },
+        "save_checkpoints": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save model checkpoints during training"
+        },
+        "checkpoint_interval": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 500,
+          "default": 50,
+          "description": "Steps between checkpoints"
+        }
+      },
+      "required": ["frequency"],
+      "additionalProperties": false
+    },
+    "optimization": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable hyperparameter optimization"
+        },
+        "optimizer": {
+          "type": "string",
+          "enum": ["optuna", "hyperopt", "skopt"],
+          "default": "optuna",
+          "description": "Optimization framework to use"
+        },
+        "n_trials": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 1000,
+          "default": 50,
+          "description": "Number of optimization trials"
+        },
+        "timeout_minutes": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 1440,
+          "default": 120,
+          "description": "Optimization timeout in minutes"
+        },
+        "objective": {
+          "type": "string",
+          "enum": ["mae", "mse", "rmse", "mape", "smape"],
+          "default": "mae",
+          "description": "Optimization objective metric"
+        }
+      },
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "min_history_hours": {
+          "type": "integer",
+          "minimum": 168,
+          "maximum": 8760,
+          "default": 720,
+          "description": "Minimum historical data required (hours)"
+        },
+        "max_history_hours": {
+          "type": "integer",
+          "minimum": 720,
+          "maximum": 17520,
+          "default": 8760,
+          "description": "Maximum historical data to use (hours)"
+        },
+        "missing_value_strategy": {
+          "type": "string",
+          "enum": ["forward_fill", "backward_fill", "interpolate", "drop"],
+          "default": "forward_fill",
+          "description": "Strategy for handling missing values"
+        },
+        "outlier_detection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable outlier detection and handling"
+        },
+        "outlier_threshold": {
+          "type": "number",
+          "minimum": 2.0,
+          "maximum": 5.0,
+          "default": 3.0,
+          "description": "Z-score threshold for outlier detection"
+        },
+        "scaling": {
+          "type": "string",
+          "enum": ["standard", "minmax", "robust", "none"],
+          "default": "standard",
+          "description": "Data scaling method"
+        }
+      },
+      "additionalProperties": false
+    },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+          "default": "INFO",
+          "description": "Logging level"
+        },
+        "format": {
+          "type": "string",
+          "default": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+          "description": "Log message format"
+        },
+        "file_logging": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable file logging"
+        },
+        "log_file": {
+          "type": "string",
+          "default": "neural_forecast.log",
+          "description": "Log file name"
+        },
+        "max_file_size_mb": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 100,
+          "description": "Maximum log file size in MB"
+        },
+        "backup_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5,
+          "description": "Number of backup log files to keep"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["version", "models", "training"],
+  "additionalProperties": false
+}

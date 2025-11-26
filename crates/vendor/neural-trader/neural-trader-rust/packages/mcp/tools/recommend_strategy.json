@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/recommend_strategy.json",
+  "title": "recommend_strategy",
+  "description": "Recommend best strategy based on market conditions.",
+  "category": "strategy",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "market_conditions": {
+          "type": "object",
+          "description": "Current market conditions",
+          "additionalProperties": true
+        },
+        "risk_tolerance": {
+          "type": "string",
+          "default": "moderate",
+          "enum": [
+            "conservative",
+            "moderate",
+            "aggressive"
+          ]
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "profit",
+            "stability"
+          ]
+        }
+      },
+      "required": [
+        "market_conditions"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "recommended_strategy": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "reasoning": {
+          "type": "string"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "strategy": {
+                "type": "string"
+              },
+              "score": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

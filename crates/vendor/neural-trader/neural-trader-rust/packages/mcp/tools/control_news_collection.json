@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/control_news_collection.json",
+  "title": "control_news_collection",
+  "description": "Control news collection: start, stop, configure.",
+  "category": "news",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "start",
+            "stop",
+            "pause",
+            "configure"
+          ]
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "update_frequency": {
+          "type": "integer",
+          "default": 300,
+          "description": "Update frequency in seconds"
+        },
+        "lookback_hours": {
+          "type": "integer",
+          "default": 24
+        }
+      },
+      "required": [
+        "action"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "active_symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "active_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "collection_rate": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

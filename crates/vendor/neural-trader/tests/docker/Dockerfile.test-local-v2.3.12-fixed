@@ -1,0 +1,79 @@
+# Test LOCAL neural-trader v2.3.12 before publishing
+FROM node:20-slim
+
+WORKDIR /test
+
+# Copy the local package
+COPY . /neural-trader-local
+
+# Pack the local version
+RUN cd /neural-trader-local && npm pack
+
+# Install the packed version WITH --ignore-scripts to skip optional dependency builds
+RUN npm install -g /neural-trader-local/neural-trader-2.3.12.tgz --ignore-scripts
+
+# Test 1: Version
+RUN echo "=== Test 1: Version ===" && \
+    neural-trader version
+
+# Test 2: List packages
+RUN echo "" && echo "=== Test 2: List Packages ===" && \
+    neural-trader list
+
+# Test 3: Init trading
+RUN echo "" && echo "=== Test 3: Init Trading ===" && \
+    mkdir /test/trading && cd /test/trading && \
+    neural-trader init trading && \
+    test -f config.json && echo "✅ config.json" || exit 1 && \
+    test -f src/main.js && echo "✅ src/main.js" || exit 1
+
+# Test 4: Init accounting
+RUN echo "" && echo "=== Test 4: Init Accounting ===" && \
+    mkdir /test/accounting && cd /test/accounting && \
+    neural-trader init accounting && \
+    test -d tax-lots && echo "✅ tax-lots/" || exit 1
+
+# Test 5: Init predictor
+RUN echo "" && echo "=== Test 5: Init Predictor ===" && \
+    mkdir /test/predictor && cd /test/predictor && \
+    neural-trader init predictor && \
+    test -d models && echo "✅ models/" || exit 1
+
+# Test 6: Init example
+RUN echo "" && echo "=== Test 6: Init Example ===" && \
+    mkdir /test/example && cd /test/example && \
+    neural-trader init example:portfolio-optimization && \
+    test -f package.json && echo "✅ package.json" || exit 1
+
+# Test 7: Test command
+RUN echo "" && echo "=== Test 7: Test Command ===" && \
+    neural-trader test
+
+# Test 8: Doctor
+RUN echo "" && echo "=== Test 8: Doctor ===" && \
+    cd /test/trading && neural-trader doctor
+
+# Test 9: JavaScript API
+RUN echo "" && echo "=== Test 9: JavaScript API ===" && \
+    mkdir /test/api && cd /test/api && \
+    npm init -y > /dev/null 2>&1 && \
+    npm install /neural-trader-local/neural-trader-2.3.12.tgz --ignore-scripts > /dev/null 2>&1 && \
+    node -e "const nt = require('neural-trader'); \
+      console.log('✅ Module loaded'); \
+      console.log('  Functions:', Object.keys(nt).length); \
+      const required = ['fetchMarketData', 'runStrategy', 'backtest', 'trainModel']; \
+      const missing = required.filter(f => typeof nt[f] !== 'function'); \
+      if (missing.length > 0) { \
+        console.error('❌ Missing:', missing.join(', ')); \
+        process.exit(1); \
+      } \
+      console.log('✅ All', required.length, 'core functions available');"
+
+CMD echo "" && \
+    echo "========================================" && \
+    echo "✅✅✅ ALL LOCAL TESTS PASSED! ✅✅✅" && \
+    echo "========================================" && \
+    echo "" && \
+    echo "neural-trader@2.3.12 validated in Docker!" && \
+    echo "Ready for npm publish" && \
+    echo ""

@@ -1,0 +1,31 @@
+# Codex + Flow-Nexus Aliases
+# Add these to your shell profile or use directly in Codex
+
+# Quick commands
+alias fx='npx flow-nexus@latest'
+alias fx-swarm='npx flow-nexus@latest swarm init'
+alias fx-agent='npx flow-nexus@latest agent spawn'
+alias fx-task='npx flow-nexus@latest task orchestrate'
+alias fx-chat='npx flow-nexus@latest seraphina chat'
+
+# Integration with Codex
+alias codex-fx='/workspaces/ai-news-trader/scripts/codex-flow-nexus.sh'
+
+# Combined workflows
+fx-dev() {
+    echo "🚀 Starting Flow-Nexus Development Environment..."
+    npx flow-nexus@latest swarm init --topology mesh
+    npx flow-nexus@latest agent spawn --type coder
+    npx flow-nexus@latest agent spawn --type tester
+    echo "✅ Ready for development with Codex + Flow-Nexus"
+}
+
+fx-analyze() {
+    echo "🔍 Analyzing with Flow-Nexus..."
+    npx flow-nexus@latest github repo analyze --repo "$1"
+}
+
+fx-sandbox() {
+    echo "📦 Creating Flow-Nexus Sandbox..."
+    npx flow-nexus@latest sandbox create --template "${1:-node}"
+}

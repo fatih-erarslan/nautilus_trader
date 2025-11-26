@@ -1,0 +1,21 @@
+{
+  "strategy_type": "mirror_trading",
+  "parameters": {
+    "confidence_threshold": 0.75,
+    "position_size": 0.025,
+    "stop_loss_threshold": -0.08,
+    "profit_threshold": 0.25,
+    "institutional_weight": 0.8,
+    "insider_weight": 0.6,
+    "kelly_fraction": 0.3
+  },
+  "performance_metrics": {
+    "sharpe_ratio": 6.01,
+    "total_return": 0.534,
+    "max_drawdown": -0.099,
+    "win_rate": 0.67
+  },
+  "gpu_optimized": true,
+  "speedup_achieved": "3000x",
+  "optimization_date": "2025-06-26T20:59:27.515219"
+}

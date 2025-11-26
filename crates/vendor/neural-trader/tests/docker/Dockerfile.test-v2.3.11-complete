@@ -1,0 +1,52 @@
+# Complete test for neural-trader@2.3.11 - Working CLI!
+FROM node:20-slim
+
+WORKDIR /app
+
+# Sleep to let npm CDN propagate
+RUN sleep 30
+
+# Test 1: npx neural-trader version (should work without errors!)
+RUN echo "=== Test 1: npx neural-trader@2.3.11 version ===" && \
+    npx --yes neural-trader@2.3.11 version
+
+# Test 2: npx neural-trader init (should create project structure!)
+RUN echo "=== Test 2: npx neural-trader@2.3.11 init ===" && \
+    cd /tmp && mkdir test-project && cd test-project && \
+    npx --yes neural-trader@2.3.11 init
+
+# Verify init created the correct files
+RUN cd /tmp/test-project && \
+    test -f config.json && echo "✅ config.json created" || (echo "❌ config.json missing" && exit 1) && \
+    test -d strategies && echo "✅ strategies/ directory created" || (echo "❌ strategies/ missing" && exit 1) && \
+    test -f strategies/example.js && echo "✅ example.js created" || (echo "❌ example.js missing" && exit 1) && \
+    test -d data && echo "✅ data/ directory created" || (echo "❌ data/ missing" && exit 1) && \
+    test -d backtest-results && echo "✅ backtest-results/ directory created" || (echo "❌ backtest-results/ missing" && exit 1)
+
+# Test 3: npx neural-trader test (verify NAPI bindings)
+RUN echo "=== Test 3: npx neural-trader@2.3.11 test ===" && \
+    npx --yes neural-trader@2.3.11 test
+
+# Test 4: JavaScript API (install and use directly)
+RUN echo "=== Test 4: JavaScript API ===" && \
+    npm init -y && \
+    npm install neural-trader@2.3.11 --ignore-scripts
+
+RUN node -e "const nt = require('neural-trader'); \
+  console.log('Testing JavaScript API...'); \
+  console.log(''); \
+  const required = ['fetchMarketData', 'runStrategy', 'backtest', 'trainModel', 'predict']; \
+  const missing = required.filter(f => typeof nt[f] !== 'function'); \
+  if (missing.length > 0) { \
+    console.error('❌ Missing functions:', missing.join(', ')); \
+    process.exit(1); \
+  } \
+  if (nt.runCli !== undefined) { \
+    console.error('❌ runCli should not be exported'); \
+    process.exit(1); \
+  } \
+  console.log('✅ All', required.length, 'core functions available'); \
+  console.log('✅ runCli correctly removed'); \
+  console.log('✅ JavaScript API fully functional');"
+
+CMD echo "✅✅✅ neural-trader@2.3.11 ALL TESTS PASSED! ✅✅✅"

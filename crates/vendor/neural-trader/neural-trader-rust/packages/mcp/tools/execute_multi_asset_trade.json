@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/execute_multi_asset_trade.json",
+  "title": "execute_multi_asset_trade",
+  "description": "Execute trades across multiple assets.",
+  "category": "trading",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "buy",
+                  "sell"
+                ]
+              },
+              "quantity": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "symbol",
+              "action",
+              "quantity"
+            ]
+          }
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "execute_parallel": {
+          "type": "boolean",
+          "default": true
+        },
+        "risk_limit": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "trades",
+        "strategy"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "batch_id": {
+          "type": "string"
+        },
+        "executions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "trade_id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "successful": {
+              "type": "integer"
+            },
+            "failed": {
+              "type": "integer"
+            },
+            "total": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

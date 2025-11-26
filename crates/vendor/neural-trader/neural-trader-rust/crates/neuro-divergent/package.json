@@ -1,0 +1,80 @@
+{
+  "name": "@neural-trader/neuro-divergent",
+  "version": "0.1.0",
+  "description": "Neuro-Divergent adaptive trading strategies with NAPI bindings",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "keywords": [
+    "trading",
+    "neuro-divergent",
+    "adaptive",
+    "rust",
+    "napi",
+    "algorithmic-trading",
+    "machine-learning"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/crates/neuro-divergent"
+  },
+  "napi": {
+    "binaryName": "neuro-divergent",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu"
+    ],
+    "package": {
+      "name": "@neural-trader/neuro-divergent"
+    }
+  },
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "build:release": "napi build --platform --release --strip",
+    "build:all": "bash ../../scripts/build-neuro-divergent-all.sh",
+    "build:linux": "bash ../../scripts/build-neuro-divergent-linux.sh",
+    "build:macos": "bash ../../scripts/build-neuro-divergent-macos.sh",
+    "build:windows": "powershell -ExecutionPolicy Bypass -File ../../scripts/build-neuro-divergent-windows.ps1",
+    "artifacts": "napi artifacts",
+    "prepublishOnly": "napi prepublish -t npm && npm run artifacts",
+    "universal": "napi universal",
+    "version": "napi version",
+    "test": "cargo test --manifest-path=../../Cargo.toml --package neuro-divergent",
+    "test:node": "node test/integration.test.js"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.4.1"
+  },
+  "optionalDependencies": {
+    "@neural-trader/neuro-divergent-linux-x64-gnu": "0.1.0",
+    "@neural-trader/neuro-divergent-linux-x64-musl": "0.1.0",
+    "@neural-trader/neuro-divergent-linux-arm64-gnu": "0.1.0",
+    "@neural-trader/neuro-divergent-darwin-x64": "0.1.0",
+    "@neural-trader/neuro-divergent-darwin-arm64": "0.1.0",
+    "@neural-trader/neuro-divergent-win32-x64-msvc": "0.1.0"
+  },
+  "engines": {
+    "node": ">= 16"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "native/**/*.node"
+  ]
+}

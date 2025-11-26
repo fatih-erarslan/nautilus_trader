@@ -1,0 +1,109 @@
+[package]
+name = "nt-napi-bindings"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Node.js N-API bindings for Neural Trader - High-performance TypeScript/JavaScript interface"
+documentation = "https://docs.rs/nt-napi-bindings"
+readme = "README.md"
+keywords = ["napi", "nodejs", "bindings", "trading", "javascript"]
+categories = ["api-bindings", "finance"]
+
+[lib]
+crate-type = ["cdylib"]
+name = "nt_napi_bindings"
+
+[dependencies]
+# Multi-Market Trading (v2.6.0)
+multi-market = { path = "../multi-market" }
+
+# Core crate with all trading types
+nt-core = { version = "2.0.0", path = "../core" }
+
+# Trading system crates
+nt-strategies = { version = "2.0.0", path = "../strategies" }
+nt-execution = { version = "2.0.0", path = "../execution" }
+nt-features = { version = "2.0.0", path = "../features" }
+nt-portfolio = { version = "2.0.0", path = "../portfolio" }
+nt-news-trading = { version = "2.0.0", path = "../news-trading" }
+nt-risk = { version = "2.0.0", path = "../risk" }
+nt-syndicate = { version = "2.0.0", path = "../nt-syndicate" }
+nt-prediction-markets = { version = "2.0.0", path = "../prediction-markets" }
+
+# E2B and API integration
+# neural-trader-api = { path = "../backend-rs/crates/api" }  # Disabled - SQLite version conflict with distributed crate
+
+# napi-rs for Node.js FFI
+napi = { version = "2.16", features = ["async", "tokio_rt"] }
+napi-derive = "2.16"
+
+# Additional dependencies for FFI layer
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+rust_decimal = { workspace = true }
+tracing = { workspace = true }
+log = "0.4"
+libc = "0.2"
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Utilities
+num_cpus = "1.16"
+rustc_version_runtime = "0.3"
+lazy_static = "1.5"
+dashmap = "6.1"
+uuid = { version = "1.11", features = ["v4", "serde"] }
+
+# Connection pooling and resource management
+deadpool = "0.12"
+parking_lot = "0.12"
+crossbeam = "0.8"
+
+# Memory management - only use tikv-jemallocator (no conflict)
+tikv-jemallocator = { version = "0.5", optional = true }
+
+# HTTP client for The Odds API
+reqwest = { version = "0.11", features = ["json"] }
+rand = "0.8"
+
+# System monitoring
+sysinfo = "0.30"
+
+# Security - XSS and path validation
+regex = "1.10"
+tempfile = "3.8"
+
+# Parallel processing for DTW optimization
+rayon = "1.10"
+
+# Optional: MessagePack for efficient binary encoding
+rmp-serde = { version = "1.1", optional = true }
+
+[build-dependencies]
+napi-build = "2.1"
+
+[features]
+default = []
+# Enable GPU acceleration (placeholder for future)
+gpu = []
+# Enable MessagePack encoding for large data transfers
+msgpack = ["rmp-serde"]
+# Enable jemalloc for better memory management
+jemalloc = ["tikv-jemallocator"]
+
+# Profile settings are managed at workspace root
+
+# Package metadata for napi-rs
+[package.metadata.napi]
+name = "neural-trader"
+targets = [
+  "x86_64-unknown-linux-gnu",
+  "x86_64-apple-darwin",
+  "aarch64-apple-darwin",
+  "x86_64-pc-windows-msvc",
+  "aarch64-unknown-linux-gnu"
+]

@@ -1,0 +1,412 @@
+{
+  "$schema": "https://claude.ai/schema/commands/v1.0.0",
+  "name": "sync",
+  "description": "Synchronize agent states, shared memory, and distributed data across the swarm",
+  "version": "1.0.0",
+  "category": "swarm-synchronization",
+  "tags": ["synchronization", "state-management", "consistency", "coordination"],
+  
+  "command": {
+    "syntax": "sync [options] <sync-type> [targets]",
+    "aliases": ["synchronize", "align", "reconcile"],
+    "examples": [
+      {
+        "description": "Full state synchronization across all agents",
+        "command": "sync --type full --verify trading-swarm-01"
+      },
+      {
+        "description": "Sync specific data types with conflict resolution",
+        "command": "sync --data models,strategies --resolve latest agent-1 agent-2"
+      },
+      {
+        "description": "Emergency sync with checkpoint restoration",
+        "command": "sync --emergency --checkpoint latest --force"
+      }
+    ]
+  },
+  
+  "parameters": {
+    "required": [
+      {
+        "name": "sync-type",
+        "type": "string",
+        "description": "Type of synchronization to perform",
+        "choices": ["full", "partial", "state", "data", "config", "emergency"],
+        "default": "partial"
+      }
+    ],
+    
+    "optional": [
+      {
+        "name": "targets",
+        "type": "array",
+        "description": "Specific agents or swarms to sync (default: all)",
+        "elementType": "string"
+      },
+      {
+        "name": "data",
+        "type": "array",
+        "short": "d",
+        "long": "data",
+        "description": "Specific data types to synchronize",
+        "elementType": "string",
+        "choices": ["state", "models", "strategies", "positions", "orders", "cache", "metrics"]
+      },
+      {
+        "name": "direction",
+        "type": "string",
+        "long": "direction",
+        "description": "Sync direction",
+        "default": "bidirectional",
+        "choices": ["bidirectional", "push", "pull", "broadcast"]
+      },
+      {
+        "name": "resolve",
+        "type": "string",
+        "short": "r",
+        "long": "resolve",
+        "description": "Conflict resolution strategy",
+        "default": "timestamp",
+        "choices": ["timestamp", "latest", "version", "manual", "consensus"]
+      },
+      {
+        "name": "verify",
+        "type": "boolean",
+        "short": "v",
+        "long": "verify",
+        "description": "Verify data integrity after sync",
+        "default": true
+      },
+      {
+        "name": "checkpoint",
+        "type": "string",
+        "short": "c",
+        "long": "checkpoint",
+        "description": "Use or create checkpoint",
+        "choices": ["latest", "create", "restore", "none"]
+      },
+      {
+        "name": "force",
+        "type": "boolean",
+        "short": "f",
+        "long": "force",
+        "description": "Force sync even with conflicts",
+        "default": false
+      },
+      {
+        "name": "timeout",
+        "type": "integer",
+        "short": "t",
+        "long": "timeout",
+        "description": "Sync timeout in seconds",
+        "default": 300
+      },
+      {
+        "name": "batch-size",
+        "type": "integer",
+        "long": "batch-size",
+        "description": "Batch size for large data transfers",
+        "default": 1000
+      }
+    ]
+  },
+  
+  "synchronization": {
+    "types": {
+      "full": {
+        "description": "Complete state and data synchronization",
+        "includes": ["state", "models", "strategies", "positions", "cache", "config"],
+        "strategy": "snapshot-based"
+      },
+      "partial": {
+        "description": "Sync only changed data",
+        "includes": ["delta-state", "recent-updates"],
+        "strategy": "incremental"
+      },
+      "state": {
+        "description": "Agent state synchronization",
+        "includes": ["agent-status", "task-queue", "active-operations"],
+        "strategy": "event-sourced"
+      },
+      "data": {
+        "description": "Trading data synchronization",
+        "includes": ["market-data", "positions", "orders", "history"],
+        "strategy": "versioned"
+      },
+      "config": {
+        "description": "Configuration synchronization",
+        "includes": ["strategies", "parameters", "rules"],
+        "strategy": "consensus-based"
+      },
+      "emergency": {
+        "description": "Emergency recovery synchronization",
+        "includes": ["critical-state", "positions", "risk-parameters"],
+        "strategy": "authoritative-source"
+      }
+    },
+    
+    "protocols": {
+      "gossip": {
+        "description": "Epidemic-style eventual consistency",
+        "use_cases": ["state-propagation", "health-checks"],
+        "parameters": {
+          "fanout": 3,
+          "interval": 1000,
+          "max_hops": 5
+        }
+      },
+      "raft": {
+        "description": "Strong consistency with leader election",
+        "use_cases": ["critical-state", "configuration"],
+        "parameters": {
+          "election_timeout": 150,
+          "heartbeat_interval": 50
+        }
+      },
+      "vector_clock": {
+        "description": "Causal consistency tracking",
+        "use_cases": ["distributed-state", "conflict-detection"],
+        "parameters": {
+          "max_vector_size": 100
+        }
+      },
+      "crdt": {
+        "description": "Conflict-free replicated data types",
+        "use_cases": ["counters", "sets", "maps"],
+        "parameters": {
+          "merge_strategy": "lww"
+        }
+      }
+    }
+  },
+  
+  "conflict_resolution": {
+    "strategies": {
+      "timestamp": {
+        "description": "Last-write-wins based on timestamp",
+        "requires": ["synchronized-clocks"]
+      },
+      "version": {
+        "description": "Higher version number wins",
+        "requires": ["version-tracking"]
+      },
+      "consensus": {
+        "description": "Majority vote among agents",
+        "requires": ["quorum"],
+        "min_voters": 3
+      },
+      "manual": {
+        "description": "Human intervention required",
+        "workflow": ["detect", "notify", "resolve"]
+      },
+      "custom": {
+        "description": "Application-specific resolution",
+        "handler": "resolve_conflict_handler"
+      }
+    },
+    
+    "detection": {
+      "methods": [
+        "version_mismatch",
+        "checksum_difference",
+        "concurrent_updates",
+        "divergent_state"
+      ],
+      "thresholds": {
+        "version_gap": 5,
+        "time_divergence": 60000
+      }
+    }
+  },
+  
+  "data_integrity": {
+    "verification": {
+      "methods": [
+        {
+          "type": "checksum",
+          "algorithm": "sha256",
+          "scope": "per-record"
+        },
+        {
+          "type": "merkle_tree",
+          "algorithm": "sha256",
+          "scope": "dataset"
+        },
+        {
+          "type": "signature",
+          "algorithm": "ed25519",
+          "scope": "critical-data"
+        }
+      ]
+    },
+    
+    "consistency_checks": [
+      {
+        "name": "position_reconciliation",
+        "description": "Verify position consistency across agents",
+        "critical": true
+      },
+      {
+        "name": "order_state_validation",
+        "description": "Validate order states match",
+        "critical": true
+      },
+      {
+        "name": "strategy_parameter_sync",
+        "description": "Ensure strategy parameters aligned",
+        "critical": false
+      }
+    ]
+  },
+  
+  "checkpointing": {
+    "creation": {
+      "triggers": ["manual", "scheduled", "pre-sync", "error"],
+      "content": {
+        "full": ["complete-state", "all-data", "configuration"],
+        "incremental": ["delta-state", "changed-data"],
+        "minimal": ["critical-state", "positions"]
+      },
+      "storage": {
+        "location": "distributed",
+        "redundancy": 3,
+        "encryption": "aes-256"
+      }
+    },
+    
+    "restoration": {
+      "strategies": [
+        {
+          "name": "latest",
+          "description": "Restore from most recent checkpoint"
+        },
+        {
+          "name": "stable",
+          "description": "Restore from last known stable state"
+        },
+        {
+          "name": "selective",
+          "description": "Restore specific components only"
+        }
+      ]
+    }
+  },
+  
+  "execution": {
+    "phases": [
+      {
+        "name": "preparation",
+        "steps": [
+          "Identify sync targets",
+          "Lock affected resources",
+          "Create pre-sync checkpoint",
+          "Calculate data delta"
+        ]
+      },
+      {
+        "name": "synchronization",
+        "steps": [
+          "Transfer data batches",
+          "Apply updates atomically",
+          "Handle conflicts",
+          "Update version vectors"
+        ]
+      },
+      {
+        "name": "verification",
+        "steps": [
+          "Verify data integrity",
+          "Check consistency constraints",
+          "Validate business rules",
+          "Compare checksums"
+        ]
+      },
+      {
+        "name": "finalization",
+        "steps": [
+          "Release locks",
+          "Update sync metadata",
+          "Broadcast completion",
+          "Cleanup temporary data"
+        ]
+      }
+    ],
+    
+    "optimization": {
+      "compression": {
+        "enabled": true,
+        "algorithm": "zstd",
+        "level": 3
+      },
+      "batching": {
+        "size": 1000,
+        "parallel": 4
+      },
+      "caching": {
+        "delta_cache": true,
+        "ttl": 300
+      }
+    }
+  },
+  
+  "monitoring": {
+    "metrics": [
+      "sync_duration",
+      "data_transferred",
+      "conflicts_detected",
+      "conflicts_resolved",
+      "verification_failures",
+      "sync_lag"
+    ],
+    
+    "events": [
+      "sync_started",
+      "sync_progress",
+      "conflict_detected",
+      "sync_completed",
+      "sync_failed"
+    ]
+  },
+  
+  "output": {
+    "success": {
+      "format": "json",
+      "fields": {
+        "sync_id": "Unique synchronization ID",
+        "status": "Sync completion status",
+        "summary": {
+          "agents_synced": "Number of agents synchronized",
+          "data_transferred": "Amount of data transferred",
+          "conflicts_resolved": "Number of conflicts resolved",
+          "duration": "Total sync duration"
+        },
+        "verification": {
+          "passed": "Verification checks passed",
+          "failed": "Verification checks failed",
+          "warnings": "Non-critical issues"
+        }
+      }
+    },
+    "progress": {
+      "format": "streaming",
+      "updates": [
+        "phase_completion",
+        "transfer_progress",
+        "conflict_resolution",
+        "verification_status"
+      ]
+    }
+  },
+  
+  "integration": {
+    "mcp_tools": [
+      "mcp__ai-news-trader__get_portfolio_status",
+      "mcp__ai-news-trader__cross_asset_correlation_matrix",
+      "mcp__ai-news-trader__neural_model_status"
+    ],
+    "storage": {
+      "backends": ["redis", "etcd", "consul", "s3"],
+      "consistency": "eventual"
+    }
+  }
+}

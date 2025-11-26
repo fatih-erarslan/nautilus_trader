@@ -1,0 +1,93 @@
+# Example Neural Trader Configuration
+# Copy this file to config.toml and fill in your credentials
+
+[brokers]
+enabled = ["alpaca"]
+
+[brokers.alpaca]
+api_key = "YOUR_ALPACA_API_KEY"
+api_secret = "YOUR_ALPACA_API_SECRET"
+paper_trading = true
+
+# Uncomment to enable Binance
+# [brokers.binance]
+# api_key = "YOUR_BINANCE_API_KEY"
+# api_secret = "YOUR_BINANCE_API_SECRET"
+# testnet = true
+
+# Uncomment to enable Coinbase
+# [brokers.coinbase]
+# api_key = "YOUR_COINBASE_API_KEY"
+# api_secret = "YOUR_COINBASE_API_SECRET"
+# passphrase = "YOUR_PASSPHRASE"
+# sandbox = true
+
+[strategies]
+enabled = ["momentum"]
+
+[strategies.momentum]
+lookback_period = 20
+top_n = 10
+rebalance_frequency = "daily"
+
+# Uncomment to enable mean reversion
+# [strategies.mean_reversion]
+# z_score_threshold = 2.0
+# lookback_period = 30
+
+# Uncomment to enable pairs trading
+# [strategies.pairs_trading]
+# correlation_threshold = 0.8
+# cointegration_pvalue = 0.05
+# lookback_period = 60
+
+[risk]
+max_position_size = 100000
+max_portfolio_heat = 0.02
+max_drawdown = 0.20
+var_confidence = 0.95
+kelly_fraction = 0.25
+enable_gpu = true
+
+[neural]
+models = ["lstm", "transformer"]
+
+[neural.training]
+batch_size = 32
+epochs = 100
+learning_rate = 0.001
+validation_split = 0.2
+
+[neural.inference]
+batch_size = 64
+use_gpu = true
+
+[memory]
+agentdb_path = "./data/agentdb"
+reasoning_bank_path = "./data/reasoning_bank"
+cache_size = 10000
+
+[distributed]
+enable_e2b = false
+enable_federation = false
+
+[api.rest]
+host = "127.0.0.1"
+port = 8080
+enable_cors = true
+
+[api.websocket]
+port = 8081
+max_connections = 1000
+
+[runtime]
+# Uncomment to set specific number of worker threads
+# worker_threads = 4
+# max_blocking_threads = 512
+
+[observability]
+log_level = "info"
+log_format = "json"
+enable_tracing = true
+enable_metrics = true
+metrics_port = 9090

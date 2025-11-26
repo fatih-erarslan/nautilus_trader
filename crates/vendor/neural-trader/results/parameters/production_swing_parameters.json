@@ -1,0 +1,181 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "generated": "2025-06-23T21:36:42.066613",
+    "purpose": "Production swing trading parameters for 20-30% annual returns",
+    "validation_status": "Safe to implement"
+  },
+  "parameters": {
+    "position_sizing": {
+      "max_position_pct": 0.12,
+      "base_risk_per_trade": 0.015,
+      "max_risk_per_trade": 0.02,
+      "max_portfolio_risk": 0.06,
+      "max_concurrent_positions": 5,
+      "position_scale_in_enabled": false,
+      "kelly_fraction": 0.25
+    },
+    "entry_filters": {
+      "rsi_oversold": 30,
+      "rsi_overbought": 70,
+      "rsi_neutral_zone": [
+        45,
+        55
+      ],
+      "volume_surge_min": 1.5,
+      "volume_surge_optimal": 2.0,
+      "trend_alignment_ma20": true,
+      "trend_alignment_ma50": true,
+      "atr_min_pct": 0.01,
+      "atr_max_pct": 0.035,
+      "market_cap_min": 1000000000.0,
+      "price_min": 10.0
+    },
+    "setup_types": {
+      "pullback_continuation": {
+        "enabled": true,
+        "weight": 0.4,
+        "rsi_range": [
+          30,
+          50
+        ],
+        "trend_requirement": "strong",
+        "profit_target_multiplier": 1.2
+      },
+      "oversold_bounce": {
+        "enabled": true,
+        "weight": 0.3,
+        "rsi_max": 30,
+        "support_proximity": 0.02,
+        "profit_target_multiplier": 1.0
+      },
+      "breakout_momentum": {
+        "enabled": true,
+        "weight": 0.3,
+        "volume_min": 2.0,
+        "resistance_break_pct": 0.01,
+        "profit_target_multiplier": 1.5
+      }
+    },
+    "exit_strategy": {
+      "initial_stop": {
+        "atr_multiplier": 2.0,
+        "max_risk_pct": 0.03,
+        "support_buffer": 0.005
+      },
+      "profit_targets": {
+        "target_1": {
+          "r_multiple": 1.5,
+          "exit_pct": 0.33
+        },
+        "target_2": {
+          "r_multiple": 2.5,
+          "exit_pct": 0.33
+        },
+        "target_3": {
+          "r_multiple": 4.0,
+          "exit_pct": 0.34
+        }
+      },
+      "trailing_stop": {
+        "activation_r": 1.5,
+        "initial_trail_atr": 1.5,
+        "tightening_schedule": {
+          "2R": 1.25,
+          "3R": 1.0,
+          "4R": 0.75
+        }
+      },
+      "time_stop": {
+        "optimal_days": 5,
+        "max_days": 10,
+        "reduce_position_after": 7
+      }
+    },
+    "risk_management": {
+      "daily_loss_limit": 0.02,
+      "weekly_loss_limit": 0.04,
+      "consecutive_losses_pause": 3,
+      "correlation_check": true,
+      "sector_concentration_limit": 0.4,
+      "market_regime_filters": {
+        "bull_market": {
+          "position_multiplier": 1.2,
+          "active": true
+        },
+        "bear_market": {
+          "position_multiplier": 0.5,
+          "active": true
+        },
+        "high_volatility": {
+          "position_multiplier": 0.7,
+          "active": true
+        },
+        "ranging": {
+          "position_multiplier": 0.8,
+          "active": true
+        }
+      }
+    },
+    "performance_targets": {
+      "annual_return_target": 0.25,
+      "sharpe_ratio_target": 2.0,
+      "max_drawdown_limit": 0.1,
+      "win_rate_target": 0.6,
+      "profit_factor_target": 2.5,
+      "calmar_ratio_target": 2.5
+    },
+    "backtesting_validation": {
+      "sample_size_min": 100,
+      "time_period_years": 3,
+      "market_conditions": [
+        "bull",
+        "bear",
+        "sideways",
+        "volatile"
+      ],
+      "monte_carlo_runs": 1000,
+      "confidence_level": 0.95
+    }
+  },
+  "expected_performance": {
+    "expected_annual_return": 0.552,
+    "expected_sharpe_ratio": 3.88,
+    "expected_max_drawdown": 0.072,
+    "expected_win_rate": 0.6,
+    "expected_profit_factor": 3.3,
+    "trades_per_year": 40,
+    "average_days_per_trade": 5
+  },
+  "validation_results": {
+    "valid": true,
+    "issues": [],
+    "warnings": [],
+    "recommendation": "Safe to implement"
+  },
+  "implementation_notes": [
+    "Start with 50% position sizes for first 2 weeks",
+    "Track actual vs expected performance daily",
+    "Review and adjust after every 20 trades",
+    "Ensure all market data feeds are reliable",
+    "Implement circuit breakers for risk management"
+  ],
+  "monitoring_kpis": {
+    "daily": [
+      "P&L",
+      "Win rate",
+      "Position sizes",
+      "Risk taken"
+    ],
+    "weekly": [
+      "Sharpe ratio",
+      "Average R-multiple",
+      "Drawdown"
+    ],
+    "monthly": [
+      "Total return",
+      "Profit factor",
+      "Trade frequency"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+# Canadian Trading Compliance Module Requirements
+
+# Core dependencies
+redis>=4.5.0          # For distributed monitoring and caching
+sqlite3               # Built-in, for audit trail storage
+
+# Data handling
+python-dateutil>=2.8.2    # Date manipulation utilities
+
+# Async support
+asyncio               # Built-in, for async operations
+
+# Optional dependencies for production
+# psycopg2-binary>=2.9.5   # PostgreSQL support for audit trail
+# pymongo>=4.3.3           # MongoDB support for large-scale audit storage
+# boto3>=1.26.0            # AWS S3 for long-term record storage
+# cryptography>=40.0.0     # For encryption of sensitive audit records

@@ -1,0 +1,235 @@
+[
+  {
+    "subject": "neural_forecast+risk_analysis+pattern_recognition",
+    "predicate": "effective_for",
+    "object": "emergence_processing",
+    "confidence": 0.5,
+    "timestamp": 1758596872603,
+    "sessionId": "session_1758596843573_j8v5h0nrj",
+    "sources": [
+      "session_1758596843573_j8v5h0nrj"
+    ]
+  },
+  {
+    "subject": "Analyze the potential for neural trading systems t",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758596872603,
+    "sessionId": "session_1758596843573_j8v5h0nrj",
+    "sources": [
+      "session_1758596843573_j8v5h0nrj"
+    ]
+  },
+  {
+    "subject": "{\"type\":\"complex_problem\",\"description\":\"Multi-ste",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"igno",
+    "confidence": 0.6,
+    "timestamp": 1758597600876,
+    "sessionId": "session_1758597574368_xx0maf5rx",
+    "sources": [
+      "session_1758597574368_xx0maf5rx"
+    ]
+  },
+  {
+    "subject": "{\"pattern\":\"A\",\"response\":\"X\",\"context\":\"learning_",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"scal",
+    "confidence": 0.6,
+    "timestamp": 1758597600882,
+    "sessionId": "session_1758597574368_xx0maf5rx",
+    "sources": [
+      "session_1758597574368_xx0maf5rx"
+    ]
+  },
+  {
+    "subject": "{\"pattern\":\"B\",\"response\":\"Y\",\"context\":\"learning_",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.64,
+    "timestamp": 1758598222009,
+    "sessionId": "session_1758597574368_xx0maf5rx",
+    "sources": [
+      "session_1758597574368_xx0maf5rx",
+      "session_1758598158657_epsczzr1y"
+    ]
+  },
+  {
+    "subject": "{\"type\":\"complex_problem\",\"description\":\"Multi-ste",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758598217298,
+    "sessionId": "session_1758598158657_epsczzr1y",
+    "sources": [
+      "session_1758598158657_epsczzr1y"
+    ]
+  },
+  {
+    "subject": "{\"pattern\":\"A\",\"response\":\"X\",\"context\":\"learning_",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"inve",
+    "confidence": 0.6,
+    "timestamp": 1758598217437,
+    "sessionId": "session_1758598158657_epsczzr1y",
+    "sources": [
+      "session_1758598158657_epsczzr1y"
+    ]
+  },
+  {
+    "subject": "test_entity",
+    "predicate": "has_property",
+    "object": "test_value",
+    "confidence": 0.91,
+    "timestamp": 1758599184257,
+    "sessionId": "test_session",
+    "sources": [
+      "test",
+      "test_session"
+    ]
+  },
+  {
+    "subject": "sentiment_analyzer+technical_indicators+microstructure_detector+execution_optimizer",
+    "predicate": "effective_for",
+    "object": "emergence_processing",
+    "confidence": 0.5,
+    "timestamp": 1758598792451,
+    "sessionId": "session_1758598739600_kkvb2cmnl",
+    "sources": [
+      "session_1758598739600_kkvb2cmnl"
+    ]
+  },
+  {
+    "subject": "Develop a comprehensive neural trading framework t",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758598792461,
+    "sessionId": "session_1758598739600_kkvb2cmnl",
+    "sources": [
+      "session_1758598739600_kkvb2cmnl"
+    ]
+  },
+  {
+    "subject": "Analyze the potential applications of quantum comp",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758599142242,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "psycho_symbolic_reason",
+    "predicate": "effective_for",
+    "object": "emergence_processing",
+    "confidence": 0.5,
+    "timestamp": 1758599270754,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "How can emergent AI systems enhance symbolic reaso",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758599270754,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "consciousness_evolve+calculate_phi",
+    "predicate": "effective_for",
+    "object": "emergence_processing",
+    "confidence": 0.5,
+    "timestamp": 1758599288633,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "Integrate consciousness evolution metrics with eme",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758599288633,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "solve+analyzeMatrix",
+    "predicate": "effective_for",
+    "object": "emergence_processing",
+    "confidence": 0.5,
+    "timestamp": 1758599310116,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "Solve complex matrix problems with emergent optimi",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758599310116,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "mean_reversion_optimized+mirror_trading_optimized+momentum_trading_optimized",
+    "predicate": "effective_for",
+    "object": "emergence_processing",
+    "confidence": 0.5,
+    "timestamp": 1758599403643,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "Which trading strategy should I use given current ",
+    "predicate": "transforms_to",
+    "object": "{\"original\":{\"finalResult\":{\"action_applied\":\"para",
+    "confidence": 0.6,
+    "timestamp": 1758599403643,
+    "sessionId": "session_1758599131966_lciikgmio",
+    "sources": [
+      "session_1758599131966_lciikgmio"
+    ]
+  },
+  {
+    "subject": "emergence_matrix_process",
+    "predicate": "effective_for",
+    "object": "emergence_processing",
+    "confidence": 0.5,
+    "timestamp": 1758600775671,
+    "sessionId": "session_1758600749075_b7duogy9m",
+    "sources": [
+      "session_1758600749075_b7duogy9m"
+    ]
+  },
+  {
+    "subject": "Solve the matrix equation Ax = b where A represent",
+    "predicate": "transforms_to",
+    "object": "{\"finalResult\":{\"action_applied\":\"parallelism_2.44",
+    "confidence": 0.6,
+    "timestamp": 1758600775671,
+    "sessionId": "session_1758600749075_b7duogy9m",
+    "sources": [
+      "session_1758600749075_b7duogy9m"
+    ]
+  }
+]

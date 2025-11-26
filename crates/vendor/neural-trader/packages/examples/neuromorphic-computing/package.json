@@ -1,0 +1,83 @@
+{
+  "name": "@neural-trader/example-neuromorphic-computing",
+  "version": "1.0.0",
+  "description": "Neural AI neuromorphic computing with Spiking Neural Networks, STDP learning, reservoir computing, liquid state machines, and event-driven temporal processing for ultra-low-power machine learning",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "neuromorphic",
+    "spiking-neural-network",
+    "snn",
+    "stdp",
+    "reservoir-computing",
+    "liquid-state-machine",
+    "event-driven",
+    "low-power-ml",
+    "temporal-processing",
+    "neural-trader",
+    "ai",
+    "neural-network",
+    "machine-learning",
+    "self-learning",
+    "optimization",
+    "typescript",
+    "agentdb",
+    "agentic-flow",
+    "brain-inspired",
+    "edge-computing",
+    "neuromorphic-hardware",
+    "spike-timing",
+    "biologically-inspired"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "homepage": "https://github.com/ruvnet/neural-trader#readme",
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "packages/examples/neuromorphic-computing"
+  },
+  "dependencies": {
+    "@neural-trader/agentdb": "*",
+    "@neural-trader/agentic-flow": "*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

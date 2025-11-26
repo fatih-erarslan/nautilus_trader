@@ -1,0 +1,39 @@
+[package]
+name = "nt-sports-betting"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+
+[dependencies]
+# Workspace dependencies
+tokio = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+reqwest = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+rust_decimal = { workspace = true }
+
+# Internal dependencies
+nt-core = { version = "2.0.0", path = "../core" }
+nt-risk = { version = "2.0.0", path = "../risk" }
+
+# Additional dependencies
+dashmap = "5.5"  # Concurrent HashMap for member management
+parking_lot = "0.12"  # Faster mutex implementation
+
+[dev-dependencies]
+tokio-test = { workspace = true }
+proptest = { workspace = true }
+mockall = { workspace = true }
+
+[features]
+default = []
+smart-contracts = []  # Optional blockchain integration

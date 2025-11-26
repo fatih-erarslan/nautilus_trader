@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/neural_backtest.json",
+  "title": "neural_backtest",
+  "description": "Run historical backtest of neural model predictions.",
+  "category": "neural",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "model_id": {
+          "type": "string"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "benchmark": {
+          "type": "string",
+          "default": "sp500"
+        },
+        "rebalance_frequency": {
+          "type": "string",
+          "default": "daily",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly"
+          ]
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "model_id",
+        "start_date",
+        "end_date"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "backtest_id": {
+          "type": "string"
+        },
+        "performance": {
+          "type": "object",
+          "properties": {
+            "total_return": {
+              "type": "number"
+            },
+            "sharpe_ratio": {
+              "type": "number"
+            },
+            "max_drawdown": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "very_high",
+    "latency": "slow",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

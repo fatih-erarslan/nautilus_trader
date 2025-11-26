@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-11-15T05:29:50.067Z",
+  "verdict": "NO-GO",
+  "averageSpeedup": 1.5928711577156698,
+  "batchSpeedup": 2.6507936507936507,
+  "targetMet": false,
+  "allTestsPass": true,
+  "individualResults": [
+    {
+      "size": 50,
+      "iterations": 200,
+      "jsTime": 25,
+      "rustTime": 12,
+      "speedup": 2.0833333333333335,
+      "match": true,
+      "jsAvg": 0.125,
+      "rustAvg": 0.06,
+      "jsResult": 97.46575713613893,
+      "rustResult": 97.46575713613893
+    },
+    {
+      "size": 100,
+      "iterations": 100,
+      "jsTime": 23,
+      "rustTime": 12,
+      "speedup": 1.9166666666666667,
+      "match": true,
+      "jsAvg": 0.23,
+      "rustAvg": 0.12,
+      "jsResult": 423.28393035966,
+      "rustResult": 423.28393035966
+    },
+    {
+      "size": 200,
+      "iterations": 50,
+      "jsTime": 25,
+      "rustTime": 16,
+      "speedup": 1.5625,
+      "match": true,
+      "jsAvg": 0.5,
+      "rustAvg": 0.32,
+      "jsResult": 478.57014277684044,
+      "rustResult": 478.57014277684044
+    },
+    {
+      "size": 500,
+      "iterations": 20,
+      "jsTime": 63,
+      "rustTime": 51,
+      "speedup": 1.2352941176470589,
+      "match": true,
+      "jsAvg": 3.15,
+      "rustAvg": 2.55,
+      "jsResult": 2832.59743511218,
+      "rustResult": 2832.59743511218
+    },
+    {
+      "size": 1000,
+      "iterations": 10,
+      "jsTime": 148,
+      "rustTime": 114,
+      "speedup": 1.2982456140350878,
+      "match": true,
+      "jsAvg": 14.8,
+      "rustAvg": 11.4,
+      "jsResult": 23565.17840890729,
+      "rustResult": 23565.17840890729
+    },
+    {
+      "size": 2000,
+      "iterations": 5,
+      "jsTime": 320,
+      "rustTime": 219,
+      "speedup": 1.461187214611872,
+      "match": true,
+      "jsAvg": 64,
+      "rustAvg": 43.8,
+      "jsResult": 21588.433411561986,
+      "rustResult": 21588.433411561986
+    }
+  ],
+  "batchResult": {
+    "speedup": 2.6507936507936507,
+    "match": true,
+    "jsTime": 167,
+    "rustTime": 63
+  },
+  "comparison": {
+    "pureJS": 1,
+    "midstreamerWASM": 0.42,
+    "rustNAPI": 1.5928711577156698
+  }
+}

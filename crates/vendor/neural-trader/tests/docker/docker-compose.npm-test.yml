@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Test npm pack + install workflow
+  pack-install-test:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.npm-test
+      target: pack-test
+    command: >
+      sh -c "
+        echo '=========================================' &&
+        echo '🧪 NPM Pack + Install Test' &&
+        echo '=========================================' &&
+        cd /test-install &&
+        npm list neural-trader &&
+        node -e \"
+          try {
+            const nt = require('neural-trader');
+            console.log('\\n✅ SUCCESS: Package installed and loads correctly');
+            console.log('Available exports:', Object.keys(nt).length);
+          } catch (e) {
+            console.error('\\n❌ FAILED:', e.message);
+            process.exit(1);
+          }
+        \"
+      "
+
+  # Test building from source
+  build-source-test:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.npm-test
+      target: build-from-source-test
+    command: >
+      sh -c "
+        echo '=========================================' &&
+        echo '🔨 Build From Source Test' &&
+        echo '=========================================' &&
+        node scripts/check-binaries.js &&
+        echo '\nTesting module...' &&
+        node -e \"
+          try {
+            require('./index.js');
+            console.log('\\n✅ SUCCESS: Built and loads correctly');
+          } catch (e) {
+            console.error('\\n⚠️  Warning:', e.message);
+          }
+        \"
+      "
+
+  # Test binary checking
+  binary-check-test:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.npm-test
+      target: binary-check-test
+    command: >
+      sh -c "
+        echo '=========================================' &&
+        echo '🔍 Binary Check Test' &&
+        echo '=========================================' &&
+        node scripts/check-binaries.js
+      "
+
+  # Test dependency installation
+  dependency-test:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.npm-test
+      target: dependency-test
+
+networks:
+  default:
+    name: neural-trader-test

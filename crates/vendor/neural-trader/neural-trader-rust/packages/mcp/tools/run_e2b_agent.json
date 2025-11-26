@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/run_e2b_agent.json",
+  "title": "run_e2b_agent",
+  "description": "Run a trading agent in E2B sandbox.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        },
+        "agent_type": {
+          "type": "string",
+          "enum": [
+            "trader",
+            "analyzer",
+            "monitor",
+            "optimizer"
+          ]
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strategy_params": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "sandbox_id",
+        "agent_type",
+        "symbols"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "execution_id": {
+          "type": "string"
+        },
+        "sandbox_id": {
+          "type": "string"
+        },
+        "agent_type": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "running",
+            "completed",
+            "failed"
+          ]
+        },
+        "results": {
+          "type": "object"
+        },
+        "execution_time": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "execution_id",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "slow",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "suite": "gpu_optimization",
+  "session_id": "20250623_231909",
+  "start_time": "2025-06-23T23:19:09.351249",
+  "config": {
+    "duration": 300,
+    "strategies": [
+      "momentum",
+      "swing",
+      "mirror",
+      "mean_reversion"
+    ],
+    "assets": [
+      "AAPL",
+      "MSFT",
+      "GOOGL",
+      "TSLA"
+    ],
+    "tests": [
+      "gpu_optimization",
+      "strategy_performance"
+    ]
+  },
+  "results": {
+    "gpu_optimization": {
+      "error": "GPU acceleration not available",
+      "status": "skipped"
+    },
+    "strategy_performance": {
+      "momentum": {
+        "strategy_name": "momentum",
+        "total_return": 0.0,
+        "annualized_return": 0.0,
+        "sharpe_ratio": 0.0,
+        "sortino_ratio": 0.0,
+        "max_drawdown": 0.0,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "total_trades": 0,
+        "avg_trade_duration": 0.0,
+        "volatility": 0.0,
+        "beta": 0.0,
+        "alpha": 0.0,
+        "calmar_ratio": 0.0
+      },
+      "swing": {
+        "strategy_name": "swing",
+        "total_return": 0.0,
+        "annualized_return": 0.0,
+        "sharpe_ratio": 0.0,
+        "sortino_ratio": 0.0,
+        "max_drawdown": 0.0,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "total_trades": 0,
+        "avg_trade_duration": 0.0,
+        "volatility": 0.0,
+        "beta": 0.0,
+        "alpha": 0.0,
+        "calmar_ratio": 0.0
+      },
+      "mirror": {
+        "strategy_name": "mirror",
+        "total_return": 0.0,
+        "annualized_return": 0.0,
+        "sharpe_ratio": 0.0,
+        "sortino_ratio": 0.0,
+        "max_drawdown": 0.0,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "total_trades": 0,
+        "avg_trade_duration": 0.0,
+        "volatility": 0.0,
+        "beta": 0.0,
+        "alpha": 0.0,
+        "calmar_ratio": 0.0
+      },
+      "mean_reversion": {
+        "strategy_name": "mean_reversion",
+        "total_return": 0.0,
+        "annualized_return": 0.0,
+        "sharpe_ratio": 0.0,
+        "sortino_ratio": 0.0,
+        "max_drawdown": 0.0,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "total_trades": 0,
+        "avg_trade_duration": 0.0,
+        "volatility": 0.0,
+        "beta": 0.0,
+        "alpha": 0.0,
+        "calmar_ratio": 0.0
+      }
+    }
+  },
+  "performance_validation": {
+    "targets": {
+      "latency_ms": 100,
+      "throughput_ops_sec": 10000,
+      "memory_mb": 2048,
+      "concurrent_simulations": 1000
+    },
+    "results": {},
+    "overall_pass": true
+  },
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 6,
+    "failed_tests": 0,
+    "performance_targets_met": true,
+    "key_metrics": {},
+    "recommendations": [
+      "All tests passed - system performing well"
+    ]
+  },
+  "status": "completed",
+  "duration": 0.005851030349731445,
+  "end_time": "2025-06-23T23:19:09.357101"
+}

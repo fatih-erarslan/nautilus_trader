@@ -1,0 +1,25 @@
+# Prometheus Configuration for Trading APIs
+global:
+  scrape_interval: 1s
+  evaluation_interval: 1s
+
+rule_files:
+  - "trading_alerts.yml"
+
+scrape_configs:
+  - job_name: 'trading-api'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 100ms
+    metrics_path: /metrics
+    
+  - job_name: 'system-metrics'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 1s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093

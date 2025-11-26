@@ -1,0 +1,44 @@
+{
+  "name": "@neural-trader/agentic-accounting-agents",
+  "version": "0.1.0",
+  "description": "Multi-agent swarm implementations for autonomous accounting operations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "bench:coordination": "ts-node benchmarks/agent-coordination.bench.ts",
+    "bench:all": "npm run bench:coordination"
+  },
+  "keywords": [
+    "agents",
+    "swarm",
+    "agentic-flow",
+    "accounting",
+    "coordination"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "dependencies": {
+    "@neural-trader/agentic-accounting-core": "workspace:*",
+    "@neural-trader/agentic-accounting-types": "workspace:*",
+    "agentic-flow": "^1.10.2",
+    "agentdb": "^1.6.1",
+    "bullmq": "^5.1.9",
+    "ioredis": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.25",
+    "typescript": "^5.3.3",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.11",
+    "ts-jest": "^29.1.1"
+  }
+}

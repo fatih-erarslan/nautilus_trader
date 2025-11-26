@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/execute_swarm_strategy.json",
+  "title": "execute_swarm_strategy",
+  "description": "Execute a coordinated trading strategy across all agents in the swarm.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "coordination": {
+          "type": "string",
+          "enum": [
+            "parallel",
+            "sequential",
+            "adaptive"
+          ],
+          "default": "parallel"
+        },
+        "timeout": {
+          "type": "integer",
+          "default": 300
+        }
+      },
+      "required": [
+        "swarm_id",
+        "strategy"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "execution_id": {
+          "type": "string"
+        },
+        "swarm_id": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "executing",
+            "completed",
+            "failed",
+            "timeout"
+          ]
+        },
+        "agents_executed": {
+          "type": "integer"
+        },
+        "total_trades": {
+          "type": "integer"
+        },
+        "total_pnl": {
+          "type": "number"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "execution_id",
+        "swarm_id",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "slow",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

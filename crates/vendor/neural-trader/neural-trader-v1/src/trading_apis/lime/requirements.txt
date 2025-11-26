@@ -1,0 +1,21 @@
+# Core dependencies for Lime Trading API
+quickfix>=1.15.1
+numpy>=1.21.0
+psutil>=5.8.0
+
+# Optional performance dependencies
+numba>=0.56.0  # JIT compilation for hot paths
+pyarrow>=8.0.0  # Zero-copy data structures
+cupy>=10.0.0  # GPU acceleration (optional)
+
+# System monitoring
+py-cpuinfo>=8.0.0  # Hardware information
+
+# Development dependencies
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-benchmark>=4.0.0
+
+# Documentation
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0

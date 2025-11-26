@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_prediction_positions_tool.json",
+  "title": "get_prediction_positions_tool",
+  "description": "Get current prediction market positions.",
+  "category": "prediction",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "positions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "market_id": {
+                "type": "string"
+              },
+              "outcome": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "number"
+              },
+              "avg_entry_price": {
+                "type": "number"
+              },
+              "current_value": {
+                "type": "number"
+              },
+              "unrealized_pl": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "total_value": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

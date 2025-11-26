@@ -1,0 +1,122 @@
+{
+  "timestamp": "2025-11-15T05:53:36.768Z",
+  "singlePatternResults": [
+    {
+      "size": 50,
+      "iterations": 200,
+      "rustBaselineTime": 7,
+      "rustOptimizedTime": 7,
+      "improvement": 1
+    },
+    {
+      "size": 100,
+      "iterations": 100,
+      "rustBaselineTime": 9,
+      "rustOptimizedTime": 10,
+      "improvement": 0.9
+    },
+    {
+      "size": 200,
+      "iterations": 50,
+      "rustBaselineTime": 16,
+      "rustOptimizedTime": 16,
+      "improvement": 1
+    },
+    {
+      "size": 500,
+      "iterations": 20,
+      "rustBaselineTime": 49,
+      "rustOptimizedTime": 34,
+      "improvement": 1.4411764705882353
+    },
+    {
+      "size": 1000,
+      "iterations": 10,
+      "rustBaselineTime": 99,
+      "rustOptimizedTime": 65,
+      "improvement": 1.523076923076923
+    }
+  ],
+  "scalingResults": [
+    {
+      "numPatterns": 100,
+      "jsTime": 25,
+      "rustBaselineTime": 6,
+      "rustParallelTime": 2,
+      "rustAdaptiveTime": 0,
+      "baselineSpeedup": 4.166666666666667,
+      "parallelSpeedup": 12.5,
+      "adaptiveSpeedup": null,
+      "parallelVsBaseline": 3,
+      "match": true
+    },
+    {
+      "numPatterns": 500,
+      "jsTime": 63,
+      "rustBaselineTime": 31,
+      "rustParallelTime": 5,
+      "rustAdaptiveTime": 5,
+      "baselineSpeedup": 2.032258064516129,
+      "parallelSpeedup": 12.6,
+      "adaptiveSpeedup": 12.6,
+      "parallelVsBaseline": 6.2,
+      "match": true
+    },
+    {
+      "numPatterns": 1000,
+      "jsTime": 115,
+      "rustBaselineTime": 61,
+      "rustParallelTime": 9,
+      "rustAdaptiveTime": 9,
+      "baselineSpeedup": 1.8852459016393444,
+      "parallelSpeedup": 12.777777777777779,
+      "adaptiveSpeedup": 12.777777777777779,
+      "parallelVsBaseline": 6.777777777777778,
+      "match": true
+    },
+    {
+      "numPatterns": 2000,
+      "jsTime": 270,
+      "rustBaselineTime": 123,
+      "rustParallelTime": 19,
+      "rustAdaptiveTime": 20,
+      "baselineSpeedup": 2.1951219512195124,
+      "parallelSpeedup": 14.210526315789474,
+      "adaptiveSpeedup": 13.5,
+      "parallelVsBaseline": 6.473684210526316,
+      "match": true
+    },
+    {
+      "numPatterns": 5000,
+      "jsTime": 569,
+      "rustBaselineTime": 309,
+      "rustParallelTime": 42,
+      "rustAdaptiveTime": 41,
+      "baselineSpeedup": 1.8414239482200647,
+      "parallelSpeedup": 13.547619047619047,
+      "adaptiveSpeedup": 13.878048780487806,
+      "parallelVsBaseline": 7.357142857142857,
+      "match": true
+    },
+    {
+      "numPatterns": 10000,
+      "jsTime": 1234,
+      "rustBaselineTime": 620,
+      "rustParallelTime": 83,
+      "rustAdaptiveTime": 83,
+      "baselineSpeedup": 1.9903225806451612,
+      "parallelSpeedup": 14.867469879518072,
+      "adaptiveSpeedup": 14.867469879518072,
+      "parallelVsBaseline": 7.469879518072289,
+      "match": true
+    }
+  ],
+  "analysis": {
+    "avgCacheImprovement": 1.1728506787330315,
+    "avgParallelSpeedup": 13.417232170117394,
+    "bestParallelSpeedup": 14.867469879518072,
+    "totalImprovement": 5.938267870732396,
+    "expectedFinalSpeedup": 15.736409857440849
+  },
+  "verdict": "SUCCESS"
+}

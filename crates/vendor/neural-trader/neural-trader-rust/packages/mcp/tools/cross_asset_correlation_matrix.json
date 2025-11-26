@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/cross_asset_correlation_matrix.json",
+  "title": "cross_asset_correlation_matrix",
+  "description": "Generate correlation matrix for multiple assets.",
+  "category": "analysis",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2
+        },
+        "lookback_days": {
+          "type": "integer",
+          "default": 90
+        },
+        "include_prediction_confidence": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "assets"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "correlation_matrix": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

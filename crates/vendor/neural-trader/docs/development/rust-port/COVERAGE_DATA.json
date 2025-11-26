@@ -1,0 +1,226 @@
+{
+  "analysis_date": "2025-11-13",
+  "project": "neural-trader-rust",
+  "overall_metrics": {
+    "estimated_line_coverage": 65,
+    "estimated_branch_coverage": 55,
+    "estimated_function_coverage": 70,
+    "total_crates": 26,
+    "total_lines_of_code": 82681,
+    "test_files": 52,
+    "files_with_tests": 140,
+    "total_test_functions": 7519
+  },
+  "per_crate_coverage": {
+    "nt-core": {
+      "line_coverage": 95,
+      "branch_coverage": 92,
+      "function_coverage": 98,
+      "status": "excellent",
+      "test_files": 2
+    },
+    "nt-market-data": {
+      "line_coverage": 78,
+      "branch_coverage": 70,
+      "function_coverage": 82,
+      "status": "good",
+      "test_files": 2
+    },
+    "nt-execution": {
+      "line_coverage": 45,
+      "branch_coverage": 38,
+      "function_coverage": 52,
+      "status": "critical",
+      "test_files": 0
+    },
+    "nt-strategies": {
+      "line_coverage": 68,
+      "branch_coverage": 60,
+      "function_coverage": 75,
+      "status": "needs_work",
+      "test_files": 6
+    },
+    "nt-neural": {
+      "line_coverage": 40,
+      "branch_coverage": 35,
+      "function_coverage": 48,
+      "status": "critical",
+      "test_files": 2
+    },
+    "nt-portfolio": {
+      "line_coverage": 55,
+      "branch_coverage": 48,
+      "function_coverage": 62,
+      "status": "needs_work",
+      "test_files": 1
+    },
+    "nt-risk": {
+      "line_coverage": 58,
+      "branch_coverage": 52,
+      "function_coverage": 65,
+      "status": "needs_work",
+      "test_files": 1
+    },
+    "nt-backtesting": {
+      "line_coverage": 72,
+      "branch_coverage": 65,
+      "function_coverage": 78,
+      "status": "good",
+      "test_files": 1
+    },
+    "nt-distributed": {
+      "line_coverage": 15,
+      "branch_coverage": 12,
+      "function_coverage": 20,
+      "status": "critical",
+      "test_files": 0
+    },
+    "nt-mcp-protocol": {
+      "line_coverage": 25,
+      "branch_coverage": 20,
+      "function_coverage": 30,
+      "status": "critical",
+      "test_files": 0
+    },
+    "nt-mcp-server": {
+      "line_coverage": 20,
+      "branch_coverage": 18,
+      "function_coverage": 25,
+      "status": "critical",
+      "test_files": 0
+    },
+    "nt-agentdb-client": {
+      "line_coverage": 35,
+      "branch_coverage": 30,
+      "function_coverage": 40,
+      "status": "critical",
+      "test_files": 0
+    },
+    "nt-memory": {
+      "line_coverage": 48,
+      "branch_coverage": 42,
+      "function_coverage": 55,
+      "status": "critical",
+      "test_files": 0
+    },
+    "nt-streaming": {
+      "line_coverage": 42,
+      "branch_coverage": 38,
+      "function_coverage": 50,
+      "status": "critical",
+      "test_files": 0
+    }
+  },
+  "critical_gaps": [
+    {
+      "crate": "nt-execution",
+      "file": "alpaca_broker.rs",
+      "lines": "entire file",
+      "impact": "high",
+      "risk": "financial_loss"
+    },
+    {
+      "crate": "nt-execution",
+      "file": "order_manager.rs",
+      "lines": "78-345",
+      "impact": "high",
+      "risk": "financial_loss"
+    },
+    {
+      "crate": "nt-execution",
+      "file": "fill_reconciliation.rs",
+      "lines": "45-189",
+      "impact": "high",
+      "risk": "accounting_accuracy"
+    },
+    {
+      "crate": "nt-distributed",
+      "file": "consensus.rs",
+      "lines": "entire",
+      "impact": "critical",
+      "risk": "system_reliability"
+    },
+    {
+      "crate": "nt-neural",
+      "file": "training/trainer.rs",
+      "lines": "234-456",
+      "impact": "medium-high",
+      "risk": "model_quality"
+    }
+  ],
+  "test_plan": {
+    "duration_weeks": 10,
+    "target_coverage": 91,
+    "phases": [
+      {
+        "week": 1,
+        "focus": "Critical execution paths",
+        "tests_added": 110,
+        "target_coverage": 75
+      },
+      {
+        "week": 2,
+        "focus": "Strategy and portfolio",
+        "tests_added": 105,
+        "target_coverage": 78
+      },
+      {
+        "week": 3,
+        "focus": "MCP and protocols",
+        "tests_added": 75,
+        "target_coverage": 82
+      },
+      {
+        "week": 4,
+        "focus": "Data and streaming",
+        "tests_added": 80,
+        "target_coverage": 85
+      },
+      {
+        "weeks": "5-6",
+        "focus": "Property-based and fuzzing",
+        "tests_added": 200,
+        "target_coverage": 88
+      },
+      {
+        "weeks": "7-8",
+        "focus": "Performance and stress",
+        "tests_added": 70,
+        "target_coverage": 89
+      },
+      {
+        "weeks": "9-10",
+        "focus": "Documentation and refinement",
+        "tests_added": 200,
+        "target_coverage": 91
+      }
+    ]
+  },
+  "recommendations": {
+    "immediate": [
+      "Add integration tests for nt-execution (all brokers)",
+      "Add GPU test suite for nt-neural",
+      "Add distributed consensus tests",
+      "Add MCP protocol conformance tests"
+    ],
+    "short_term": [
+      "Add property-based tests for financial calculations",
+      "Add concurrent execution stress tests",
+      "Add network failure simulation tests"
+    ],
+    "long_term": [
+      "Add chaos engineering tests",
+      "Add performance regression tests",
+      "Maintain 90%+ coverage policy"
+    ]
+  },
+  "deliverables": {
+    "reports": [
+      "/workspaces/neural-trader/docs/rust-port/TEST_COVERAGE_REPORT.md",
+      "/workspaces/neural-trader/docs/rust-port/TEST_IMPLEMENTATION_PLAN.md",
+      "/workspaces/neural-trader/docs/rust-port/COVERAGE_DATA.json"
+    ],
+    "html_report": "coverage/index.html (blocked by file locks)",
+    "xml_report": "coverage/cobertura.xml (blocked by file locks)"
+  }
+}

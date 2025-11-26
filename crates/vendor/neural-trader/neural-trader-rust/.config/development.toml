@@ -1,0 +1,104 @@
+# Neural Trader - Development Configuration
+
+[environment]
+name = "development"
+log_level = "trace"
+debug = true
+
+[server]
+host = "127.0.0.1"
+port = 8080
+workers = 1
+max_connections = 50
+request_timeout_ms = 120000
+keepalive_timeout_s = 30
+
+[database]
+url = "postgresql://neural:trader@localhost:5432/neural_trader_dev"
+max_connections = 5
+min_connections = 1
+connection_timeout_s = 10
+idle_timeout_s = 60
+max_lifetime_s = 300
+
+[redis]
+url = "redis://localhost:6379/0"
+pool_size = 2
+connection_timeout_ms = 5000
+command_timeout_ms = 5000
+
+[market_data]
+providers = ["alpaca"]
+
+[market_data.alpaca]
+api_url = "https://paper-api.alpaca.markets"
+data_url = "https://data.alpaca.markets"
+api_key = "PKXXXXXXXXXXXXXX"  # Replace with your paper trading key
+api_secret = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+rate_limit_per_minute = 200
+
+[execution]
+max_orders_per_second = 1
+max_position_size_usd = 1000
+default_time_in_force = "day"
+enable_paper_trading = true
+require_manual_approval = true
+
+[risk]
+max_portfolio_drawdown = 0.50
+max_position_size = 0.25
+max_sector_exposure = 0.50
+max_daily_loss = 0.20
+position_sizing_method = "equal"
+stop_loss_pct = 0.05
+take_profit_pct = 0.10
+
+[backtesting]
+initial_capital = 10000.0
+commission_rate = 0.001
+slippage_bps = 5
+use_realistic_fills = false
+
+[neural]
+model_path = "./models"
+cache_predictions = false
+prediction_timeout_ms = 500
+batch_size = 8
+enable_gpu = false
+
+[agentdb]
+enabled = true
+db_path = "./data/agentdb"
+vector_dimensions = 384
+enable_quantization = false
+quantization_bits = 8
+hnsw_ef_construction = 100
+hnsw_m = 16
+
+[monitoring]
+enable_metrics = true
+metrics_port = 9090
+prometheus_enabled = false
+jaeger_enabled = false
+jaeger_endpoint = "http://localhost:14268/api/traces"
+
+[security]
+enable_tls = false
+require_api_key = false
+rate_limit_enabled = false
+cors_allowed_origins = ["http://localhost:3000", "http://localhost:5173"]
+
+[logging]
+format = "pretty"
+output = "stdout"
+rotation = "never"
+retention_days = 7
+enable_audit_log = false
+
+[features]
+enable_websocket = true
+enable_graphql = false
+enable_rest_api = true
+enable_auto_rebalancing = false
+enable_ml_predictions = true
+enable_social_sentiment = false

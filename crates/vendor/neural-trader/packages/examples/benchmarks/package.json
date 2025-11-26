@@ -1,0 +1,102 @@
+{
+  "name": "@neural-trader/benchmarks",
+  "version": "1.0.0",
+  "description": "Comprehensive benchmarking framework with statistical analysis, performance tracking, regression detection, memory profiling, and CLI tools for neural-trader optimization and testing",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "neural-bench": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "bench": "node dist/cli.js run --all",
+    "bench:compare": "node dist/cli.js compare",
+    "bench:history": "node dist/cli.js history",
+    "bench:regression": "node dist/cli.js detect-regression",
+    "bench:profile": "node --prof dist/cli.js run --profile",
+    "lint": "eslint src tests --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "neural-trader",
+    "benchmarking",
+    "performance",
+    "statistical-analysis",
+    "regression-detection",
+    "profiling",
+    "memory-leak-detection",
+    "ai",
+    "neural-network",
+    "machine-learning",
+    "typescript",
+    "agentdb",
+    "agentic-flow",
+    "performance-testing",
+    "optimization",
+    "cli-tools",
+    "metrics",
+    "monitoring",
+    "performance-analytics",
+    "benchmark-suite",
+    "load-testing"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "homepage": "https://github.com/ruvnet/neural-trader#readme",
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "packages/examples/benchmarks"
+  },
+  "dependencies": {
+    "@neural-trader/predictor": "workspace:*",
+    "@neural-trader/test-framework": "workspace:*",
+    "agentdb": "^2.0.0",
+    "claude-flow": "^2.0.0",
+    "chalk": "^5.0.0",
+    "cli-table3": "^0.6.0",
+    "ora": "^7.0.0",
+    "yargs": "^17.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@types/yargs": "^17.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "openrouter": "^1.0.0",
+    "sublinear-time-solver": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

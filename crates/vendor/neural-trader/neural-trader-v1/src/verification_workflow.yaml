@@ -1,0 +1,243 @@
+# Neural Trader Automated Verification Workflow
+# Ensures all trading operations use real data, not simulations
+
+name: neural-trader-verification
+version: 1.0.0
+truth_threshold: 0.95
+
+# Continuous verification settings
+verification:
+  mode: continuous
+  interval: 5  # seconds
+  alert_on_failure: true
+  block_on_failure: true
+  
+# Pre-trade verification checks
+pre_trade:
+  checks:
+    - name: verify_api_connection
+      command: "npx claude-flow@alpha verify source --api {api} --live"
+      required: true
+      threshold: 0.95
+      
+    - name: validate_credentials
+      script: |
+        python -c "
+        from data_verification import NeuralTraderVerification
+        config = {'ALPACA_KEY': '$ALPACA_KEY', 'POLYGON_KEY': '$POLYGON_KEY'}
+        result = NeuralTraderVerification.verify_not_demo_mode(config)
+        exit(0 if result else 1)
+        "
+      required: true
+      
+    - name: check_market_hours
+      command: "npx claude-flow@alpha verify market-hours"
+      required: false
+      
+    - name: confirm_live_data
+      script: |
+        python -c "
+        from data_verification import DataVerification
+        import time
+        verifier = DataVerification(0.95)
+        data = {
+          'timestamp': time.time(),
+          'api_key': '$ALPACA_KEY',
+          'demo_mode': False,
+          'latency_ms': 50
+        }
+        is_verified, score, _ = verifier.verify_live_data(data)
+        exit(0 if is_verified else 1)
+        "
+      required: true
+
+# During trade verification
+during_trade:
+  checks:
+    - name: monitor_data_feed
+      continuous: true
+      interval: 1
+      script: |
+        python verification_commands.py truth
+      alert_threshold: 0.90
+      
+    - name: validate_prices
+      on_event: price_update
+      script: |
+        python -c "
+        from data_verification import DataVerification
+        verifier = DataVerification()
+        result = verifier.check_price_movements({
+          'price': {price},
+          'prev_close': {prev_close}
+        })
+        exit(0 if result else 1)
+        "
+      
+    - name: check_execution_latency
+      on_event: order_execution
+      max_latency_ms: 100
+      
+    - name: verify_order_fills
+      on_event: order_filled
+      cross_reference: true
+
+# Post-trade verification
+post_trade:
+  checks:
+    - name: audit_transactions
+      command: "python verification_commands.py trade --id {trade_id} --deep-check"
+      store_results: true
+      
+    - name: verify_positions
+      script: |
+        python -c "
+        # Verify positions match expected state
+        from data_verification import DataVerification
+        # Implementation here
+        "
+      
+    - name: validate_pnl
+      cross_reference_sources:
+        - alpaca
+        - polygon
+        - internal_calculation
+      variance_threshold: 0.001  # 0.1% variance allowed
+      
+    - name: check_compliance
+      command: "python verification_commands.py report"
+      save_report: true
+
+# Alert configuration
+alerts:
+  channels:
+    - console
+    - log_file: /var/log/neural-trader-verification.log
+    - webhook: ${WEBHOOK_URL}
+    
+  conditions:
+    - name: truth_score_below_threshold
+      condition: "truth_score < 0.95"
+      severity: critical
+      message: "CRITICAL: Truth score {truth_score} below threshold"
+      
+    - name: simulation_mode_detected
+      condition: "demo_mode == true"
+      severity: critical
+      message: "CRITICAL: Simulation/demo mode detected"
+      action: block_all_trades
+      
+    - name: demo_credentials_found
+      condition: "'demo' in api_key or 'test' in api_key"
+      severity: critical
+      message: "CRITICAL: Demo credentials detected"
+      action: block_all_trades
+      
+    - name: data_anomaly_detected
+      condition: "price_variance > 0.05"
+      severity: warning
+      message: "WARNING: Price variance {variance} exceeds threshold"
+
+# Enforcement rules
+enforcement:
+  rules:
+    - name: block_unverified_trades
+      condition: "truth_score < 0.95"
+      action: block
+      log: true
+      alert: true
+      
+    - name: require_manual_override
+      condition: "failed_verifications > 3"
+      action: require_manual_approval
+      message: "Multiple verification failures - manual approval required"
+      
+    - name: emergency_shutdown
+      condition: "critical_alerts > 5"
+      action: shutdown_system
+      message: "Emergency shutdown triggered - too many critical alerts"
+
+# Pair programming mode
+pair_mode:
+  verification:
+    enabled: true
+    real_time_validation: true
+    cross_reference_sources:
+      - alpaca
+      - polygon
+      - yahoo_finance
+    alert_channels:
+      - console
+      - visual_indicator
+    fail_on_simulation: true
+    
+  commands:
+    start: "npx claude-flow@alpha pair --start --verify-mode"
+    monitor: "npx claude-flow@alpha verify monitor --real-time"
+    status: "npx claude-flow@alpha truth --metrics"
+
+# Monitoring dashboard
+monitoring:
+  dashboard:
+    refresh_interval: 1  # seconds
+    display:
+      - overall_truth_score
+      - data_source_status
+      - api_authentication
+      - timestamp_delta
+      - price_validity
+      - volume_patterns
+      - latency_metrics
+      
+  metrics:
+    - name: truth_score
+      query: "SELECT avg(truth_score) FROM verifications WHERE time > now() - 5m"
+      threshold: 0.95
+      
+    - name: verification_failures
+      query: "SELECT count(*) FROM verifications WHERE verified = false AND time > now() - 5m"
+      threshold: 5
+      
+    - name: average_latency
+      query: "SELECT avg(latency_ms) FROM data_feeds WHERE time > now() - 1m"
+      threshold: 100
+
+# Automated testing
+testing:
+  schedule: "*/15 * * * *"  # Every 15 minutes
+  tests:
+    - name: test_live_connection
+      command: "python verification_commands.py source --api alpaca --live"
+      expected: "verified: true"
+      
+    - name: test_demo_detection
+      script: |
+        python -c "
+        from data_verification import DataVerification
+        verifier = DataVerification()
+        data = {'api_key': 'demo_key', 'demo_mode': True}
+        is_verified, _, _ = verifier.verify_live_data(data)
+        exit(1 if is_verified else 0)  # Should fail for demo
+        "
+      
+    - name: test_timestamp_validation
+      command: "python -m pytest tests/test_verification.py::test_timestamp"
+
+# Integration with claude-flow
+claude_flow:
+  hooks:
+    pre_task: "npx claude-flow@alpha verify init --threshold 0.95"
+    post_task: "npx claude-flow@alpha verify report"
+    on_error: "npx claude-flow@alpha verify diagnose"
+    
+  memory:
+    store_verifications: true
+    namespace: "verification"
+    ttl: 86400  # 24 hours
+    
+  commands:
+    - "verify init --threshold 0.95"
+    - "truth --monitor --interval 5s"
+    - "pair --start --verify-mode"
+    - "verify source --api alpaca --live"
+    - "verify trade --id {trade_id} --deep-check"

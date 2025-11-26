@@ -1,0 +1,49 @@
+# Test neural-trader@2.3.10 CLI and API
+FROM node:20-slim
+
+WORKDIR /app
+
+# Wait for npm CDN to propagate (v2.3.10 was just published)
+RUN sleep 30
+
+# Test 1: Run npx neural-trader init and capture ALL output
+RUN echo "=== Test 1: Testing npx neural-trader@2.3.10 init ===" && \
+    npx --yes neural-trader@2.3.10 init > /tmp/cli-stdout.txt 2> /tmp/cli-stderr.txt || true && \
+    echo "=== STDOUT ===" && cat /tmp/cli-stdout.txt && \
+    echo "=== STDERR ===" && cat /tmp/cli-stderr.txt && \
+    cat /tmp/cli-stdout.txt /tmp/cli-stderr.txt > /tmp/cli-output.txt
+
+# Verify the output contains helpful messages (not Python/crash errors)
+RUN echo "=== Checking output ===" && \
+    if grep -q "JavaScript API Usage" /tmp/cli-output.txt; then \
+      echo "✅ CLI shows helpful JavaScript API usage message"; \
+    elif grep -q "ENOENT.*python" /tmp/cli-output.txt; then \
+      echo "❌ CLI still trying to use Python fallback"; \
+      exit 1; \
+    elif grep -q "runCli is not a function" /tmp/cli-output.txt; then \
+      echo "❌ runCli error still occurring"; \
+      exit 1; \
+    else \
+      echo "⚠️  Output doesn't match expected patterns (but no crash)"; \
+      cat /tmp/cli-output.txt; \
+    fi
+
+# Test 2: Verify the JavaScript API works
+RUN npm init -y && npm install neural-trader@2.3.10 --ignore-scripts
+
+RUN node -e "const nt = require('neural-trader'); \
+  console.log('✅ Module exports:', Object.keys(nt).join(', ')); \
+  const required = ['fetchMarketData', 'runStrategy', 'backtest', 'trainModel']; \
+  const missing = required.filter(f => typeof nt[f] !== 'function'); \
+  if (missing.length > 0) { \
+    console.error('❌ Missing functions:', missing.join(', ')); \
+    process.exit(1); \
+  } \
+  if (nt.runCli !== undefined) { \
+    console.error('❌ runCli should not be exported!'); \
+    process.exit(1); \
+  } \
+  console.log('✅ All required functions available'); \
+  console.log('✅ runCli correctly removed from exports');"
+
+CMD echo "✅ neural-trader@2.3.10 VALIDATION PASSED!"

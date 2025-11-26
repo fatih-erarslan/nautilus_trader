@@ -1,0 +1,14 @@
+{
+  "passed": 2,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "Optimize Strategy (CORRECT ORDER)",
+      "success": true
+    },
+    {
+      "name": "Control News Collection (CORRECT ORDER)",
+      "success": true
+    }
+  ]
+}

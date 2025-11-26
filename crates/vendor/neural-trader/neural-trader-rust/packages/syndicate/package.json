@@ -1,0 +1,73 @@
+{
+  "name": "@neural-trader/syndicate",
+  "version": "2.1.0",
+  "description": "Investment syndicate management with Kelly Criterion allocation, voting, and performance tracking",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "syndicate": "./bin/syndicate.js"
+  },
+  "scripts": {
+    "start": "node bin/syndicate.js",
+    "test": "node test/index.js",
+    "build": "cd ../../crates/nt-syndicate && cargo build --release"
+  },
+  "napi": {
+    "name": "syndicate",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        "aarch64-apple-darwin",
+        "x86_64-pc-windows-msvc"
+      ]
+    }
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "syndicate",
+    "kelly-criterion",
+    "governance",
+    "voting",
+    "capital-management"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/syndicate"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "yargs": "^17.7.2",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "homepage": "https://neural-trader.ruv.io"
+}

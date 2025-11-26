@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/calculate_kelly_criterion.json",
+  "title": "calculate_kelly_criterion",
+  "description": "Calculate optimal bet size using Kelly Criterion.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "probability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "odds": {
+          "type": "number",
+          "minimum": 1
+        },
+        "bankroll": {
+          "type": "number",
+          "minimum": 0
+        },
+        "confidence": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "probability",
+        "odds",
+        "bankroll"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "kelly_fraction": {
+          "type": "number"
+        },
+        "recommended_stake": {
+          "type": "number"
+        },
+        "expected_value": {
+          "type": "number"
+        },
+        "risk_of_ruin": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

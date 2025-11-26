@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  # PostgreSQL with pgvector extension for vector operations
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: agentic-accounting-test-db
+    environment:
+      POSTGRES_DB: agentic_accounting_test
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5433:5432"  # Use 5433 to avoid conflicts with local postgres
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./fixtures/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d agentic_accounting_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: agentic-accounting-test-redis
+    command: redis-server --requirepass test_redis_password
+    ports:
+      - "6380:6379"  # Use 6380 to avoid conflicts with local redis
+    volumes:
+      - redis_test_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - test-network
+
+  # AgentDB (if needed as separate service)
+  # Note: AgentDB can also be used as embedded library
+  agentdb:
+    image: agentdb/agentdb:latest
+    container_name: agentic-accounting-test-agentdb
+    environment:
+      AGENTDB_PORT: 8765
+      AGENTDB_DATA_DIR: /data
+    ports:
+      - "8766:8765"
+    volumes:
+      - agentdb_test_data:/data
+    networks:
+      - test-network
+
+volumes:
+  postgres_test_data:
+    driver: local
+  redis_test_data:
+    driver: local
+  agentdb_test_data:
+    driver: local
+
+networks:
+  test-network:
+    driver: bridge

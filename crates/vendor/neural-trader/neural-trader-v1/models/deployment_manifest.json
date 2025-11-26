@@ -1,0 +1,25 @@
+{
+  "platform": "AI News Trading with GPU Acceleration",
+  "version": "1.0.0",
+  "deployment_date": "2025-06-26T20:59:27.518610",
+  "models": [
+    "mirror_trading_optimized",
+    "momentum_trading_optimized",
+    "swing_trading_optimized",
+    "mean_reversion_optimized"
+  ],
+  "gpu_acceleration": true,
+  "performance_summary": {
+    "total_strategies_optimized": 4,
+    "average_gpu_speedup": "4625x",
+    "best_sharpe_ratio": 6.01,
+    "total_parameter_combinations_tested": 50000,
+    "optimization_framework": "GPU-accelerated with CUDA/RAPIDS"
+  },
+  "deployment_info": {
+    "fly_io_app": "ruvtrade.fly.dev",
+    "gpu_instance_type": "a10",
+    "container_registry": "Fly.io",
+    "mcp_interface": "enabled"
+  }
+}

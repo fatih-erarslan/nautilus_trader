@@ -1,0 +1,397 @@
+name: Build Neuro-Divergent NAPI Binaries
+
+on:
+  push:
+    branches: [main, develop, rust-port]
+    paths:
+      - 'neural-trader-rust/crates/neuro-divergent/**'
+      - '.github/workflows/build-neuro-divergent.yml'
+    tags:
+      - 'neuro-divergent-v*'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'neural-trader-rust/crates/neuro-divergent/**'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  PACKAGE_NAME: '@neural-trader/neuro-divergent'
+
+jobs:
+  build:
+    name: Build ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          # Linux x64 (glibc)
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux-x64-gnu
+            binary: neuro-divergent.linux-x64-gnu.node
+            docker: false
+
+          # Linux x64 (musl) - for Alpine Linux
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            platform: linux-x64-musl
+            binary: neuro-divergent.linux-x64-musl.node
+            docker: true
+            image: rust:alpine
+
+          # Linux ARM64 (glibc)
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            platform: linux-arm64-gnu
+            binary: neuro-divergent.linux-arm64-gnu.node
+            cross: true
+            docker: false
+
+          # macOS Intel (x64)
+          - os: macos-13
+            target: x86_64-apple-darwin
+            platform: darwin-x64
+            binary: neuro-divergent.darwin-x64.node
+            docker: false
+
+          # macOS ARM (M1/M2/M3)
+          - os: macos-14
+            target: aarch64-apple-darwin
+            platform: darwin-arm64
+            binary: neuro-divergent.darwin-arm64.node
+            docker: false
+
+          # Windows x64 (MSVC)
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: win32-x64-msvc
+            binary: neuro-divergent.win32-x64-msvc.node
+            docker: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: neural-trader-rust/crates/neuro-divergent/package.json
+
+      - name: Install Rust toolchain
+        if: ${{ !matrix.settings.docker }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.settings.target }}
+
+      - name: Setup Rust cache
+        if: ${{ !matrix.settings.docker }}
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: neural-trader-rust
+          key: neuro-divergent-${{ matrix.settings.target }}
+
+      # Linux ARM64 cross-compilation setup
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.settings.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          rustup target add aarch64-unknown-linux-gnu
+
+      # musl build using Docker
+      - name: Build with Docker (musl)
+        if: matrix.settings.docker
+        run: |
+          docker run --rm -v $(pwd):/work -w /work \
+            ${{ matrix.settings.image }} \
+            sh -c "
+              apk add --no-cache nodejs npm musl-dev &&
+              cd neural-trader-rust/crates/neuro-divergent &&
+              npm install &&
+              npm run build -- --target ${{ matrix.settings.target }}
+            "
+
+      # Standard builds (non-Docker)
+      - name: Install dependencies
+        if: ${{ !matrix.settings.docker }}
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        run: npm install
+
+      - name: Build NAPI binary
+        if: ${{ !matrix.settings.docker }}
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        env:
+          CARGO_BUILD_TARGET: ${{ matrix.settings.target }}
+          # ARM64 cross-compile configuration
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+          CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
+        run: |
+          npm run build -- --target ${{ matrix.settings.target }} --release --strip
+
+      - name: List build artifacts
+        shell: bash
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        run: |
+          echo "=== Build artifacts ==="
+          find . -name "*.node" -type f -exec ls -lh {} \;
+          echo ""
+          echo "=== Target directory ==="
+          if [ -d "target/${{ matrix.settings.target }}/release" ]; then
+            ls -lah target/${{ matrix.settings.target }}/release/
+          else
+            echo "No release directory found"
+          fi
+
+      - name: Verify binary size
+        shell: bash
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        run: |
+          BINARY=$(find . -name "*.node" -type f | head -n 1)
+          if [ -f "$BINARY" ]; then
+            SIZE=$(stat -c%s "$BINARY" 2>/dev/null || stat -f%z "$BINARY")
+            SIZE_MB=$((SIZE / 1024 / 1024))
+            echo "Binary size: ${SIZE_MB}MB"
+            if [ $SIZE_MB -gt 20 ]; then
+              echo "⚠️  Warning: Binary size exceeds 20MB"
+            else
+              echo "✓ Binary size is acceptable"
+            fi
+          fi
+
+      - name: Create artifacts directory
+        shell: bash
+        run: |
+          mkdir -p artifacts/${{ matrix.settings.platform }}/native
+
+      - name: Copy binary to artifacts
+        shell: bash
+        run: |
+          BINARY=$(find neural-trader-rust/crates/neuro-divergent -name "*.node" -type f | head -n 1)
+          if [ -f "$BINARY" ]; then
+            cp "$BINARY" "artifacts/${{ matrix.settings.platform }}/native/${{ matrix.settings.binary }}"
+            echo "✓ Copied binary to artifacts/${{ matrix.settings.platform }}/native/${{ matrix.settings.binary }}"
+            ls -lh "artifacts/${{ matrix.settings.platform }}/native/${{ matrix.settings.binary }}"
+          else
+            echo "❌ ERROR: Binary not found!"
+            exit 1
+          fi
+
+      - name: Test binary loading (native builds only)
+        if: ${{ !matrix.settings.cross && !matrix.settings.docker }}
+        shell: bash
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        run: |
+          # Basic smoke test - ensure binary loads
+          node -e "
+            try {
+              const binding = require('./index.js');
+              console.log('✓ Binary loaded successfully');
+              console.log('Exports:', Object.keys(binding));
+              process.exit(0);
+            } catch(e) {
+              console.error('✗ Failed to load binary:', e.message);
+              process.exit(1);
+            }
+          "
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: neuro-divergent-${{ matrix.settings.platform }}
+          path: artifacts/${{ matrix.settings.platform }}/native/${{ matrix.settings.binary }}
+          retention-days: 7
+          if-no-files-found: error
+
+  test-binaries:
+    name: Test Binary - ${{ matrix.settings.platform }}
+    needs: build
+    runs-on: ${{ matrix.settings.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - os: ubuntu-latest
+            platform: linux-x64-gnu
+          - os: macos-13
+            platform: darwin-x64
+          - os: macos-14
+            platform: darwin-arm64
+          - os: windows-latest
+            platform: win32-x64-msvc
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Download binary
+        uses: actions/download-artifact@v4
+        with:
+          name: neuro-divergent-${{ matrix.settings.platform }}
+          path: neural-trader-rust/crates/neuro-divergent/native/
+
+      - name: Install dependencies
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        run: npm install --ignore-scripts
+
+      - name: Run integration tests
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        run: npm run test:node
+
+  create-release:
+    name: Create Release
+    needs: [build, test-binaries]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/neuro-divergent-v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          for platform in linux-x64-gnu linux-x64-musl linux-arm64-gnu darwin-x64 darwin-arm64 win32-x64-msvc; do
+            if [ -d "artifacts/neuro-divergent-$platform" ]; then
+              cp -r artifacts/neuro-divergent-$platform/* release/
+            fi
+          done
+          ls -lh release/
+
+          # Create checksums
+          cd release
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/*
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+          body: |
+            ## Neuro-Divergent NAPI Binaries
+
+            Pre-built native binaries for all supported platforms:
+
+            - ✅ Linux x64 (glibc) - `neuro-divergent.linux-x64-gnu.node`
+            - ✅ Linux x64 (musl/Alpine) - `neuro-divergent.linux-x64-musl.node`
+            - ✅ Linux ARM64 - `neuro-divergent.linux-arm64-gnu.node`
+            - ✅ macOS Intel (x64) - `neuro-divergent.darwin-x64.node`
+            - ✅ macOS Apple Silicon (ARM64) - `neuro-divergent.darwin-arm64.node`
+            - ✅ Windows x64 - `neuro-divergent.win32-x64-msvc.node`
+
+            **Installation:**
+            ```bash
+            npm install @neural-trader/neuro-divergent
+            ```
+
+            **Verify checksums:**
+            ```bash
+            sha256sum -c SHA256SUMS.txt
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    name: Publish to NPM
+    needs: [build, test-binaries]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/neuro-divergent-v')
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare NPM package
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        run: |
+          # Copy binaries to package
+          mkdir -p native
+          for platform in linux-x64-gnu linux-x64-musl linux-arm64-gnu darwin-x64 darwin-arm64 win32-x64-msvc; do
+            if [ -d "../../artifacts/neuro-divergent-$platform" ]; then
+              cp -r ../../artifacts/neuro-divergent-$platform/* native/
+            fi
+          done
+
+          # Verify all binaries present
+          echo "=== Packaged binaries ==="
+          ls -lh native/
+
+          npm install --ignore-scripts
+
+      - name: Publish to NPM
+        working-directory: neural-trader-rust/crates/neuro-divergent
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+
+  build-summary:
+    name: Build Summary
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate build summary
+        run: |
+          echo "# Neuro-Divergent Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Built Binaries" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Binary | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|------|" >> $GITHUB_STEP_SUMMARY
+
+          for dir in artifacts/neuro-divergent-*; do
+            if [ -d "$dir" ]; then
+              platform=$(basename "$dir" | sed 's/neuro-divergent-//')
+              for binary in "$dir"/*; do
+                if [ -f "$binary" ]; then
+                  size=$(stat -c%s "$binary" 2>/dev/null || stat -f%z "$binary")
+                  size_mb=$(echo "scale=2; $size / 1024 / 1024" | bc)
+                  name=$(basename "$binary")
+                  echo "| $platform | $name | ${size_mb}MB |" >> $GITHUB_STEP_SUMMARY
+                fi
+              done
+            fi
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All platforms built successfully" >> $GITHUB_STEP_SUMMARY

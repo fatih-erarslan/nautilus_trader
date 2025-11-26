@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/update_syndicate_member_contribution.json",
+  "title": "update_syndicate_member_contribution",
+  "description": "Update a member's capital contribution.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "additional_amount": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "member_id",
+        "additional_amount"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "member_id": {
+          "type": "string"
+        },
+        "previous_contribution": {
+          "type": "number"
+        },
+        "additional_contribution": {
+          "type": "number"
+        },
+        "total_contribution": {
+          "type": "number"
+        },
+        "new_equity_share": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "member_id",
+        "total_contribution",
+        "new_equity_share"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

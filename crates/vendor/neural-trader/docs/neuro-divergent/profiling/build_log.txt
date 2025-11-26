@@ -1,0 +1,520 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /workspaces/neural-trader/neural-trader-rust/crates/nt-syndicate/Cargo.toml
+workspace: /workspaces/neural-trader/neural-trader-rust/Cargo.toml
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /workspaces/neural-trader/neural-trader-rust/crates/nt-benchoptimizer/Cargo.toml
+workspace: /workspaces/neural-trader/neural-trader-rust/Cargo.toml
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /workspaces/neural-trader/neural-trader-rust/crates/nt-napi/Cargo.toml
+workspace: /workspaces/neural-trader/neural-trader-rust/Cargo.toml
+    Blocking waiting for file lock on build directory
+   Compiling neuro-divergent v2.1.0 (/workspaces/neural-trader/neural-trader-rust/crates/neuro-divergent)
+error[E0761]: file for module `models` found at both "crates/neuro-divergent/src/models.rs" and "crates/neuro-divergent/src/models/mod.rs"
+  --> crates/neuro-divergent/src/lib.rs:83:1
+   |
+83 | pub mod models;
+   | ^^^^^^^^^^^^^^^
+   |
+   = help: delete or rename one of them to remove the ambiguity
+
+error[E0432]: unresolved import `crate::training::metrics::TrainingMetrics`
+   --> crates/neuro-divergent/src/training/mod.rs:175:9
+    |
+175 | pub use crate::training::metrics::TrainingMetrics;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `TrainingMetrics` in `training::metrics`
+
+warning: unexpected `cfg` condition value: `napi-bindings`
+  --> crates/neuro-divergent/src/lib.rs:90:7
+   |
+90 | #[cfg(feature = "napi-bindings")]
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `accelerate`, `all-models`, `candle-core`, `candle-nn`, `cpu`, `cuda`, `cudarc`, `default`, `gpu`, `metal`, `neural`, `nt-neural`, and `simd`
+   = help: consider adding `napi-bindings` as a feature in `Cargo.toml`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unused import: `NeuroDivergentError`
+ --> crates/neuro-divergent/src/data/preprocessor.rs:4:21
+  |
+4 | use crate::{Result, NeuroDivergentError};
+  |                     ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Axis`
+  --> crates/neuro-divergent/src/training/backprop.rs:10:31
+   |
+10 | use ndarray::{Array1, Array2, Axis};
+   |                               ^^^^
+
+warning: unused imports: `Array2` and `Axis`
+ --> crates/neuro-divergent/src/training/losses.rs:9:23
+  |
+9 | use ndarray::{Array1, Array2, Axis};
+  |                       ^^^^^^  ^^^^
+
+warning: unnecessary parentheses around assigned value
+   --> crates/neuro-divergent/src/training/losses.rs:312:35
+    |
+312 |                 let denominator = (pred.abs() + target.abs() + self.epsilon);
+    |                                   ^                                        ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+312 -                 let denominator = (pred.abs() + target.abs() + self.epsilon);
+312 +                 let denominator = pred.abs() + target.abs() + self.epsilon;
+    |
+
+warning: unused imports: `AdamW`, `ConstantLR`, and `OptimizerConfig`
+  --> crates/neuro-divergent/src/training/trainer.rs:15:29
+   |
+15 |     optimizers::{Optimizer, OptimizerConfig, AdamW},
+   |                             ^^^^^^^^^^^^^^^  ^^^^^
+16 |     schedulers::{LRScheduler, SchedulerMetrics, ConstantLR},
+   |                                                 ^^^^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> crates/neuro-divergent/src/training/trainer.rs:22:5
+   |
+22 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused import: `NeuroDivergentError`
+ --> crates/neuro-divergent/src/training/engine.rs:3:21
+  |
+3 | use crate::{Result, NeuroDivergentError};
+  |                     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::Result`
+ --> crates/neuro-divergent/src/inference/mod.rs:4:5
+  |
+4 | use crate::Result;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `ArrayView3`
+  --> crates/neuro-divergent/src/optimizations/flash_attention.rs:20:43
+   |
+20 | use ndarray::{Array2, Array3, ArrayView2, ArrayView3, s};
+   |                                           ^^^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> crates/neuro-divergent/src/optimizations/flash_attention.rs:21:5
+   |
+21 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> crates/neuro-divergent/src/optimizations/parallel.rs:31:5
+   |
+31 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/backprop.rs:285:53
+    |
+285 |                 .ok_or_else(|| NeuroDivergentError::Training(
+    |                                                     ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+  --> crates/neuro-divergent/src/training/optimizers.rs:97:45
+   |
+97 |             return Err(NeuroDivergentError::Training(
+   |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+   |
+  ::: crates/neuro-divergent/src/error.rs:10:1
+   |
+10 | pub enum NeuroDivergentError {
+   | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/optimizers.rs:191:45
+    |
+191 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/optimizers.rs:299:45
+    |
+299 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+  --> crates/neuro-divergent/src/training/schedulers.rs:90:45
+   |
+90 |             return Err(NeuroDivergentError::Training(
+   |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+   |
+  ::: crates/neuro-divergent/src/error.rs:10:1
+   |
+10 | pub enum NeuroDivergentError {
+   | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/schedulers.rs:146:45
+    |
+146 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+  --> crates/neuro-divergent/src/training/losses.rs:31:45
+   |
+31 |             return Err(NeuroDivergentError::Training(
+   |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+   |
+  ::: crates/neuro-divergent/src/error.rs:10:1
+   |
+10 | pub enum NeuroDivergentError {
+   | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+  --> crates/neuro-divergent/src/training/losses.rs:42:45
+   |
+42 |             return Err(NeuroDivergentError::Training(
+   |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+   |
+  ::: crates/neuro-divergent/src/error.rs:10:1
+   |
+10 | pub enum NeuroDivergentError {
+   | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+  --> crates/neuro-divergent/src/training/losses.rs:63:45
+   |
+63 |             return Err(NeuroDivergentError::Training(
+   |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+   |
+  ::: crates/neuro-divergent/src/error.rs:10:1
+   |
+10 | pub enum NeuroDivergentError {
+   | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+  --> crates/neuro-divergent/src/training/losses.rs:74:45
+   |
+74 |             return Err(NeuroDivergentError::Training(
+   |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+   |
+  ::: crates/neuro-divergent/src/error.rs:10:1
+   |
+10 | pub enum NeuroDivergentError {
+   | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:109:45
+    |
+109 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:129:45
+    |
+129 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:160:45
+    |
+160 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:171:45
+    |
+171 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:190:45
+    |
+190 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:233:45
+    |
+233 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:257:45
+    |
+257 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:303:45
+    |
+303 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:322:45
+    |
+322 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:361:45
+    |
+361 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/losses.rs:386:45
+    |
+386 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no method named `values` found for reference `&TimeSeriesDataFrame` in the current scope
+   --> crates/neuro-divergent/src/training/trainer.rs:420:27
+    |
+420 |         let values = data.values();
+    |                           ^^^^^^ field, not a method
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `values`, perhaps you need to implement one of them:
+            candidate #1: `polars_arrow::array::GenericBinaryArray`
+            candidate #2: `polars_arrow::array::fixed_size_binary::FixedSizeBinaryValues`
+help: remove the arguments
+    |
+420 -         let values = data.values();
+420 +         let values = data.values;
+    |
+help: one of the expressions' fields has a method of the same name
+    |
+420 |         let values = data.metadata.values();
+    |                           +++++++++
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/trainer.rs:424:45
+    |
+424 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/trainer.rs:481:34
+    |
+481 |             NeuroDivergentError::Training(format!("Failed to create checkpoint directory: {}", e))
+    |                                  ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/trainer.rs:495:34
+    |
+495 |             NeuroDivergentError::Training(format!("Failed to serialize checkpoint: {}", e))
+    |                                  ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/training/trainer.rs:499:34
+    |
+499 |             NeuroDivergentError::Training(format!("Failed to write checkpoint: {}", e))
+    |                                  ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+error[E0599]: no variant or associated item named `Optimization` found for enum `error::NeuroDivergentError` in the current scope
+  --> crates/neuro-divergent/src/optimizations/parallel.rs:67:51
+   |
+67 |                 .map_err(|e| NeuroDivergentError::Optimization(
+   |                                                   ^^^^^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+   |
+  ::: crates/neuro-divergent/src/error.rs:10:1
+   |
+10 | pub enum NeuroDivergentError {
+   | ---------------------------- variant or associated item `Optimization` not found for this enum
+
+error[E0599]: no variant or associated item named `Optimization` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/optimizations/parallel.rs:182:41
+    |
+182 |         return Err(NeuroDivergentError::Optimization(
+    |                                         ^^^^^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Optimization` not found for this enum
+
+error[E0599]: no variant or associated item named `Optimization` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/optimizations/parallel.rs:328:49
+    |
+328 |                 return Err(NeuroDivergentError::Optimization(
+    |                                                 ^^^^^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Optimization` not found for this enum
+
+error[E0599]: no variant or associated item named `Optimization` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/optimizations/parallel.rs:446:51
+    |
+446 |                 .map_err(|e| NeuroDivergentError::Optimization(
+    |                                                   ^^^^^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Optimization` not found for this enum
+
+error[E0599]: no variant or associated item named `Training` found for enum `error::NeuroDivergentError` in the current scope
+   --> crates/neuro-divergent/src/optimizations/mixed_precision.rs:465:45
+    |
+465 |             return Err(NeuroDivergentError::Training(
+    |                                             ^^^^^^^^ variant or associated item not found in `error::NeuroDivergentError`
+    |
+   ::: crates/neuro-divergent/src/error.rs:10:1
+    |
+ 10 | pub enum NeuroDivergentError {
+    | ---------------------------- variant or associated item `Training` not found for this enum
+
+warning: unused variable: `set_params_fn`
+   --> crates/neuro-divergent/src/training/trainer.rs:219:13
+    |
+219 |         mut set_params_fn: impl FnMut(Vec<Array2<f64>>),
+    |             ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_set_params_fn`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/neuro-divergent/src/training/trainer.rs:219:9
+    |
+219 |         mut set_params_fn: impl FnMut(Vec<Array2<f64>>),
+    |         ----^^^^^^^^^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+error[E0596]: cannot borrow `val_loader.0` as mutable, as `val_loader` is not declared as mutable
+   --> crates/neuro-divergent/src/training/trainer.rs:260:40
+    |
+260 |             let val_loss = if let Some(ref mut val_loader) = val_loader {
+    |                                        ^^^^^^^^^^^^^^^^^^ cannot borrow as mutable
+    |
+help: consider changing this to be mutable
+    |
+236 |         let mut val_loader = x_val.map(|x| {
+    |             +++
+
+warning: unused variable: `d_k`
+  --> crates/neuro-divergent/src/optimizations/flash_attention.rs:89:35
+   |
+89 |         let (batch_size, seq_len, d_k) = q.dim();
+   |                                   ^^^ help: if this is intentional, prefix it with an underscore: `_d_k`
+
+warning: unused variable: `scale_vec`
+   --> crates/neuro-divergent/src/optimizations/flash_attention.rs:231:13
+    |
+231 |         let scale_vec = _mm256_set1_pd(self.config.scale);
+    |             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_scale_vec`
+
+warning: unused variable: `seq_len`
+   --> crates/neuro-divergent/src/optimizations/flash_attention.rs:336:32
+    |
+336 |     pub fn memory_usage(&self, seq_len: usize, d_k: usize, d_v: usize, batch_size: usize) -> usize {
+    |                                ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_seq_len`
+
+warning: unused variable: `d_k`
+   --> crates/neuro-divergent/src/optimizations/flash_attention.rs:336:48
+    |
+336 |     pub fn memory_usage(&self, seq_len: usize, d_k: usize, d_v: usize, batch_size: usize) -> usize {
+    |                                                ^^^ help: if this is intentional, prefix it with an underscore: `_d_k`
+
+Some errors have detailed explanations: E0432, E0596, E0599, E0761.
+For more information about an error, try `rustc --explain E0432`.
+warning: `neuro-divergent` (lib) generated 18 warnings
+error: could not compile `neuro-divergent` (lib) due to 34 previous errors; 18 warnings emitted

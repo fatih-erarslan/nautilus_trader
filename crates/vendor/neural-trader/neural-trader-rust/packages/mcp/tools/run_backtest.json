@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/run_backtest.json",
+  "title": "run_backtest",
+  "description": "Run comprehensive historical backtest with GPU acceleration.",
+  "category": "analysis",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "description": "Strategy name"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Start date (YYYY-MM-DD)"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date",
+          "description": "End date (YYYY-MM-DD)"
+        },
+        "benchmark": {
+          "type": "string",
+          "default": "sp500",
+          "description": "Benchmark index"
+        },
+        "include_costs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include transaction costs"
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable GPU acceleration"
+        }
+      },
+      "required": [
+        "strategy",
+        "symbol",
+        "start_date",
+        "end_date"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "backtest_id": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "performance": {
+          "type": "object",
+          "properties": {
+            "total_return": {
+              "type": "number"
+            },
+            "annual_return": {
+              "type": "number"
+            },
+            "sharpe_ratio": {
+              "type": "number"
+            },
+            "sortino_ratio": {
+              "type": "number"
+            },
+            "max_drawdown": {
+              "type": "number"
+            },
+            "win_rate": {
+              "type": "number"
+            },
+            "profit_factor": {
+              "type": "number"
+            },
+            "total_trades": {
+              "type": "integer"
+            }
+          }
+        },
+        "benchmark_comparison": {
+          "type": "object",
+          "properties": {
+            "alpha": {
+              "type": "number"
+            },
+            "beta": {
+              "type": "number"
+            },
+            "outperformance": {
+              "type": "number"
+            }
+          }
+        },
+        "gpu_metrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "speedup": {
+              "type": "string"
+            },
+            "execution_time": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "backtest_id",
+        "strategy",
+        "performance"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "iterations": 1000,
+  "parallel": true,
+  "format": "markdown",
+  "severity": "medium",
+  "output": "./reports/benchmark.md",
+  "warmup": true,
+  "fix": false,
+  "strict": false,
+  "verbose": false,
+  "quiet": false,
+  "noColor": false
+}

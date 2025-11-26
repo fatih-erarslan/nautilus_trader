@@ -1,0 +1,124 @@
+{
+  "name": "@neural-trader/e2b-strategies",
+  "version": "1.1.1",
+  "description": "Production-ready E2B sandbox trading strategies with 10-50x performance improvements, circuit breakers, and comprehensive observability",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./momentum": "./strategies/momentum.js",
+    "./swarm": "./swarm/coordinator.js",
+    "./benchmark": "./benchmark/e2b-benchmark.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "e2b-strategies": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node strategies/momentum.js",
+    "swarm:deploy": "node scripts/deploy-swarm.js deploy",
+    "swarm:benchmark": "node scripts/deploy-swarm.js benchmark",
+    "swarm:status": "node scripts/deploy-swarm.js status --learning --patterns",
+    "swarm:patterns": "node scripts/deploy-swarm.js patterns",
+    "swarm:export": "node scripts/deploy-swarm.js export",
+    "benchmark": "node benchmark/e2b-benchmark.js",
+    "publish:npm": "npm publish --access public"
+  },
+  "keywords": [
+    "neural-trader",
+    "e2b",
+    "sandbox",
+    "trading",
+    "algorithmic-trading",
+    "momentum",
+    "mean-reversion",
+    "neural-forecast",
+    "risk-management",
+    "portfolio-optimization",
+    "circuit-breaker",
+    "high-performance",
+    "production-ready",
+    "observability",
+    "prometheus",
+    "kubernetes",
+    "docker",
+    "typescript",
+    "rust",
+    "napi",
+    "10x-faster",
+    "cloud-trading",
+    "alpaca",
+    "interactive-brokers",
+    "real-time",
+    "backtesting",
+    "technical-analysis",
+    "swarm",
+    "multi-agent",
+    "ai-coordination",
+    "self-learning",
+    "agentic",
+    "quantum-resistant",
+    "distributed-trading",
+    "benchmark"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "packages/e2b-strategies"
+  },
+  "homepage": "https://github.com/ruvnet/neural-trader/tree/main/packages/e2b-strategies#readme",
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "dependencies": {
+    "@e2b/sdk": "^0.12.5",
+    "agentic-jujutsu": "^2.3.3",
+    "commander": "^11.1.0",
+    "express": "^4.18.2",
+    "node-cache": "^5.1.2",
+    "opossum": "^8.1.2"
+  },
+  "peerDependencies": {
+    "@alpacahq/alpaca-trade-api": "^3.0.2"
+  },
+  "peerDependenciesMeta": {
+    "@alpacahq/alpaca-trade-api": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {
+    "@neural-trader/brokers": "^2.1.1",
+    "@neural-trader/execution": "^2.1.1",
+    "@neural-trader/features": "^2.1.1",
+    "@neural-trader/market-data": "^2.1.1",
+    "@neural-trader/neural": "^2.1.2",
+    "@neural-trader/portfolio": "^2.1.1",
+    "@neural-trader/risk": "^2.1.1",
+    "@neural-trader/strategies": "^2.1.1"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "bin",
+    "strategies",
+    "swarm",
+    "benchmark",
+    "scripts",
+    "examples",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

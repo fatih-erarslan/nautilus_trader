@@ -1,0 +1,269 @@
+name: Build NAPI Binaries
+
+on:
+  push:
+    branches: [main, develop, rust-port]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x64
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux-x64-gnu
+            node: neural-trader.linux-x64-gnu.node
+
+          # Linux ARM64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            platform: linux-arm64-gnu
+            node: neural-trader.linux-arm64-gnu.node
+            cross: true
+
+          # macOS Intel
+          - os: macos-13
+            target: x86_64-apple-darwin
+            platform: darwin-x64
+            node: neural-trader.darwin-x64.node
+
+          # macOS ARM (M1/M2/M3)
+          - os: macos-14
+            target: aarch64-apple-darwin
+            platform: darwin-arm64
+            node: neural-trader.darwin-arm64.node
+
+          # Windows x64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: win32-x64-msvc
+            node: neural-trader.win32-x64-msvc.node
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: neural-trader-rust/crates/napi-bindings/package.json
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: neural-trader-rust
+          key: ${{ matrix.target }}
+
+      # Linux ARM64 requires cross-compilation
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          rustup target add aarch64-unknown-linux-gnu
+
+      # macOS ARM cross-compile from Intel (if needed)
+      - name: Setup macOS cross-compilation
+        if: matrix.os == 'macos-13' && matrix.target == 'aarch64-apple-darwin'
+        run: rustup target add aarch64-apple-darwin
+
+      - name: Install dependencies
+        working-directory: neural-trader-rust/crates/napi-bindings
+        run: npm install
+
+      - name: Build NAPI binary
+        working-directory: neural-trader-rust/crates/napi-bindings
+        env:
+          CARGO_BUILD_TARGET: ${{ matrix.target }}
+          # ARM64 cross-compile configuration
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+          CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
+        run: |
+          npm run build:release
+
+      - name: List build artifacts
+        shell: bash
+        working-directory: neural-trader-rust
+        run: |
+          echo "=== Build artifacts ==="
+          find . -name "*.node" -type f -exec ls -lh {} \;
+          echo "=== Target directory ==="
+          ls -lah target/${{ matrix.target }}/release/ || echo "No release directory"
+
+      - name: Copy binary to packages
+        shell: bash
+        run: |
+          mkdir -p packages/${{ matrix.platform }}/native
+          # Find the built .node file and copy it
+          BINARY=$(find neural-trader-rust/target/${{ matrix.target }}/release -name "*.node" -type f | head -n 1)
+          if [ -f "$BINARY" ]; then
+            cp "$BINARY" "packages/${{ matrix.platform }}/native/${{ matrix.node }}"
+            ls -lh "packages/${{ matrix.platform }}/native/${{ matrix.node }}"
+          else
+            echo "ERROR: Binary not found!"
+            exit 1
+          fi
+
+      - name: Test binary (native builds only)
+        if: "!matrix.cross"
+        shell: bash
+        working-directory: neural-trader-rust/crates/napi-bindings
+        run: |
+          # Basic smoke test - ensure binary loads
+          node -e "try { require('./index.js'); console.log('✓ Binary loaded successfully'); } catch(e) { console.error('✗ Failed to load:', e.message); process.exit(1); }"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: napi-${{ matrix.platform }}
+          path: packages/${{ matrix.platform }}/native/${{ matrix.node }}
+          retention-days: 7
+          if-no-files-found: error
+
+  test-binaries:
+    name: Test Binaries
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x64-gnu
+          - os: macos-13
+            platform: darwin-x64
+          - os: macos-14
+            platform: darwin-arm64
+          - os: windows-latest
+            platform: win32-x64-msvc
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Download binary
+        uses: actions/download-artifact@v4
+        with:
+          name: napi-${{ matrix.platform }}
+          path: neural-trader-rust/crates/napi-bindings/
+
+      - name: Install dependencies
+        working-directory: neural-trader-rust/crates/napi-bindings
+        run: npm install --ignore-scripts
+
+      - name: Run integration tests
+        working-directory: neural-trader-rust/crates/napi-bindings
+        run: npm run test:node
+
+  create-release:
+    name: Create Release
+    needs: [build, test-binaries]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          for platform in linux-x64-gnu linux-arm64-gnu darwin-x64 darwin-arm64 win32-x64-msvc; do
+            if [ -d "artifacts/napi-$platform" ]; then
+              cp artifacts/napi-$platform/* release/
+            fi
+          done
+          ls -lh release/
+
+          # Create checksums
+          cd release
+          sha256sum *.node > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/*
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    name: Publish to NPM
+    needs: [build, test-binaries]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare NPM package
+        working-directory: neural-trader-rust/crates/napi-bindings
+        run: |
+          # Copy binaries to package
+          for platform in linux-x64-gnu linux-arm64-gnu darwin-x64 darwin-arm64 win32-x64-msvc; do
+            if [ -d "../../artifacts/napi-$platform" ]; then
+              mkdir -p "native/$platform"
+              cp ../../artifacts/napi-$platform/* "native/$platform/"
+            fi
+          done
+
+          # Verify all binaries present
+          ls -R native/
+
+          npm install --ignore-scripts
+
+      - name: Publish to NPM
+        working-directory: neural-trader-rust/crates/napi-bindings
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public

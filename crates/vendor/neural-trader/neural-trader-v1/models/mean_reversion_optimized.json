@@ -1,0 +1,22 @@
+{
+  "strategy_type": "mean_reversion",
+  "parameters": {
+    "entry_z_threshold": 2.2,
+    "exit_z_threshold": 0.3,
+    "base_position_size": 0.028,
+    "max_half_life": 12,
+    "min_reversion_strength": 1.2,
+    "cointegration_threshold": 0.05,
+    "kelly_fraction": 0.25
+  },
+  "performance_metrics": {
+    "sharpe_ratio": 2.9,
+    "total_return": 0.388,
+    "max_drawdown": -0.067,
+    "win_rate": 0.72,
+    "reversion_efficiency": 0.84
+  },
+  "gpu_optimized": true,
+  "speedup_achieved": "6000x",
+  "optimization_date": "2025-06-26T20:59:27.515238"
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/switch_active_strategy.json",
+  "title": "switch_active_strategy",
+  "description": "Switch from one strategy to another.",
+  "category": "strategy",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "from_strategy": {
+          "type": "string"
+        },
+        "to_strategy": {
+          "type": "string"
+        },
+        "close_positions": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "from_strategy",
+        "to_strategy"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "partial",
+            "failed"
+          ]
+        },
+        "from_strategy": {
+          "type": "string"
+        },
+        "to_strategy": {
+          "type": "string"
+        },
+        "positions_closed": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,152 @@
+# Integration Test Configuration for AI News Trading Benchmark System
+# This configuration defines settings for running integration tests
+
+test_categories:
+  integration:
+    enabled: true
+    timeout: 1200  # 20 minutes
+    parallel_execution: true
+    max_workers: 2  # Fewer workers for integration tests
+    retry_on_failure: true
+    max_retries: 2
+    
+performance_validation:
+  enabled: true  # Integration tests validate basic performance
+  strict_mode: false
+  tolerance_percent: 20  # More lenient for integration tests
+
+reporting:
+  formats: ["json", "html", "junit"]
+  output_dir: "./test_results/integration"
+  detailed_logs: true
+  include_screenshots: true
+  include_logs: true
+
+environment_checks:
+  system_resources: true
+  dependencies: true
+  connectivity: true  # Integration tests need external connectivity
+  external_services: true
+
+parallel_execution:
+  enabled: true
+  max_workers: 2  # Limited to avoid resource conflicts
+
+test_suites:
+  end_to_end:
+    enabled: true
+    timeout: 600  # 10 minutes
+    test_cases:
+      - "test_complete_benchmark_pipeline"
+      - "test_multi_asset_concurrent_processing"
+      - "test_real_time_latency_requirements"
+      - "test_throughput_stress_test"
+      - "test_memory_efficiency"
+      - "test_error_recovery_and_resilience"
+  
+  cli_integration:
+    enabled: true
+    timeout: 300  # 5 minutes
+    test_cases:
+      - "test_benchmark_command_integration"
+      - "test_simulation_command_integration"
+      - "test_optimization_command_integration"
+      - "test_complete_workflow_integration"
+  
+  realtime_simulation:
+    enabled: true
+    timeout: 600  # 10 minutes
+    test_cases:
+      - "test_realtime_data_to_simulation_pipeline"
+      - "test_concurrent_symbol_processing"
+      - "test_market_scenario_simulation"
+      - "test_news_driven_simulation"
+      - "test_arbitrage_opportunity_detection"
+  
+  optimization_integration:
+    enabled: true
+    timeout: 900  # 15 minutes
+    test_cases:
+      - "test_bayesian_optimization_integration"
+      - "test_genetic_algorithm_integration"
+      - "test_multi_objective_optimization"
+      - "test_performance_aware_optimization"
+
+resource_limits:
+  # Resource limits for integration tests
+  max_memory_mb: 2048  # 2GB
+  max_cpu_percent: 80
+  max_duration_seconds: 1200
+  max_disk_io_mb: 1000
+
+test_data:
+  # Test data configuration for integration tests
+  use_mock_data: false  # Use more realistic data
+  mock_external_services: false  # Test with real services when possible
+  test_database: "sqlite:///test_integration.db"
+  sample_data_size: "medium"  # small, medium, large
+  
+  data_sources:
+    market_data:
+      symbols: ["AAPL", "GOOGL", "MSFT", "BTC-USD", "ETH-USD"]
+      time_range_hours: 24
+      frequency_seconds: 1
+    news_data:
+      sources: ["mock_feed_1", "mock_feed_2"]
+      articles_per_hour: 10
+      sentiment_distribution: "realistic"
+
+external_services:
+  # Configuration for external service testing
+  timeout_seconds: 30
+  retry_attempts: 3
+  mock_failures: true  # Simulate occasional failures
+  
+  data_feeds:
+    primary:
+      type: "mock"
+      latency_ms: 10
+      reliability: 0.99
+    secondary:
+      type: "mock"
+      latency_ms: 50
+      reliability: 0.95
+
+performance_thresholds:
+  # Performance expectations for integration tests
+  max_latency_p99_ms: 150  # More lenient than unit tests
+  min_throughput_per_sec: 500
+  max_memory_usage_mb: 1024
+  min_success_rate: 0.95
+
+quality_gates:
+  # Quality gates for integration tests
+  min_test_count: 20
+  max_failure_rate: 0.1  # 10% failure rate max
+  min_end_to_end_success: 0.9
+  max_duration_minutes: 20
+
+monitoring:
+  # Monitoring during integration tests
+  enabled: true
+  metrics:
+    - "memory_usage"
+    - "cpu_usage"
+    - "network_io"
+    - "disk_io"
+    - "response_times"
+  sampling_interval_seconds: 5
+
+cleanup:
+  # Cleanup settings
+  after_each_test: true
+  after_suite: true
+  preserve_on_failure: true
+  
+notifications:
+  # Notification settings
+  enabled: true
+  on_failure_only: true
+  channels:
+    - type: "log"
+      level: "ERROR"

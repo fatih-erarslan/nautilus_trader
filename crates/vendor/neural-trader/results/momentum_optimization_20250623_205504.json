@@ -1,0 +1,183 @@
+{
+  "optimization_timestamp": "2025-06-23T20:55:04.805322",
+  "best_parameters": {
+    "strong_threshold": 0.4,
+    "moderate_threshold": 0.3496477459413304,
+    "weak_threshold": 0.12443047771799084,
+    "max_position_pct": 0.2,
+    "min_position_pct": 0.02324886434595005,
+    "lookback_short": 3,
+    "lookback_medium": 11,
+    "lookback_long": 33,
+    "price_weight": 0.46252240627297564,
+    "volume_weight": 0.22563602395005378,
+    "rs_weight": 0.23252479467651244,
+    "fundamental_weight": 0.07931677510045824,
+    "stop_loss_pct": 0.1322135414643074,
+    "trailing_stop_pct": 0.015694451793948447,
+    "max_holding_days": 16,
+    "sharpe_ratio": 0.49186265837055715,
+    "annual_return": 0.8422417722470381,
+    "max_drawdown": 0.0,
+    "win_rate": 0.5622483544494077,
+    "profit_factor": 1.686745063348223
+  },
+  "regime_parameters": {
+    "bull_market": {
+      "strong_threshold": 0.48362117682944883,
+      "moderate_threshold": 0.2674357544476277,
+      "weak_threshold": 0.1727956507241668,
+      "max_position_pct": 0.2608633532878847,
+      "min_position_pct": 0.023855907750637152,
+      "lookback_short": 6,
+      "lookback_medium": 15,
+      "lookback_long": 81,
+      "price_weight": 0.5301900229527983,
+      "volume_weight": 0.25083191885054307,
+      "rs_weight": 0.11705046647793768,
+      "fundamental_weight": 0.10192759171872105,
+      "stop_loss_pct": 0.021600064917991886,
+      "trailing_stop_pct": 0.026231420292182894,
+      "max_holding_days": 16,
+      "sharpe_ratio": 0.9666822825815753,
+      "annual_return": 1.0,
+      "max_drawdown": 0.0,
+      "win_rate": 0.6255576376775434,
+      "profit_factor": 1.87667291303263
+    },
+    "bear_market": {
+      "strong_threshold": 0.5625114764986141,
+      "moderate_threshold": 0.30772389095686414,
+      "weak_threshold": 0.17534433978704891,
+      "max_position_pct": 0.14529615630277157,
+      "min_position_pct": 0.027976848467504985,
+      "lookback_short": 4,
+      "lookback_medium": 16,
+      "lookback_long": 81,
+      "price_weight": 0.39030534092295677,
+      "volume_weight": 0.14095511156100943,
+      "rs_weight": 0.2690681813580122,
+      "fundamental_weight": 0.19967136615802158,
+      "stop_loss_pct": 0.057678382800743846,
+      "trailing_stop_pct": 0.07568544071424368,
+      "max_holding_days": 24,
+      "sharpe_ratio": 0.2639979550162696,
+      "annual_return": 0.6903319700108463,
+      "max_drawdown": -0.027200408996746084,
+      "win_rate": 0.5318663940021693,
+      "profit_factor": 1.5955991820065079
+    },
+    "sideways_market": {
+      "strong_threshold": 0.45928369234933,
+      "moderate_threshold": 0.24997145606940785,
+      "weak_threshold": 0.05,
+      "max_position_pct": 0.15,
+      "min_position_pct": 0.025901618053495275,
+      "lookback_short": 4,
+      "lookback_medium": 14,
+      "lookback_long": 76,
+      "price_weight": 0.46692817301940875,
+      "volume_weight": 0.2056184469144889,
+      "rs_weight": 0.15512374505126153,
+      "fundamental_weight": 0.17232963501484075,
+      "stop_loss_pct": 0.05058813732844504,
+      "trailing_stop_pct": 0.05269501864293746,
+      "max_holding_days": 14,
+      "sharpe_ratio": 0.5567104185836673,
+      "annual_return": 0.8854736123891114,
+      "max_drawdown": 0.0,
+      "win_rate": 0.5708947224778222,
+      "profit_factor": 1.7126841674334667
+    },
+    "high_volatility": {
+      "strong_threshold": 0.4,
+      "moderate_threshold": 0.3496477459413304,
+      "weak_threshold": 0.12443047771799084,
+      "max_position_pct": 0.2,
+      "min_position_pct": 0.02324886434595005,
+      "lookback_short": 3,
+      "lookback_medium": 11,
+      "lookback_long": 33,
+      "price_weight": 0.46252240627297564,
+      "volume_weight": 0.22563602395005378,
+      "rs_weight": 0.23252479467651244,
+      "fundamental_weight": 0.07931677510045824,
+      "stop_loss_pct": 0.1322135414643074,
+      "trailing_stop_pct": 0.015694451793948447,
+      "max_holding_days": 16,
+      "sharpe_ratio": 0.49186265837055715,
+      "annual_return": 0.8422417722470381,
+      "max_drawdown": 0.0,
+      "win_rate": 0.5622483544494077,
+      "profit_factor": 1.686745063348223
+    }
+  },
+  "optimization_config": {
+    "population_size": 50,
+    "generations": 100,
+    "mutation_rate": 0.15,
+    "crossover_rate": 0.8
+  },
+  "parameter_bounds": {
+    "strong_threshold": [
+      0.4,
+      0.95
+    ],
+    "moderate_threshold": [
+      0.2,
+      0.6
+    ],
+    "weak_threshold": [
+      0.05,
+      0.35
+    ],
+    "max_position_pct": [
+      0.02,
+      0.2
+    ],
+    "min_position_pct": [
+      0.005,
+      0.03
+    ],
+    "lookback_short": [
+      3,
+      10
+    ],
+    "lookback_medium": [
+      10,
+      30
+    ],
+    "lookback_long": [
+      30,
+      90
+    ],
+    "price_weight": [
+      0.2,
+      0.7
+    ],
+    "volume_weight": [
+      0.1,
+      0.4
+    ],
+    "rs_weight": [
+      0.1,
+      0.4
+    ],
+    "fundamental_weight": [
+      0.05,
+      0.3
+    ],
+    "stop_loss_pct": [
+      0.04,
+      0.15
+    ],
+    "trailing_stop_pct": [
+      0.01,
+      0.08
+    ],
+    "max_holding_days": [
+      5,
+      20
+    ]
+  }
+}

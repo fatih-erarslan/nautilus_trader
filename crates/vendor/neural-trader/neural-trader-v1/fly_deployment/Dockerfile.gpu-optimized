@@ -1,0 +1,187 @@
+# Fly.io GPU-Optimized Dockerfile for AI News Trading Platform
+# Multi-stage build for optimal GPU performance
+
+# Stage 1: Base Ubuntu image with Python (we'll install CUDA later)
+FROM ubuntu:22.04 as base
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Install CUDA repository and basic dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    ca-certificates \
+    gnupg \
+    && wget -O- https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub | gpg --dearmor -o /usr/share/keyrings/nvidia-archive-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/nvidia-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" > /etc/apt/sources.list.d/cuda-ubuntu2204-x86_64.list
+
+# Install system dependencies including CUDA
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3.10-dev \
+    python3-pip \
+    git \
+    curl \
+    build-essential \
+    cmake \
+    pkg-config \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libv4l-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libgtk-3-dev \
+    libatlas-base-dev \
+    gfortran \
+    cuda-toolkit-12-1 \
+    cuda-drivers \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create symbolic link for python
+RUN ln -s /usr/bin/python3.10 /usr/bin/python
+
+# Upgrade pip
+RUN python -m pip install --upgrade pip
+
+# Stage 2: Python dependencies
+FROM base as python-deps
+
+# Install PyTorch with CUDA support
+RUN pip install torch==2.1.0+cu118 torchvision==0.16.0+cu118 torchaudio==2.1.0+cu118 \
+    --index-url https://download.pytorch.org/whl/cu118
+
+# Install TensorRT
+RUN pip install tensorrt
+
+# Install NVIDIA packages for GPU optimization
+RUN pip install \
+    nvidia-ml-py \
+    pynvml \
+    cupy-cuda12x \
+    nvidia-cublas-cu12 \
+    nvidia-cuda-cupti-cu12 \
+    nvidia-cuda-nvrtc-cu12 \
+    nvidia-cuda-runtime-cu12 \
+    nvidia-cudnn-cu12 \
+    nvidia-cufft-cu12 \
+    nvidia-curand-cu12 \
+    nvidia-cusolver-cu12 \
+    nvidia-cusparse-cu12 \
+    nvidia-nccl-cu12 \
+    nvidia-nvtx-cu12
+
+# Stage 3: Application dependencies
+FROM python-deps as app-deps
+
+# Copy requirements first for better caching
+COPY requirements.txt /tmp/requirements.txt
+COPY config/mcp/requirements-mcp.txt /tmp/requirements-mcp.txt
+COPY fly_deployment/requirements-gpu.txt /tmp/requirements-gpu.txt
+
+# Install Python dependencies
+RUN pip install -r /tmp/requirements.txt
+RUN pip install -r /tmp/requirements-mcp.txt  
+RUN pip install -r /tmp/requirements-gpu.txt
+
+# Install NeuralForecast with GPU support
+RUN pip install 'neuralforecast[gpu]>=1.6.4'
+
+# Install additional neural forecasting dependencies
+RUN pip install \
+    pytorch-lightning>=2.0.0 \
+    lightning-utilities \
+    pytorch-forecasting \
+    darts[torch] \
+    sktime[all_extras] \
+    statsforecast \
+    hierarchicalforecast \
+    datasetsforecast
+
+# Install FastAPI and async dependencies
+RUN pip install \
+    fastapi[all] \
+    uvicorn[standard] \
+    websockets \
+    aiofiles \
+    httpx \
+    pydantic[email] \
+    python-multipart
+
+# Install monitoring and optimization
+RUN pip install \
+    prometheus-client \
+    grafana-api \
+    psutil \
+    GPUtil \
+    py3nvml \
+    nvitop
+
+# Stage 4: Final application image  
+FROM app-deps as final
+
+# Set working directory
+WORKDIR /app
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/models /app/data /app/cache
+
+# Copy application code
+COPY . /app/
+
+# Set up GPU environment variables
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+
+# NVIDIA Container Runtime environment
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+# PyTorch CUDA optimization
+ENV TORCH_CUDA_ARCH_LIST="7.0 7.5 8.0 8.6 8.9 9.0"
+ENV PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,garbage_collection_threshold:0.6
+
+# TensorRT optimization
+ENV TRT_LOGGER_VERBOSITY=WARNING
+ENV TENSORRT_VERBOSE=0
+
+# Performance optimization
+ENV OMP_NUM_THREADS=8
+ENV MKL_NUM_THREADS=8
+ENV NUMBA_CACHE_DIR=/app/cache/numba
+ENV MPLCONFIGDIR=/app/cache/matplotlib
+
+# Application configuration
+ENV PYTHONPATH=/app
+ENV NEURAL_FORECAST_GPU_ENABLED=true
+ENV NEURAL_FORECAST_MODEL_TYPE=nhits
+ENV FLYIO_GPU_DEPLOYMENT=true
+
+# Health check script
+COPY fly_deployment/scripts/health_check.sh /app/health_check.sh
+RUN chmod +x /app/health_check.sh
+
+# GPU initialization script
+COPY fly_deployment/scripts/gpu_init.sh /app/gpu_init.sh
+RUN chmod +x /app/gpu_init.sh
+
+# Create non-root user for security
+RUN useradd -m -u 1000 trader && \
+    chown -R trader:trader /app
+USER trader
+
+# Expose ports
+EXPOSE 8080
+EXPOSE 9090
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD /app/health_check.sh
+
+# GPU initialization and startup
+CMD ["/app/gpu_init.sh", "&&", "python", "src/neural_forecast/flyio_gpu_launcher.py"]

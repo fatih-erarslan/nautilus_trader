@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/place_prediction_order_tool.json",
+  "title": "place_prediction_order_tool",
+  "description": "Place market orders (demo mode).",
+  "category": "prediction",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "buy",
+            "sell"
+          ]
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "order_type": {
+          "type": "string",
+          "default": "market",
+          "enum": [
+            "market",
+            "limit"
+          ]
+        },
+        "limit_price": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "market_id",
+        "outcome",
+        "side",
+        "quantity"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "filled_quantity": {
+          "type": "integer"
+        },
+        "average_price": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

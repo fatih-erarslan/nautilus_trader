@@ -1,3 +1,0 @@
-[submodule "crates/vendor/neural-trader"]
-	path = crates/vendor/neural-trader
-	url = https://github.com/fatih-erarslan/neural-trader.git

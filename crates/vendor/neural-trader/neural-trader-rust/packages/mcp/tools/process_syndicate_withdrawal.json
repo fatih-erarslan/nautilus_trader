@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/process_syndicate_withdrawal.json",
+  "title": "process_syndicate_withdrawal",
+  "description": "Process a member withdrawal request.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "member_id": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "is_emergency": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "member_id",
+        "amount"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "withdrawal_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "pending",
+            "rejected"
+          ]
+        },
+        "amount": {
+          "type": "number"
+        },
+        "fee": {
+          "type": "number"
+        },
+        "net_amount": {
+          "type": "number"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "processed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "withdrawal_id",
+        "status",
+        "amount"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

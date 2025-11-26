@@ -1,0 +1,241 @@
+{
+  "timestamp": "2025-11-14T21:06:39.389Z",
+  "tests": [
+    {
+      "name": "Neural - Forecast",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "computation_time_ms": 45.2,
+        "forecast_id": "forecast_1763154399",
+        "gpu_accelerated": true,
+        "horizon_days": 5,
+        "model_id": "lstm_v1",
+        "model_metrics": {
+          "architecture": "LSTM-Attention",
+          "mae": 0.0234,
+          "rmse": 0.0312,
+          "training_accuracy": 0.92,
+          "validation_accuracy": 0.88
+        },
+        "predictions": [
+          {
+            "confidence": 0.95,
+            "day": 1,
+            "lower_bound": 178.45,
+            "predicted_price": 178.45,
+            "upper_bound": 178.45
+          },
+          {
+            "confidence": 0.95,
+            "day": 2,
+            "lower_bound": 179.34224999999998,
+            "predicted_price": 179.8776,
+            "upper_bound": 180.41294999999997
+          },
+          {
+            "confidence": 0.95,
+            "day": 3,
+            "lower_bound": 180.2345,
+            "predicted_price": 181.30519999999999,
+            "upper_bound": 182.3759
+          },
+          {
+            "confidence": 0.95,
+            "day": 4,
+            "lower_bound": 181.12674999999996,
+            "predicted_price": 182.7328,
+            "upper_bound": 184.33884999999998
+          },
+          {
+            "confidence": 0.95,
+            "day": 5,
+            "lower_bound": 182.019,
+            "predicted_price": 184.16039999999998,
+            "upper_bound": 186.3018
+          }
+        ],
+        "symbol": "AAPL",
+        "timestamp": "2025-11-14T21:06:39.394809199+00:00"
+      }
+    },
+    {
+      "name": "Neural - Train",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "data_path": "/tmp/data.csv",
+        "epochs_completed": 100,
+        "gpu_accelerated": true,
+        "model_architecture": {
+          "hidden_layers": [
+            128,
+            64,
+            32
+          ],
+          "input_features": 32,
+          "output_features": 1,
+          "total_parameters": 45632
+        },
+        "model_path": "./models/lstm_model_1763154399.pt",
+        "model_type": "lstm",
+        "status": "completed",
+        "timestamp": "2025-11-14T21:06:39.395404940+00:00",
+        "training_id": "train_1763154399",
+        "training_metrics": {
+          "best_epoch": 85,
+          "best_val_loss": 0.0289,
+          "final_loss": 0.0234,
+          "training_time_seconds": 234.5
+        }
+      }
+    },
+    {
+      "name": "Neural - Optimize",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "best_parameters": {
+          "dropout": 0.2,
+          "hidden_size": 128,
+          "learning_rate": 0.0008,
+          "num_layers": 3
+        },
+        "computation_time_ms": 1567.3,
+        "gpu_accelerated": true,
+        "model_id": "test-model",
+        "optimization_id": "nopt_1763154399",
+        "performance": {
+          "baseline_mae": 0.0234,
+          "improvement_percent": 23.9,
+          "optimized_mae": 0.0178
+        },
+        "timestamp": "2025-11-14T21:06:39.396197656+00:00",
+        "trials_completed": 100
+      }
+    },
+    {
+      "name": "Neural - Predict",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "computation_time_ms": 12.3,
+        "confidence": 0.89,
+        "gpu_accelerated": true,
+        "model_id": "test-model",
+        "prediction_id": "pred_1763154399",
+        "predictions": [
+          182.45,
+          183.89,
+          185.12,
+          184.67,
+          186.34
+        ],
+        "timestamp": "2025-11-14T21:06:39.396377181+00:00"
+      }
+    },
+    {
+      "name": "E2B - Create Sandbox",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "name": "test-sb",
+        "sandbox_id": "sb_1763154399",
+        "status": "running",
+        "timestamp": "2025-11-14T21:06:39.396570515+00:00"
+      }
+    },
+    {
+      "name": "E2B - Run Agent",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "agent_id": "agt_1763154399",
+        "sandbox_id": "sb_1763154399",
+        "status": "running",
+        "timestamp": "2025-11-14T21:06:39.396778019+00:00"
+      }
+    },
+    {
+      "name": "E2B - Deploy Template",
+      "success": true,
+      "latency": 1,
+      "error": null,
+      "response": {
+        "deployment_id": "dep_1763154399",
+        "status": "deployed",
+        "template": "trading-bot",
+        "timestamp": "2025-11-14T21:06:39.396961555+00:00"
+      }
+    },
+    {
+      "name": "Backtest - Run Full Backtest",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "backtest_id": "bt_1763154399",
+        "benchmark_comparison": {
+          "alpha": 0.089,
+          "benchmark": "sp500",
+          "benchmark_return": 0.234,
+          "beta": 0.95,
+          "correlation": 0.78
+        },
+        "computation_time_ms": 245.3,
+        "gpu_accelerated": true,
+        "performance": {
+          "annualized_return": 0.289,
+          "max_drawdown": 0.12,
+          "profit_factor": 2.3,
+          "sharpe_ratio": 2.84,
+          "sortino_ratio": 3.45,
+          "total_return": 0.453,
+          "win_rate": 0.68
+        },
+        "period": {
+          "end": "2024-12-31",
+          "start": "2024-01-01",
+          "trading_days": 252
+        },
+        "strategy": "momentum",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-14T21:06:39.397358930+00:00",
+        "trade_statistics": {
+          "avg_loss": -98.3,
+          "avg_win": 234.5,
+          "largest_loss": -450.2,
+          "largest_win": 1250.8,
+          "losing_trades": 50,
+          "total_trades": 156,
+          "winning_trades": 106
+        }
+      }
+    },
+    {
+      "name": "Backtest - Optimize Strategy",
+      "success": false,
+      "latency": 0,
+      "error": "Failed to convert napi value into rust type `bool`",
+      "response": null
+    },
+    {
+      "name": "News - Control Collection",
+      "success": false,
+      "latency": 0,
+      "error": "Given napi value is not an array",
+      "response": null
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 8,
+    "failed": 2
+  }
+}

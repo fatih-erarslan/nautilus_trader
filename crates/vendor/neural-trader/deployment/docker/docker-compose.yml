@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: accounting-postgres
+    environment:
+      POSTGRES_DB: agentic_accounting
+      POSTGRES_USER: accounting_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U accounting_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Agentic Accounting API
+  accounting-api:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    container_name: accounting-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://accounting_user:${POSTGRES_PASSWORD:-changeme}@postgres:5432/agentic_accounting
+      LOG_LEVEL: info
+      PORT: 3000
+      GRAPHQL_PORT: 4000
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    volumes:
+      - agentdb_data:/app/.agentdb
+      - logs_data:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Prometheus monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: accounting-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+
+  # Grafana dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: accounting-grafana
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  agentdb_data:
+    driver: local
+  logs_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  default:
+    name: accounting-network

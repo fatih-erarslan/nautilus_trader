@@ -1,0 +1,23 @@
+{
+  "strategy_type": "momentum_trading",
+  "parameters": {
+    "momentum_threshold": 0.028,
+    "confidence_threshold": 0.65,
+    "base_position_size": 0.035,
+    "risk_threshold": 0.75,
+    "lookback_periods": [
+      12,
+      1
+    ],
+    "emergency_limit": 0.08
+  },
+  "performance_metrics": {
+    "sharpe_ratio": 2.84,
+    "total_return": 0.339,
+    "max_drawdown": -0.125,
+    "win_rate": 0.58
+  },
+  "gpu_optimized": true,
+  "speedup_achieved": "5000x",
+  "optimization_date": "2025-06-26T20:59:27.515230"
+}

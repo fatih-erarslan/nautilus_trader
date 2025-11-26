@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/update_syndicate_allocation_strategy.json",
+  "title": "update_syndicate_allocation_strategy",
+  "description": "Update allocation strategy parameters.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "strategy_config": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Strategy configuration parameters"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "strategy_config"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "updated_config": {
+          "type": "object"
+        },
+        "effective_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "updated_config"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

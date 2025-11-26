@@ -1,0 +1,250 @@
+name: Release NPM Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            build: npm run build -- --target x86_64-unknown-linux-gnu
+
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            build: |
+              sudo apt-get update
+              sudo apt-get install -y musl-tools
+              npm run build -- --target x86_64-unknown-linux-musl
+
+          - host: macos-latest
+            target: x86_64-apple-darwin
+            build: npm run build -- --target x86_64-apple-darwin
+
+          - host: macos-latest
+            target: aarch64-apple-darwin
+            build: npm run build -- --target aarch64-apple-darwin
+
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            build: npm run build -- --target x86_64-pc-windows-msvc
+
+    name: Build ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.settings.target }}
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ matrix.settings.target }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ matrix.settings.target }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ matrix.settings.target }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build native module
+        run: ${{ matrix.settings.build }}
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: |
+            *.node
+            npm/*/neural-trader.*.node
+          if-no-files-found: error
+
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - host: macos-latest
+            target: x86_64-apple-darwin
+          - host: macos-latest
+            target: aarch64-apple-darwin
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    name: Test ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: .
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Test CLI
+        run: npx neural-trader --version
+
+  publish:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Move artifacts to correct locations
+        run: |
+          mkdir -p npm/darwin-x64 npm/darwin-arm64 npm/linux-x64-gnu npm/linux-x64-musl npm/win32-x64-msvc
+          find artifacts -name "*.node" -type f | while read file; do
+            target=$(basename $(dirname $file))
+            case $target in
+              bindings-x86_64-unknown-linux-gnu)
+                cp "$file" npm/linux-x64-gnu/
+                ;;
+              bindings-x86_64-unknown-linux-musl)
+                cp "$file" npm/linux-x64-musl/
+                ;;
+              bindings-x86_64-apple-darwin)
+                cp "$file" npm/darwin-x64/
+                ;;
+              bindings-aarch64-apple-darwin)
+                cp "$file" npm/darwin-arm64/
+                ;;
+              bindings-x86_64-pc-windows-msvc)
+                cp "$file" npm/win32-x64-msvc/
+                ;;
+            esac
+          done
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: List packages
+        run: |
+          echo "Main package:"
+          ls -lh *.node 2>/dev/null || echo "No binaries in root"
+          echo ""
+          echo "Platform packages:"
+          for dir in npm/*/; do
+            echo "$dir:"
+            ls -lh "$dir"*.node 2>/dev/null || echo "  No binaries"
+          done
+
+      - name: Publish main package
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish platform packages
+        run: |
+          for dir in npm/*/; do
+            echo "Publishing $dir..."
+            cd "$dir"
+            npm publish --access public --provenance || echo "Failed to publish $dir"
+            cd ../..
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            *.node
+            npm/*/neural-trader.*.node
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-dry-run:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.ref, 'refs/tags/v')"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dry run publish
+        run: npm publish --dry-run --access public

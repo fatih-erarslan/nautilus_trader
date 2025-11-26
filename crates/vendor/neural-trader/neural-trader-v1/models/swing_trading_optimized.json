@@ -1,0 +1,20 @@
+{
+  "strategy_type": "swing_trading",
+  "parameters": {
+    "base_position_size": 0.012,
+    "atr_stop_multiplier": 2.5,
+    "profit_target_multiplier": 3.5,
+    "min_risk_reward_ratio": 2.5,
+    "pattern_confidence_threshold": 0.7,
+    "trend_filter": true
+  },
+  "performance_metrics": {
+    "sharpe_ratio": 1.89,
+    "total_return": 0.234,
+    "max_drawdown": -0.089,
+    "win_rate": 0.61
+  },
+  "gpu_optimized": true,
+  "speedup_achieved": "4500x",
+  "optimization_date": "2025-06-26T20:59:27.515234"
+}

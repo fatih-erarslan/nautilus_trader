@@ -1,0 +1,42 @@
+# Test neural-trader@2.3.9 with --ignore-scripts to skip builds
+FROM node:20-slim
+
+WORKDIR /app
+
+# Initialize package.json
+RUN npm init -y
+
+# Install with --ignore-scripts to skip all postinstall/build scripts
+# This should work because we have prebuilt NAPI binaries
+RUN npm install neural-trader@2.3.9 --ignore-scripts
+
+# Test that the main NAPI bindings load (the core neural-trader functionality)
+RUN node -e "console.log('Testing main NAPI bindings load...'); \
+  try { \
+    const nt = require('neural-trader'); \
+    console.log('✅ Module loaded successfully'); \
+    console.log('Available exports:', Object.keys(nt).join(', ')); \
+    console.log(''); \
+    console.log('Function types:'); \
+    console.log('  fetchMarketData:', typeof nt.fetchMarketData); \
+    console.log('  runStrategy:', typeof nt.runStrategy); \
+    console.log('  backtest:', typeof nt.backtest); \
+    console.log('  trainModel:', typeof nt.trainModel); \
+  } catch (e) { \
+    console.error('❌ Module load failed:', e.message); \
+    console.error('Stack:', e.stack); \
+    process.exit(1); \
+  }"
+
+# Verify all core functions are available
+RUN node -e "const nt = require('neural-trader'); \
+  const required = ['fetchMarketData', 'streamMarketData', 'runStrategy', 'backtest', 'executeOrder', 'getPortfolio', 'trainModel', 'predict']; \
+  const missing = required.filter(f => typeof nt[f] !== 'function'); \
+  if (missing.length > 0) { \
+    console.error('❌ Missing functions:', missing.join(', ')); \
+    process.exit(1); \
+  } \
+  console.log('✅ All', required.length, 'core functions available'); \
+  console.log('✅ NAPI bindings working correctly');"
+
+CMD echo "✅ neural-trader@2.3.9 NAPI test PASSED!"

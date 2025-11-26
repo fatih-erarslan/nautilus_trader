@@ -1,0 +1,84 @@
+# Multi-stage Dockerfile for testing neural-trader installation
+# Tests both pure npm install and with build tools
+
+# Stage 1: Minimal Node.js (simulates user without build tools)
+FROM node:20-slim AS minimal-test
+
+WORKDIR /test
+
+# Copy package files (build context is repo root)
+COPY package.json ./
+COPY package-lock.json* ./
+COPY scripts/ ./scripts/
+COPY index.js* ./
+
+# Install without build tools (should work with pre-built binaries)
+RUN npm install --ignore-scripts || true
+RUN npm install
+
+# Validate installation
+RUN node -e "console.log('Testing basic require...'); try { require('./index.js'); console.log('✅ Module loads'); } catch(e) { console.log('⚠️  Module load failed:', e.message); }"
+
+# Stage 2: With build tools (simulates building from source)
+FROM node:20 AS build-test
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    python3-pip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /test
+
+# Copy all source files
+COPY . .
+
+# Install and build
+RUN npm install
+RUN npm run build || echo "Build failed, continuing..."
+
+# Test native bindings
+RUN node -e "try { const nt = require('./index.js'); console.log('✅ Native bindings work'); } catch(e) { console.log('⚠️  Native bindings failed'); }"
+
+# Stage 3: Alpine Linux (musl libc) test
+FROM node:20-alpine AS alpine-test
+
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /test
+
+COPY package.json package-lock.json ./
+COPY scripts/ ./scripts/
+
+RUN npm install --ignore-scripts || true
+RUN npm install
+
+RUN node -e "console.log('Alpine test...'); try { require('./index.js'); console.log('✅ Works on Alpine'); } catch(e) { console.log('⚠️  Alpine compatibility issue'); }"
+
+# Stage 4: Final test stage
+FROM node:20-slim AS final
+
+WORKDIR /app
+
+# Copy from build stage
+COPY --from=build-test /test ./
+
+# Run comprehensive tests
+CMD ["node", "-e", "\
+  console.log('🧪 Comprehensive Installation Test'); \
+  console.log('==================================='); \
+  try { \
+    const nt = require('./index.js'); \
+    console.log('✅ Package loads successfully'); \
+    console.log('Exports:', Object.keys(nt)); \
+  } catch (e) { \
+    console.error('❌ Package failed to load:', e.message); \
+    process.exit(1); \
+  } \
+"]

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/export_e2b_template.json",
+  "title": "export_e2b_template",
+  "description": "Export sandbox configuration as reusable template.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        },
+        "template_name": {
+          "type": "string"
+        },
+        "include_data": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "sandbox_id",
+        "template_name"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "template_id": {
+          "type": "string"
+        },
+        "template_name": {
+          "type": "string"
+        },
+        "exported_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size_mb": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "template_id",
+        "template_name"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

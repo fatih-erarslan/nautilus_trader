@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/performance_report.json",
+  "title": "performance_report",
+  "description": "Generate detailed performance analytics report.",
+  "category": "analytics",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "description": "Strategy name"
+        },
+        "period_days": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 1,
+          "maximum": 365
+        },
+        "include_benchmark": {
+          "type": "boolean",
+          "default": true
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "strategy"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "performance_metrics": {
+          "type": "object",
+          "properties": {
+            "total_return": {
+              "type": "number"
+            },
+            "sharpe_ratio": {
+              "type": "number"
+            },
+            "max_drawdown": {
+              "type": "number"
+            },
+            "win_rate": {
+              "type": "number"
+            }
+          }
+        },
+        "trades": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "winning": {
+              "type": "integer"
+            },
+            "losing": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

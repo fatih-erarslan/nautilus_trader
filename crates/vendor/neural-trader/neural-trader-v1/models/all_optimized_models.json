@@ -1,0 +1,88 @@
+{
+  "mirror_trading_optimized": {
+    "strategy_type": "mirror_trading",
+    "parameters": {
+      "confidence_threshold": 0.75,
+      "position_size": 0.025,
+      "stop_loss_threshold": -0.08,
+      "profit_threshold": 0.25,
+      "institutional_weight": 0.8,
+      "insider_weight": 0.6,
+      "kelly_fraction": 0.3
+    },
+    "performance_metrics": {
+      "sharpe_ratio": 6.01,
+      "total_return": 0.534,
+      "max_drawdown": -0.099,
+      "win_rate": 0.67
+    },
+    "gpu_optimized": true,
+    "speedup_achieved": "3000x",
+    "optimization_date": "2025-06-26T20:59:27.515219"
+  },
+  "momentum_trading_optimized": {
+    "strategy_type": "momentum_trading",
+    "parameters": {
+      "momentum_threshold": 0.028,
+      "confidence_threshold": 0.65,
+      "base_position_size": 0.035,
+      "risk_threshold": 0.75,
+      "lookback_periods": [
+        12,
+        1
+      ],
+      "emergency_limit": 0.08
+    },
+    "performance_metrics": {
+      "sharpe_ratio": 2.84,
+      "total_return": 0.339,
+      "max_drawdown": -0.125,
+      "win_rate": 0.58
+    },
+    "gpu_optimized": true,
+    "speedup_achieved": "5000x",
+    "optimization_date": "2025-06-26T20:59:27.515230"
+  },
+  "swing_trading_optimized": {
+    "strategy_type": "swing_trading",
+    "parameters": {
+      "base_position_size": 0.012,
+      "atr_stop_multiplier": 2.5,
+      "profit_target_multiplier": 3.5,
+      "min_risk_reward_ratio": 2.5,
+      "pattern_confidence_threshold": 0.7,
+      "trend_filter": true
+    },
+    "performance_metrics": {
+      "sharpe_ratio": 1.89,
+      "total_return": 0.234,
+      "max_drawdown": -0.089,
+      "win_rate": 0.61
+    },
+    "gpu_optimized": true,
+    "speedup_achieved": "4500x",
+    "optimization_date": "2025-06-26T20:59:27.515234"
+  },
+  "mean_reversion_optimized": {
+    "strategy_type": "mean_reversion",
+    "parameters": {
+      "entry_z_threshold": 2.2,
+      "exit_z_threshold": 0.3,
+      "base_position_size": 0.028,
+      "max_half_life": 12,
+      "min_reversion_strength": 1.2,
+      "cointegration_threshold": 0.05,
+      "kelly_fraction": 0.25
+    },
+    "performance_metrics": {
+      "sharpe_ratio": 2.9,
+      "total_return": 0.388,
+      "max_drawdown": -0.067,
+      "win_rate": 0.72,
+      "reversion_efficiency": 0.84
+    },
+    "gpu_optimized": true,
+    "speedup_achieved": "6000x",
+    "optimization_date": "2025-06-26T20:59:27.515238"
+  }
+}

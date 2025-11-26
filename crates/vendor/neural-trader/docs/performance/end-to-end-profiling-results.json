@@ -1,0 +1,354 @@
+{
+  "timestamp": "2025-11-15T05:57:54.708Z",
+  "totalCycles": 100,
+  "totalTime": 5050.033482999987,
+  "stats": {
+    "market_data_ingestion": {
+      "count": 100,
+      "total": 13.946470000000003,
+      "avg": 0.13946470000000002,
+      "min": 0.093224,
+      "max": 0.716415,
+      "p50": 0.103753,
+      "p95": 0.471588,
+      "p99": 0.716415
+    },
+    "pattern_matching_dtw_single": {
+      "count": 100000,
+      "total": 108.87815999998752,
+      "avg": 0.0010887815999998751,
+      "min": 0.000731,
+      "max": 0.667494,
+      "p50": 0.000862,
+      "p95": 0.001774,
+      "p99": 0.003306
+    },
+    "pattern_matching_dtw": {
+      "count": 100,
+      "total": 126.48755100000005,
+      "avg": 1.2648755100000004,
+      "min": 1.013108,
+      "max": 5.21149,
+      "p50": 1.084911,
+      "p95": 1.920899,
+      "p99": 5.21149
+    },
+    "strategy_indicators": {
+      "count": 100,
+      "total": 0.5001000000000002,
+      "avg": 0.005001000000000002,
+      "min": 0.003075,
+      "max": 0.030517,
+      "p50": 0.004147,
+      "p95": 0.007543,
+      "p99": 0.030517
+    },
+    "strategy_pattern_signals": {
+      "count": 100,
+      "total": 0.15972299999999995,
+      "avg": 0.0015972299999999994,
+      "min": 0.000862,
+      "max": 0.015198,
+      "p50": 0.001303,
+      "p95": 0.003236,
+      "p99": 0.015198
+    },
+    "strategy_decision_logic": {
+      "count": 100,
+      "total": 0.048605,
+      "avg": 0.00048605,
+      "min": 0.0003,
+      "max": 0.003807,
+      "p50": 0.00041,
+      "p95": 0.000751,
+      "p99": 0.003807
+    },
+    "strategy_signal_generation": {
+      "count": 100,
+      "total": 0.9659540000000001,
+      "avg": 0.009659540000000001,
+      "min": 0.005801,
+      "max": 0.036568,
+      "p50": 0.008676,
+      "p95": 0.015068,
+      "p99": 0.036568
+    },
+    "strategy_execution": {
+      "count": 100,
+      "total": 1.0250299999999999,
+      "avg": 0.010250299999999999,
+      "min": 0.006171,
+      "max": 0.03743,
+      "p50": 0.009378,
+      "p95": 0.01572,
+      "p99": 0.03743
+    },
+    "risk_var_calculation": {
+      "count": 100,
+      "total": 23.778457,
+      "avg": 0.23778457,
+      "min": 0.204501,
+      "max": 0.607702,
+      "p50": 0.213137,
+      "p95": 0.420143,
+      "p99": 0.607702
+    },
+    "risk_position_sizing": {
+      "count": 100,
+      "total": 0.02422000000000001,
+      "avg": 0.0002422000000000001,
+      "min": 0.00014,
+      "max": 0.000771,
+      "p50": 0.0002,
+      "p95": 0.000471,
+      "p99": 0.000771
+    },
+    "risk_exposure_checks": {
+      "count": 100,
+      "total": 0.045398,
+      "avg": 0.00045398,
+      "min": 0.00022,
+      "max": 0.001463,
+      "p50": 0.000341,
+      "p95": 0.001162,
+      "p99": 0.001463
+    },
+    "risk_calculations": {
+      "count": 100,
+      "total": 24.031782999999997,
+      "avg": 0.24031782999999998,
+      "min": 0.206495,
+      "max": 0.612091,
+      "p50": 0.216123,
+      "p95": 0.427657,
+      "p99": 0.612091
+    },
+    "news_fetching": {
+      "count": 100,
+      "total": 1.3147019999999998,
+      "avg": 0.013147019999999999,
+      "min": 0.009748,
+      "max": 0.099635,
+      "p50": 0.011181,
+      "p95": 0.021279,
+      "p99": 0.099635
+    },
+    "news_nlp_processing": {
+      "count": 100,
+      "total": 2.6398669999999997,
+      "avg": 0.02639867,
+      "min": 0.017583,
+      "max": 0.097181,
+      "p50": 0.020979,
+      "p95": 0.060323,
+      "p99": 0.097181
+    },
+    "news_aggregation": {
+      "count": 100,
+      "total": 0.17136600000000007,
+      "avg": 0.0017136600000000007,
+      "min": 0.001032,
+      "max": 0.014807,
+      "p50": 0.001312,
+      "p95": 0.002755,
+      "p99": 0.014807
+    },
+    "news_sentiment_analysis": {
+      "count": 100,
+      "total": 4.3023940000000005,
+      "avg": 0.043023940000000004,
+      "min": 0.029866,
+      "max": 0.216002,
+      "p50": 0.036158,
+      "p95": 0.082905,
+      "p99": 0.216002
+    },
+    "quic_message_serialization": {
+      "count": 100,
+      "total": 0.618677,
+      "avg": 0.00618677,
+      "min": 0.003456,
+      "max": 0.026028,
+      "p50": 0.00539,
+      "p95": 0.010489,
+      "p99": 0.026028
+    },
+    "quic_network_send": {
+      "count": 100,
+      "total": 239.07361600000007,
+      "avg": 2.3907361600000008,
+      "min": 0.007274,
+      "max": 4.722248,
+      "p50": 2.498485,
+      "p95": 4.409686,
+      "p99": 4.722248
+    },
+    "quic_consensus": {
+      "count": 100,
+      "total": 747.4521179999997,
+      "avg": 7.474521179999997,
+      "min": 4.999395,
+      "max": 10.000293,
+      "p50": 7.000564,
+      "p95": 9.00077,
+      "p99": 10.000293
+    },
+    "quic_coordination": {
+      "count": 100,
+      "total": 987.4070200000004,
+      "avg": 9.874070200000004,
+      "min": 5.322777,
+      "max": 14.095603,
+      "p50": 9.994342,
+      "p95": 13.225492,
+      "p99": 14.095603
+    },
+    "reasoningbank_vector_search": {
+      "count": 100,
+      "total": 14.256039000000007,
+      "avg": 0.14256039000000006,
+      "min": 0.098844,
+      "max": 0.743986,
+      "p50": 0.111087,
+      "p95": 0.341737,
+      "p99": 0.743986
+    },
+    "reasoningbank_trajectory_lookup": {
+      "count": 100,
+      "total": 0.17605400000000002,
+      "avg": 0.00176054,
+      "min": 0.000682,
+      "max": 0.05354,
+      "p50": 0.001032,
+      "p95": 0.003416,
+      "p99": 0.05354
+    },
+    "reasoningbank_learning": {
+      "count": 100,
+      "total": 0.17696900000000002,
+      "avg": 0.0017696900000000002,
+      "min": 0.000441,
+      "max": 0.022212,
+      "p50": 0.000611,
+      "p95": 0.014236,
+      "p99": 0.022212
+    },
+    "reasoningbank_query": {
+      "count": 100,
+      "total": 14.839186999999995,
+      "avg": 0.14839186999999995,
+      "min": 0.103743,
+      "max": 0.765536,
+      "p50": 0.115194,
+      "p95": 0.349872,
+      "p99": 0.765536
+    },
+    "order_validation": {
+      "count": 100,
+      "total": 0.042566000000000014,
+      "avg": 0.0004256600000000001,
+      "min": 0.00022,
+      "max": 0.007584,
+      "p50": 0.000311,
+      "p95": 0.000631,
+      "p99": 0.007584
+    },
+    "order_placement": {
+      "count": 54,
+      "total": 0.12206500000000002,
+      "avg": 0.0022604629629629633,
+      "min": 0.001353,
+      "max": 0.008476,
+      "p50": 0.001933,
+      "p95": 0.003115,
+      "p99": 0.008476
+    },
+    "order_confirmation": {
+      "count": 54,
+      "total": 303.725979,
+      "avg": 5.624555166666666,
+      "min": 0.788129,
+      "max": 9.887964,
+      "p50": 5.879515,
+      "p95": 9.868246,
+      "p99": 9.887964
+    },
+    "order_execution": {
+      "count": 100,
+      "total": 304.037021,
+      "avg": 3.04037021,
+      "min": 0.000681,
+      "max": 9.891509,
+      "p50": 1.874884,
+      "p95": 8.887218,
+      "p99": 9.891509
+    },
+    "trading_cycle_total": {
+      "count": 100,
+      "total": 2129.7863919999995,
+      "avg": 21.297863919999994,
+      "min": 14.618738,
+      "max": 31.858677,
+      "p50": 19.998983,
+      "p95": 29.995949,
+      "p99": 31.858677
+    }
+  },
+  "bottlenecks": [
+    {
+      "operation": "trading_cycle_total",
+      "percentage": "42.2",
+      "totalTime": "2129.79",
+      "avgTime": "21.298",
+      "severity": "CRITICAL",
+      "recommendation": "Immediate optimization required - accounts for >20% of runtime"
+    },
+    {
+      "operation": "quic_coordination",
+      "percentage": "19.6",
+      "totalTime": "987.41",
+      "avgTime": "9.874",
+      "severity": "HIGH",
+      "recommendation": "High-priority optimization target"
+    },
+    {
+      "operation": "quic_consensus",
+      "percentage": "14.8",
+      "totalTime": "747.45",
+      "avgTime": "7.475",
+      "severity": "HIGH",
+      "recommendation": "High-priority optimization target"
+    },
+    {
+      "operation": "order_confirmation",
+      "percentage": "6.0",
+      "totalTime": "303.73",
+      "avgTime": "5.625",
+      "severity": "MEDIUM",
+      "recommendation": "Consider optimization if low-hanging fruit"
+    },
+    {
+      "operation": "order_execution",
+      "percentage": "6.0",
+      "totalTime": "304.04",
+      "avgTime": "3.040",
+      "severity": "MEDIUM",
+      "recommendation": "Consider optimization if low-hanging fruit"
+    }
+  ],
+  "recommendations": [
+    {
+      "title": "QUIC Message Batching + Zero-Copy",
+      "roi": "MEDIUM",
+      "current": "19.6% of runtime (987.41ms)",
+      "target": "3-5% of runtime",
+      "speedup": "2-3x with batching",
+      "effort": "3-5 days",
+      "implementation": "Batch messages, zero-copy serialization, reduce consensus rounds"
+    }
+  ],
+  "dtwAnalysis": {
+    "percentage": 2.5,
+    "verdict": "NOT_CRITICAL"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "@neural-trader/agentic-accounting-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite for agentic accounting system",
+  "private": true,
+  "scripts": {
+    "test": "jest --config jest.config.js",
+    "test:unit": "jest --config jest.config.js unit/",
+    "test:integration": "jest --config jest.config.js integration/",
+    "test:e2e": "jest --config jest.config.js e2e/",
+    "test:watch": "jest --config jest.config.js --watch",
+    "test:coverage": "jest --config jest.config.js --coverage",
+    "test:ci": "jest --config jest.config.js --ci --coverage --maxWorkers=2",
+    "test:vitest": "vitest",
+    "test:vitest:ui": "vitest --ui",
+    "db:up": "docker-compose -f docker-compose.test.yml up -d",
+    "db:down": "docker-compose -f docker-compose.test.yml down -v",
+    "db:logs": "docker-compose -f docker-compose.test.yml logs -f",
+    "db:reset": "npm run db:down && npm run db:up",
+    "lint": "eslint . --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "decimal.js": "^10.4.3",
+    "pg": "^8.11.3",
+    "ioredis": "^5.8.2",
+    "agentdb": "^1.6.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.19.25",
+    "@types/pg": "^8.10.9",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.1.0",
+    "@vitest/ui": "^1.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

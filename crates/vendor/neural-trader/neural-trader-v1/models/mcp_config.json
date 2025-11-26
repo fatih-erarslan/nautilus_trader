@@ -1,0 +1,141 @@
+{
+  "mcp_server": {
+    "name": "ai-news-trader-gpu-sports",
+    "version": "1.1.0",
+    "description": "GPU-accelerated trading strategies with sports betting integration - 51 total tools",
+    "endpoints": {
+      "models": "/models",
+      "optimize": "/optimize",
+      "backtest": "/backtest",
+      "predict": "/predict",
+      "sports_events": "/sports/events",
+      "sports_odds": "/sports/odds",
+      "sports_arbitrage": "/sports/arbitrage",
+      "sports_portfolio": "/sports/portfolio"
+    },
+    "sports_betting": {
+      "providers_supported": ["TheOddsAPI", "Betfair", "Unified"],
+      "tools_count": 10,
+      "features": ["arbitrage_detection", "kelly_criterion", "market_depth", "portfolio_management"]
+    }
+  },
+  "models": [
+    {
+      "name": "mirror_trading_optimized",
+      "type": "trading_strategy",
+      "gpu_accelerated": true,
+      "speedup": "3000x",
+      "endpoint": "/models/mirror_trading"
+    },
+    {
+      "name": "momentum_trading_optimized",
+      "type": "trading_strategy",
+      "gpu_accelerated": true,
+      "speedup": "5000x",
+      "endpoint": "/models/momentum_trading"
+    },
+    {
+      "name": "swing_trading_optimized",
+      "type": "trading_strategy",
+      "gpu_accelerated": true,
+      "speedup": "4500x",
+      "endpoint": "/models/swing_trading"
+    },
+    {
+      "name": "mean_reversion_optimized",
+      "type": "trading_strategy",
+      "gpu_accelerated": true,
+      "speedup": "6000x",
+      "endpoint": "/models/mean_reversion"
+    }
+  ],
+  "sports_betting_tools": [
+    {
+      "name": "get_sports_events",
+      "type": "sports_data",
+      "gpu_accelerated": true,
+      "description": "Get upcoming sports events with comprehensive analysis",
+      "endpoint": "/sports/events"
+    },
+    {
+      "name": "get_sports_odds",
+      "type": "sports_data",
+      "gpu_accelerated": true,
+      "description": "Get real-time sports betting odds with market analysis",
+      "endpoint": "/sports/odds"
+    },
+    {
+      "name": "find_sports_arbitrage",
+      "type": "sports_analysis",
+      "gpu_accelerated": true,
+      "description": "Find arbitrage opportunities in sports betting markets",
+      "endpoint": "/sports/arbitrage"
+    },
+    {
+      "name": "analyze_betting_market_depth",
+      "type": "sports_analysis",
+      "gpu_accelerated": true,
+      "description": "Analyze betting market depth and liquidity",
+      "endpoint": "/sports/market_depth"
+    },
+    {
+      "name": "calculate_kelly_criterion",
+      "type": "risk_management",
+      "gpu_accelerated": false,
+      "description": "Calculate optimal bet size using Kelly Criterion",
+      "endpoint": "/sports/kelly"
+    },
+    {
+      "name": "simulate_betting_strategy",
+      "type": "strategy_simulation",
+      "gpu_accelerated": true,
+      "description": "Simulate betting strategy performance with Monte Carlo",
+      "endpoint": "/sports/simulate"
+    },
+    {
+      "name": "get_betting_portfolio_status",
+      "type": "portfolio_management",
+      "gpu_accelerated": false,
+      "description": "Get comprehensive betting portfolio status",
+      "endpoint": "/sports/portfolio"
+    },
+    {
+      "name": "execute_sports_bet",
+      "type": "trade_execution",
+      "gpu_accelerated": false,
+      "description": "Execute sports bet with validation and risk checks",
+      "endpoint": "/sports/execute"
+    },
+    {
+      "name": "get_sports_betting_performance",
+      "type": "performance_analytics",
+      "gpu_accelerated": false,
+      "description": "Get comprehensive sports betting performance analytics",
+      "endpoint": "/sports/performance"
+    },
+    {
+      "name": "compare_betting_providers",
+      "type": "provider_comparison",
+      "gpu_accelerated": true,
+      "description": "Compare odds across multiple betting providers",
+      "endpoint": "/sports/compare"
+    }
+  ],
+  "gpu_acceleration": {
+    "enabled": true,
+    "backend": "CUDA/RAPIDS",
+    "target_speedup": "6250x",
+    "memory_optimization": true,
+    "batch_processing": true,
+    "sports_betting_gpu_tools": 5,
+    "total_gpu_accelerated_tools": 9
+  },
+  "tool_summary": {
+    "total_tools": 51,
+    "original_trading_tools": 41,
+    "sports_betting_tools": 10,
+    "gpu_accelerated_tools": 9,
+    "provider_integrations": ["TheOddsAPI", "Betfair", "Unified_Sports_API"],
+    "last_updated": "2025-07-02"
+  }
+}

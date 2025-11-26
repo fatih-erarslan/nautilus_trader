@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/neural_forecast.json",
+  "title": "neural_forecast",
+  "description": "Generate neural network forecasts with confidence intervals.",
+  "category": "neural",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol"
+        },
+        "horizon": {
+          "type": "integer",
+          "description": "Forecast horizon in days",
+          "minimum": 1,
+          "maximum": 365
+        },
+        "model_id": {
+          "type": "string",
+          "description": "Neural model ID (optional)"
+        },
+        "confidence_level": {
+          "type": "number",
+          "default": 0.95,
+          "minimum": 0.5,
+          "maximum": 0.99
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "symbol",
+        "horizon"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "forecast_id": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "horizon": {
+          "type": "integer"
+        },
+        "predictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "integer"
+              },
+              "predicted_price": {
+                "type": "number"
+              },
+              "lower_bound": {
+                "type": "number"
+              },
+              "upper_bound": {
+                "type": "number"
+              },
+              "confidence": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "model_info": {
+          "type": "object",
+          "properties": {
+            "model_id": {
+              "type": "string"
+            },
+            "architecture": {
+              "type": "string"
+            },
+            "accuracy_metrics": {
+              "type": "object"
+            }
+          }
+        },
+        "gpu_accelerated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "forecast_id",
+        "predictions"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

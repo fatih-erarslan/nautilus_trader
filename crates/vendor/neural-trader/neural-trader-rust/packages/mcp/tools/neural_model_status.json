@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/neural_model_status.json",
+  "title": "neural_model_status",
+  "description": "Get status and info about neural models.",
+  "category": "neural",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "description": "Specific model ID (optional)"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "architecture": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

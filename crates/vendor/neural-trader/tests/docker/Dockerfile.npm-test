@@ -1,0 +1,104 @@
+# Test neural-trader installation scenarios
+# This Dockerfile simulates how end users would install the package
+
+# Stage 1: Test npm pack + install (simulates published package)
+FROM node:20-slim AS pack-test
+
+WORKDIR /source
+
+# Copy entire project to build the package
+COPY . .
+
+# Create .tgz package
+RUN npm pack
+
+# Now test installation in clean environment
+WORKDIR /test-install
+RUN cp /source/neural-trader-*.tgz ./
+
+# Install from tarball (simulates npm install neural-trader)
+RUN npm install ./neural-trader-*.tgz || echo "Installation completed with warnings"
+
+# Test basic functionality
+RUN node -e "console.log('Testing module load...'); \
+  try { \
+    const nt = require('neural-trader'); \
+    console.log('✅ Module loaded'); \
+    console.log('Exports:', Object.keys(nt).slice(0, 5).join(', '), '...'); \
+  } catch (e) { \
+    console.log('⚠️  Module load failed:', e.message); \
+  }"
+
+# Stage 2: Build from source test
+FROM node:20 AS build-from-source-test
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    python3-pip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /app
+COPY . .
+
+# Build project
+RUN npm install || echo "Some dependencies had issues"
+RUN npm run check-binaries || echo "Binary check completed"
+
+# Test CLI
+RUN chmod +x bin/cli.js
+RUN node bin/cli.js --help || echo "CLI test"
+
+# Stage 3: Minimal binary check
+FROM node:20-slim AS binary-check-test
+
+WORKDIR /app
+COPY . .
+
+# Just run the binary checker
+RUN node scripts/check-binaries.js || echo "Binary check output"
+
+# Stage 4: Dependency validation
+FROM node:20-slim AS dependency-test
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+
+# Install only production dependencies
+RUN npm install --production --no-optional 2>&1 || echo "Installation completed"
+
+# Check which dependencies loaded
+RUN node -e " \
+  const deps = [ \
+    '@neural-trader/core', \
+    '@neural-trader/predictor', \
+    'agentdb', \
+    'agentic-flow', \
+    'e2b', \
+    'ioredis', \
+    'midstreamer' \
+  ]; \
+  \
+  console.log('Checking dependencies...'); \
+  let loaded = 0; \
+  let failed = 0; \
+  \
+  for (const dep of deps) { \
+    try { \
+      require(dep); \
+      console.log('✅', dep); \
+      loaded++; \
+    } catch (e) { \
+      console.log('❌', dep, '-', e.message.split('\\n')[0]); \
+      failed++; \
+    } \
+  } \
+  \
+  console.log('\\nSummary:', loaded, 'loaded,', failed, 'failed'); \
+"

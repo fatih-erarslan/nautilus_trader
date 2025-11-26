@@ -1,0 +1,93 @@
+{
+  "name": "neural-trader",
+  "version": "2.2.7",
+  "description": "Complete AI-powered algorithmic trading platform with neural networks, backtesting, live trading, and MCP integration - all features included (meta package)",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "neural-trader": "./bin/neural-trader.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "bin/",
+    "lib/",
+    "examples/",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo \"Run tests in individual packages\" && exit 0",
+    "lint": "echo \"Run linting in individual packages\" && exit 0",
+    "build": "echo \"Build individual packages\" && exit 0",
+    "docs": "echo \"Generate documentation\" && exit 0",
+    "check-deps": "node -e \"require('./index.js').checkDependencies()\"",
+    "examples:quick-start": "node examples/quick-start.js",
+    "examples:backtesting": "node examples/backtesting.js",
+    "examples:live": "node examples/live-trading.js paper",
+    "examples:neural": "node examples/neural-models.js",
+    "start:mcp": "node bin/neural-trader.js mcp",
+    "mcp": "node bin/neural-trader.js mcp"
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "complete-platform",
+    "full-featured",
+    "all-in-one",
+    "trading-bot"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/neural-trader"
+  },
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "homepage": "https://neural-trader.ruv.io",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "dependencies": {
+    "@neural-trader/backtesting": "^1.0.0",
+    "@neural-trader/benchoptimizer": "^1.0.0",
+    "@neural-trader/brokers": "^1.0.0",
+    "@neural-trader/core": "^1.0.0",
+    "@neural-trader/execution": "^1.0.0",
+    "@neural-trader/features": "^1.0.0",
+    "@neural-trader/market-data": "^1.0.0",
+    "@neural-trader/mcp": "^2.0.4",
+    "@neural-trader/mcp-protocol": "^1.0.0",
+    "@neural-trader/neural": "^1.0.0",
+    "@neural-trader/news-trading": "^1.0.0",
+    "@neural-trader/portfolio": "^1.0.0",
+    "@neural-trader/predictor": "^0.1.0",
+    "@neural-trader/prediction-markets": "^1.0.0",
+    "@neural-trader/risk": "^1.0.0",
+    "@neural-trader/sports-betting": "^1.0.0",
+    "@neural-trader/strategies": "^1.0.0",
+    "@neural-trader/syndicate": "^1.0.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "axios": "^1.13.2",
+    "typescript": "^5.3.3"
+  }
+}

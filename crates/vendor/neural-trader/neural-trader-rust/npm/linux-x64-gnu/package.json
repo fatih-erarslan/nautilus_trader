@@ -1,0 +1,30 @@
+{
+  "name": "@neural-trader/linux-x64-gnu",
+  "version": "0.1.0",
+  "description": "Neural Trader native bindings for Linux x64 (GNU)",
+  "main": "neural-trader.linux-x64-gnu.node",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neural-trader/neural-trader-rust.git"
+  },
+  "keywords": [
+    "trading",
+    "neural",
+    "rust",
+    "napi"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "files": [
+    "neural-trader.linux-x64-gnu.node"
+  ]
+}

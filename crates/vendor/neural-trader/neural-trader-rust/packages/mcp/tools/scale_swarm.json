@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/scale_swarm.json",
+  "title": "scale_swarm",
+  "description": "Scale E2B trading swarm by adding or removing agents based on demand.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "target_agents": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "scale_mode": {
+          "type": "string",
+          "enum": [
+            "immediate",
+            "gradual",
+            "adaptive"
+          ],
+          "default": "gradual"
+        },
+        "preserve_state": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "swarm_id",
+        "target_agents"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "previous_agents": {
+          "type": "integer"
+        },
+        "target_agents": {
+          "type": "integer"
+        },
+        "current_agents": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "scaling",
+            "completed",
+            "failed"
+          ]
+        },
+        "estimated_completion": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "swarm_id",
+        "status",
+        "target_agents"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

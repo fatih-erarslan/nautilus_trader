@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/allocate_syndicate_funds.json",
+  "title": "allocate_syndicate_funds",
+  "description": "Allocate syndicate funds across betting opportunities.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "opportunities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "market_id": {
+                "type": "string"
+              },
+              "odds": {
+                "type": "number"
+              },
+              "probability": {
+                "type": "number"
+              },
+              "max_stake": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "market_id",
+              "odds",
+              "probability"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "strategy": {
+          "type": "string",
+          "default": "kelly_criterion",
+          "enum": [
+            "kelly_criterion",
+            "equal_weight",
+            "proportional",
+            "risk_adjusted"
+          ]
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "opportunities"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "allocation_id": {
+          "type": "string"
+        },
+        "syndicate_id": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "allocations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "market_id": {
+                "type": "string"
+              },
+              "allocated_amount": {
+                "type": "number"
+              },
+              "expected_value": {
+                "type": "number"
+              },
+              "risk_score": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "total_allocated": {
+          "type": "number"
+        },
+        "expected_return": {
+          "type": "number"
+        },
+        "risk_metrics": {
+          "type": "object",
+          "properties": {
+            "portfolio_var": {
+              "type": "number"
+            },
+            "kelly_fraction": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": [
+        "allocation_id",
+        "allocations",
+        "total_allocated"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

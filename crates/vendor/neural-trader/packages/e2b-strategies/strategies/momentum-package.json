@@ -1,0 +1,26 @@
+{
+  "name": "momentum-trading-strategy",
+  "version": "1.0.0",
+  "description": "Momentum-based trading strategy for E2B sandbox deployment",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "@neural-trader/strategies": "^2.1.1",
+    "@neural-trader/features": "^2.1.1",
+    "@neural-trader/market-data": "^2.1.1",
+    "@neural-trader/brokers": "^2.1.1",
+    "@neural-trader/execution": "^2.1.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Neural Trader",
+  "license": "MIT"
+}

@@ -1,0 +1,51 @@
+# VS Code Server with GPU on Fly.io - AI Trading Platform
+app = "ai-trader-vscode-gpu"
+primary_region = "ord"
+
+[build]
+  dockerfile = "fly_deployment/Dockerfile.vscode-gpu"
+
+[experimental]
+  auto_stop_machines = false
+
+[env]
+  CUDA_VISIBLE_DEVICES = "0"
+  NVIDIA_VISIBLE_DEVICES = "all"
+  NVIDIA_DRIVER_CAPABILITIES = "compute,utility"
+
+[[vm]]
+  gpu_kind = "a100-pcie-40gb"
+  cpu_kind = "performance"
+  cpus = 8
+  memory = "32gb"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+    
+  # Health checks
+  [[services.http_checks]]
+    grace_period = "30s"
+    interval = "60s"
+    method = "GET"
+    path = "/"
+    timeout = "10s"
+
+# Persistent volume for your code
+[[mounts]]
+  source = "vscode_data"
+  destination = "/home/trader/workspace"
+  initial_size = "50gb"
+
+# Auto-scaling (optional)
+[scaling]
+  min_machines_running = 1
+  max_machines_running = 1

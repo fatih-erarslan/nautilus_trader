@@ -1,0 +1,88 @@
+[workspace]
+members = [
+    "crates/api",
+    "crates/napi",
+    "crates/core",
+    "crates/db",
+    "crates/common",
+]
+resolver = "2"
+
+[workspace.package]
+version = "2.0.0"
+edition = "2021"
+authors = ["Neural Trader Team"]
+license = "MIT"
+repository = "https://github.com/ruvnet/neural-trader"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+futures = "0.3"
+
+# HTTP framework
+axum = { version = "0.7", features = ["macros", "ws"] }
+tower = { version = "0.4", features = ["full"] }
+tower-http = { version = "0.5", features = ["cors", "trace", "compression-gzip"] }
+hyper = { version = "1.0", features = ["full"] }
+
+# Database - Using SQLite for development (much easier than PostgreSQL)
+diesel = { version = "2.1", features = ["sqlite", "r2d2", "chrono", "uuid", "serde_json", "returning_clauses_for_sqlite_3_35"] }
+diesel_migrations = "2.1"
+r2d2 = "0.8"
+libsqlite3-sys = { version = "0.27", features = ["bundled"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Authentication
+jsonwebtoken = "9.2"
+bcrypt = "0.15"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+
+# WebSocket
+tokio-tungstenite = "0.21"
+
+# Redis
+redis = { version = "0.24", features = ["tokio-comp", "connection-manager"] }
+
+# UUID
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Chrono
+chrono = { version = "0.4", features = ["serde"] }
+
+# Environment
+dotenvy = "0.15"
+
+# Validation
+validator = { version = "0.16", features = ["derive"] }
+
+# Testing
+mockall = "0.12"
+rstest = "0.18"
+
+# NAPI-RS
+napi = { version = "2.16", features = ["async", "tokio_rt", "serde-json"] }
+napi-derive = "2.16"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/analyze_news.json",
+  "title": "analyze_news",
+  "description": "AI sentiment analysis of market news for a symbol.",
+  "category": "news",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol"
+        },
+        "lookback_hours": {
+          "type": "integer",
+          "default": 24,
+          "minimum": 1,
+          "maximum": 168
+        },
+        "sentiment_model": {
+          "type": "string",
+          "default": "enhanced",
+          "enum": [
+            "basic",
+            "enhanced",
+            "advanced"
+          ]
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "symbol"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "sentiment_score": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "sentiment_label": {
+          "type": "string",
+          "enum": [
+            "very_bearish",
+            "bearish",
+            "neutral",
+            "bullish",
+            "very_bullish"
+          ]
+        },
+        "articles_analyzed": {
+          "type": "integer"
+        },
+        "key_topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "impact_assessment": {
+          "type": "object",
+          "properties": {
+            "short_term": {
+              "type": "string"
+            },
+            "medium_term": {
+              "type": "string"
+            },
+            "confidence": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": [
+        "symbol",
+        "sentiment_score",
+        "articles_analyzed"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

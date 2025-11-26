@@ -1,0 +1,9 @@
+test/
+*.md
+!README.md
+.git
+.gitignore
+Cargo.toml
+Cargo.lock
+target/
+src/

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_syndicate_status.json",
+  "title": "get_syndicate_status",
+  "description": "Get current status and statistics for a syndicate.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "syndicate_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "member_count": {
+          "type": "integer"
+        },
+        "total_capital": {
+          "type": "number"
+        },
+        "available_capital": {
+          "type": "number"
+        },
+        "deployed_capital": {
+          "type": "number"
+        },
+        "total_returns": {
+          "type": "number"
+        },
+        "roi": {
+          "type": "number"
+        },
+        "active_positions": {
+          "type": "integer"
+        },
+        "performance_metrics": {
+          "type": "object",
+          "properties": {
+            "sharpe_ratio": {
+              "type": "number"
+            },
+            "win_rate": {
+              "type": "number"
+            },
+            "total_bets": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "total_capital",
+        "roi"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,25 @@
+# Core IB API dependencies
+ib_insync>=0.9.86
+
+# Async HTTP client for WebSocket connections
+aiohttp>=3.8.0
+
+# Optimized JSON parsing
+orjson>=3.8.0
+
+# Fast event loop (optional but recommended)
+uvloop>=0.17.0; sys_platform != "win32"
+
+# High-performance data structures
+numpy>=1.21.0
+
+# Testing dependencies
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.10.0
+
+# Development dependencies
+black>=22.0.0
+isort>=5.10.0
+flake8>=4.0.0
+mypy>=0.991

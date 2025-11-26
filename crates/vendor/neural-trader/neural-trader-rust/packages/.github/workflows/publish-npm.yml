@@ -1,0 +1,131 @@
+name: Publish to NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install dependencies
+        run: |
+          cd packages
+          npm install
+
+      - name: Build packages
+        run: |
+          cd packages
+          npm run build
+
+      - name: Bump versions (if manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cd packages
+          # Update all package.json versions
+          for dir in core mcp-protocol backtesting brokers execution features market-data mcp neural news-trading portfolio prediction-markets risk sports-betting strategies neural-trader; do
+            if [ -f "$dir/package.json" ]; then
+              cd "$dir"
+              npm version ${{ github.event.inputs.version_bump }} --no-git-tag-version
+              cd ..
+            fi
+          done
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages
+          bash scripts/publish-all.sh
+
+      - name: Create git tag (if manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          VERSION=$(node -p "require('./packages/neural-trader/package.json').version")
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add packages/*/package.json
+          git commit -m "chore: bump version to $VERSION"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          git push origin main
+
+      - name: Create GitHub Release
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          release_name: Release v${{ steps.version.outputs.version }}
+          body: |
+            ## Neural Trader v${{ steps.version.outputs.version }}
+
+            Published to npm: https://www.npmjs.com/package/neural-trader
+
+            ### Installation
+            ```bash
+            npm install neural-trader@${{ steps.version.outputs.version }}
+            ```
+
+            ### Changes
+            See CHANGELOG.md for details.
+          draft: false
+          prerelease: false
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 NPM Publishing Failed',
+              body: 'The automated NPM publishing workflow failed. Please check the logs: ' + context.payload.repository.html_url + '/actions/runs/' + context.runId,
+              labels: ['bug', 'ci/cd']
+            })

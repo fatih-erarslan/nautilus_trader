@@ -1,0 +1,62 @@
+{
+  "name": "@neural-trader/mcp",
+  "version": "2.1.0",
+  "description": "Model Context Protocol (MCP) server for Neural Trader with 87+ trading tools",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "neural-trader-mcp": "./bin/mcp-server.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "bin",
+    "src",
+    "tools",
+    "native",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "node bin/mcp-server.js",
+    "test": "mocha 'tests/*.test.js' --timeout 10000",
+    "test:watch": "mocha 'tests/*.test.js' --watch",
+    "test:coverage": "c8 mocha 'tests/*.test.js'"
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "ai-tools",
+    "claude-desktop",
+    "mcp-server",
+    "ai-assistant",
+    "102-tools"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/mcp"
+  },
+  "homepage": "https://neural-trader.ruv.io",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@neural-trader/core": "^1.0.0",
+    "@neural-trader/mcp-protocol": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^6.2.1",
+    "mocha": "^11.7.5"
+  }
+}

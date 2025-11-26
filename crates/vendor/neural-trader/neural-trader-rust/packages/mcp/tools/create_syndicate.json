@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/create_syndicate.json",
+  "title": "create_syndicate",
+  "description": "Create a new investment syndicate for collaborative trading.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string",
+          "description": "Unique syndicate identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Syndicate name"
+        },
+        "description": {
+          "type": "string",
+          "default": "",
+          "description": "Syndicate description"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "name"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "pending"
+          ]
+        },
+        "member_count": {
+          "type": "integer"
+        },
+        "total_capital": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "name",
+        "created_at",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

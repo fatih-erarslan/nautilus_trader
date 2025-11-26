@@ -1,0 +1,11 @@
+[
+  {
+    "package": "/workspaces/neural-trader/neural-trader-rust/packages",
+    "valid": false,
+    "errors": [
+      "package.json not found"
+    ],
+    "warnings": [],
+    "info": {}
+  }
+]

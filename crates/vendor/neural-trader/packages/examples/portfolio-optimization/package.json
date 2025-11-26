@@ -1,0 +1,92 @@
+{
+  "name": "@neural-trader/example-portfolio-optimization",
+  "version": "1.0.0",
+  "description": "Neural AI portfolio optimization with self-learning mean-variance, risk parity, Black-Litterman, benchmark swarms, and multi-objective optimization for quantitative investment management",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "benchmark": "node dist/benchmark-swarm.js",
+    "example:basic": "node dist/examples/basic-optimization.js",
+    "example:swarm": "node dist/examples/swarm-exploration.js",
+    "lint": "eslint src tests examples --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "portfolio-optimization",
+    "mean-variance",
+    "risk-parity",
+    "black-litterman",
+    "self-learning",
+    "agentdb",
+    "neural-trader",
+    "ai",
+    "neural-network",
+    "machine-learning",
+    "swarm-intelligence",
+    "optimization",
+    "typescript",
+    "agentic-flow",
+    "asset-allocation",
+    "risk-management",
+    "quantitative-finance",
+    "investment-management",
+    "markowitz",
+    "efficient-frontier",
+    "real-time",
+    "multi-objective"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT",
+  "dependencies": {
+    "@neural-trader/predictor": "workspace:*",
+    "@neural-trader/core": "workspace:*",
+    "agentdb": "^1.0.0",
+    "agentic-flow": "^1.0.0",
+    "openai": "^4.0.0",
+    "numeric": "^1.2.6",
+    "mathjs": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@types/numeric": "^1.2.2",
+    "typescript": "^5.3.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.0",
+    "eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "homepage": "https://github.com/ruvnet/neural-trader#readme",
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "packages/examples/portfolio-optimization"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

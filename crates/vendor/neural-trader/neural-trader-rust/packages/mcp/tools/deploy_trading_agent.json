@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/deploy_trading_agent.json",
+  "title": "deploy_trading_agent",
+  "description": "Deploy a specialized trading agent to the E2B swarm with specific role and capabilities.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string",
+          "description": "Unique identifier of the swarm"
+        },
+        "agent_type": {
+          "type": "string",
+          "enum": [
+            "market_maker",
+            "trend_follower",
+            "arbitrage",
+            "risk_manager",
+            "coordinator"
+          ]
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strategy_params": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "memory_mb": {
+              "type": "integer",
+              "default": 512
+            },
+            "cpu_count": {
+              "type": "integer",
+              "default": 1
+            },
+            "gpu_enabled": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      },
+      "required": [
+        "swarm_id",
+        "agent_type",
+        "symbols"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "swarm_id": {
+          "type": "string"
+        },
+        "agent_type": {
+          "type": "string"
+        },
+        "sandbox_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "deploying",
+            "running",
+            "error"
+          ]
+        },
+        "deployed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "agent_id",
+        "swarm_id",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/run_benchmark.json",
+  "title": "run_benchmark",
+  "description": "Run comprehensive performance benchmarks.",
+  "category": "system",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "description": "Strategy to benchmark"
+        },
+        "benchmark_type": {
+          "type": "string",
+          "default": "performance",
+          "enum": [
+            "performance",
+            "throughput",
+            "latency",
+            "accuracy"
+          ]
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "strategy"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "benchmark_id": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "results": {
+          "type": "object",
+          "properties": {
+            "execution_time_cpu": {
+              "type": "string"
+            },
+            "execution_time_gpu": {
+              "type": "string"
+            },
+            "speedup": {
+              "type": "number"
+            },
+            "throughput": {
+              "type": "number"
+            },
+            "accuracy": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "slow",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,94 @@
+# cargo-deny configuration
+# Enforces security, licensing, and dependency policies
+# Run with: cargo deny check
+
+[advisories]
+# Security vulnerability database
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "warn"
+notice = "warn"
+ignore = [
+    # Example: Temporarily ignore a specific advisory
+    # "RUSTSEC-2020-0001",
+]
+
+[licenses]
+# License policy
+unlicensed = "deny"
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-DFS-2016",
+    "Zlib",
+]
+deny = [
+    "GPL-3.0",
+    "AGPL-3.0",
+    "LGPL-3.0",
+]
+copyleft = "warn"
+allow-osi-fsf-free = "both"
+default = "deny"
+confidence-threshold = 0.8
+
+# Some crates don't have license metadata, allow them explicitly
+[[licenses.clarify]]
+name = "ring"
+version = "*"
+expression = "MIT AND ISC AND OpenSSL"
+license-files = [
+    { path = "LICENSE", hash = 0xbd0eed23 }
+]
+
+[licenses.private]
+# Allow private/proprietary licenses for internal dependencies
+ignore = false
+registries = []
+
+[bans]
+# Multiple versions of the same crate
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+
+# Deny specific crates
+deny = [
+    # Prefer rustls over native-tls for better security and cross-platform support
+    { name = "openssl", wrappers = ["native-tls"] },
+    # Deny old/vulnerable crates
+    { name = "chrono", version = "<0.4.20" },
+]
+
+# Skip checking these crates for multiple versions
+skip = [
+    { name = "windows-sys", version = "*" },  # Windows crates often have version conflicts
+    { name = "syn", version = "*" },  # Proc-macro crates
+]
+
+skip-tree = [
+    # Skip entire dependency trees
+    # { name = "some-dev-tool", depth = 20 },
+]
+
+[sources]
+# Source registry policy
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = [
+    # Allow specific git sources if needed
+    # "https://github.com/your-org/private-crate",
+]
+
+[sources.allow-org]
+# Allow all git sources from these GitHub orgs
+github = [
+    # "your-organization",
+]

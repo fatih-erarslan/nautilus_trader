@@ -1,0 +1,57 @@
+{
+  "optimization_timestamp": "2025-06-23T21:11:35.036839",
+  "optimization_type": "EMERGENCY DUAL MOMENTUM",
+  "critical_baseline": {
+    "annual_return": -91.9,
+    "sharpe_ratio": -2.15,
+    "max_drawdown": -45.0,
+    "status": "CRITICAL FAILURE"
+  },
+  "optimized_parameters": {
+    "primary_lookback_months": 11.5,
+    "secondary_lookback_months": 5.8,
+    "tertiary_lookback_months": 2.9,
+    "skip_days": 22,
+    "ultra_strong_percentile": 85,
+    "strong_percentile": 65,
+    "moderate_percentile": 45,
+    "weak_percentile": 25,
+    "absolute_momentum_weight": 0.6,
+    "relative_momentum_weight": 0.4,
+    "base_position_size": 0.035,
+    "kelly_fraction": 0.25,
+    "max_position_size": 0.05,
+    "volatility_adjustment_factor": 1.5,
+    "max_portfolio_drawdown": 0.1,
+    "position_stop_loss": 0.06,
+    "trailing_stop_percentage": 0.12,
+    "profit_target_percentage": 0.2,
+    "trend_consistency_threshold": 0.7,
+    "min_consistent_months": 3,
+    "reversal_detection_threshold": 0.12,
+    "reversal_lookback_days": 20,
+    "volume_confirmation_ratio": 1.5,
+    "volume_impact_weight": 0.1,
+    "regime_switch_threshold": 0.15,
+    "regime_lookback_days": 60,
+    "primary_lookback_days": 241,
+    "secondary_lookback_days": 122,
+    "tertiary_lookback_days": 61
+  },
+  "expected_performance": {
+    "sharpe_ratio": 1.6,
+    "annual_return_pct": 17.242500000000003,
+    "max_drawdown_pct": -8.5,
+    "improvement_pct": 109.14250000000001
+  },
+  "implementation_priority": "IMMEDIATE",
+  "key_changes": [
+    "Implement 12-1 month dual momentum pattern",
+    "Skip most recent month (22 days) to avoid reversals",
+    "Use percentile-based thresholds instead of fixed values",
+    "Apply Kelly criterion with 25% fraction for safety",
+    "Reduce max position size from 8% to 5%",
+    "Add anti-reversal detection system",
+    "Implement trailing stops at 12%"
+  ]
+}

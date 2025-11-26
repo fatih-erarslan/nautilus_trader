@@ -1,0 +1,245 @@
+name: Release & NPM Publish
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          npm install -g conventional-changelog-cli
+          conventional-changelog -p angular -i CHANGELOG.md -s
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          release_name: Neural Trader v${{ steps.version.outputs.version }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+
+  build-binaries:
+    name: Build Release Binaries
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: neural-trader-linux-x64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact_name: neural-trader-linux-arm64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: neural-trader-macos-x64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: neural-trader-macos-arm64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: neural-trader-windows-x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools
+        if: matrix.os == 'ubuntu-latest' && matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Build release binary
+        run: |
+          cd neural-trader-rust
+          cargo build --release --target ${{ matrix.target }} --bin neural-trader
+
+      - name: Package binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd neural-trader-rust/target/${{ matrix.target }}/release
+          tar czf ${{ matrix.artifact_name }}.tar.gz neural-trader
+          mv ${{ matrix.artifact_name }}.tar.gz ${{ github.workspace }}/
+
+      - name: Package binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd neural-trader-rust/target/${{ matrix.target }}/release
+          Compress-Archive -Path neural-trader.exe -DestinationPath ${{ github.workspace }}/${{ matrix.artifact_name }}.zip
+
+      - name: Upload Release Asset (Unix)
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./${{ matrix.artifact_name }}.tar.gz
+          asset_name: ${{ matrix.artifact_name }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload Release Asset (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./${{ matrix.artifact_name }}.zip
+          asset_name: ${{ matrix.artifact_name }}.zip
+          asset_content_type: application/zip
+
+  build-napi:
+    name: Build NAPI for NPM
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install napi-cli
+        run: npm install -g @napi-rs/cli
+
+      - name: Build NAPI bindings
+        run: |
+          cd neural-trader-rust/crates/napi-bindings
+          napi build --platform --release --target ${{ matrix.target }}
+
+      - name: Upload NAPI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: napi-${{ matrix.target }}
+          path: neural-trader-rust/crates/napi-bindings/*.node
+
+  publish-npm:
+    name: Publish to NPM
+    needs: [create-release, build-napi]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all NAPI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: bindings
+
+      - name: Prepare NPM package
+        run: |
+          mkdir -p npm-package/bin
+          cp -r bindings/* npm-package/bin/
+          cp package.json npm-package/
+          cp README.md npm-package/
+          cp LICENSE npm-package/ || true
+
+      - name: Update package version
+        run: |
+          cd npm-package
+          npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version
+
+      - name: Publish to NPM
+        run: |
+          cd npm-package
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: 60,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ **Release Published!**\n\n` +
+                    `Version: v${{ needs.create-release.outputs.version }}\n` +
+                    `NPM: https://www.npmjs.com/package/neural-trader\n` +
+                    `GitHub: ${context.payload.release.html_url}`
+            })
+
+  publish-crates-io:
+    name: Publish to crates.io
+    needs: [create-release, build-binaries]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish crates
+        run: |
+          cd neural-trader-rust
+          # Publish in dependency order
+          for crate in crates/utils crates/core crates/market-data crates/features crates/strategies crates/execution crates/portfolio crates/risk crates/backtesting crates/neural crates/agentdb-client crates/streaming crates/governance crates/cli crates/napi-bindings; do
+            cd $crate
+            cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || true
+            cd -
+            sleep 10
+          done

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_prediction_markets_tool.json",
+  "title": "get_prediction_markets_tool",
+  "description": "List available prediction markets with filtering.",
+  "category": "prediction",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Market category filter"
+        },
+        "sort_by": {
+          "type": "string",
+          "default": "volume",
+          "enum": [
+            "volume",
+            "liquidity",
+            "popularity"
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10,
+          "maximum": 100
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "markets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "market_id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "volume_24h": {
+                "type": "number"
+              },
+              "liquidity": {
+                "type": "number"
+              },
+              "outcomes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

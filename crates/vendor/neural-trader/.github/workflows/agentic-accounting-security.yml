@@ -1,0 +1,290 @@
+name: Agentic Accounting - Security Scanning
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'packages/agentic-accounting/**'
+      - 'neural-trader-rust/crates/agentic-accounting/**'
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+
+env:
+  NODE_VERSION: '18'
+  RUST_VERSION: 'stable'
+
+jobs:
+  # Dependency vulnerability scanning
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run npm audit
+        run: |
+          npm audit --json > npm-audit-report.json || true
+          npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run cargo audit
+        run: |
+          cd neural-trader-rust
+          cargo audit --json > ../cargo-audit-report.json || true
+          cargo audit
+        continue-on-error: true
+
+      - name: Upload audit reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-reports
+          path: |
+            npm-audit-report.json
+            cargo-audit-report.json
+          retention-days: 30
+
+  # CodeQL analysis
+  codeql:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript', 'typescript']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+  # Secret scanning
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        run: |
+          wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
+          tar -xzf gitleaks_8.18.0_linux_x64.tar.gz
+          chmod +x gitleaks
+
+      - name: Run Gitleaks scan
+        run: |
+          ./gitleaks detect \
+            --source . \
+            --report-path gitleaks-report.json \
+            --report-format json \
+            --verbose
+
+      - name: Upload Gitleaks report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+          retention-days: 30
+
+  # SAST with Semgrep
+  semgrep:
+    name: SAST with Semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+            p/typescript
+          generateSarif: true
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+
+  # Container security scanning (if Docker images exist)
+  trivy-scan:
+    name: Container Security (Trivy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './packages/agentic-accounting'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # License compliance check
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install license-checker
+        run: npm install -g license-checker
+
+      - name: Check npm licenses
+        run: |
+          cd packages/agentic-accounting
+          license-checker --json --out ../../npm-licenses.json
+          license-checker --failOn "GPL;AGPL;LGPL" || true
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+
+      - name: Install cargo-license
+        run: cargo install cargo-license || true
+
+      - name: Check Rust licenses
+        run: |
+          cd neural-trader-rust
+          cargo license --json > ../cargo-licenses.json || true
+          cargo license
+        continue-on-error: true
+
+      - name: Upload license reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-reports
+          path: |
+            npm-licenses.json
+            cargo-licenses.json
+          retention-days: 30
+
+  # SBOM generation
+  sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          path: ./packages/agentic-accounting
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+          retention-days: 90
+
+  # Security summary
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, codeql, secret-scan, semgrep, license-check]
+    if: always()
+
+    steps:
+      - name: Generate security summary
+        run: |
+          echo "### Security Scan Summary :shield:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan Type | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ${{ needs.dependency-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL Analysis | ${{ needs.codeql.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scanning | ${{ needs.secret-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SAST (Semgrep) | ${{ needs.semgrep.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Check | ${{ needs.license-check.result }} |" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.secret-scan.result }}" == "failure" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo ":warning: **Warning**: Secrets detected in repository!" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the Gitleaks report and rotate any exposed credentials." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ "${{ needs.dependency-scan.result }}" == "failure" ]] || \
+             [[ "${{ needs.codeql.result }}" == "failure" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo ":warning: **Warning**: Security vulnerabilities detected!" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the scan results and address critical issues." >> $GITHUB_STEP_SUMMARY
+          fi

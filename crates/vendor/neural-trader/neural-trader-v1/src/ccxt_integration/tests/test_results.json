@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-08-18T17:20:44.679619",
+  "tests": {
+    "exchange_registry": "PASSED",
+    "websocket_manager": "PASSED",
+    "integration": "PASSED",
+    "order_router": "PASSED",
+    "client_manager": "PASSED",
+    "ccxt_interface": "PASSED"
+  },
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "errors": []
+  }
+}

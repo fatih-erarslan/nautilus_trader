@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/execute_e2b_process.json",
+  "title": "execute_e2b_process",
+  "description": "Execute a process in E2B sandbox.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capture_output": {
+          "type": "boolean",
+          "default": true
+        },
+        "timeout": {
+          "type": "integer",
+          "default": 60
+        }
+      },
+      "required": [
+        "sandbox_id",
+        "command"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "process_id": {
+          "type": "string"
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "stdout": {
+          "type": "string"
+        },
+        "stderr": {
+          "type": "string"
+        },
+        "execution_time": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "process_id",
+        "exit_code"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

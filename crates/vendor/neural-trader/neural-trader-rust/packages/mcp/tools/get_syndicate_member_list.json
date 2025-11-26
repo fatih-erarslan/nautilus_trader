@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_syndicate_member_list.json",
+  "title": "get_syndicate_member_list",
+  "description": "Get list of all syndicate members.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "active_only": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "syndicate_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "member_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "equity_share": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "total_members": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "members",
+        "total_members"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

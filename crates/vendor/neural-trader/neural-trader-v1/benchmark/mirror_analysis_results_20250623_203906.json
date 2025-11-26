@@ -1,0 +1,215 @@
+{
+  "timestamp": "2025-06-23T20:39:06.426068",
+  "mirror_strategy_performance": {
+    "strategy_name": "mirror",
+    "total_return": 0.3436688735605896,
+    "annualized_return": 0.5339815415495135,
+    "sharpe_ratio": 6.008950394400111,
+    "sortino_ratio": 7.884628430937881,
+    "max_drawdown": 0.2590454333898358,
+    "win_rate": 0.6,
+    "profit_factor": 2.266760523879727,
+    "total_trades": 5,
+    "avg_trade_duration": 31.8,
+    "volatility": 0.08553599344546188,
+    "beta": -0.007414136268138531,
+    "alpha": 0.517591683277256,
+    "calmar_ratio": 2.0613431959092985
+  },
+  "comparative_analysis": {
+    "mirror": {
+      "strategy_name": "mirror",
+      "total_return": 0.3436688735605896,
+      "annualized_return": 0.5339815415495135,
+      "sharpe_ratio": 6.008950394400111,
+      "sortino_ratio": 7.884628430937881,
+      "max_drawdown": 0.2590454333898358,
+      "win_rate": 0.6,
+      "profit_factor": 2.266760523879727,
+      "total_trades": 5,
+      "avg_trade_duration": 31.8,
+      "volatility": 0.08553599344546188,
+      "beta": -0.007414136268138531,
+      "alpha": 0.517591683277256,
+      "calmar_ratio": 2.0613431959092985
+    },
+    "momentum": {
+      "strategy_name": "momentum",
+      "total_return": -0.8242186003293611,
+      "annualized_return": -0.9193862383135047,
+      "sharpe_ratio": -2.152922705509225,
+      "sortino_ratio": -1.5608708958849355,
+      "max_drawdown": 0.8076535610910491,
+      "win_rate": 0.20833333333333334,
+      "profit_factor": 0.2203301826849303,
+      "total_trades": 24,
+      "avg_trade_duration": 7.875,
+      "volatility": 0.43633068475224907,
+      "beta": 0.04806738582364104,
+      "alpha": -0.9712014865980884,
+      "calmar_ratio": -1.1383423321646937
+    },
+    "mean_reversion": {
+      "strategy_name": "mean_reversion",
+      "total_return": 0.2780166199712728,
+      "annualized_return": 0.4266216873214719,
+      "sharpe_ratio": 1.516163314477114,
+      "sortino_ratio": 0,
+      "max_drawdown": 0.18273339829757274,
+      "win_rate": 0.8,
+      "profit_factor": 2.4788896518756935,
+      "total_trades": 5,
+      "avg_trade_duration": 15.4,
+      "volatility": 0.26819121887387526,
+      "beta": 0.0436893285539934,
+      "alpha": 0.3993690640312715,
+      "calmar_ratio": 2.3346672874037977
+    },
+    "swing": {
+      "strategy_name": "swing",
+      "total_return": 0.007274678262367041,
+      "annualized_return": 0.010553899173276537,
+      "sharpe_ratio": -0.04623908398162224,
+      "sortino_ratio": -0.03227553139237965,
+      "max_drawdown": 0.29250538254579517,
+      "win_rate": 0.4375,
+      "profit_factor": 1.016110654573935,
+      "total_trades": 16,
+      "avg_trade_duration": 6.625,
+      "volatility": 0.20428823439663776,
+      "beta": -0.04649006410720777,
+      "alpha": 0.022519033773340556,
+      "calmar_ratio": 0.03608104261679424
+    },
+    "buy_and_hold": {
+      "strategy_name": "buy_and_hold",
+      "total_return": -0.02849536947881369,
+      "annualized_return": -0.041007970927700255,
+      "sharpe_ratio": -2.835737487125511e+17,
+      "sortino_ratio": -2.835737487125511e+17,
+      "max_drawdown": 0.028094777608337652,
+      "win_rate": 0.0,
+      "profit_factor": 0.0,
+      "total_trades": 1,
+      "avg_trade_duration": 251.0,
+      "volatility": 2.1513969894844507e-19,
+      "beta": -2.9199453628828755e-35,
+      "alpha": -0.06100797092770026,
+      "calmar_ratio": -1.4596296685235326
+    }
+  },
+  "market_condition_analysis": {
+    "mirror_bull": {
+      "strategy_name": "mirror",
+      "total_return": 0.01881520841407308,
+      "annualized_return": 0.027366755016232425,
+      "sharpe_ratio": 0.21454876115041374,
+      "sortino_ratio": 0,
+      "max_drawdown": 0.12975018305271135,
+      "win_rate": 0.5,
+      "profit_factor": 1.1528905590453389,
+      "total_trades": 2,
+      "avg_trade_duration": 40.5,
+      "volatility": 0.034336040798985605,
+      "beta": -0.002313259625784175,
+      "alpha": 0.006202528133680503,
+      "calmar_ratio": 0.21091881623869932
+    },
+    "mirror_bear": {
+      "strategy_name": "mirror",
+      "total_return": 0.15454593260360752,
+      "annualized_return": 0.23139446524336438,
+      "sharpe_ratio": 1.062410221099348,
+      "sortino_ratio": 0.9744125943575065,
+      "max_drawdown": 0.2736028072725187,
+      "win_rate": 0.46153846153846156,
+      "profit_factor": 1.1857721506023482,
+      "total_trades": 13,
+      "avg_trade_duration": 12.384615384615385,
+      "volatility": 0.19897630975784492,
+      "beta": 0.01625002335083982,
+      "alpha": 0.2051686700075374,
+      "calmar_ratio": 0.8457313269190502
+    },
+    "mirror_sideways": {
+      "strategy_name": "mirror",
+      "total_return": 0.0,
+      "annualized_return": 0.0,
+      "sharpe_ratio": 0.0,
+      "sortino_ratio": 0.0,
+      "max_drawdown": 0.0,
+      "win_rate": 0.0,
+      "profit_factor": 0.0,
+      "total_trades": 0,
+      "avg_trade_duration": 0.0,
+      "volatility": 0.0,
+      "beta": 0.0,
+      "alpha": 0.0,
+      "calmar_ratio": 0.0
+    },
+    "mirror_volatile": {
+      "strategy_name": "mirror",
+      "total_return": -1.2899703403617944,
+      "annualized_return": NaN,
+      "sharpe_ratio": NaN,
+      "sortino_ratio": NaN,
+      "max_drawdown": 0.7675119272814596,
+      "win_rate": 0.0,
+      "profit_factor": 0.0,
+      "total_trades": 9,
+      "avg_trade_duration": 16.444444444444443,
+      "volatility": 0.16761197589571078,
+      "beta": 0.04333352164153371,
+      "alpha": NaN,
+      "calmar_ratio": NaN
+    }
+  },
+  "bottleneck_analysis": {
+    "performance_gaps": {},
+    "efficiency_issues": {},
+    "risk_concerns": {
+      "high_drawdown": {
+        "current_drawdown": 0.2590454333898358,
+        "target_drawdown": 0.12,
+        "excess_risk": 13.904543338983583
+      }
+    },
+    "tracking_problems": {
+      "beta_tracking_error": {
+        "current_beta": -0.007414136268138531,
+        "target_beta": 0.85,
+        "tracking_error": 0.8574141362681386
+      }
+    }
+  },
+  "optimization_recommendations": [
+    {
+      "priority": "high",
+      "category": "win_rate",
+      "recommendation": "Improve win rate from 60.0% to 65%+",
+      "potential_improvement": "8.3%",
+      "implementation": "Implement better entry timing and institutional signal validation"
+    },
+    {
+      "priority": "medium",
+      "category": "risk_management",
+      "recommendation": "Reduce max drawdown from 25.9% to <10%",
+      "potential_improvement": "Risk reduction of 15.9 percentage points",
+      "implementation": "Implement dynamic position sizing and better stop-loss mechanisms"
+    },
+    {
+      "priority": "medium",
+      "category": "market_adaptability",
+      "recommendation": "Improve performance in sideways market conditions",
+      "potential_improvement": "Current Sharpe: 0.00, Target: >0.8",
+      "implementation": "Develop market regime detection and adaptive position sizing"
+    },
+    {
+      "priority": "high",
+      "category": "tracking_efficiency",
+      "recommendation": "Optimize institutional signal delay and execution timing",
+      "potential_improvement": "Reduce tracking error by 20-30%",
+      "implementation": "Implement faster 13F filing processing and predictive positioning"
+    }
+  ]
+}

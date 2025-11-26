@@ -1,0 +1,1 @@
+"""AI News Trader source package."""

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/analyze_betting_market_depth.json",
+  "title": "analyze_betting_market_depth",
+  "description": "Analyze betting market depth and liquidity.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "sport": {
+          "type": "string"
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "market_id",
+        "sport"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "liquidity_score": {
+          "type": "number"
+        },
+        "depth_analysis": {
+          "type": "object"
+        },
+        "recommendation": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

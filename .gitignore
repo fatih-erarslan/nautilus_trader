@@ -48,8 +48,9 @@ claude-flow
 hive-mind-prompt-*.txt
 
 # Vendored external dependencies - include source, exclude artifacts
-# Include nautilus_trader source code
+# Include vendor source code (nautilus_trader, neural-trader)
 !crates/vendor/nautilus_trader/
+!crates/vendor/neural-trader/
 # Exclude build artifacts in vendor
 crates/vendor/**/target/
 crates/vendor/**/.git/
@@ -69,7 +70,6 @@ crates/vendor/**/.venv/
 crates/vendor/**/venv/
 crates/vendor/**/*.whl
 # Exclude other vendor directories not yet needed
-crates/vendor/neural-trader/
 crates/vendor/physics/
 crates/vendor/ruv-fann/
 crates/vendor/ruvector/

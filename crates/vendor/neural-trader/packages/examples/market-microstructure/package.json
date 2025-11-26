@@ -1,0 +1,92 @@
+{
+  "name": "@neural-trader/example-market-microstructure",
+  "version": "1.0.0",
+  "description": "Self-learning market microstructure analysis with AI-powered order book prediction, swarm-based feature engineering, and real-time liquidity optimization for trading systems",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint src tests --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "neural-trader",
+    "market-microstructure",
+    "order-book",
+    "liquidity",
+    "price-discovery",
+    "machine-learning",
+    "swarm-intelligence",
+    "agentdb",
+    "typescript",
+    "ai",
+    "neural-network",
+    "self-learning",
+    "optimization",
+    "agentic-flow",
+    "rust",
+    "napi",
+    "trading",
+    "algorithmic-trading",
+    "high-frequency-trading",
+    "bid-ask-spread",
+    "market-making",
+    "real-time",
+    "prediction",
+    "feature-engineering",
+    "quantitative-finance",
+    "financial-modeling"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "homepage": "https://github.com/ruvnet/neural-trader#readme",
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "packages/examples/market-microstructure"
+  },
+  "dependencies": {
+    "@neural-trader/predictor": "workspace:*",
+    "agentdb": "^2.0.0",
+    "sublinear-time-solver": "^1.0.0",
+    "claude-flow": "^2.0.0",
+    "openrouter": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

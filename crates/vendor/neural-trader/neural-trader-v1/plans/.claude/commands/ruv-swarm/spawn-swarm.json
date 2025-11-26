@@ -1,0 +1,375 @@
+{
+  "$schema": "https://claude.ai/schema/commands/v1.0.0",
+  "name": "spawn-swarm",
+  "description": "Initialize a swarm of AI agents with specified configuration for distributed trading operations",
+  "version": "1.0.0",
+  "category": "swarm-management",
+  "tags": ["initialization", "swarm", "distributed", "setup"],
+  
+  "command": {
+    "syntax": "spawn-swarm [options] <config-file>",
+    "aliases": ["swarm-init", "init-swarm"],
+    "examples": [
+      {
+        "description": "Spawn a trading swarm with default configuration",
+        "command": "spawn-swarm --agents 5 --strategy momentum trading-swarm.yaml"
+      },
+      {
+        "description": "Spawn with GPU acceleration and custom memory allocation",
+        "command": "spawn-swarm --gpu --memory 16G --agents 10 advanced-config.yaml"
+      },
+      {
+        "description": "Spawn with specific MCP tools enabled",
+        "command": "spawn-swarm --mcp-tools neural_forecast,risk_analysis production.yaml"
+      }
+    ]
+  },
+  
+  "parameters": {
+    "required": [
+      {
+        "name": "config-file",
+        "type": "string",
+        "description": "Path to swarm configuration file (YAML/JSON)",
+        "validation": {
+          "pattern": "^.*\\.(yaml|yml|json)$",
+          "fileExists": true
+        }
+      }
+    ],
+    
+    "optional": [
+      {
+        "name": "agents",
+        "type": "integer",
+        "short": "a",
+        "long": "agents",
+        "description": "Number of agents to spawn in the swarm",
+        "default": 3,
+        "validation": {
+          "min": 1,
+          "max": 100
+        }
+      },
+      {
+        "name": "strategy",
+        "type": "string",
+        "short": "s",
+        "long": "strategy",
+        "description": "Default trading strategy for all agents",
+        "default": "adaptive",
+        "choices": ["momentum", "mirror", "swing", "mean_reversion", "adaptive", "neural"]
+      },
+      {
+        "name": "gpu",
+        "type": "boolean",
+        "short": "g",
+        "long": "gpu",
+        "description": "Enable GPU acceleration for neural operations",
+        "default": false
+      },
+      {
+        "name": "memory",
+        "type": "string",
+        "short": "m",
+        "long": "memory",
+        "description": "Memory allocation per agent (e.g., 4G, 512M)",
+        "default": "2G",
+        "validation": {
+          "pattern": "^\\d+[GMK]$"
+        }
+      },
+      {
+        "name": "mcp-tools",
+        "type": "array",
+        "long": "mcp-tools",
+        "description": "Comma-separated list of MCP tools to enable",
+        "default": ["quick_analysis", "neural_forecast", "risk_analysis"],
+        "elementType": "string"
+      },
+      {
+        "name": "parallel",
+        "type": "boolean",
+        "short": "p",
+        "long": "parallel",
+        "description": "Enable parallel agent execution",
+        "default": true
+      },
+      {
+        "name": "timeout",
+        "type": "integer",
+        "short": "t",
+        "long": "timeout",
+        "description": "Initialization timeout in seconds",
+        "default": 300
+      },
+      {
+        "name": "dry-run",
+        "type": "boolean",
+        "long": "dry-run",
+        "description": "Validate configuration without spawning agents",
+        "default": false
+      }
+    ]
+  },
+  
+  "configuration": {
+    "schema": {
+      "type": "object",
+      "required": ["swarm", "agents"],
+      "properties": {
+        "swarm": {
+          "type": "object",
+          "required": ["name", "version"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Swarm identifier"
+            },
+            "version": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            },
+            "description": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        
+        "agents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "role"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9-_]+$"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["analyzer", "trader", "monitor", "orchestrator", "risk-manager"]
+              },
+              "role": {
+                "type": "string",
+                "description": "Specific role within the swarm"
+              },
+              "strategy": {
+                "type": "string"
+              },
+              "mcp_tools": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "resources": {
+                "type": "object",
+                "properties": {
+                  "memory": {
+                    "type": "string"
+                  },
+                  "cpu": {
+                    "type": "number"
+                  },
+                  "gpu": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "parameters": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        
+        "orchestration": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["centralized", "distributed", "hybrid"]
+            },
+            "communication": {
+              "type": "string",
+              "enum": ["shared-memory", "message-queue", "websocket"]
+            },
+            "coordination": {
+              "type": "object",
+              "properties": {
+                "leader_election": {
+                  "type": "boolean"
+                },
+                "consensus_protocol": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        
+        "resources": {
+          "type": "object",
+          "properties": {
+            "total_memory": {
+              "type": "string"
+            },
+            "total_cpu": {
+              "type": "integer"
+            },
+            "gpu_enabled": {
+              "type": "boolean"
+            },
+            "gpu_memory": {
+              "type": "string"
+            }
+          }
+        },
+        
+        "monitoring": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "metrics_interval": {
+              "type": "integer"
+            },
+            "health_check_interval": {
+              "type": "integer"
+            },
+            "alerting": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  },
+  
+  "execution": {
+    "phases": [
+      {
+        "name": "validation",
+        "description": "Validate configuration and system requirements",
+        "steps": [
+          "Load and parse configuration file",
+          "Validate against schema",
+          "Check system resources",
+          "Verify MCP server connectivity",
+          "Validate trading strategy parameters"
+        ]
+      },
+      {
+        "name": "initialization",
+        "description": "Initialize swarm infrastructure",
+        "steps": [
+          "Create swarm namespace",
+          "Initialize shared memory/message queue",
+          "Setup monitoring infrastructure",
+          "Initialize logging system"
+        ]
+      },
+      {
+        "name": "agent-spawning",
+        "description": "Spawn individual agents",
+        "steps": [
+          "Allocate resources per agent",
+          "Initialize agent processes",
+          "Connect to MCP server",
+          "Load trading strategies",
+          "Establish inter-agent communication"
+        ]
+      },
+      {
+        "name": "orchestration-setup",
+        "description": "Setup orchestration layer",
+        "steps": [
+          "Initialize orchestrator",
+          "Establish agent registry",
+          "Setup task distribution",
+          "Configure load balancing"
+        ]
+      },
+      {
+        "name": "verification",
+        "description": "Verify swarm is operational",
+        "steps": [
+          "Health check all agents",
+          "Test inter-agent communication",
+          "Verify MCP tool access",
+          "Run initialization tests"
+        ]
+      }
+    ],
+    
+    "error_handling": {
+      "strategies": [
+        {
+          "error": "ResourceAllocationError",
+          "action": "rollback",
+          "description": "Insufficient resources to spawn requested agents"
+        },
+        {
+          "error": "MCPConnectionError",
+          "action": "retry",
+          "retries": 3,
+          "backoff": "exponential",
+          "description": "Failed to connect to MCP server"
+        },
+        {
+          "error": "ConfigurationError",
+          "action": "fail",
+          "description": "Invalid configuration file"
+        },
+        {
+          "error": "AgentSpawnError",
+          "action": "partial-rollback",
+          "description": "Failed to spawn one or more agents"
+        }
+      ]
+    }
+  },
+  
+  "output": {
+    "success": {
+      "format": "json",
+      "fields": {
+        "swarm_id": "Unique identifier for the swarm",
+        "agents": "List of spawned agents with their IDs and status",
+        "resources": "Allocated resources summary",
+        "endpoints": "Communication endpoints for monitoring",
+        "start_time": "ISO timestamp of swarm initialization"
+      }
+    },
+    "failure": {
+      "format": "json",
+      "fields": {
+        "error": "Error type and message",
+        "phase": "Phase where error occurred",
+        "details": "Detailed error information",
+        "cleanup": "Cleanup actions performed"
+      }
+    }
+  },
+  
+  "integration": {
+    "mcp_tools": [
+      "mcp__ai-news-trader__list_strategies",
+      "mcp__ai-news-trader__get_strategy_info",
+      "mcp__ai-news-trader__get_system_metrics"
+    ],
+    "hooks": {
+      "pre_spawn": "Executed before spawning begins",
+      "post_spawn": "Executed after successful spawn",
+      "on_error": "Executed on spawn failure"
+    }
+  }
+}

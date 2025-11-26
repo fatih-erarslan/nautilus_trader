@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/list_strategies.json",
+  "title": "list_strategies",
+  "description": "List all available trading strategies with GPU capabilities.",
+  "category": "trading",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "strategies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total_count": {
+          "type": "integer"
+        },
+        "gpu_enabled_count": {
+          "type": "integer"
+        },
+        "models": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "sharpe_ratio": {
+                "type": "number"
+              },
+              "gpu_accelerated": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "strategies",
+        "total_count",
+        "models"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

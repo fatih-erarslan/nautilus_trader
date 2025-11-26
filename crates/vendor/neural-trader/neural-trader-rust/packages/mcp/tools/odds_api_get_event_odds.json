@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/odds_api_get_event_odds.json",
+  "title": "odds_api_get_event_odds",
+  "description": "Get detailed odds for a specific event.",
+  "category": "odds_api",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sport": {
+          "type": "string"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "string",
+          "default": "us"
+        },
+        "markets": {
+          "type": "string",
+          "default": "h2h,spreads,totals"
+        },
+        "bookmakers": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sport",
+        "event_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "bookmakers": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

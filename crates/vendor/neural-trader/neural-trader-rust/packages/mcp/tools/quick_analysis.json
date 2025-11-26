@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/quick_analysis.json",
+  "title": "quick_analysis",
+  "description": "Get quick market analysis for a symbol with optional GPU acceleration.",
+  "category": "analysis",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol (e.g., AAPL, TSLA)"
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable GPU acceleration"
+        }
+      },
+      "required": [
+        "symbol"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "current_price": {
+          "type": "number"
+        },
+        "change_percent": {
+          "type": "number"
+        },
+        "volume": {
+          "type": "integer"
+        },
+        "technical_indicators": {
+          "type": "object",
+          "properties": {
+            "rsi": {
+              "type": "number"
+            },
+            "macd": {
+              "type": "number"
+            },
+            "moving_avg_20": {
+              "type": "number"
+            },
+            "moving_avg_50": {
+              "type": "number"
+            }
+          }
+        },
+        "sentiment": {
+          "type": "object",
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "label": {
+              "type": "string",
+              "enum": [
+                "bullish",
+                "bearish",
+                "neutral"
+              ]
+            }
+          }
+        },
+        "gpu_accelerated": {
+          "type": "boolean"
+        },
+        "execution_time": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "symbol",
+        "current_price",
+        "technical_indicators"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

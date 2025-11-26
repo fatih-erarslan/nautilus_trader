@@ -1,0 +1,55 @@
+# Core trading dependencies
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+scikit-learn>=1.3.0
+
+# GPU acceleration (RAPIDS components)
+cudf>=23.10.0
+cuml>=23.10.0
+cupy-cuda11x>=12.0.0
+numba>=0.58.0
+
+# Financial data and analysis
+yfinance>=0.2.0
+alpha-vantage>=2.3.0
+pandas-ta>=0.3.0
+ta-lib>=0.4.0
+ccxt>=4.0.0
+
+# Machine learning and optimization
+optuna>=3.4.0
+hyperopt>=0.2.7
+bayesian-optimization>=1.4.0
+xgboost>=1.7.0
+lightgbm>=4.0.0
+
+# Web framework and API
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.4.0
+websockets>=11.0.0
+
+# Data storage and caching
+redis>=5.0.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+sqlite3
+
+# Monitoring and logging
+prometheus-client>=0.18.0
+structlog>=23.2.0
+rich>=13.6.0
+
+# Utilities
+python-dotenv>=1.0.0
+click>=8.1.0
+requests>=2.31.0
+aiohttp>=3.9.0
+asyncio
+concurrent.futures
+
+# Testing (for development)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.12.0

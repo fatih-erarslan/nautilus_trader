@@ -1,0 +1,62 @@
+{
+  "name": "@neural-trader/benchoptimizer",
+  "version": "2.1.0",
+  "description": "Comprehensive benchmarking, validation, and optimization tool for neural-trader packages",
+  "main": "index.js",
+  "bin": {
+    "benchoptimizer": "./bin/benchoptimizer.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.js\""
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "benchmarking",
+    "optimization",
+    "validation",
+    "performance-analysis"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/benchoptimizer"
+  },
+  "files": [
+    "index.js",
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "yargs": "^17.7.2",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "cli-table3": "^0.6.3",
+    "cli-progress": "^3.12.0",
+    "fs-extra": "^11.1.1",
+    "glob": "^10.3.10",
+    "marked": "^11.1.1",
+    "marked-terminal": "^6.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1"
+  },
+  "homepage": "https://neural-trader.ruv.io"
+}

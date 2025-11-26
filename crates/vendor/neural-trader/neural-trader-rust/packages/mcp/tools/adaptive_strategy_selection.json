@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/adaptive_strategy_selection.json",
+  "title": "adaptive_strategy_selection",
+  "description": "Automatically select best strategy for current conditions.",
+  "category": "strategy",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "auto_switch": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "symbol"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "selected_strategy": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "switched": {
+          "type": "boolean"
+        },
+        "reasoning": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

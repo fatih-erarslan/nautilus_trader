@@ -1,0 +1,39 @@
+# AI News Trader - Non-GPU Python deployment
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python source code
+COPY src/ ./src/
+
+# Copy requirements file
+COPY requirements.txt* ./
+
+# Install Python dependencies (CPU versions only) including JWT
+RUN pip install --no-cache-dir \
+    numpy pandas scikit-learn requests python-dotenv \
+    fastapi uvicorn[standard] httpx alpaca-py \
+    newsapi-python finnhub-python yfinance ta structlog \
+    cryptography python-jose passlib bcrypt python-multipart \
+    && pip list
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Expose port
+EXPOSE 8080
+
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
+
+# Start command for Python FastAPI app
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]

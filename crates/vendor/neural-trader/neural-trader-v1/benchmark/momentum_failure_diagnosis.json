@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-06-23T21:07:54.564885",
+  "bull_market_performance": {
+    "market_return": 0.2329612292363341,
+    "strategy_return": -0.028921803296689495,
+    "underperformance": 0.2618830325330236
+  },
+  "trade_statistics": {
+    "total_trades": 16,
+    "win_rate": 0.3125,
+    "avg_win": 0.04603374540988289,
+    "avg_loss": -0.023553684576918546,
+    "profit_factor": 0.8883718240954056
+  },
+  "failure_modes": {
+    "momentum_traps": 1,
+    "momentum_trap_rate": 0.0625,
+    "late_entry_rate": 0.0625,
+    "early_exit_rate": 0.1875
+  },
+  "key_issues": [
+    "Buying at momentum peaks before reversals",
+    "Stop losses triggered by normal volatility",
+    "Exit signals too sensitive to short-term reversals",
+    "Momentum threshold (2%) may be too low",
+    "No trend strength validation"
+  ],
+  "emergency_recommendations": [
+    "Increase momentum threshold from 2% to 5%+",
+    "Add trend quality filters (ADX, moving averages)",
+    "Implement dynamic stop losses based on volatility",
+    "Add volume confirmation requirements",
+    "Use multiple timeframe momentum confirmation"
+  ]
+}

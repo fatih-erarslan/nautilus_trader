@@ -1,0 +1,50 @@
+{
+  "strategy": {
+    "movement_threshold": 0.005,
+    "max_drawdown": 0.002,
+    "min_win_rate": 0.60,
+    "position_timeout": 300,
+    "risk_per_trade": 0.001
+  },
+  "technical_features": [
+    "rsi",
+    "macd",
+    "bb_position",
+    "volume_ratio",
+    "price_momentum",
+    "volatility",
+    "support_distance",
+    "resistance_distance",
+    "ema_cross",
+    "vwap_deviation"
+  ],
+  "twitter_accounts": [
+    "@APompliano",
+    "@saylor",
+    "@elonmusk",
+    "@CathieDWood",
+    "@novogratz",
+    "@PeterSchiff",
+    "@glassnode",
+    "@WClementeIII",
+    "@woonomic",
+    "@100trillionUSD"
+  ],
+  "reddit_subs": [
+    "Bitcoin",
+    "CryptoCurrency",
+    "BitcoinMarkets",
+    "CryptoMarkets",
+    "SatoshiStreetBets"
+  ],
+  "bookmap_config": {
+    "api_endpoint": "wss://api.bookmap.com/v1/stream",
+    "depth_levels": 10,
+    "update_frequency": 100
+  },
+  "alerts": {
+    "discord_webhook": "",
+    "telegram_bot": "",
+    "email": ""
+  }
+}

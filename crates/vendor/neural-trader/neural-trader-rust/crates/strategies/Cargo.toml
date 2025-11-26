@@ -1,0 +1,64 @@
+[package]
+name = "nt-strategies"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Trading strategies and algorithms for Neural Trader - momentum, mean reversion, arbitrage, and more"
+documentation = "https://docs.rs/nt-strategies"
+readme = "README.md"
+keywords = ["trading", "strategies", "algorithms", "finance", "quant"]
+categories = ["finance", "algorithms", "science"]
+
+[dependencies]
+# Core types and traits
+nt-core = { version = "2.0.0", path = "../core" }
+nt-execution = { version = "2.0.0", path = "../execution" }
+nt-risk = { version = "2.0.0", path = "../risk" }
+nt-agentdb-client = { version = "2.0.0", path = "../agentdb-client" }
+
+# Async
+tokio.workspace = true
+async-trait.workspace = true
+futures = "0.3"
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Decimal precision
+rust_decimal.workspace = true
+
+# Date/Time
+chrono.workspace = true
+
+# UUID
+uuid.workspace = true
+
+# HTTP client for AgentDB
+reqwest = { version = "0.11", features = ["json"] }
+hex = "0.4"
+
+# Error handling
+thiserror.workspace = true
+anyhow.workspace = true
+
+# Logging
+tracing.workspace = true
+
+# Data processing
+polars.workspace = true
+
+# Statistics
+statrs = "0.16"
+
+[dev-dependencies]
+tokio-test = "0.4"
+proptest.workspace = true
+criterion = { version = "0.5", features = ["async_tokio", "html_reports"] }
+approx = "0.5"
+
+# [[bench]]
+# name = "strategy_benchmarks"
+# harness = false

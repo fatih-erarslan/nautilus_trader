@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_e2b_sandbox_status.json",
+  "title": "get_e2b_sandbox_status",
+  "description": "Get detailed status and metrics for sandbox.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sandbox_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "uptime": {
+          "type": "number"
+        },
+        "resource_usage": {
+          "type": "object",
+          "properties": {
+            "cpu_percent": {
+              "type": "number"
+            },
+            "memory_mb": {
+              "type": "number"
+            },
+            "disk_mb": {
+              "type": "number"
+            }
+          }
+        },
+        "processes_running": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sandbox_id",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

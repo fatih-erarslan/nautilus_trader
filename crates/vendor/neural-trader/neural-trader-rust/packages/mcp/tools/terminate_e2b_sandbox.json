@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/terminate_e2b_sandbox.json",
+  "title": "terminate_e2b_sandbox",
+  "description": "Terminate E2B sandbox and cleanup resources.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        },
+        "force": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "sandbox_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "terminated",
+            "terminating",
+            "failed"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "terminated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "sandbox_id",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "validation_timestamp": "2025-06-20T18:50:18.077896",
+  "overall_status": "FAIL",
+  "total_tests": 9,
+  "passed_tests": 3,
+  "failed_tests": 6,
+  "critical_failures": [
+    "Signal Generation P99 Latency",
+    "Order Execution P95 Latency",
+    "Trading Throughput",
+    "Signal Generation Throughput",
+    "Strategy Sharpe Ratio"
+  ],
+  "pass_rate": 33.33333333333333,
+  "results": [
+    {
+      "test_name": "Signal Generation P99 Latency",
+      "target_value": 100.0,
+      "measured_value": 187.1688003848575,
+      "unit": "ms",
+      "status": "FAIL",
+      "duration_ms": 1247.7617263793945,
+      "timestamp": "2025-06-20T18:50:01.638679",
+      "critical": true
+    },
+    {
+      "test_name": "Order Execution P95 Latency",
+      "target_value": 50.0,
+      "measured_value": 59.342211177720294,
+      "unit": "ms",
+      "status": "FAIL",
+      "duration_ms": 585.578203201294,
+      "timestamp": "2025-06-20T18:50:02.224436",
+      "critical": true
+    },
+    {
+      "test_name": "Data Processing Latency",
+      "target_value": 25.0,
+      "measured_value": 13.026788012273308,
+      "unit": "ms",
+      "status": "PASS",
+      "duration_ms": 2371.018886566162,
+      "timestamp": "2025-06-20T18:50:04.595620",
+      "critical": true
+    },
+    {
+      "test_name": "Trading Throughput",
+      "target_value": 1000.0,
+      "measured_value": 830.7796776783633,
+      "unit": "trades/sec",
+      "status": "FAIL",
+      "duration_ms": 5000.122308731079,
+      "timestamp": "2025-06-20T18:50:09.596010",
+      "critical": true
+    },
+    {
+      "test_name": "Signal Generation Throughput",
+      "target_value": 10000.0,
+      "measured_value": 8303.388313202859,
+      "unit": "signals/sec",
+      "status": "FAIL",
+      "duration_ms": 3001.1844635009766,
+      "timestamp": "2025-06-20T18:50:12.597374",
+      "critical": true
+    },
+    {
+      "test_name": "Sustained Memory Usage",
+      "target_value": 2048.0,
+      "measured_value": 1000.19921875,
+      "unit": "MB",
+      "status": "PASS",
+      "duration_ms": 2226.6972064971924,
+      "timestamp": "2025-06-20T18:50:14.824236",
+      "critical": true
+    },
+    {
+      "test_name": "CPU Usage Under Load",
+      "target_value": 80.0,
+      "measured_value": 81.75999999999999,
+      "unit": "%",
+      "status": "FAIL",
+      "duration_ms": 2245.2263832092285,
+      "timestamp": "2025-06-20T18:50:17.070622",
+      "critical": false
+    },
+    {
+      "test_name": "Strategy Sharpe Ratio",
+      "target_value": 2.0,
+      "measured_value": 0.6778528140749797,
+      "unit": "ratio",
+      "status": "FAIL",
+      "duration_ms": 3.0260086059570312,
+      "timestamp": "2025-06-20T18:50:17.073806",
+      "critical": true
+    },
+    {
+      "test_name": "Optimization Convergence Time",
+      "target_value": 30.0,
+      "measured_value": 28.390174048752264,
+      "unit": "minutes",
+      "status": "PASS",
+      "duration_ms": 1003.6253929138184,
+      "timestamp": "2025-06-20T18:50:18.077757",
+      "critical": false
+    }
+  ],
+  "performance_summary": {
+    "latency": {
+      "total_tests": 3,
+      "passed_tests": 1,
+      "pass_rate": 33.33333333333333,
+      "status": "FAIL"
+    },
+    "throughput": {
+      "total_tests": 2,
+      "passed_tests": 0,
+      "pass_rate": 0.0,
+      "status": "FAIL"
+    },
+    "resource": {
+      "total_tests": 2,
+      "passed_tests": 1,
+      "pass_rate": 50.0,
+      "status": "FAIL"
+    },
+    "strategy": {
+      "total_tests": 1,
+      "passed_tests": 0,
+      "pass_rate": 0.0,
+      "status": "FAIL"
+    },
+    "optimization": {
+      "total_tests": 1,
+      "passed_tests": 1,
+      "pass_rate": 100.0,
+      "status": "PASS"
+    }
+  }
+}

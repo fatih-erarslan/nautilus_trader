@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/odds_api_compare_margins.json",
+  "title": "odds_api_compare_margins",
+  "description": "Compare bookmaker margins.",
+  "category": "odds_api",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sport": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "string",
+          "default": "us"
+        },
+        "markets": {
+          "type": "string",
+          "default": "h2h"
+        }
+      },
+      "required": [
+        "sport"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "margins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bookmaker": {
+                "type": "string"
+              },
+              "average_margin": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

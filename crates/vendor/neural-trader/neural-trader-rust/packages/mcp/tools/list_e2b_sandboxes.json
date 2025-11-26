@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/list_e2b_sandboxes.json",
+  "title": "list_e2b_sandboxes",
+  "description": "List all E2B sandboxes with optional filtering.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "status_filter": {
+          "type": "string",
+          "enum": [
+            "running",
+            "stopped",
+            "all"
+          ]
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "sandboxes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sandbox_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "template": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "total_count": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sandboxes",
+        "total_count"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

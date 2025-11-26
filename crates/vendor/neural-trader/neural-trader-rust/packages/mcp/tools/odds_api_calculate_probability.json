@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/odds_api_calculate_probability.json",
+  "title": "odds_api_calculate_probability",
+  "description": "Calculate implied probability from odds.",
+  "category": "odds_api",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "odds": {
+          "type": "number"
+        },
+        "odds_format": {
+          "type": "string",
+          "default": "decimal",
+          "enum": [
+            "decimal",
+            "american"
+          ]
+        }
+      },
+      "required": [
+        "odds"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "implied_probability": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

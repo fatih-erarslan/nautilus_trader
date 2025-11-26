@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/compare_betting_providers.json",
+  "title": "compare_betting_providers",
+  "description": "Compare odds across betting providers.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sport": {
+          "type": "string"
+        },
+        "event_filter": {
+          "type": "string"
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "sport"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string"
+              },
+              "best_odds": {
+                "type": "object"
+              },
+              "providers": {
+                "type": "array"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

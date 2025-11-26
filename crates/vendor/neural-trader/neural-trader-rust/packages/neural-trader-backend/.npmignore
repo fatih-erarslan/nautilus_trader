@@ -1,0 +1,49 @@
+# Source files
+src/
+tests/
+*.rs
+Cargo.toml
+Cargo.lock
+build.rs
+
+# Build artifacts
+target/
+*.node.tmp
+*.profraw
+*.gcda
+*.gcno
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation source
+docs/
+*.md.tmp
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Development scripts
+scripts/build-*.sh
+scripts/build-*.ps1
+scripts/prepack.js
+
+# Keep only what's needed for npm package
+!index.js
+!index.d.ts
+!README.md
+!LICENSE
+!scripts/postinstall.js

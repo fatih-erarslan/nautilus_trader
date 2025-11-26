@@ -1,0 +1,168 @@
+# Multi-stage Dockerfile for Neural Trader NAPI-RS Validation
+# Optimized for CI/CD with layer caching and multi-platform support
+
+# =============================================================================
+# Stage 1: Rust Builder - Compile all Rust crates including NAPI bindings
+# =============================================================================
+FROM rust:1.75-slim AS rust-builder
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /build
+
+# Copy workspace files for caching
+COPY neural-trader-rust/Cargo.toml neural-trader-rust/Cargo.lock ./
+COPY neural-trader-rust/crates ./crates/
+
+# Build dependencies first (cached layer)
+RUN cargo fetch
+
+# Build all workspace members in release mode
+RUN cargo build --release --workspace
+
+# Build NAPI bindings specifically
+WORKDIR /build/crates/napi-bindings
+RUN cargo build --release
+
+# Verify binaries exist
+RUN ls -la /build/target/release/ && \
+    test -f /build/target/release/libneural_trader.so || \
+    test -f /build/target/release/libneural_trader.dylib || \
+    test -f /build/target/release/neural_trader.dll
+
+# =============================================================================
+# Stage 2: Node.js Builder - Install dependencies and build NAPI bindings
+# =============================================================================
+FROM node:18-slim AS node-builder
+
+# Install build tools for native addons
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy package files for caching
+COPY package*.json ./
+COPY neural-trader-rust/packages/neural-trader/package*.json ./neural-trader-rust/packages/neural-trader/
+
+# Install dependencies
+RUN npm ci --ignore-scripts
+
+# Copy source code
+COPY . .
+
+# Copy built Rust artifacts from previous stage
+COPY --from=rust-builder /build/target/release /app/neural-trader-rust/target/release
+
+# Build NAPI bindings using napi-rs
+WORKDIR /app/neural-trader-rust/crates/napi-bindings
+RUN npm install @napi-rs/cli && \
+    npx napi build --platform --release --strip
+
+# Verify NAPI artifacts
+RUN ls -la *.node || echo "Warning: No .node files found"
+
+# =============================================================================
+# Stage 3: Testing Environment - Full test suite execution
+# =============================================================================
+FROM node:18-slim AS testing
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    jq \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy built artifacts from previous stages
+COPY --from=node-builder /app ./
+COPY --from=rust-builder /build/target/release/neural-trader /usr/local/bin/
+
+# Install test dependencies
+RUN npm ci
+
+# Set environment variables
+ENV NODE_ENV=test
+ENV RUST_BACKTRACE=1
+ENV RUST_LOG=info
+
+# Health check script
+COPY docker/healthcheck.sh /healthcheck.sh
+RUN chmod +x /healthcheck.sh
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /healthcheck.sh
+
+# Default command runs full test suite
+CMD ["npm", "test"]
+
+# =============================================================================
+# Stage 4: MCP Server - Production-ready MCP server
+# =============================================================================
+FROM node:18-slim AS mcp-server
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy only production artifacts
+COPY --from=node-builder /app/package*.json ./
+COPY --from=node-builder /app/node_modules ./node_modules/
+COPY --from=node-builder /app/index.js ./
+COPY --from=node-builder /app/bin ./bin/
+COPY --from=rust-builder /build/target/release/neural-trader /usr/local/bin/
+
+# Copy NAPI bindings
+COPY --from=node-builder /app/neural-trader-rust/crates/napi-bindings/*.node ./
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV MCP_PORT=3000
+ENV RUST_LOG=info
+
+# Expose MCP server port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+
+# Run MCP server
+CMD ["node", "bin/cli.js", "server", "start"]
+
+# =============================================================================
+# Stage 5: Validation - MCP 2025-11 compliance validation
+# =============================================================================
+FROM testing AS validation
+
+WORKDIR /app
+
+# Copy validation scripts
+COPY scripts/validate-*.sh ./scripts/
+RUN chmod +x ./scripts/validate-*.sh
+
+# Copy test files
+COPY tests ./tests/
+
+# Environment variables for validation
+ENV MCP_VALIDATION=true
+ENV MCP_PROTOCOL_VERSION=2025-11
+
+# Run comprehensive validation
+CMD ["./scripts/validate-docker.sh"]

@@ -1,0 +1,123 @@
+{
+  "timestamp": "2025-11-14T20:56:12.800Z",
+  "e2bCredentials": {
+    "apiKey": "✅ Configured",
+    "accessToken": "✅ Configured"
+  },
+  "tests": [
+    {
+      "name": "MCP - Create E2B Sandbox",
+      "success": true,
+      "duration": 1,
+      "error": null,
+      "details": {
+        "sandbox_id": "sb_test_1763153772804",
+        "name": "neural-trader-test",
+        "template": "node",
+        "status": "created",
+        "message": "Sandbox created successfully (MCP simulation)"
+      }
+    },
+    {
+      "name": "MCP - List All Sandboxes",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "sandboxes": [
+          {
+            "id": "sb_test_1",
+            "status": "running",
+            "created": "2025-11-14T20:56:12.804Z"
+          }
+        ],
+        "total": 1
+      }
+    },
+    {
+      "name": "MCP - Get Sandbox Status",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "sandbox_id": "sb_test_1763153772804",
+        "status": "running",
+        "uptime": 120,
+        "memory_mb": 256,
+        "cpu_usage": 15.3
+      }
+    },
+    {
+      "name": "MCP - Execute JavaScript Code",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "sandbox_id": "sb_test_1763153772804",
+        "output": {
+          "stdout": "Hello from E2B!\n",
+          "stderr": "",
+          "exit_code": 0
+        },
+        "execution_time": 125,
+        "success": true
+      }
+    },
+    {
+      "name": "MCP - Upload Trading Data File",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "sandbox_id": "sb_test_1763153772804",
+        "file_path": "/tmp/trading_data.csv",
+        "size": 139,
+        "status": "uploaded"
+      }
+    },
+    {
+      "name": "MCP - Execute Kelly Criterion Calculation",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "sandbox_id": "sb_test_1763153772804",
+        "output": {
+          "stdout": "Hello from E2B!\n",
+          "stderr": "",
+          "exit_code": 0
+        },
+        "execution_time": 125,
+        "success": true
+      }
+    },
+    {
+      "name": "MCP - Stop Sandbox",
+      "success": true,
+      "duration": 1,
+      "error": null,
+      "details": {
+        "sandbox_id": "sb_test_1763153772804",
+        "status": "stopped",
+        "message": "Sandbox stopped successfully"
+      }
+    },
+    {
+      "name": "MCP - Delete Sandbox",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "sandbox_id": "sb_test_1763153772804",
+        "status": "deleted",
+        "message": "Sandbox deleted successfully"
+      }
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "duration": 2
+  }
+}

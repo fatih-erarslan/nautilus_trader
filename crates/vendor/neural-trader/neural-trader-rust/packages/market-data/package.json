@@ -1,0 +1,80 @@
+{
+  "name": "@neural-trader/market-data",
+  "version": "2.1.1",
+  "description": "Market data providers for Neural Trader - Alpaca, Polygon, Yahoo Finance",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "load-binary.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "native"
+  ],
+  "scripts": {
+    "build": "napi build --platform --release --cargo-cwd ../../crates/napi-bindings --cargo-name nt-napi-bindings",
+    "build:all": "napi build --platform --release --target x86_64-unknown-linux-gnu --target x86_64-apple-darwin --target aarch64-apple-darwin --target x86_64-pc-windows-msvc --cargo-cwd ../../crates/napi-bindings --cargo-name nt-napi-bindings",
+    "clean": "rm -f *.node"
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "real-time",
+    "historical-data",
+    "market-data",
+    "streaming",
+    "websocket"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/market-data"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "detect-libc": "^2.0.2"
+  },
+  "peerDependencies": {
+    "@neural-trader/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "napi": {
+    "name": "neural-trader",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-gnu",
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        "aarch64-apple-darwin",
+        "x86_64-pc-windows-msvc"
+      ]
+    }
+  },
+  "optionalDependencies": {
+    "@neural-trader/market-data-linux-x64-gnu": "1.0.0",
+    "@neural-trader/market-data-linux-x64-musl": "1.0.0",
+    "@neural-trader/market-data-linux-arm64-gnu": "1.0.0",
+    "@neural-trader/market-data-darwin-x64": "1.0.0",
+    "@neural-trader/market-data-darwin-arm64": "1.0.0",
+    "@neural-trader/market-data-win32-x64-msvc": "1.0.0"
+  },
+  "homepage": "https://neural-trader.ruv.io"
+}

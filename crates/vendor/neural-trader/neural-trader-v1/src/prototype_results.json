@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-09-09T15:37:32.148846",
+  "metrics": {
+    "scrape_time_ms": 3.920727999684459,
+    "neural_time_ms": 3.167664000102377,
+    "scoring_time_ms": 2.1628410004268517,
+    "execution_time_ms": 8.13323100010166,
+    "total_time_ms": 17.467190000388655
+  },
+  "status": "success",
+  "target_met": true
+}

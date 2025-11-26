@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/odds_api_get_live_odds.json",
+  "title": "odds_api_get_live_odds",
+  "description": "Get live odds for a specific sport.",
+  "category": "odds_api",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sport": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "string",
+          "default": "us"
+        },
+        "markets": {
+          "type": "string",
+          "default": "h2h"
+        },
+        "odds_format": {
+          "type": "string",
+          "default": "decimal",
+          "enum": [
+            "decimal",
+            "american"
+          ]
+        },
+        "bookmakers": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sport"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "sport_key": {
+                "type": "string"
+              },
+              "commence_time": {
+                "type": "string"
+              },
+              "home_team": {
+                "type": "string"
+              },
+              "away_team": {
+                "type": "string"
+              },
+              "bookmakers": {
+                "type": "array"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

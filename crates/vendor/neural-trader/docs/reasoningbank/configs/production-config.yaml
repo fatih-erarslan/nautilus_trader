@@ -1,0 +1,439 @@
+# ReasoningBank E2B Swarm Production Configuration
+# Version: 1.0.0
+# Last Updated: 2025-11-14
+
+# ============================================================================
+# ENVIRONMENT CONFIGURATION
+# ============================================================================
+environment:
+  name: production
+  region: us-east-1
+  deployment_id: prod-reasoningbank-swarm-001
+  log_level: info
+  enable_profiling: false
+  enable_debug: false
+
+# ============================================================================
+# REASONINGBANK CONFIGURATION
+# ============================================================================
+reasoningbank:
+  # Database Configuration
+  database:
+    path: ./data/production/reasoning-bank.db
+    enable_wal: true
+    page_size: 4096
+    cache_size: 10000
+    synchronous: NORMAL
+    journal_mode: WAL
+
+  # Learning Parameters
+  learning:
+    enabled: true
+    learning_rate: 0.1
+    confidence_threshold: 0.75
+    min_usage_for_apply: 5
+    auto_learning: true
+    cross_domain_transfer: true
+    meta_learning: true
+
+  # Performance Optimization
+  performance:
+    cache_size: 2000
+    cache_ttl_seconds: 3600
+    enable_vector_index: true
+    index_type: approximate
+    index_dimensions: 1024
+    warm_cache_on_startup: true
+
+  # Judgment Configuration
+  judgment:
+    provider: anthropic
+    model: claude-sonnet-4-5-20250929
+    fallback_provider: openrouter
+    fallback_model: anthropic/claude-sonnet-3.5
+    max_judgments_per_day: 600
+    cost_limit_usd_per_day: 0.50
+    async_judgment: true
+    batch_judgments: true
+    judgment_priority: all
+    min_confidence_for_judgment: 0.5
+
+  # Storage Configuration
+  storage:
+    type: sqlite
+    backup_frequency: hourly
+    retention_days: 90
+    auto_prune: true
+    prune_threshold: 0.3
+    max_patterns: 50000
+    compression: true
+
+  # Embedding Configuration
+  embeddings:
+    type: hash_based
+    dimensions: 1024
+    normalize: true
+    cache_embeddings: true
+    embedding_ttl_seconds: 3600
+
+# ============================================================================
+# E2B SWARM CONFIGURATION
+# ============================================================================
+e2b_swarm:
+  # Topology Configuration
+  topology:
+    type: hierarchical
+    max_agents: 50
+    min_agents: 10
+    auto_scale: true
+    scale_metric: volatility
+    scale_up_threshold: 40.0
+    scale_down_threshold: 15.0
+
+  # Resource Allocation
+  resources:
+    tier: production_high_performance
+    cpu_cores: 4
+    memory_mb: 2048
+    disk_mb: 10240
+    network_mbps: 100
+    cost_cap_usd_per_hour: 0.40
+    gpu_enabled: false
+
+  # Agent Configuration
+  agents:
+    default_timeout_seconds: 14400
+    health_check_interval_seconds: 10
+    metrics_interval_seconds: 5
+    restart_on_failure: true
+    max_retries: 3
+    backoff_ms: 5000
+
+  # Coordination Protocol
+  coordination:
+    protocol: hierarchical
+    coordinator_redundancy: 2
+    heartbeat_interval_seconds: 5
+    consensus_threshold: 0.67
+    enable_gossip: true
+    gossip_fanout: 3
+
+  # Failover Configuration
+  failover:
+    enabled: true
+    max_failover_attempts: 3
+    failover_timeout_seconds: 30
+    preserve_state: true
+    backup_coordinator_count: 2
+
+# ============================================================================
+# TRADING CONFIGURATION
+# ============================================================================
+trading:
+  # Symbols
+  symbols:
+    - AAPL
+    - MSFT
+    - GOOGL
+    - AMZN
+    - TSLA
+    - META
+    - NVDA
+
+  # Strategies
+  strategies:
+    enabled:
+      - momentum
+      - mean_reversion
+      - neural_forecast
+
+    momentum:
+      period: 20
+      threshold: 0.02
+      learning_enabled: true
+
+    mean_reversion:
+      lookback: 50
+      std_dev_threshold: 2.0
+      learning_enabled: true
+
+    neural_forecast:
+      model: lstm
+      horizon: 10
+      confidence_threshold: 0.7
+      learning_enabled: true
+
+  # Risk Management
+  risk:
+    max_position_size_usd: 100000
+    max_portfolio_exposure: 0.25
+    stop_loss_pct: 0.05
+    take_profit_pct: 0.10
+    max_drawdown_pct: 0.15
+
+  # Execution
+  execution:
+    order_type: limit
+    slippage_tolerance_pct: 0.001
+    time_in_force: day
+    min_order_size_usd: 1000
+
+# ============================================================================
+# MONITORING CONFIGURATION
+# ============================================================================
+monitoring:
+  # Metrics Collection
+  metrics:
+    enabled: true
+    interval_seconds: 5
+    retention_days: 30
+    export_format: prometheus
+    export_endpoint: http://prometheus:9090/metrics
+
+  # Health Checks
+  health:
+    enabled: true
+    interval_seconds: 10
+    timeout_seconds: 5
+    failure_threshold: 3
+
+  # Alerting
+  alerts:
+    enabled: true
+    channels:
+      - slack
+      - email
+      - pagerduty
+
+    thresholds:
+      pattern_confidence_min: 0.60
+      retrieval_latency_max_ms: 100
+      judgment_failure_rate_max: 0.05
+      memory_usage_max_pct: 80
+      agent_failure_rate_max: 0.10
+      cost_overrun_max_usd: 500
+
+    severity_levels:
+      critical:
+        - agent_crashes
+        - database_errors
+        - authentication_failures
+      high:
+        - high_latency
+        - cost_overrun
+        - agent_failure_spike
+      medium:
+        - low_confidence_patterns
+        - memory_pressure
+      low:
+        - info_notifications
+
+# ============================================================================
+# SECURITY CONFIGURATION
+# ============================================================================
+security:
+  # Authentication
+  authentication:
+    provider: e2b
+    api_key_env: E2B_API_KEY
+    refresh_token_interval_hours: 24
+
+  # Encryption
+  encryption:
+    enabled: true
+    algorithm: AES-256-GCM
+    key_rotation_days: 90
+    encrypt_patterns: true
+    encrypt_trajectories: true
+
+  # Network Security
+  network:
+    vpc_id: vpc-prod-001
+    subnet: private
+    security_groups:
+      - sg-trading-agents
+      - sg-reasoningbank
+    allowed_ips:
+      - 10.0.0.0/8
+    blocked_ips: []
+
+  # Access Control
+  access_control:
+    rbac_enabled: true
+    mfa_required: true
+    session_timeout_minutes: 60
+    audit_logging: true
+
+# ============================================================================
+# COST MANAGEMENT
+# ============================================================================
+cost_management:
+  # Budgets
+  budgets:
+    daily_limit_usd: 500
+    monthly_limit_usd: 15000
+    quarterly_limit_usd: 45000
+
+  # Cost Allocation
+  allocation:
+    e2b_sandboxes: 84
+    reasoningbank_storage: 1
+    llm_judgment: 10
+    bandwidth: 2
+    monitoring: 1
+    development: 2
+
+  # Optimization
+  optimization:
+    enable_cost_optimization: true
+    use_spot_instances: false
+    auto_shutdown_idle_agents: true
+    idle_timeout_minutes: 30
+    scale_down_on_low_volatility: true
+
+  # Reporting
+  reporting:
+    frequency: daily
+    recipients:
+      - finance@company.com
+      - operations@company.com
+    include_breakdown: true
+    include_forecasts: true
+
+# ============================================================================
+# BACKUP & DISASTER RECOVERY
+# ============================================================================
+backup:
+  # Database Backups
+  database:
+    enabled: true
+    frequency: hourly
+    retention_days: 90
+    storage_location: s3://neural-trader-backups/reasoningbank/
+    encryption: true
+    compression: true
+
+  # State Snapshots
+  snapshots:
+    enabled: true
+    frequency: every_6_hours
+    retention_count: 28
+    include_agent_state: true
+    include_swarm_config: true
+
+  # Disaster Recovery
+  disaster_recovery:
+    rpo_minutes: 60
+    rto_minutes: 30
+    multi_region: true
+    backup_regions:
+      - us-west-2
+      - eu-west-1
+    automated_failover: true
+
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+logging:
+  # Log Levels
+  levels:
+    root: info
+    reasoningbank: info
+    e2b: info
+    trading: info
+    monitoring: warn
+
+  # Output
+  output:
+    console: true
+    file: true
+    syslog: false
+
+  # File Logging
+  file:
+    path: ./logs/production/
+    rotation: daily
+    retention_days: 30
+    max_size_mb: 100
+    compression: true
+
+  # Structured Logging
+  structured:
+    enabled: true
+    format: json
+    include_timestamps: true
+    include_caller: true
+    include_stack_trace: true
+
+# ============================================================================
+# FEATURE FLAGS
+# ============================================================================
+feature_flags:
+  # ReasoningBank Features
+  reasoningbank_learning: true
+  cross_domain_transfer: true
+  meta_learning: true
+  pattern_sharing: true
+  async_judgment: true
+
+  # E2B Features
+  auto_scaling: true
+  multi_region: true
+  blue_green_deployment: false
+  canary_deployment: false
+
+  # Advanced Features
+  neural_integration: false
+  quantum_resistant_encryption: false
+  distributed_reasoningbank: false
+  real_time_streaming: false
+
+# ============================================================================
+# INTEGRATION ENDPOINTS
+# ============================================================================
+integrations:
+  # Market Data
+  market_data:
+    provider: polygon
+    api_key_env: POLYGON_API_KEY
+    websocket_url: wss://socket.polygon.io/stocks
+
+  # Execution
+  execution:
+    provider: alpaca
+    api_key_env: ALPACA_API_KEY
+    api_secret_env: ALPACA_SECRET_KEY
+    base_url: https://api.alpaca.markets
+
+  # Monitoring
+  monitoring:
+    prometheus_url: http://prometheus:9090
+    grafana_url: http://grafana:3000
+
+  # Notifications
+  notifications:
+    slack_webhook_env: SLACK_WEBHOOK_URL
+    email_smtp: smtp.gmail.com:587
+    pagerduty_api_key_env: PAGERDUTY_API_KEY
+
+# ============================================================================
+# EXPERIMENTAL SETTINGS
+# ============================================================================
+experimental:
+  # Advanced Learning
+  advanced_learning:
+    enable_transfer_learning: false
+    enable_few_shot_learning: false
+    enable_zero_shot_learning: false
+
+  # Performance
+  performance:
+    enable_wasm_acceleration: false
+    enable_gpu_acceleration: false
+    enable_distributed_cache: false
+
+  # Research
+  research:
+    enable_pattern_visualization: false
+    enable_learning_curves_export: false
+    enable_ablation_studies: false

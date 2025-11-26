@@ -1,0 +1,31 @@
+[package]
+name = "neural-trader-predictor-wasm"
+version = "0.1.0"
+edition = "2021"
+authors = ["Neural Trader Team <team@neural-trader.io>"]
+description = "WebAssembly bindings for conformal prediction"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+neural-trader-predictor = { path = "../", features = ["wasm"] }
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+console_error_panic_hook = "0.1"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["console"] }
+getrandom = { version = "0.2", features = ["js"] }
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true
+codegen-units = 1
+strip = true
+
+[package.metadata.wasm-opt]
+wasm-opt = false

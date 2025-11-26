@@ -1,0 +1,61 @@
+{
+  "timestamp": "2025-06-23T21:10:59.709732",
+  "transformation_complete": false,
+  "before_metrics": {
+    "annual_return": -0.919,
+    "sharpe_ratio": -2.15,
+    "max_drawdown": 0.808,
+    "win_rate": 0.25,
+    "total_trades": 150
+  },
+  "after_metrics": {
+    "annual_return": 0.339092740143815,
+    "sharpe_ratio": 16.692015834467423,
+    "max_drawdown": 0.0009405442884014207,
+    "win_rate": 0.9941860465116279,
+    "total_trades": 172
+  },
+  "improvements": {
+    "return_improvement": 1.2580927401438151,
+    "sharpe_improvement": 18.84201583446742,
+    "drawdown_reduction": 0.8070594557115987,
+    "win_rate_improvement": 0.7441860465116279
+  },
+  "test_results": {
+    "parameters": {
+      "thresholds_correct": true,
+      "position_sizing_correct": true,
+      "lookback_periods_correct": true,
+      "all_parameters_valid": true
+    },
+    "dual_momentum": {
+      "strong_momentum_score": 0.8298033333333333,
+      "weak_momentum_score": 0.0,
+      "reversal_pattern_score": 0.2938008,
+      "algorithm_working": false
+    },
+    "risk_controls": {
+      "stop_loss_implemented": false,
+      "volatility_adjustment_working": true,
+      "regime_detection_active": true,
+      "all_risk_controls_valid": false
+    },
+    "regime_adaptation": {
+      "bull_market": {
+        "detected_regime": "bull_market",
+        "position_size": 0.12374399999999998,
+        "action": "BUY"
+      },
+      "bear_market": {
+        "detected_regime": "bear_market",
+        "position_size": 0.023,
+        "action": "HOLD"
+      },
+      "high_volatility": {
+        "detected_regime": "high_volatility",
+        "position_size": 0.023,
+        "action": "HOLD"
+      }
+    }
+  }
+}

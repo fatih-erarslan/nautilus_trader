@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_syndicate_allocation_limits.json",
+  "title": "get_syndicate_allocation_limits",
+  "description": "Get allocation limits and risk constraints.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "syndicate_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "max_single_bet": {
+          "type": "number"
+        },
+        "max_total_exposure": {
+          "type": "number"
+        },
+        "max_correlated_exposure": {
+          "type": "number"
+        },
+        "min_bankroll_reserve": {
+          "type": "number"
+        },
+        "kelly_multiplier": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "max_single_bet",
+        "max_total_exposure"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

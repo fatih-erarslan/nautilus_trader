@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_sports_betting_performance.json",
+  "title": "get_sports_betting_performance",
+  "description": "Get sports betting performance analytics.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "period_days": {
+          "type": "integer",
+          "default": 30
+        },
+        "include_detailed_analysis": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "total_bets": {
+          "type": "integer"
+        },
+        "win_rate": {
+          "type": "number"
+        },
+        "roi": {
+          "type": "number"
+        },
+        "profit_loss": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

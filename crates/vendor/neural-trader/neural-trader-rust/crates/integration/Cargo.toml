@@ -1,0 +1,143 @@
+[package]
+name = "neural-trader-integration"
+version = "2.0.0"
+edition = "2021"
+authors = ["Neural Trader Team"]
+description = "Integration layer unifying all Neural Trader crates - complete trading system with REST API"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ruvnet/neural-trader"
+documentation = "https://docs.rs/neural-trader-integration"
+readme = "README.md"
+keywords = ["trading", "integration", "api", "finance", "neural"]
+categories = ["finance", "web-programming", "asynchronous"]
+
+[dependencies]
+# Internal crates - all 17 components
+nt-risk = { version = "2.0.0", path = "../risk" }
+multi-market = { version = "2.0.0", path = "../multi-market" }
+neural-trader-distributed = { version = "2.0.0", path = "../distributed" }
+
+# Core async runtime
+tokio = { version = "1.35", features = ["full", "tracing"] }
+tokio-util = { version = "0.7", features = ["codec", "time"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Configuration management
+config = { version = "0.14", features = ["toml", "json", "yaml"] }
+dotenvy = "0.15"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+color-eyre = "0.6"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+tracing-opentelemetry = "0.22"
+
+# HTTP server (REST API)
+axum = { version = "0.7", features = ["ws", "macros", "multipart"] }
+tower = { version = "0.4", features = ["full"] }
+tower-http = { version = "0.5", features = ["trace", "cors", "compression-full"] }
+hyper = { version = "0.14", features = ["full"] }
+
+# WebSocket
+tokio-tungstenite = "0.21"
+
+# CLI
+clap = { version = "4.4", features = ["derive", "env", "cargo"] }
+clap_complete = "4.4"
+indicatif = "0.17"
+console = "0.15"
+dialoguer = "0.11"
+
+# Data structures
+dashmap = "5.5"
+parking_lot = "0.12"
+arc-swap = "1.6"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+time = "0.3"
+
+# Decimal math
+rust_decimal = { version = "1.33", features = ["serde-float"] }
+
+# Metrics and monitoring
+metrics = "0.21"
+metrics-exporter-prometheus = "0.13"
+prometheus = "0.13"
+
+# Distributed tracing
+opentelemetry = "0.21"
+opentelemetry-jaeger = "0.20"
+
+# Connection pooling
+deadpool = "0.10"
+bb8 = "0.8"
+
+# Rate limiting
+governor = "0.6"
+
+# Validation
+validator = { version = "0.16", features = ["derive"] }
+
+# State management
+state = "0.6"
+
+# JSON Web Tokens
+jsonwebtoken = "9.2"
+
+# UUID
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Signal handling
+signal-hook = "0.3"
+signal-hook-tokio = { version = "0.3", features = ["futures-v0_3"] }
+
+# Performance
+rayon = "1.8"
+
+# Development dependencies
+[dev-dependencies]
+criterion = { version = "0.5", features = ["async_tokio"] }
+mockall = "0.12"
+tokio-test = "0.4"
+proptest = "1.4"
+approx = "0.5"
+wiremock = "0.5"
+tempfile = "3.8"
+
+[features]
+default = []
+full = ["gpu", "distributed", "all-markets"]
+gpu = ["nt-risk/gpu"]
+distributed = []
+all-markets = ["multi-market/all"]
+
+# Market-specific features
+sports-betting = ["multi-market/sports"]
+prediction-markets = ["multi-market/prediction"]
+crypto-trading = ["multi-market/crypto"]
+
+# Development features
+dev = []
+testing = []
+
+[[bin]]
+name = "neural-trader"
+path = "src/bin/main.rs"
+
+[[bench]]
+name = "integration_bench"
+harness = false
+
+# Profile settings are managed at workspace root

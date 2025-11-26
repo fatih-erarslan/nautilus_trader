@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/monitor_swarm_health.json",
+  "title": "monitor_swarm_health",
+  "description": "Monitor E2B swarm health with real-time metrics and alerts.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "interval": {
+          "type": "integer",
+          "default": 60,
+          "minimum": 10
+        },
+        "alerts": {
+          "type": "object",
+          "properties": {
+            "failure_threshold": {
+              "type": "number",
+              "default": 0.2
+            },
+            "latency_threshold": {
+              "type": "number",
+              "default": 1000
+            },
+            "error_rate_threshold": {
+              "type": "number",
+              "default": 0.05
+            }
+          }
+        },
+        "include_system_metrics": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "swarm_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "health_status": {
+          "type": "string",
+          "enum": [
+            "healthy",
+            "degraded",
+            "critical"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "cpu_usage": {
+              "type": "number"
+            },
+            "memory_usage": {
+              "type": "number"
+            },
+            "network_latency_ms": {
+              "type": "number"
+            },
+            "error_rate": {
+              "type": "number"
+            },
+            "uptime_seconds": {
+              "type": "number"
+            }
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "severity": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "agent_health": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "last_heartbeat": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "swarm_id",
+        "health_status",
+        "timestamp"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

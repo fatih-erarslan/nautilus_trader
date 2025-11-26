@@ -1,0 +1,33 @@
+BENCHMARK REPORT: QUICK
+============================================================
+Session ID: 20250623_205738
+Start Time: 2025-06-23T20:57:38.040449
+Duration: 210.15 seconds
+Status: COMPLETED
+
+SUMMARY:
+  Total Tests: 8
+  Passed: 5
+  Failed: 3
+  Performance Targets Met: No
+
+KEY METRICS:
+  signal_latency_p95_ms: 8.125325549917761
+  signal_throughput_ops_sec: 0.0
+
+PERFORMANCE VALIDATION:
+  LATENCY:
+    signal_generation: PASS
+    data_processing: PASS
+    risk_calculation: PASS
+  THROUGHPUT:
+    signal_generation: FAIL
+
+RECOMMENDATIONS:
+  - Address 3 failed tests
+  - Performance targets not met - consider optimization
+
+ERRORS:
+  throughput.data_processing: 'ThroughputBenchmark' object has no attribute 'benchmark_data_processing_throughput'
+  throughput.portfolio_optimization: 'ThroughputBenchmark' object has no attribute 'benchmark_portfolio_optimization_throughput'
+  latency.portfolio_update: Unknown benchmark: portfolio_update

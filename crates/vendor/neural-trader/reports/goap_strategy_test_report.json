@@ -1,0 +1,207 @@
+{
+  "test_summary": {
+    "total_scenarios_tested": 4,
+    "average_performance_score": 50.0,
+    "test_timestamp": "2025-09-23T15:21:15.908808"
+  },
+  "scenario_results": [
+    {
+      "scenario": "bull_market_strong_signal",
+      "timestamp": "2025-09-23T15:21:15.908418",
+      "market_conditions": {
+        "regime": "bull",
+        "signal_strength": 0.8275,
+        "correlation_risk": 0.3
+      },
+      "strategy_response": {
+        "planned_actions": [
+          "calculate_position_size",
+          "analyze_institutional_flows",
+          "dynamic_stop_loss",
+          "evaluate_insider_transactions",
+          "execute_mirror_trade"
+        ],
+        "recommended_action": "calculate_position_size",
+        "adaptive_parameters": {
+          "confidence_threshold": 0.741,
+          "institutional_weight": 0.85,
+          "insider_weight": 0.65,
+          "base_position_size": 0.02,
+          "max_position_size": 0.08,
+          "kelly_fraction_range": [
+            0.2,
+            0.5
+          ],
+          "stop_loss_base": -0.06,
+          "profit_threshold": 0.28,
+          "correlation_limit": 0.35,
+          "volatility_scalar": true,
+          "regime_detection": true,
+          "momentum_filter": 0.15,
+          "timeframe_weights": {
+            "intraday": 0.25,
+            "daily": 0.35,
+            "weekly": 0.25,
+            "monthly": 0.15
+          }
+        }
+      },
+      "performance_assessment": {
+        "score": 60,
+        "rationale": [
+          "Correctly planned trade execution for strong signal",
+          "Appropriately aggressive threshold for bull market",
+          "Included dynamic risk management"
+        ]
+      }
+    },
+    {
+      "scenario": "bear_market_high_correlation",
+      "timestamp": "2025-09-23T15:21:15.908543",
+      "market_conditions": {
+        "regime": "bear",
+        "signal_strength": 0.43999999999999995,
+        "correlation_risk": 0.75
+      },
+      "strategy_response": {
+        "planned_actions": [
+          "analyze_institutional_flows",
+          "dynamic_stop_loss",
+          "adjust_correlations",
+          "execute_mirror_trade"
+        ],
+        "recommended_action": "analyze_institutional_flows",
+        "adaptive_parameters": {
+          "confidence_threshold": 0.8580000000000001,
+          "institutional_weight": 0.85,
+          "insider_weight": 0.65,
+          "base_position_size": 0.013999999999999999,
+          "max_position_size": 0.08,
+          "kelly_fraction_range": [
+            0.05,
+            0.25
+          ],
+          "stop_loss_base": -0.048,
+          "profit_threshold": 0.28,
+          "correlation_limit": 0.35,
+          "volatility_scalar": true,
+          "regime_detection": true,
+          "momentum_filter": 0.15,
+          "timeframe_weights": {
+            "intraday": 0.25,
+            "daily": 0.35,
+            "weekly": 0.25,
+            "monthly": 0.15
+          }
+        }
+      },
+      "performance_assessment": {
+        "score": 70,
+        "rationale": [
+          "Correctly prioritized correlation adjustment",
+          "Appropriately conservative in bear market",
+          "Included dynamic risk management"
+        ]
+      }
+    },
+    {
+      "scenario": "sideways_market_mixed_signals",
+      "timestamp": "2025-09-23T15:21:15.908655",
+      "market_conditions": {
+        "regime": "sideways",
+        "signal_strength": 0.53,
+        "correlation_risk": 0.491
+      },
+      "strategy_response": {
+        "planned_actions": [
+          "analyze_institutional_flows",
+          "dynamic_stop_loss",
+          "adjust_correlations"
+        ],
+        "recommended_action": "analyze_institutional_flows",
+        "adaptive_parameters": {
+          "confidence_threshold": 0.78,
+          "institutional_weight": 0.85,
+          "insider_weight": 0.65,
+          "base_position_size": 0.02,
+          "max_position_size": 0.08,
+          "kelly_fraction_range": [
+            0.1,
+            0.5
+          ],
+          "stop_loss_base": -0.06,
+          "profit_threshold": 0.28,
+          "correlation_limit": 0.35,
+          "volatility_scalar": true,
+          "regime_detection": true,
+          "momentum_filter": 0.15,
+          "timeframe_weights": {
+            "intraday": 0.25,
+            "daily": 0.35,
+            "weekly": 0.25,
+            "monthly": 0.15
+          }
+        }
+      },
+      "performance_assessment": {
+        "score": 10,
+        "rationale": [
+          "Included dynamic risk management"
+        ]
+      }
+    },
+    {
+      "scenario": "high_volatility_defensive",
+      "timestamp": "2025-09-23T15:21:15.908762",
+      "market_conditions": {
+        "regime": "sideways",
+        "signal_strength": 0.42,
+        "correlation_risk": 0.491
+      },
+      "strategy_response": {
+        "planned_actions": [
+          "analyze_institutional_flows",
+          "dynamic_stop_loss",
+          "adjust_correlations"
+        ],
+        "recommended_action": "analyze_institutional_flows",
+        "adaptive_parameters": {
+          "confidence_threshold": 0.78,
+          "institutional_weight": 0.85,
+          "insider_weight": 0.65,
+          "base_position_size": 0.013999999999999999,
+          "max_position_size": 0.08,
+          "kelly_fraction_range": [
+            0.1,
+            0.5
+          ],
+          "stop_loss_base": -0.048,
+          "profit_threshold": 0.28,
+          "correlation_limit": 0.35,
+          "volatility_scalar": true,
+          "regime_detection": true,
+          "momentum_filter": 0.15,
+          "timeframe_weights": {
+            "intraday": 0.25,
+            "daily": 0.35,
+            "weekly": 0.25,
+            "monthly": 0.15
+          }
+        }
+      },
+      "performance_assessment": {
+        "score": 60,
+        "rationale": [
+          "Tightened stop losses for high volatility",
+          "Reduced position sizes for volatility",
+          "Included dynamic risk management"
+        ]
+      }
+    }
+  ],
+  "recommendations": [
+    "Strategy needs significant improvement before deployment",
+    "Review action sequences and adaptive parameters",
+    "Poor performance in sideways_market_mixed_signals - review strategy logic"
+  ]
+}

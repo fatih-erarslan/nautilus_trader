@@ -1,0 +1,80 @@
+# Source files
+src/
+crates/
+tests/
+benches/
+target/
+*.rs
+Cargo.toml
+Cargo.lock
+
+# Build artifacts
+*.node
+!index.js
+!index.d.ts
+
+# Documentation (use npm package for docs)
+*.md
+!README.md
+
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+.env*
+!.env.example
+
+# Test files
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+coverage/
+.nyc_output/
+
+# Build config
+.dockerignore
+Dockerfile
+docker-compose.yml
+rust-toolchain.toml
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+azure-pipelines.yml
+
+# Scripts
+scripts/
+build.rs
+
+# Config
+config/
+sql/
+
+# Documentation source
+docs/source/
+docs/diagrams/
+
+# Temporary files
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Claude Flow
+.claude-flow/

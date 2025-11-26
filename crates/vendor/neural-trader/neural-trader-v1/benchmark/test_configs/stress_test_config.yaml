@@ -1,0 +1,312 @@
+# Stress Test Configuration for AI News Trading Benchmark System
+# This configuration defines settings for stress testing and extreme load validation
+
+test_categories:
+  stress:
+    enabled: true
+    timeout: 3600  # 60 minutes for extensive stress testing
+    parallel_execution: true
+    max_workers: 8  # Use all available cores for stress testing
+    aggressive_mode: true
+    
+performance_validation:
+  enabled: true
+  strict_mode: false  # More lenient under stress conditions
+  tolerance_percent: 50  # Expect significant performance degradation under stress
+
+reporting:
+  formats: ["json", "html", "csv"]
+  output_dir: "./test_results/stress"
+  detailed_logs: true
+  include_metrics: true
+  include_system_metrics: true
+  failure_analysis: true
+
+environment_checks:
+  system_resources: true
+  dependencies: true
+  connectivity: true
+  stress_mode: true
+
+stress_test_scenarios:
+  extreme_load:
+    enabled: true
+    description: "Test system behavior under extreme load conditions"
+    duration_minutes: 30
+    
+    load_characteristics:
+      concurrent_users: 500
+      requests_per_second: 10000
+      concurrent_symbols: 1000
+      data_volume_multiplier: 50
+      
+    expected_behavior:
+      graceful_degradation: true
+      max_acceptable_latency_ms: 1000
+      min_acceptable_throughput_percent: 20  # 20% of normal throughput
+      max_memory_usage_gb: 8
+      max_error_rate_percent: 10
+
+  memory_stress:
+    enabled: true
+    description: "Test memory usage under stress conditions"
+    duration_minutes: 45
+    
+    memory_pressure:
+      large_data_structures: true
+      frequent_allocations: true
+      minimal_gc: false
+      memory_multiplier: 10
+      
+    thresholds:
+      max_memory_growth_mb_per_min: 100
+      max_total_memory_gb: 6
+      min_gc_efficiency: 0.5
+      memory_leak_detection: true
+
+  network_stress:
+    enabled: true
+    description: "Test network resilience under high load"
+    duration_minutes: 20
+    
+    network_conditions:
+      high_latency_ms: 500
+      packet_loss_percent: 5
+      bandwidth_limit_mbps: 10
+      connection_interruptions: true
+      
+    resilience_requirements:
+      max_reconnection_time_seconds: 30
+      data_integrity_maintained: true
+      graceful_degradation: true
+
+  cpu_stress:
+    enabled: true
+    description: "Test CPU intensive operations"
+    duration_minutes: 25
+    
+    cpu_load:
+      computational_intensity: "high"
+      parallel_processing: true
+      cpu_bound_operations: true
+      target_cpu_usage_percent: 95
+      
+    performance_expectations:
+      latency_degradation_max_percent: 200
+      throughput_degradation_max_percent: 50
+      system_stability: true
+
+  io_stress:
+    enabled: true
+    description: "Test disk and network I/O under stress"
+    duration_minutes: 20
+    
+    io_characteristics:
+      large_file_operations: true
+      frequent_reads_writes: true
+      concurrent_io_operations: 100
+      io_intensive_workload: true
+      
+    limits:
+      max_disk_usage_gb: 10
+      max_io_wait_percent: 50
+      min_io_throughput_mbps: 50
+
+failure_injection:
+  # Chaos engineering - inject failures to test resilience
+  enabled: true
+  
+  failure_types:
+    network_failures:
+      connection_drops: true
+      timeout_injection: true
+      packet_corruption: false  # Too disruptive for CI
+      dns_failures: true
+      
+    resource_failures:
+      memory_exhaustion: true
+      disk_full_simulation: false  # Dangerous in CI
+      cpu_throttling: true
+      
+    service_failures:
+      random_exceptions: true
+      data_corruption: false  # Too risky
+      slow_responses: true
+      service_unavailability: true
+      
+  injection_schedule:
+    random_intervals: true
+    min_interval_seconds: 60
+    max_interval_seconds: 300
+    failure_duration_seconds: 30
+
+load_patterns:
+  # Different load patterns for stress testing
+  spike_load:
+    description: "Sudden spike in load"
+    baseline_rps: 1000
+    spike_rps: 20000
+    spike_duration_seconds: 60
+    recovery_time_seconds: 120
+    
+  oscillating_load:
+    description: "Oscillating between high and low load"
+    min_rps: 500
+    max_rps: 8000
+    cycle_duration_seconds: 180
+    oscillation_count: 10
+    
+  sustained_overload:
+    description: "Sustained load above capacity"
+    target_rps: 15000  # Well above normal capacity
+    duration_minutes: 15
+    ramp_up_minutes: 2
+    
+  random_burst:
+    description: "Random bursts of high activity"
+    baseline_rps: 1000
+    burst_rps: 10000
+    burst_probability: 0.1  # 10% chance per minute
+    burst_duration_seconds: 30
+
+resource_limits:
+  # Resource limits during stress testing
+  max_memory_gb: 8  # Higher limit for stress tests
+  max_cpu_percent: 100  # Allow full CPU usage
+  max_disk_io_mbps: 1000
+  max_network_io_mbps: 500
+  max_open_files: 10000
+  max_connections: 5000
+
+monitoring:
+  # Enhanced monitoring during stress tests
+  enabled: true
+  high_frequency_sampling: true
+  sampling_interval_seconds: 1
+  
+  critical_metrics:
+    - "memory_usage_mb"
+    - "cpu_usage_percent"
+    - "response_time_p99_ms"
+    - "error_rate_percent"
+    - "active_connections"
+    - "queue_depth"
+    - "gc_frequency"
+    - "swap_usage_mb"
+    
+  alerts:
+    memory_usage_gb: 7  # Alert at 7GB
+    cpu_usage_percent: 95
+    error_rate_percent: 20
+    response_time_p99_ms: 2000
+
+recovery_testing:
+  # Test system recovery after stress
+  enabled: true
+  
+  recovery_scenarios:
+    gradual_load_reduction:
+      enabled: true
+      reduction_rate_percent_per_minute: 20
+      target_recovery_minutes: 5
+      
+    immediate_load_stop:
+      enabled: true
+      recovery_timeout_minutes: 10
+      expected_recovery_time_seconds: 60
+      
+    partial_service_restoration:
+      enabled: true
+      restore_percentage: 50
+      monitor_stability_minutes: 5
+
+stability_testing:
+  # Long-term stability under moderate stress
+  enabled: true
+  duration_hours: 2  # 2-hour soak test
+  
+  load_characteristics:
+    steady_rps: 2000  # Above normal but sustainable
+    data_retention_hours: 8
+    continuous_monitoring: true
+    
+  stability_metrics:
+    memory_leak_detection: true
+    performance_degradation_tracking: true
+    error_rate_trending: true
+    resource_utilization_analysis: true
+
+breaking_point_analysis:
+  # Find the actual breaking point of the system
+  enabled: true
+  
+  methodology:
+    incremental_load_increase: true
+    step_size_rps: 500
+    step_duration_minutes: 5
+    failure_criteria:
+      - "error_rate_percent > 50"
+      - "response_time_p99_ms > 5000"
+      - "memory_usage_gb > 7"
+      - "system_unresponsive"
+      
+  analysis:
+    identify_bottlenecks: true
+    resource_utilization_at_failure: true
+    failure_mode_analysis: true
+
+quality_gates:
+  # Quality gates for stress testing
+  system_resilience:
+    no_crashes: true
+    graceful_degradation: true
+    recovery_within_sla: true
+    
+  data_integrity:
+    no_data_loss: true
+    no_data_corruption: true
+    consistent_state: true
+    
+  performance_bounds:
+    max_latency_under_stress_ms: 2000
+    min_throughput_under_stress_percent: 10
+    max_memory_usage_stress_gb: 8
+
+reporting:
+  # Specialized reporting for stress tests
+  stress_analysis:
+    enabled: true
+    include_failure_analysis: true
+    include_recovery_analysis: true
+    include_breaking_point_analysis: true
+    
+  comparison:
+    baseline_performance: true
+    degradation_analysis: true
+    recovery_comparison: true
+    
+  recommendations:
+    capacity_planning: true
+    optimization_suggestions: true
+    architecture_recommendations: true
+
+cleanup:
+  # Aggressive cleanup after stress tests
+  after_each_scenario: true
+  after_suite: true
+  force_cleanup: true
+  system_restart_if_needed: false  # Don't restart in CI
+
+safety:
+  # Safety measures for stress testing
+  enabled: true
+  
+  circuit_breakers:
+    memory_usage_gb: 7.5  # Stop test if memory > 7.5GB
+    system_load_average: 20
+    disk_usage_percent: 90
+    
+  automatic_abort:
+    system_unresponsive_seconds: 120
+    critical_error_count: 50
+    resource_exhaustion: true

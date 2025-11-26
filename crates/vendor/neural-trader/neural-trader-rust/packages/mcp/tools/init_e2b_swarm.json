@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/init_e2b_swarm.json",
+  "title": "init_e2b_swarm",
+  "description": "Initialize E2B trading swarm with specified topology and configuration. Creates a distributed trading system with multiple coordinated agents.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topology": {
+          "type": "string",
+          "enum": [
+            "mesh",
+            "hierarchical",
+            "ring",
+            "star"
+          ],
+          "description": "Network topology for swarm coordination"
+        },
+        "maxAgents": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 50
+        },
+        "strategy": {
+          "type": "string",
+          "default": "balanced",
+          "enum": [
+            "balanced",
+            "aggressive",
+            "conservative",
+            "adaptive"
+          ]
+        },
+        "sharedMemory": {
+          "type": "boolean",
+          "default": true
+        },
+        "autoScale": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "topology"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "topology": {
+          "type": "string"
+        },
+        "max_agents": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "initializing",
+            "active",
+            "error"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "swarm_id",
+        "topology",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "e2b:example": "node examples/e2b-sandbox-example.js",
+    "e2b:test": "jest tests/e2b/sandbox-manager.test.js",
+    "e2b:test:watch": "jest tests/e2b/sandbox-manager.test.js --watch"
+  }
+}

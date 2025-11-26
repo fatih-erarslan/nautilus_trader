@@ -1,0 +1,185 @@
+{
+  "model_path": "/tmp/tmpi7b341d8/test_model.json",
+  "optimization_config": {
+    "trials": 10,
+    "metric": "rmse",
+    "gpu_used": false,
+    "timeout": 300,
+    "param_space": {
+      "learning_rate": [
+        1e-05,
+        0.1
+      ],
+      "batch_size": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "hidden_size": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "num_layers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "dropout": [
+        0.0,
+        0.5
+      ],
+      "epochs": [
+        50,
+        100,
+        200,
+        300
+      ]
+    }
+  },
+  "best_parameters": {
+    "learning_rate": 0.054688684006285335,
+    "batch_size": "32",
+    "hidden_size": "64",
+    "num_layers": "2",
+    "dropout": 0.4002876033305312,
+    "epochs": "300"
+  },
+  "best_score": 0.050650201277064835,
+  "optimization_timestamp": "2025-06-26T20:23:03.241461",
+  "trial_history": [
+    {
+      "trial": 1,
+      "params": {
+        "learning_rate": 0.007421747832875036,
+        "batch_size": "64",
+        "hidden_size": "128",
+        "num_layers": "3",
+        "dropout": 0.34791270415807607,
+        "epochs": "100"
+      },
+      "score": 0.13483408131745853,
+      "is_best": true
+    },
+    {
+      "trial": 2,
+      "params": {
+        "learning_rate": 0.00810854136979912,
+        "batch_size": "32",
+        "hidden_size": "128",
+        "num_layers": "2",
+        "dropout": 0.42800113564114145,
+        "epochs": "50"
+      },
+      "score": 0.11772355094135013,
+      "is_best": true
+    },
+    {
+      "trial": 3,
+      "params": {
+        "learning_rate": 0.0822479806228557,
+        "batch_size": "16",
+        "hidden_size": "256",
+        "num_layers": "4",
+        "dropout": 0.3617494328025177,
+        "epochs": "200"
+      },
+      "score": 0.1255560666732528,
+      "is_best": false
+    },
+    {
+      "trial": 4,
+      "params": {
+        "learning_rate": 0.04710735946977176,
+        "batch_size": "32",
+        "hidden_size": "64",
+        "num_layers": "3",
+        "dropout": 0.2631076166040926,
+        "epochs": "300"
+      },
+      "score": 0.09195962203972888,
+      "is_best": true
+    },
+    {
+      "trial": 5,
+      "params": {
+        "learning_rate": 0.0802442737783789,
+        "batch_size": "64",
+        "hidden_size": "128",
+        "num_layers": "3",
+        "dropout": 0.30844006992293904,
+        "epochs": "200"
+      },
+      "score": 0.05162361026305383,
+      "is_best": true
+    },
+    {
+      "trial": 6,
+      "params": {
+        "learning_rate": 0.03930926914293655,
+        "batch_size": "32",
+        "hidden_size": "64",
+        "num_layers": "2",
+        "dropout": 0.4168123457575804,
+        "epochs": "200"
+      },
+      "score": 0.09310628479361757,
+      "is_best": false
+    },
+    {
+      "trial": 7,
+      "params": {
+        "learning_rate": 0.054688684006285335,
+        "batch_size": "32",
+        "hidden_size": "64",
+        "num_layers": "2",
+        "dropout": 0.4002876033305312,
+        "epochs": "300"
+      },
+      "score": 0.050650201277064835,
+      "is_best": true
+    },
+    {
+      "trial": 8,
+      "params": {
+        "learning_rate": 0.004672154957960078,
+        "batch_size": "64",
+        "hidden_size": "128",
+        "num_layers": "1",
+        "dropout": 0.1895824751386188,
+        "epochs": "100"
+      },
+      "score": 0.17204217194510102,
+      "is_best": false
+    },
+    {
+      "trial": 9,
+      "params": {
+        "learning_rate": 0.020138081182351122,
+        "batch_size": "64",
+        "hidden_size": "256",
+        "num_layers": "1",
+        "dropout": 0.46397828281152576,
+        "epochs": "200"
+      },
+      "score": 0.07409027059782819,
+      "is_best": false
+    },
+    {
+      "trial": 10,
+      "params": {
+        "learning_rate": 0.09073214661527405,
+        "batch_size": "16",
+        "hidden_size": "512",
+        "num_layers": "4",
+        "dropout": 0.4611859432970644,
+        "epochs": "300"
+      },
+      "score": 0.12246902263381734,
+      "is_best": false
+    }
+  ]
+}

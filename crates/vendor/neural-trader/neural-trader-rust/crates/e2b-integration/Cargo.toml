@@ -1,0 +1,11 @@
+[package]
+name = "nt-e2b-integration"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+reqwest = { workspace = true }
+thiserror = { workspace = true }
+nt-core = { version = "2.0.0", path = "../core" }

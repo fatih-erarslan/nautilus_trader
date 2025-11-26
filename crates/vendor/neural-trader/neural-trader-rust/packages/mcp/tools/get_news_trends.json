@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_news_trends.json",
+  "title": "get_news_trends",
+  "description": "Analyze news trends over multiple time intervals.",
+  "category": "news",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "time_intervals": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "default": [
+            1,
+            6,
+            24
+          ]
+        }
+      },
+      "required": [
+        "symbols"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "trends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "intervals": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "hours": {
+                      "type": "integer"
+                    },
+                    "sentiment": {
+                      "type": "number"
+                    },
+                    "volume": {
+                      "type": "integer"
+                    },
+                    "momentum": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

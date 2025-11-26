@@ -1,0 +1,31 @@
+# Test neural-trader@2.3.10 CLI and API
+FROM node:20-slim
+
+WORKDIR /app
+
+# Test 1: npx neural-trader (should show helpful message, not crash)
+RUN echo "=== Test 1: npx neural-trader ===" && \
+    npx --yes neural-trader@2.3.10 init 2>&1 | tee /tmp/cli-output.txt || true
+
+# Verify the output contains helpful messages (not Python errors)
+RUN if grep -q "JavaScript API Usage" /tmp/cli-output.txt; then \
+      echo "✅ CLI shows helpful message"; \
+    else \
+      echo "❌ CLI did not show expected message"; \
+      cat /tmp/cli-output.txt; \
+      exit 1; \
+    fi
+
+# Test 2: Verify the API can be imported and used
+RUN npm init -y && npm install neural-trader@2.3.10 --ignore-scripts
+
+RUN node -e "const nt = require('neural-trader'); \
+  console.log('✅ Module exports:', Object.keys(nt).join(', ')); \
+  if (typeof nt.fetchMarketData === 'function') { \
+    console.log('✅ fetchMarketData is available'); \
+  } else { \
+    console.error('❌ fetchMarketData not available'); \
+    process.exit(1); \
+  }"
+
+CMD echo "✅ neural-trader@2.3.10 ALL TESTS PASSED!"

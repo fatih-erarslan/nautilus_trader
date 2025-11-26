@@ -1,0 +1,66 @@
+# Test LOCAL neural-trader v2.3.12 before publishing
+FROM node:20-slim
+
+WORKDIR /test
+
+# Copy the local package
+COPY . /neural-trader-local
+
+# Pack the local version
+RUN cd /neural-trader-local && npm pack
+
+# Install the packed version
+RUN npm install -g /neural-trader-local/neural-trader-2.3.12.tgz
+
+# Test 1: Version
+RUN echo "=== Test 1: Version ===" && \
+    neural-trader version && echo ""
+
+# Test 2: List packages
+RUN echo "=== Test 2: List Packages ===" && \
+    neural-trader list && echo ""
+
+# Test 3: Init trading
+RUN echo "=== Test 3: Init Trading ===" && \
+    mkdir /test/trading && cd /test/trading && \
+    neural-trader init trading && \
+    test -f config.json && echo "✅ config.json" || exit 1 && \
+    test -f src/main.js && echo "✅ src/main.js" || exit 1 && \
+    echo ""
+
+# Test 4: Init accounting
+RUN echo "=== Test 4: Init Accounting ===" && \
+    mkdir /test/accounting && cd /test/accounting && \
+    neural-trader init accounting && \
+    test -d tax-lots && echo "✅ tax-lots/" || exit 1 && \
+    echo ""
+
+# Test 5: Test command
+RUN echo "=== Test 5: Test Command ===" && \
+    neural-trader test && echo ""
+
+# Test 6: Doctor
+RUN echo "=== Test 6: Doctor ===" && \
+    neural-trader doctor && echo ""
+
+# Test 7: JavaScript API
+RUN echo "=== Test 7: JavaScript API ===" && \
+    mkdir /test/api && cd /test/api && \
+    npm init -y > /dev/null 2>&1 && \
+    npm install /neural-trader-local/neural-trader-2.3.12.tgz --ignore-scripts > /dev/null 2>&1 && \
+    node -e "const nt = require('neural-trader'); \
+      console.log('✅ Module loaded, functions:', Object.keys(nt).length); \
+      if (typeof nt.fetchMarketData !== 'function') { \
+        console.error('❌ fetchMarketData missing'); \
+        process.exit(1); \
+      } \
+      console.log('✅ All core functions available');" && \
+    echo ""
+
+CMD echo "" && \
+    echo "========================================" && \
+    echo "✅✅✅ ALL LOCAL TESTS PASSED! ✅✅✅" && \
+    echo "========================================" && \
+    echo "" && \
+    echo "neural-trader@2.3.12 is ready for publishing!" && \
+    echo ""

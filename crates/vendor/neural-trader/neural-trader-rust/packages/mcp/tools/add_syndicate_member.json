@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/add_syndicate_member.json",
+  "title": "add_syndicate_member",
+  "description": "Add a new member to an investment syndicate.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "admin",
+            "manager",
+            "member",
+            "observer"
+          ]
+        },
+        "initial_contribution": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "name",
+        "email",
+        "role",
+        "initial_contribution"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "member_id": {
+          "type": "string"
+        },
+        "syndicate_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "capital_contributed": {
+          "type": "number"
+        },
+        "equity_share": {
+          "type": "number"
+        },
+        "joined_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "member_id",
+        "syndicate_id",
+        "capital_contributed"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

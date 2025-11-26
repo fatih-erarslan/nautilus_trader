@@ -1,0 +1,51 @@
+# Multi-stage Docker build to prebuild all native dependencies
+# Stage 1: Build environment with all tools
+FROM node:20 AS builder
+
+WORKDIR /build
+
+# Install build tools
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install neural-trader with all dependencies
+RUN npm install -g neural-trader@2.3.6
+
+# Extract built native modules
+RUN mkdir -p /prebuilds && \
+    cd /usr/local/lib/node_modules/neural-trader/node_modules && \
+    find . -name '*.node' -exec cp {} /prebuilds/ \; && \
+    ls -lh /prebuilds/
+
+# Stage 2: Runtime environment without build tools
+FROM node:20-slim
+
+WORKDIR /app
+
+# Copy prebuilt binaries from builder
+COPY --from=builder /prebuilds /usr/local/lib/prebuilds/
+
+# Install neural-trader (will use prebuilt binaries)
+RUN npm install -g neural-trader@2.3.6 --force || true
+
+# Manually place prebuilt binaries where they're needed
+RUN if [ -f /usr/local/lib/prebuilds/*.node ]; then \
+      find /usr/local/lib/node_modules/neural-trader/node_modules -type d -name 'build' \
+        -exec cp /usr/local/lib/prebuilds/*.node {} \; ; \
+    fi
+
+# Test module loading
+RUN node -e "console.log('Testing module load...'); \
+  try { \
+    const nt = require('neural-trader'); \
+    console.log('✅ Module loaded successfully'); \
+    console.log('Available exports:', Object.keys(nt).slice(0, 10).join(', ')); \
+  } catch (e) { \
+    console.error('❌ Module load failed:', e.message); \
+    process.exit(1); \
+  }"
+
+CMD ["echo", "✅ Prebuilt package test PASSED!"]

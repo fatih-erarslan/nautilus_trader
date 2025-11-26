@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/correlation_analysis.json",
+  "title": "correlation_analysis",
+  "description": "Analyze asset correlations with GPU acceleration.",
+  "category": "analysis",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "description": "List of symbols to analyze"
+        },
+        "period_days": {
+          "type": "integer",
+          "default": 90,
+          "minimum": 30,
+          "maximum": 365
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "symbols"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "correlation_matrix": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "period": {
+          "type": "string"
+        },
+        "highest_correlation": {
+          "type": "object",
+          "properties": {
+            "pair": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "coefficient": {
+              "type": "number"
+            }
+          }
+        },
+        "gpu_accelerated": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

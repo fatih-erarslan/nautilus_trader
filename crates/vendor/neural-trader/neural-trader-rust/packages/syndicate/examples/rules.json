@@ -1,0 +1,25 @@
+{
+  "maxAllocationPercent": 25,
+  "minCapitalRequirement": 10000,
+  "withdrawalRules": {
+    "minWithdrawalAmount": 1000,
+    "maxWithdrawalPercent": 50,
+    "emergencyWithdrawalFee": 0.05,
+    "standardWithdrawalFee": 0.02
+  },
+  "votingRules": {
+    "quorumPercent": 60,
+    "majorityPercent": 51,
+    "votingPeriodHours": 48
+  },
+  "profitSharing": {
+    "performanceFeePercent": 10,
+    "managementFeePercent": 2,
+    "distributionFrequency": "weekly"
+  },
+  "riskLimits": {
+    "maxSingleBetPercent": 10,
+    "maxDailyLossPercent": 15,
+    "maxWeeklyLossPercent": 30
+  }
+}

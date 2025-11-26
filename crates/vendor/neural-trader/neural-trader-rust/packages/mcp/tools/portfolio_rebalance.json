@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/portfolio_rebalance.json",
+  "title": "portfolio_rebalance",
+  "description": "Calculate portfolio rebalancing strategy.",
+  "category": "portfolio",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "target_allocations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Target allocation percentages by symbol"
+        },
+        "current_portfolio": {
+          "type": "object"
+        },
+        "rebalance_threshold": {
+          "type": "number",
+          "default": 0.05
+        }
+      },
+      "required": [
+        "target_allocations"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "rebalance_needed": {
+          "type": "boolean"
+        },
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "estimated_cost": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+*.node
+!*.linux-*.node
+!*.darwin-*.node
+!*.win32-*.node
+target/
+Cargo.lock
+.cargo/
+*.rs
+build.rs
+Cargo.toml
+.git/
+.github/
+test/
+examples/node_modules/

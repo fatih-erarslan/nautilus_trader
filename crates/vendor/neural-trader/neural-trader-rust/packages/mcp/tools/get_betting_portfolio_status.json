@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_betting_portfolio_status.json",
+  "title": "get_betting_portfolio_status",
+  "description": "Get betting portfolio status and risk metrics.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "include_risk_analysis": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "total_bankroll": {
+          "type": "number"
+        },
+        "active_bets": {
+          "type": "integer"
+        },
+        "pending_bets": {
+          "type": "integer"
+        },
+        "total_exposed": {
+          "type": "number"
+        },
+        "risk_metrics": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

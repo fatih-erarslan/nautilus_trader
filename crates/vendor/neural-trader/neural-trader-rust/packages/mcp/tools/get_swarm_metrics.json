@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_swarm_metrics.json",
+  "title": "get_swarm_metrics",
+  "description": "Get detailed performance metrics for E2B trading swarm.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "time_range": {
+          "type": "string",
+          "enum": [
+            "1h",
+            "6h",
+            "24h",
+            "7d",
+            "30d"
+          ],
+          "default": "24h"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "latency",
+              "throughput",
+              "error_rate",
+              "success_rate",
+              "pnl",
+              "trades",
+              "all"
+            ]
+          },
+          "default": [
+            "all"
+          ]
+        },
+        "aggregation": {
+          "type": "string",
+          "enum": [
+            "avg",
+            "min",
+            "max",
+            "sum",
+            "p50",
+            "p95",
+            "p99"
+          ],
+          "default": "avg"
+        }
+      },
+      "required": [
+        "swarm_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "time_range": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "latency_ms": {
+              "type": "number"
+            },
+            "throughput_tps": {
+              "type": "number"
+            },
+            "error_rate": {
+              "type": "number"
+            },
+            "success_rate": {
+              "type": "number"
+            },
+            "total_pnl": {
+              "type": "number"
+            },
+            "total_trades": {
+              "type": "integer"
+            },
+            "avg_trade_size": {
+              "type": "number"
+            },
+            "win_rate": {
+              "type": "number"
+            }
+          }
+        },
+        "per_agent_metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent_id": {
+                "type": "string"
+              },
+              "trades": {
+                "type": "integer"
+              },
+              "pnl": {
+                "type": "number"
+              },
+              "success_rate": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "swarm_id",
+        "time_range",
+        "metrics"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

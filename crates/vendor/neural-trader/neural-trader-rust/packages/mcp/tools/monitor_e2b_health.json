@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/monitor_e2b_health.json",
+  "title": "monitor_e2b_health",
+  "description": "Monitor health and performance of E2B infrastructure.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "include_all_sandboxes": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "overall_health": {
+          "type": "string",
+          "enum": [
+            "healthy",
+            "degraded",
+            "unhealthy"
+          ]
+        },
+        "total_sandboxes": {
+          "type": "integer"
+        },
+        "running_sandboxes": {
+          "type": "integer"
+        },
+        "average_cpu": {
+          "type": "number"
+        },
+        "average_memory": {
+          "type": "number"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "overall_health",
+        "total_sandboxes"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

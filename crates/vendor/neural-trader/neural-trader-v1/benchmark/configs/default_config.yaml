@@ -1,0 +1,207 @@
+# AI News Trading Benchmark - Default Configuration
+# Main configuration file for benchmark operations
+
+# Global settings
+global:
+  output_dir: ./benchmark_results
+  log_level: INFO
+  parallel_workers: 8
+  verbose: false
+  quiet: false
+  format: terminal
+  profile: false
+  debug: false
+
+# Benchmark settings
+benchmark:
+  default_suite: standard
+  warmup_duration: 60  # seconds
+  measurement_duration: 300  # seconds
+  parallel: true
+  save_baseline: false
+  
+  # Suite definitions
+  suites:
+    quick:
+      duration: 60
+      strategies: [momentum, mean_reversion]
+      metrics: [latency, throughput]
+    
+    standard:
+      duration: 300
+      strategies: [momentum, mean_reversion, arbitrage]
+      metrics: [latency, throughput, memory]
+    
+    comprehensive:
+      duration: 900
+      strategies: [momentum, mean_reversion, arbitrage, ml_enhanced]
+      metrics: [latency, throughput, memory, cpu, io]
+    
+    custom:
+      duration: 600
+      strategies: []  # Will be specified via command line
+      metrics: []     # Will be specified via command line
+
+# Simulation settings
+simulation:
+  data_source: historical  # historical, synthetic, live
+  tick_resolution: 1s
+  market_hours_only: true
+  default_capital: 100000.0
+  speed_factor: 1.0
+  
+  # Historical data settings
+  historical:
+    default_start_date: "2024-01-01"
+    default_end_date: "2024-12-31"
+    default_assets: ["AAPL", "GOOGL", "MSFT", "TSLA", "AMZN"]
+  
+  # Synthetic data settings
+  synthetic:
+    volatility: 0.2
+    trend: 0.05
+    noise_level: 0.1
+    market_regime: normal  # normal, bull, bear, volatile
+
+# Optimization settings
+optimization:
+  default_algorithm: bayesian  # grid, random, bayesian, genetic, ml
+  max_trials: 1000
+  early_stopping: true
+  parallel: true
+  timeout_minutes: 60
+  
+  # Algorithm specific settings
+  algorithms:
+    grid:
+      exhaustive: false
+      max_combinations: 10000
+    
+    random:
+      seed: 42
+      
+    bayesian:
+      acquisition_function: ei  # ei, pi, ucb
+      n_initial_points: 10
+      
+    genetic:
+      population_size: 50
+      generations: 100
+      mutation_rate: 0.1
+      crossover_rate: 0.8
+
+# Metrics configuration
+metrics:
+  # Latency metrics
+  latency:
+    percentiles: [50, 90, 95, 99, 99.9]
+    window_size: 1000
+    units: milliseconds
+    
+  # Throughput metrics
+  throughput:
+    interval: 1s
+    units: operations_per_second
+    
+  # Memory metrics
+  memory:
+    sample_rate: 10Hz
+    units: MB
+    track_allocations: true
+    
+  # CPU metrics
+  cpu:
+    sample_rate: 10Hz
+    track_cores: true
+    
+  # I/O metrics
+  io:
+    track_disk: true
+    track_network: true
+    sample_rate: 1Hz
+
+# Strategy parameters
+strategies:
+  momentum:
+    lookback_period: 20
+    threshold: 0.05
+    position_size: 0.1
+    
+  mean_reversion:
+    window_size: 50
+    z_score_threshold: 2.0
+    hold_period: 5
+    
+  arbitrage:
+    min_spread: 0.001
+    max_position: 0.2
+    execution_delay: 0.1
+    
+  ml_enhanced:
+    model_type: lstm
+    lookback_window: 100
+    prediction_horizon: 1
+    confidence_threshold: 0.7
+
+# Reporting settings
+reporting:
+  # Output formats
+  formats:
+    json:
+      pretty_print: true
+      include_metadata: true
+      
+    csv:
+      delimiter: ","
+      include_headers: true
+      
+    html:
+      template: default
+      include_charts: true
+      chart_library: plotly
+      
+    excel:
+      include_charts: true
+      separate_sheets: true
+
+  # Dashboard settings
+  dashboard:
+    default_port: 8080
+    auto_refresh: 30  # seconds
+    theme: light  # light, dark
+
+# Error handling
+error_handling:
+  exit_codes:
+    success: 0
+    general_error: 1
+    invalid_arguments: 2
+    configuration_error: 3
+    runtime_error: 4
+    performance_regression: 5
+    user_interrupted: 10
+    
+  logging:
+    log_file: benchmark.log
+    rotation: daily
+    max_size: 100MB
+    backup_count: 7
+
+# Performance thresholds for regression detection
+thresholds:
+  latency:
+    p50: 5.0    # % increase threshold
+    p90: 10.0
+    p95: 15.0
+    p99: 20.0
+    
+  throughput:
+    operations_per_second: -5.0  # % decrease threshold
+    
+  memory:
+    peak_usage: 10.0  # % increase threshold
+    
+  strategy_performance:
+    sharpe_ratio: -5.0      # % decrease threshold
+    win_rate: -2.0          # % decrease threshold
+    max_drawdown: 10.0      # % increase threshold

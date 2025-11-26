@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/shutdown_swarm.json",
+  "title": "shutdown_swarm",
+  "description": "Gracefully shutdown E2B trading swarm and cleanup resources.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "grace_period": {
+          "type": "integer",
+          "default": 60
+        },
+        "save_state": {
+          "type": "boolean",
+          "default": true
+        },
+        "force": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "swarm_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "shutting_down",
+            "stopped",
+            "error"
+          ]
+        },
+        "agents_stopped": {
+          "type": "integer"
+        },
+        "state_saved": {
+          "type": "boolean"
+        },
+        "shutdown_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "final_metrics": {
+          "type": "object",
+          "properties": {
+            "total_runtime_seconds": {
+              "type": "number"
+            },
+            "total_trades": {
+              "type": "integer"
+            },
+            "total_pnl": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": [
+        "swarm_id",
+        "status",
+        "agents_stopped"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

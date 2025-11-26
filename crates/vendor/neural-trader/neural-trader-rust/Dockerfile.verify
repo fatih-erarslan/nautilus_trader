@@ -1,0 +1,25 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Test 1: Verify neural-trader installs
+RUN echo "=== Test 1: Installing neural-trader ===" && \
+    npx --yes neural-trader@2.0.0 --version
+
+# Test 2: Verify MCP package works
+RUN echo "=== Test 2: Testing MCP package ===" && \
+    npx --yes @neural-trader/mcp@2.0.0 --help
+
+# Test 3: Test main CLI help
+RUN echo "=== Test 3: Main CLI help ===" && \
+    npx --yes neural-trader@2.0.0 --help
+
+# Test 4: Test MCP command
+RUN echo "=== Test 4: MCP command help ===" && \
+    npx --yes neural-trader@2.0.0 mcp --help
+
+# Test 5: Test examples command
+RUN echo "=== Test 5: Examples command ===" && \
+    npx --yes neural-trader@2.0.0 examples
+
+CMD ["echo", "All verification tests passed!"]

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/create_e2b_sandbox.json",
+  "title": "create_e2b_sandbox",
+  "description": "Create a new E2B sandbox for isolated execution.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Sandbox name"
+        },
+        "template": {
+          "type": "string",
+          "default": "base",
+          "enum": [
+            "base",
+            "python",
+            "nodejs",
+            "trading"
+          ]
+        },
+        "memory_mb": {
+          "type": "integer",
+          "default": 512,
+          "minimum": 256,
+          "maximum": 4096
+        },
+        "cpu_count": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 4
+        },
+        "timeout": {
+          "type": "integer",
+          "default": 300,
+          "description": "Timeout in seconds"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "sandbox_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "creating",
+            "running",
+            "stopped"
+          ]
+        },
+        "template": {
+          "type": "string"
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "memory_mb": {
+              "type": "integer"
+            },
+            "cpu_count": {
+              "type": "integer"
+            }
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endpoint": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sandbox_id",
+        "name",
+        "status"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

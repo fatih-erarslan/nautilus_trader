@@ -1,0 +1,44 @@
+{
+  "name": "e2b-deployment-patterns-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite for E2B swarm deployment patterns",
+  "main": "deployment-patterns.test.js",
+  "scripts": {
+    "test": "jest deployment-patterns.test.js --verbose --detectOpenHandles",
+    "test:watch": "jest deployment-patterns.test.js --watch",
+    "test:coverage": "jest deployment-patterns.test.js --coverage",
+    "test:ci": "jest deployment-patterns.test.js --ci --maxWorkers=2",
+    "test:pattern": "jest deployment-patterns.test.js --testNamePattern",
+    "test:mock": "jest deployment-patterns.test.js --verbose",
+    "test:live": "E2B_API_KEY=$E2B_API_KEY jest deployment-patterns.test.js --verbose"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 120000,
+    "verbose": true,
+    "collectCoverageFrom": [
+      "../../src/e2b/**/*.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/tests/"
+    ]
+  },
+  "keywords": [
+    "e2b",
+    "deployment",
+    "patterns",
+    "swarm",
+    "testing",
+    "topology",
+    "trading"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT",
+  "dependencies": {
+    "e2b": "^2.6.4"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

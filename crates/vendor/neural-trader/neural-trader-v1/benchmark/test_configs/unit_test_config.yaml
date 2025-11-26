@@ -1,0 +1,93 @@
+# Unit Test Configuration for AI News Trading Benchmark System
+# This configuration defines settings for running unit tests
+
+test_categories:
+  unit:
+    enabled: true
+    timeout: 300  # 5 minutes
+    parallel_execution: true
+    max_workers: 4
+    
+performance_validation:
+  enabled: false  # Unit tests don't validate performance targets
+  strict_mode: false
+  tolerance_percent: 10
+
+reporting:
+  formats: ["json", "junit"]
+  output_dir: "./test_results/unit"
+  detailed_logs: true
+  include_coverage: true
+
+environment_checks:
+  system_resources: true
+  dependencies: true
+  connectivity: false  # Unit tests don't need external connectivity
+
+parallel_execution:
+  enabled: true
+  max_workers: 4
+
+pytest_options:
+  # Pytest-specific options for unit tests
+  verbose: true
+  tb_style: "short"
+  timeout_per_test: 30  # 30 seconds per test
+  markers:
+    - "not slow"  # Exclude slow tests in unit test runs
+    - "not integration"
+    - "not performance"
+    - "not regression"
+  
+  coverage:
+    enabled: true
+    source: ["benchmark.src"]
+    omit: 
+      - "*/tests/*"
+      - "*/test_*"
+    fail_under: 80  # Require 80% code coverage
+    
+  addopts:
+    - "--strict-markers"
+    - "--strict-config"
+    - "--disable-warnings"
+    - "--tb=short"
+
+filters:
+  # Specific filters for unit tests
+  include_patterns:
+    - "test_*.py"
+    - "*_test.py"
+  exclude_patterns:
+    - "test_*integration*.py"
+    - "test_*performance*.py"
+    - "test_*regression*.py"
+  exclude_directories:
+    - "integration"
+    - "performance" 
+    - "regression"
+
+resource_limits:
+  # Resource limits for unit tests
+  max_memory_mb: 512
+  max_cpu_percent: 50
+  max_duration_seconds: 300
+
+test_data:
+  # Test data configuration
+  use_mock_data: true
+  mock_external_services: true
+  test_database: ":memory:"  # In-memory SQLite for fast tests
+  
+quality_gates:
+  # Quality gates that must pass
+  min_test_count: 50
+  max_failure_rate: 0.05  # 5% failure rate max
+  min_coverage_percent: 80
+  max_duration_minutes: 5
+
+notifications:
+  # Notification settings for unit test results
+  enabled: false  # Usually disabled for unit tests
+  on_failure_only: false
+  channels: []

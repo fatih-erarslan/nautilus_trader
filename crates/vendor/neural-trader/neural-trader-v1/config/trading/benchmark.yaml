@@ -1,0 +1,15 @@
+# Test configuration for benchmark CLI
+global:
+  output_dir: ./test_results
+  log_level: INFO
+  parallel_workers: 2
+
+benchmark:
+  default_suite: quick
+  warmup_duration: 10
+  measurement_duration: 30
+
+simulation:
+  data_source: synthetic
+  tick_resolution: 1s
+  market_hours_only: false

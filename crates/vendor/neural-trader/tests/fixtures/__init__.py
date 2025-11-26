@@ -1,0 +1,1 @@
+# Fixtures package for Fantasy Collective tests

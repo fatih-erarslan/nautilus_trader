@@ -1,0 +1,13 @@
+{
+  "$schema": "https://modelcontextprotocol.org/schema/config.json",
+  "mcpServers": {
+    "neural-trader": {
+      "command": "npx",
+      "args": ["@neural-trader/mcp"],
+      "env": {
+        "ENABLE_GPU": "true",
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}

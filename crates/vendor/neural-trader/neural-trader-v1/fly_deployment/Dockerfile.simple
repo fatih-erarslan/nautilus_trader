@@ -1,0 +1,50 @@
+# Simple Dockerfile for faster deployment
+FROM python:3.10-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install neural forecasting (CPU version for now)
+RUN pip install --no-cache-dir neuralforecast>=1.6.4
+
+# Copy application code
+COPY . /app/
+
+# Set up environment variables
+ENV PYTHONPATH=/app
+ENV NEURAL_FORECAST_GPU_ENABLED=false
+ENV NEURAL_FORECAST_MODEL_TYPE=nhits
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/models /app/data /app/cache
+
+# Create non-root user
+RUN useradd -m -u 1000 trader && \
+    chown -R trader:trader /app
+USER trader
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Simple startup command
+CMD ["python", "src/neural_forecast/flyio_gpu_launcher.py"]

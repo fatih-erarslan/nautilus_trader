@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/simulate_syndicate_allocation.json",
+  "title": "simulate_syndicate_allocation",
+  "description": "Simulate fund allocation across strategies.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "opportunities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "test_strategies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "opportunities"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "simulation_id": {
+          "type": "string"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "strategy": {
+                "type": "string"
+              },
+              "expected_return": {
+                "type": "number"
+              },
+              "risk_score": {
+                "type": "number"
+              },
+              "sharpe_ratio": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "recommended_strategy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "simulation_id",
+        "results"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

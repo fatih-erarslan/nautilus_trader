@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_system_metrics.json",
+  "title": "get_system_metrics",
+  "description": "Get system performance metrics.",
+  "category": "system",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "cpu",
+            "memory",
+            "latency",
+            "throughput"
+          ]
+        },
+        "time_range_minutes": {
+          "type": "integer",
+          "default": 60
+        },
+        "include_history": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "cpu_usage": {
+          "type": "number"
+        },
+        "memory_usage": {
+          "type": "number"
+        },
+        "gpu_usage": {
+          "type": "number"
+        },
+        "latency": {
+          "type": "number"
+        },
+        "throughput": {
+          "type": "number"
+        },
+        "history": {
+          "type": "array"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

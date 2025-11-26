@@ -1,0 +1,204 @@
+# Trading APIs Configuration
+# Ultra-low latency trading API configurations
+
+# Global settings apply to all APIs
+global_settings:
+  timezone: "America/New_York"
+  log_level: "INFO"
+  enable_paper_trading: false
+  default_timeout_ms: 5000
+  retry_attempts: 3
+  retry_delay_ms: 100
+
+# Connection pool configuration
+connection_pool:
+  min_connections: 3
+  max_connections: 10
+  health_check_interval: 30
+  connection_timeout: 10
+  warmup_requests: true
+  circuit_breaker_threshold: 5
+  circuit_breaker_timeout: 60
+
+# Monitoring configuration
+monitoring:
+  enable_latency_monitoring: true
+  latency_alert_threshold_ms: 50
+  metrics_export_interval: 300
+  alert_channels:
+    - console
+    - metrics_file
+  latency_thresholds:
+    order_placement: 5.0
+    order_cancel: 5.0
+    market_data: 2.0
+    account_query: 10.0
+
+# Trading API configurations
+apis:
+  # Alpaca Trading API
+  alpaca:
+    provider: "alpaca"
+    enabled: true
+    credentials:
+      api_key: "${ALPACA_API_KEY}"
+      secret_key: "${ALPACA_SECRET_KEY}"
+      # Use ENC[...] for encrypted values
+      # secret_key: "ENC[encrypted_value_here]"
+    endpoints:
+      base_url: "https://api.alpaca.markets"
+      data_url: "https://data.alpaca.markets"
+      ws_url: "wss://stream.data.alpaca.markets"
+      paper_base_url: "https://paper-api.alpaca.markets"
+      paper_ws_url: "wss://paper-api.alpaca.markets"
+    settings:
+      use_paper_trading: false
+      data_feed: "iex"  # sip or iex
+      enable_fractional_trading: true
+      max_position_size: 100000
+    rate_limits:
+      orders_per_minute: 200
+      data_requests_per_minute: 200
+      websocket_connections: 1
+
+  # Interactive Brokers TWS API
+  interactive_brokers:
+    provider: "ib"
+    enabled: true
+    credentials:
+      username: "${IB_USERNAME}"
+      account_id: "${IB_ACCOUNT_ID}"
+    endpoints:
+      gateway_host: "localhost"
+      gateway_port: 7497
+      paper_gateway_port: 7497
+    settings:
+      client_id: 1
+      enable_delayed_data: false
+      market_data_lines: 100
+      enable_pre_market: true
+      enable_after_hours: true
+    rate_limits:
+      messages_per_second: 50
+      market_data_lines: 100
+
+  # TD Ameritrade API
+  td_ameritrade:
+    provider: "td"
+    enabled: true
+    credentials:
+      client_id: "${TD_CLIENT_ID}"
+      refresh_token: "${TD_REFRESH_TOKEN}"
+    endpoints:
+      auth_url: "https://api.tdameritrade.com/v1/oauth2/token"
+      base_url: "https://api.tdameritrade.com/v1"
+      ws_url: "wss://api.tdameritrade.com/ws"
+    settings:
+      account_type: "MARGIN"
+      enable_extended_hours: true
+      default_duration: "DAY"
+      default_order_type: "LIMIT"
+    rate_limits:
+      transactions_per_second: 2
+      quotes_per_second: 4
+      orders_per_second: 1
+
+  # Tradier API
+  tradier:
+    provider: "tradier"
+    enabled: false
+    credentials:
+      access_token: "${TRADIER_ACCESS_TOKEN}"
+      account_number: "${TRADIER_ACCOUNT_NUMBER}"
+    endpoints:
+      base_url: "https://api.tradier.com/v1"
+      sandbox_url: "https://sandbox.tradier.com/v1"
+      ws_url: "wss://ws.tradier.com"
+    settings:
+      use_sandbox: false
+      enable_options_trading: true
+      default_equity_order_class: "equity"
+    rate_limits:
+      requests_per_minute: 60
+      orders_per_minute: 60
+      market_data_per_minute: 500
+
+  # Coinbase Pro API
+  coinbase_pro:
+    provider: "coinbase"
+    enabled: false
+    credentials:
+      api_key: "${COINBASE_API_KEY}"
+      secret: "${COINBASE_SECRET}"
+      passphrase: "${COINBASE_PASSPHRASE}"
+    endpoints:
+      rest_url: "https://api.pro.coinbase.com"
+      ws_url: "wss://ws-feed.pro.coinbase.com"
+      sandbox_rest_url: "https://api-public.sandbox.pro.coinbase.com"
+      sandbox_ws_url: "wss://ws-feed-public.sandbox.pro.coinbase.com"
+    settings:
+      use_sandbox: false
+      enable_margin_trading: false
+      post_only_mode: false
+      fee_currency_preference: "USD"
+    rate_limits:
+      private_requests_per_second: 5
+      public_requests_per_second: 3
+      websocket_messages_per_second: 100
+
+  # Kraken API
+  kraken:
+    provider: "kraken"
+    enabled: false
+    credentials:
+      api_key: "${KRAKEN_API_KEY}"
+      private_key: "${KRAKEN_PRIVATE_KEY}"
+    endpoints:
+      rest_url: "https://api.kraken.com"
+      ws_url: "wss://ws.kraken.com"
+      ws_auth_url: "wss://ws-auth.kraken.com"
+    settings:
+      tier_level: 3  # Affects rate limits
+      enable_margin: true
+      default_leverage: 2
+      validate_timestamps: true
+    rate_limits:
+      tier_3_limit: 20  # requests per second
+      ws_orders_per_second: 50
+      ws_trades_per_second: 50
+
+  # Alpha Vantage API - German Stocks
+  alpha_vantage:
+    provider: "alpha_vantage"
+    enabled: true
+    credentials:
+      api_key: "${ALPHA_VANTAGE_API_KEY}"
+    endpoints:
+      base_url: "https://www.alphavantage.co/query"
+    settings:
+      tier: "free"  # free, starter, professional, enterprise
+      timezone: "Europe/Berlin"
+      output_format: "json"
+      enable_german_stocks: true
+      enable_real_time: true
+      enable_fundamentals: true
+    rate_limits:
+      calls_per_minute: 5  # free tier
+      calls_per_day: 500   # free tier
+      requests_per_second: 1
+    german_exchanges:
+      - exchange: "XETRA"
+        suffix: ".DE"
+        currency: "EUR"
+        trading_hours: "09:00-17:30"
+        timezone: "Europe/Berlin"
+      - exchange: "STUTTGART"
+        suffix: ".STU"
+        currency: "EUR"
+        trading_hours: "08:00-22:00"
+        timezone: "Europe/Berlin"
+
+# Include additional configuration files
+# include:
+#   - "trading_apis_dev.yaml"
+#   - "trading_apis_secrets.yaml"

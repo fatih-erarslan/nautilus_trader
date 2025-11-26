@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/simulate_betting_strategy.json",
+  "title": "simulate_betting_strategy",
+  "description": "Simulate betting strategy with Monte Carlo.",
+  "category": "sports",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_config": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "num_simulations": {
+          "type": "integer",
+          "default": 1000,
+          "maximum": 100000
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "strategy_config"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "simulation_id": {
+          "type": "string"
+        },
+        "results": {
+          "type": "object",
+          "properties": {
+            "mean_return": {
+              "type": "number"
+            },
+            "median_return": {
+              "type": "number"
+            },
+            "win_probability": {
+              "type": "number"
+            },
+            "risk_of_ruin": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

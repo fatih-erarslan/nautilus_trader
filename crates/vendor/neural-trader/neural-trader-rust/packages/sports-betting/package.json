@@ -1,0 +1,57 @@
+{
+  "name": "@neural-trader/sports-betting",
+  "version": "2.1.1",
+  "description": "Sports betting for Neural Trader - arbitrage detection, Kelly sizing, syndicate management",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "load-binary.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "native"
+  ],
+  "scripts": {
+    "build": "napi build --platform --release --cargo-cwd ../../crates/napi-bindings --cargo-name nt-napi-bindings",
+    "clean": "rm -f *.node"
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "sports-betting",
+    "kelly-criterion",
+    "arbitrage",
+    "odds-analysis"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/sports-betting"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "detect-libc": "^2.0.2"
+  },
+  "peerDependencies": {
+    "@neural-trader/core": "^1.0.0",
+    "@neural-trader/risk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "homepage": "https://neural-trader.ruv.io"
+}

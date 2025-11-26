@@ -1,0 +1,11 @@
+{
+  "pattern_size": 100,
+  "iterations": 100,
+  "js_time_ms": 27,
+  "wasm_time_ms": 43,
+  "speedup": 0.627906976744186,
+  "verdict": "NO-GO",
+  "js_result": 275.933178157556,
+  "wasm_result": 275.933178157556,
+  "results_match": true
+}

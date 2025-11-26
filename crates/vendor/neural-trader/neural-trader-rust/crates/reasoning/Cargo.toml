@@ -1,0 +1,36 @@
+[package]
+name = "reasoning"
+version = "0.1.0"
+edition = "2021"
+authors = ["Neural Trader Team"]
+description = "ReasoningBank self-learning engine for pattern recognition and adaptive trading"
+license = "MIT"
+
+[dependencies]
+# Core dependencies
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+
+# Date/Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID generation
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Async utilities
+async-trait = "0.1"
+
+# Statistics
+statrs = "0.17"
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = "0.5"
+
+[[bench]]
+name = "pattern_learning"
+harness = false

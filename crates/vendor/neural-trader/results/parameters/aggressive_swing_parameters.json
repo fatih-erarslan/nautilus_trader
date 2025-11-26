@@ -1,0 +1,57 @@
+{
+  "optimization_result": {
+    "timestamp": "2025-06-23T21:34:36.625111",
+    "configuration": "Quality Selective",
+    "score": 76.04545454545455,
+    "target_achieved": false
+  },
+  "position_sizing": {
+    "max_position_pct": 0.1,
+    "base_risk_per_trade": 0.012,
+    "max_risk_per_trade": 0.018000000000000002,
+    "max_portfolio_risk": 0.06
+  },
+  "entry_criteria": {
+    "rsi_oversold": 25,
+    "rsi_overbought": 75,
+    "volume_surge_threshold": 2.0,
+    "trend_alignment_required": true
+  },
+  "exit_management": {
+    "atr_stop_multiplier": 2.5,
+    "profit_targets": [
+      2.0,
+      3.5,
+      5.0
+    ],
+    "partial_exits": [
+      0.4,
+      0.3,
+      0.3
+    ],
+    "trailing_stop_activation": 2.0,
+    "breakeven_at_r_multiple": 1.5
+  },
+  "timing": {
+    "optimal_holding_days": 6,
+    "min_holding_days": 4,
+    "max_holding_days": 9
+  },
+  "expected_performance": {
+    "annual_return": 0.704,
+    "sharpe_ratio": 10.37,
+    "max_drawdown": 0.054,
+    "win_rate": 0.63,
+    "profit_factor": 4.17,
+    "trades_per_year": 50,
+    "avg_win_r": 2.4,
+    "risk_per_trade": 0.012
+  },
+  "implementation_guidelines": [
+    "Start with 50% of recommended position sizes for first month",
+    "Monitor actual vs expected performance weekly",
+    "Adjust parameters if win rate drops below 55%",
+    "Use paper trading for 2 weeks before live trading",
+    "Set maximum daily loss limit at 2% of capital"
+  ]
+}

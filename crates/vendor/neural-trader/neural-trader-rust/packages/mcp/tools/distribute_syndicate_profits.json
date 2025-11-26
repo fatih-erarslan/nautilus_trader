@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/distribute_syndicate_profits.json",
+  "title": "distribute_syndicate_profits",
+  "description": "Distribute profits among syndicate members.",
+  "category": "syndicate",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "syndicate_id": {
+          "type": "string"
+        },
+        "total_profit": {
+          "type": "number"
+        },
+        "model": {
+          "type": "string",
+          "default": "hybrid",
+          "enum": [
+            "proportional",
+            "equal",
+            "hybrid",
+            "performance_based"
+          ]
+        }
+      },
+      "required": [
+        "syndicate_id",
+        "total_profit"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "distribution_id": {
+          "type": "string"
+        },
+        "syndicate_id": {
+          "type": "string"
+        },
+        "total_profit": {
+          "type": "number"
+        },
+        "model": {
+          "type": "string"
+        },
+        "distributions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "member_id": {
+                "type": "string"
+              },
+              "member_name": {
+                "type": "string"
+              },
+              "share": {
+                "type": "number"
+              },
+              "amount": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "distribution_id",
+        "distributions",
+        "total_profit"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

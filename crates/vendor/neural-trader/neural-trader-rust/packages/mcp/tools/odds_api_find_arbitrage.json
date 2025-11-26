@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/odds_api_find_arbitrage.json",
+  "title": "odds_api_find_arbitrage",
+  "description": "Find arbitrage opportunities across bookmakers.",
+  "category": "odds_api",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sport": {
+          "type": "string"
+        },
+        "markets": {
+          "type": "string",
+          "default": "h2h"
+        },
+        "regions": {
+          "type": "string",
+          "default": "us,uk,au"
+        },
+        "min_profit_margin": {
+          "type": "number",
+          "default": 0.01
+        }
+      },
+      "required": [
+        "sport"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "opportunities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string"
+              },
+              "profit_margin": {
+                "type": "number"
+              },
+              "bets": {
+                "type": "array"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

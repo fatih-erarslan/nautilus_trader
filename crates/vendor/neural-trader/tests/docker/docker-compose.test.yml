@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # Test minimal installation (no build tools)
+  test-minimal:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.test
+      target: minimal-test
+    environment:
+      - NODE_ENV=production
+    command: >
+      sh -c "
+        echo '🧪 Testing minimal installation...' &&
+        node -e \"
+          console.log('Platform:', process.platform, process.arch);
+          try {
+            const nt = require('./index.js');
+            console.log('✅ Module loads in minimal environment');
+          } catch (e) {
+            console.log('⚠️  Error:', e.message);
+          }
+        \"
+      "
+
+  # Test with build tools
+  test-build:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.test
+      target: build-test
+    environment:
+      - NODE_ENV=development
+    command: >
+      sh -c "
+        echo '🧪 Testing with build tools...' &&
+        npm run test:napi || echo 'NAPI tests skipped' &&
+        node -e \"
+          try {
+            const nt = require('./index.js');
+            console.log('✅ Built from source successfully');
+          } catch (e) {
+            console.error('❌ Build failed:', e.message);
+            process.exit(1);
+          }
+        \"
+      "
+
+  # Test Alpine Linux compatibility
+  test-alpine:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.test
+      target: alpine-test
+    environment:
+      - NODE_ENV=production
+    command: >
+      sh -c "
+        echo '🧪 Testing Alpine Linux compatibility...' &&
+        node -e \"
+          console.log('musl libc environment');
+          try {
+            const nt = require('./index.js');
+            console.log('✅ Works on Alpine');
+          } catch (e) {
+            console.log('⚠️  Alpine issue:', e.message);
+          }
+        \"
+      "
+
+  # Test dependency binaries
+  test-dependencies:
+    build:
+      context: ../..
+      dockerfile: tests/docker/Dockerfile.test
+      target: build-test
+    command: >
+      sh -c "
+        echo '🧪 Testing dependency binaries...' &&
+        node -e \"
+          const deps = [
+            'agentdb',
+            'agentic-flow',
+            'agentic-payments',
+            'aidefence',
+            'sublinear-time-solver',
+            'e2b',
+            'ioredis',
+            'midstreamer'
+          ];
+
+          let failed = [];
+          for (const dep of deps) {
+            try {
+              require(dep);
+              console.log('✅', dep);
+            } catch (e) {
+              console.log('❌', dep, '-', e.message.split('\\n')[0]);
+              failed.push(dep);
+            }
+          }
+
+          if (failed.length > 0) {
+            console.log('\\n⚠️  Failed dependencies:', failed.join(', '));
+          } else {
+            console.log('\\n✅ All dependencies loaded');
+          }
+        \"
+      "

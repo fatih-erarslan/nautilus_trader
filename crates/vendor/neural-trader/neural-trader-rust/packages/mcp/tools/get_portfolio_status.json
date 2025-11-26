@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_portfolio_status.json",
+  "title": "get_portfolio_status",
+  "description": "Get current portfolio status with analytics.",
+  "category": "portfolio",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "include_analytics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include advanced analytics"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "portfolio_value": {
+          "type": "number"
+        },
+        "cash_balance": {
+          "type": "number"
+        },
+        "positions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "number"
+              },
+              "avg_entry_price": {
+                "type": "number"
+              },
+              "current_price": {
+                "type": "number"
+              },
+              "market_value": {
+                "type": "number"
+              },
+              "unrealized_pl": {
+                "type": "number"
+              },
+              "unrealized_pl_percent": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "analytics": {
+          "type": "object",
+          "properties": {
+            "total_return": {
+              "type": "number"
+            },
+            "daily_return": {
+              "type": "number"
+            },
+            "sharpe_ratio": {
+              "type": "number"
+            },
+            "volatility": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": [
+        "portfolio_value",
+        "positions"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

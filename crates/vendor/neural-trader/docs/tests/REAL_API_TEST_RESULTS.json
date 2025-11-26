@@ -1,0 +1,157 @@
+{
+  "timestamp": "2025-11-14T20:34:33.764Z",
+  "tests": [
+    {
+      "name": "Alpaca - Quick Analysis (AAPL)",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "data_required": {
+          "bars": "Minimum 50 bars for technical indicators",
+          "news": "Optional for sentiment analysis",
+          "volume": "Required for volume-based indicators"
+        },
+        "gpu_accelerated": false,
+        "indicators_available": [
+          "RSI",
+          "MACD",
+          "SMA",
+          "EMA",
+          "Bollinger Bands",
+          "ATR",
+          "ADX",
+          "Stochastic",
+          "Volume Profile"
+        ],
+        "next_steps": "Connect market data provider to enable real-time analysis",
+        "note": "Real-time analysis requires market data feed",
+        "source": "nt-features crate",
+        "status": "analysis_ready",
+        "symbol": "AAPL",
+        "timestamp": "2025-11-14T20:34:33.771538502+00:00"
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "The Odds API - Get Sports List",
+      "success": true,
+      "latency": 1,
+      "error": null,
+      "response": {
+        "sports": [],
+        "timestamp": "2025-11-14T20:34:33.772299493+00:00"
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "The Odds API - Get NFL Odds",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "odds": [],
+        "sport": "americanfootball_nfl",
+        "timestamp": "2025-11-14T20:34:33.773286433+00:00"
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "Kelly Criterion - Optimal Bet Sizing",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "kelly_fraction": 0.10000000000000009,
+        "recommended_bet": 500.00000000000045,
+        "timestamp": "2025-11-14T20:34:33.773511299+00:00"
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "News - Sentiment Analysis (AAPL)",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "articles": 28,
+        "sentiment_score": 0.65,
+        "sources": [
+          "reuters",
+          "bloomberg"
+        ],
+        "symbol": "AAPL",
+        "timestamp": "2025-11-14T20:34:33.773789338+00:00"
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "Syndicate - Create New Syndicate",
+      "success": true,
+      "latency": 1,
+      "error": null,
+      "response": {
+        "name": "Performance Test Syndicate",
+        "status": "created",
+        "syndicate_id": "test-syndicate-1763152473774",
+        "timestamp": "2025-11-14T20:34:33.774103795+00:00"
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "Prediction Markets - List Available Markets",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "markets": [],
+        "timestamp": "2025-11-14T20:34:33.774360898+00:00",
+        "total_count": 0
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "System - Get Performance Metrics",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "metrics": {
+          "cpu_usage": 45.3,
+          "gpu_utilization": 78.5,
+          "memory_usage": 62.1,
+          "network_latency_ms": 8.2
+        },
+        "time_range_minutes": 60,
+        "timestamp": "2025-11-14T20:34:33.774609919+00:00"
+      },
+      "realApiCall": false
+    },
+    {
+      "name": "E2B - List Sandboxes",
+      "success": false,
+      "latency": 0,
+      "error": "napi.listE2bSandboxes is not a function",
+      "response": null,
+      "realApiCall": false
+    },
+    {
+      "name": "Sports Betting - Get Upcoming Events",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "events": [],
+        "sport": "americanfootball_nfl",
+        "timestamp": "2025-11-14T20:34:33.775144159+00:00"
+      },
+      "realApiCall": false
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 9,
+    "failed": 1,
+    "realApiCalls": 2
+  }
+}

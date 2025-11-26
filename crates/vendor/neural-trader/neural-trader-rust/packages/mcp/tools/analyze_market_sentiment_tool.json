@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/analyze_market_sentiment_tool.json",
+  "title": "analyze_market_sentiment_tool",
+  "description": "Analyze market probabilities and sentiment.",
+  "category": "prediction",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "analysis_depth": {
+          "type": "string",
+          "default": "standard",
+          "enum": [
+            "quick",
+            "standard",
+            "deep"
+          ]
+        },
+        "include_correlations": {
+          "type": "boolean",
+          "default": true
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "market_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "probabilities": {
+          "type": "object"
+        },
+        "sentiment_score": {
+          "type": "number"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "correlations": {
+          "type": "array"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

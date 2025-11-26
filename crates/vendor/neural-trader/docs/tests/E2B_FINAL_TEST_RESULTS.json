@@ -1,0 +1,123 @@
+{
+  "timestamp": "2025-11-14T20:59:28.310Z",
+  "e2bCredentials": {
+    "apiKey": "✅ Configured",
+    "accessToken": "✅ Configured"
+  },
+  "tests": [
+    {
+      "name": "E2B - Create Sandbox",
+      "success": true,
+      "latency": 1,
+      "error": null,
+      "response": {
+        "name": "neural-trader-final-test",
+        "sandbox_id": "sb_1763153968",
+        "status": "running",
+        "timestamp": "2025-11-14T20:59:28.315661177+00:00"
+      }
+    },
+    {
+      "name": "E2B - List Sandboxes",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "sandboxes": [],
+        "timestamp": "2025-11-14T20:59:28.316619645+00:00",
+        "total_count": 0
+      }
+    },
+    {
+      "name": "E2B - Get Sandbox Status",
+      "success": true,
+      "latency": 1,
+      "error": null,
+      "response": {
+        "metrics": {},
+        "sandbox_id": "sb_1763153968",
+        "status": "running",
+        "timestamp": "2025-11-14T20:59:28.316913235+00:00"
+      }
+    },
+    {
+      "name": "E2B - Execute JavaScript Code",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "execution_id": "exec_1763153968",
+        "exit_code": 0,
+        "output": "",
+        "sandbox_id": "sb_1763153968",
+        "timestamp": "2025-11-14T20:59:28.317212073+00:00"
+      }
+    },
+    {
+      "name": "E2B - Run Trading Agent",
+      "success": false,
+      "latency": 0,
+      "error": "Failed to convert JavaScript value `Boolean false ` into rust type `String`",
+      "response": null
+    },
+    {
+      "name": "E2B - Monitor Health",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "overall_health": "healthy",
+        "sandboxes": [],
+        "timestamp": "2025-11-14T20:59:28.317651192+00:00"
+      }
+    },
+    {
+      "name": "E2B - Deploy Template",
+      "success": false,
+      "latency": 1,
+      "error": "Failed to convert JavaScript value `Object {\"strategy\":\"momentum\",\"symbols\":[\"AAPL\"]}` into rust type `String`",
+      "response": null
+    },
+    {
+      "name": "E2B - Scale Deployment",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "deployment_id": "deployment-test",
+        "instances": 3,
+        "status": "scaled",
+        "timestamp": "2025-11-14T20:59:28.318175310+00:00"
+      }
+    },
+    {
+      "name": "E2B - Export Template",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "sandbox_id": "sb_1763153968",
+        "status": "exported",
+        "template_id": "tpl_1763153968",
+        "timestamp": "2025-11-14T20:59:28.318438639+00:00"
+      }
+    },
+    {
+      "name": "E2B - Terminate Sandbox",
+      "success": true,
+      "latency": 0,
+      "error": null,
+      "response": {
+        "sandbox_id": "sb_1763153968",
+        "status": "terminated",
+        "timestamp": "2025-11-14T20:59:28.318726804+00:00"
+      }
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 8,
+    "failed": 2,
+    "realApiCalls": 1
+  }
+}

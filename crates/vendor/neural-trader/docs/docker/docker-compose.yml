@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  trading-api:
+    build: .
+    container_name: low-latency-trading
+    image: trading-api:latest
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 2G
+        reservations:
+          cpus: '2.0'
+          memory: 1G
+    
+    # Environment variables
+    environment:
+      - POLYGON_API_KEY=${POLYGON_API_KEY}
+      - ALPACA_API_KEY=${ALPACA_API_KEY}
+      - ALPACA_API_SECRET=${ALPACA_API_SECRET}
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONOPTIMIZE=2
+    
+    # Volumes
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+      - ./data:/app/data
+    
+    # Network mode for lowest latency
+    network_mode: host
+    
+    # Privileged for CPU affinity control
+    privileged: true
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    
+    # Capabilities needed for performance tuning
+    cap_add:
+      - SYS_NICE      # For process priority
+      - NET_RAW       # For raw socket access
+      - SYS_RESOURCE  # For resource limits
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:9090/metrics')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        
+  # Monitoring service (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: trading-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    
+volumes:
+  prometheus-data:

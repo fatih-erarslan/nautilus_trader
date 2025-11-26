@@ -1,0 +1,28 @@
+/**
+ * Jest Configuration for E2B Template Tests
+ */
+
+module.exports = {
+  displayName: 'E2B Template Tests',
+  testEnvironment: 'node',
+  testMatch: [
+    '**/tests/e2b/**/*.test.js',
+  ],
+  collectCoverage: false,
+  coverageDirectory: 'coverage/e2b',
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/e2b/fixtures/',
+    '/tests/e2b/helpers/mock-backend.js',
+  ],
+  testTimeout: 120000, // 2 minutes
+  verbose: true,
+  maxWorkers: 3,
+  setupFilesAfterEnv: ['<rootDir>/tests/e2b/setup.js'],
+  globals: {
+    'TEST_MODE': 'e2b-templates',
+  },
+  moduleNameMapper: {
+    '@neural-trader/backend': '<rootDir>/neural-trader-rust/packages/neural-trader-backend',
+  },
+};

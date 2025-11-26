@@ -1,0 +1,53 @@
+{
+  "name": "@neural-trader/midstreamer-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite for midstreamer integration",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:dtw": "jest tests/midstreamer/dtw",
+    "test:lcs": "jest tests/midstreamer/lcs",
+    "test:reasoningbank": "jest tests/midstreamer/reasoningbank",
+    "test:quic": "jest tests/midstreamer/quic",
+    "test:integration": "jest tests/midstreamer/integration",
+    "test:benchmarks": "jest tests/midstreamer/benchmarks",
+    "test:verbose": "jest --verbose",
+    "benchmark": "npm run test:benchmarks -- --verbose"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/midstreamer/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage/midstreamer",
+    "collectCoverageFrom": [
+      "src/midstreamer/**/*.js",
+      "!src/midstreamer/**/*.test.js"
+    ],
+    "coverageThresholds": {
+      "global": {
+        "statements": 80,
+        "branches": 75,
+        "functions": 80,
+        "lines": 80
+      }
+    },
+    "testTimeout": 10000,
+    "verbose": true,
+    "bail": false,
+    "maxWorkers": "50%"
+  },
+  "keywords": [
+    "midstreamer",
+    "dtw",
+    "lcs",
+    "reasoningbank",
+    "quic",
+    "pattern-matching",
+    "testing"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT"
+}

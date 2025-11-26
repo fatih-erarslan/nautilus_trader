@@ -1,0 +1,83 @@
+{
+  "name": "@neural-trader/backtesting",
+  "version": "2.1.1",
+  "description": "High-performance backtesting engine for Neural Trader - Rust-powered NAPI bindings",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "load-binary.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "native"
+  ],
+  "scripts": {
+    "build": "cargo build --package nt-backtesting-napi --release && napi build --platform --release --cargo-cwd ../../crates/backtesting-napi",
+    "build:all": "napi build --platform --release --target x86_64-unknown-linux-gnu --target x86_64-apple-darwin --target aarch64-apple-darwin --target x86_64-pc-windows-msvc --cargo-cwd ../../crates/backtesting-napi",
+    "clean": "cargo clean && rm -f *.node",
+    "test": "jest --testMatch '**/*.test.ts' --passWithNoTests --coverage --collectCoverageFrom='index.js'",
+    "test:unit": "jest --testMatch '**/*unit*.test.ts'",
+    "test:integration": "jest --testMatch '**/*integration*.test.ts'"
+  },
+  "keywords": [
+    "neural-trader",
+    "trading",
+    "algorithmic-trading",
+    "ai",
+    "rust",
+    "napi",
+    "high-performance",
+    "typescript",
+    "claude-code",
+    "mcp",
+    "self-learning",
+    "backtest",
+    "walk-forward",
+    "multi-threaded",
+    "performance",
+    "testing"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "neural-trader-rust/packages/backtesting"
+  },
+  "homepage": "https://neural-trader.ruv.io",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@neural-trader/core": "^1.0.0"
+  },
+  "dependencies": {
+    "detect-libc": "^2.0.2"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "napi": {
+    "name": "neural-trader",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-gnu",
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        "aarch64-apple-darwin",
+        "x86_64-pc-windows-msvc"
+      ]
+    }
+  },
+  "optionalDependencies": {
+    "@neural-trader/backtesting-linux-x64-gnu": "1.0.0",
+    "@neural-trader/backtesting-linux-x64-musl": "1.0.0",
+    "@neural-trader/backtesting-linux-arm64-gnu": "1.0.0",
+    "@neural-trader/backtesting-darwin-x64": "1.0.0",
+    "@neural-trader/backtesting-darwin-arm64": "1.0.0",
+    "@neural-trader/backtesting-win32-x64-msvc": "1.0.0"
+  }
+}

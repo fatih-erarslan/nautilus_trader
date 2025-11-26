@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmitOnError": false,
+    "baseUrl": ".",
+    "paths": {
+      "@neural-trader/agentic-accounting-types": ["../agentic-accounting-types/src/index.ts"],
+      "@neural-trader/agentic-accounting-types/*": ["../agentic-accounting-types/src/*"],
+      "@neural-trader/agentic-accounting-core": ["../agentic-accounting-core/src/index.ts"],
+      "@neural-trader/agentic-accounting-core/*": ["../agentic-accounting-core/src/*"],
+      "@neural-trader/agentic-accounting-rust-core": ["../agentic-accounting-rust-core/index.d.ts"],
+      "@neural-trader/agentic-accounting-rust-core/*": ["../agentic-accounting-rust-core/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
+  "references": [
+    { "path": "../agentic-accounting-core" },
+    { "path": "../agentic-accounting-types" }
+  ]
+}

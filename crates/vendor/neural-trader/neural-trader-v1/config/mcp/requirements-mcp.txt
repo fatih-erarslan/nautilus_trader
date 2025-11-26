@@ -1,0 +1,24 @@
+# Official Anthropic MCP Python SDK Requirements
+# Install with: pip install -r requirements-mcp.txt
+
+# Official MCP SDK
+mcp[cli]>=1.9.4
+fastmcp>=2.9.0
+
+# Core dependencies (still needed for trading strategies)
+numpy>=1.21.0
+pandas>=1.5.0
+scipy>=1.9.0
+scikit-learn>=1.1.0
+
+# Financial data and indicators
+yfinance>=0.2.0
+TA-Lib>=0.4.24
+
+# Optional GPU support (uncomment if needed)
+# torch>=2.0.0
+# cupy>=12.0.0
+
+# Development dependencies
+pytest>=7.0.0
+pytest-asyncio>=0.21.0

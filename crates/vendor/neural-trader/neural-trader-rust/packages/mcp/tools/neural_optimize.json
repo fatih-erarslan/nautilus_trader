@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/neural_optimize.json",
+  "title": "neural_optimize",
+  "description": "Optimize neural model hyperparameters.",
+  "category": "neural",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "model_id": {
+          "type": "string"
+        },
+        "parameter_ranges": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "trials": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "optimization_metric": {
+          "type": "string",
+          "default": "mae"
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "model_id",
+        "parameter_ranges"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "optimization_id": {
+          "type": "string"
+        },
+        "best_parameters": {
+          "type": "object"
+        },
+        "best_score": {
+          "type": "number"
+        },
+        "trials_completed": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "very_high",
+    "latency": "slow",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

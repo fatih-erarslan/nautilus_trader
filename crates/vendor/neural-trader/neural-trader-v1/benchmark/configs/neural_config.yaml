@@ -1,0 +1,202 @@
+# Neural Forecasting Configuration
+# Configuration file for Claude-Flow Neural Forecasting commands
+
+# Default model settings
+models:
+  default: "nhits"
+  available:
+    - "nhits"
+    - "nbeats" 
+    - "tft"
+    - "patchtst"
+  
+  # Model-specific configurations
+  nhits:
+    default_epochs: 100
+    default_batch_size: 32
+    default_learning_rate: 0.001
+    max_horizon: 168  # 1 week
+    
+  nbeats:
+    default_epochs: 150
+    default_batch_size: 64
+    default_learning_rate: 0.0001
+    max_horizon: 24   # 1 day
+    
+  tft:
+    default_epochs: 200
+    default_batch_size: 16
+    default_learning_rate: 0.0003
+    max_horizon: 720  # 1 month
+    
+  patchtst:
+    default_epochs: 80
+    default_batch_size: 128
+    default_learning_rate: 0.005
+    max_horizon: 48   # 2 days
+
+# Forecasting settings
+forecasting:
+  default_horizon: 24  # hours
+  default_confidence: 0.95
+  max_horizon: 720     # 30 days
+  min_horizon: 1       # 1 hour
+  
+  # Data requirements
+  min_training_samples: 1000
+  validation_split: 0.2
+  test_split: 0.1
+
+# GPU settings
+gpu:
+  enabled: true
+  memory_fraction: 0.8
+  allow_growth: true
+  fallback_to_cpu: true
+
+# Optimization settings
+optimization:
+  default_trials: 50
+  max_trials: 1000
+  timeout: 3600  # 1 hour
+  
+  # Parameter search spaces
+  search_spaces:
+    learning_rate:
+      type: "log_uniform"
+      low: 1e-5
+      high: 1e-1
+      
+    batch_size:
+      type: "choice"
+      values: [16, 32, 64, 128, 256]
+      
+    hidden_size:
+      type: "choice" 
+      values: [64, 128, 256, 512, 1024]
+      
+    num_layers:
+      type: "int_uniform"
+      low: 1
+      high: 6
+      
+    dropout:
+      type: "uniform"
+      low: 0.0
+      high: 0.5
+
+# Evaluation metrics
+metrics:
+  default: ["mae", "mape", "rmse"]
+  available:
+    - "mae"     # Mean Absolute Error
+    - "mape"    # Mean Absolute Percentage Error
+    - "rmse"    # Root Mean Square Error  
+    - "smape"   # Symmetric Mean Absolute Percentage Error
+    - "mse"     # Mean Square Error
+    - "r2"      # R-squared
+    - "sharpe"  # Sharpe Ratio (for trading)
+
+# Backtesting settings
+backtesting:
+  default_capital: 10000
+  max_capital: 1000000
+  min_capital: 1000
+  
+  # Risk management
+  max_position_size: 0.95  # 95% of capital
+  stop_loss: 0.05          # 5% stop loss
+  take_profit: 0.15        # 15% take profit
+  
+  # Trading strategies
+  strategies:
+    - "buy_hold"
+    - "momentum"
+    - "mean_reversion"
+    - "trend_following"
+
+# Deployment settings
+deployment:
+  environments:
+    - "development"
+    - "staging" 
+    - "production"
+    
+  default_environment: "development"
+  
+  # Health check settings
+  health_checks:
+    latency_threshold: 200    # ms
+    accuracy_threshold: 0.85  # 85%
+    error_rate_threshold: 0.02 # 2%
+    
+  # Rollback settings
+  rollback:
+    auto_rollback: true
+    error_rate_threshold: 0.1  # 10%
+    latency_threshold: 500     # ms
+
+# Monitoring settings
+monitoring:
+  default_refresh: 30  # seconds
+  dashboard_port: 8080
+  metrics_retention: 30  # days
+  
+  # Alert thresholds
+  alerts:
+    high_error_rate: 0.05      # 5%
+    high_latency: 300          # ms
+    low_accuracy: 0.8          # 80%
+    memory_usage: 0.9          # 90%
+    cpu_usage: 0.8             # 80%
+
+# Output settings  
+output:
+  default_format: "text"
+  formats:
+    - "text"
+    - "json"
+    - "csv"
+    - "html"
+    
+  # File naming
+  timestamp_format: "%Y%m%d_%H%M%S"
+  
+  # Plotting
+  plot:
+    figure_size: [12, 6]
+    dpi: 300
+    style: "seaborn"
+    colors:
+      forecast: "#2E86AB"
+      actual: "#A23B72"
+      confidence: "#F18F01"
+
+# Data sources
+data:
+  sources:
+    - "yahoo"
+    - "alpha_vantage"
+    - "quandl"
+    - "fred"
+    
+  # Cache settings
+  cache:
+    enabled: true
+    ttl: 3600  # 1 hour
+    max_size: 1000  # MB
+    
+  # Validation
+  validation:
+    check_missing_values: true
+    check_duplicates: true
+    check_outliers: true
+    outlier_threshold: 3  # standard deviations
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "neural_forecasting.log"
+  max_size: 10  # MB
+  backup_count: 5

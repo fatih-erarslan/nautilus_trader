@@ -1,0 +1,66 @@
+[package]
+name = "neuro-divergent-napi"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "NAPI bindings for Neuro-Divergent neural forecasting models"
+documentation = "https://docs.rs/neuro-divergent-napi"
+readme = "README.md"
+keywords = ["napi", "neural", "forecasting", "time-series", "trading"]
+categories = ["api-bindings", "science"]
+
+[lib]
+crate-type = ["cdylib"]
+name = "neuro_divergent_napi"
+
+[dependencies]
+# Core neuro-divergent crate
+neuro-divergent = { version = "2.1.0", path = "../neuro-divergent" }
+
+# Neural network dependencies
+nt-neural = { version = "2.1.0", path = "../neural" }
+nt-core = { version = "2.1.0", path = "../core" }
+
+# NAPI-RS for Node.js FFI
+napi = { version = "2.16", features = ["async", "tokio_rt"] }
+napi-derive = "2.16"
+
+# Async runtime
+tokio = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Utilities
+chrono = { workspace = true }
+tracing = { workspace = true }
+
+# Numerical computing
+ndarray = "0.15"
+ndarray-rand = "0.14"
+
+[build-dependencies]
+napi-build = "2.1"
+
+[features]
+default = []
+
+# Package metadata for napi-rs
+[package.metadata.napi]
+name = "neuro-divergent"
+targets = [
+  "x86_64-unknown-linux-gnu",
+  "x86_64-apple-darwin",
+  "aarch64-apple-darwin",
+  "x86_64-pc-windows-msvc",
+  "aarch64-unknown-linux-gnu",
+  "x86_64-unknown-linux-musl",
+  "aarch64-unknown-linux-musl"
+]

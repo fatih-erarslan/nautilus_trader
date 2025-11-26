@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/simulate_trade.json",
+  "title": "simulate_trade",
+  "description": "Simulate a trading operation with performance tracking.",
+  "category": "trading",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "description": "Trading strategy name"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "description": "Trade action"
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable GPU acceleration"
+        }
+      },
+      "required": [
+        "strategy",
+        "symbol",
+        "action"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "simulation_id": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "entry_price": {
+          "type": "number"
+        },
+        "exit_price": {
+          "type": "number"
+        },
+        "profit_loss": {
+          "type": "number"
+        },
+        "profit_loss_percent": {
+          "type": "number"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "risk_metrics": {
+          "type": "object",
+          "properties": {
+            "var_95": {
+              "type": "number"
+            },
+            "sharpe_ratio": {
+              "type": "number"
+            }
+          }
+        },
+        "execution_time": {
+          "type": "string"
+        },
+        "gpu_accelerated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "simulation_id",
+        "strategy",
+        "symbol",
+        "profit_loss"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "medium",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

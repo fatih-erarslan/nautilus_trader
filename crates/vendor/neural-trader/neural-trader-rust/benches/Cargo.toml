@@ -1,0 +1,59 @@
+[package]
+name = "nt-benches"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bench]]
+name = "market_data_throughput"
+harness = false
+
+[[bench]]
+name = "feature_extraction_latency"
+harness = false
+
+[[bench]]
+name = "strategy_execution"
+harness = false
+
+[[bench]]
+name = "order_placement"
+harness = false
+
+[[bench]]
+name = "risk_calculations"
+harness = false
+
+[[bench]]
+name = "portfolio_updates"
+harness = false
+
+[[bench]]
+name = "agentdb_queries"
+harness = false
+
+[[bench]]
+name = "trading_benchmarks"
+harness = false
+
+[dependencies]
+# Workspace crates
+nt-core = { path = "../crates/core" }
+nt-market-data = { path = "../crates/market-data" }
+nt-features = { path = "../crates/features" }
+nt-strategies = { path = "../crates/strategies" }
+nt-execution = { path = "../crates/execution" }
+nt-portfolio = { path = "../crates/portfolio" }
+nt-risk = { path = "../crates/risk" }
+nt-agentdb-client = { path = "../crates/agentdb-client" }
+
+# Workspace dependencies
+tokio = { workspace = true }
+criterion = { workspace = true }
+rust_decimal = { workspace = true }
+chrono = { workspace = true }
+serde_json = { workspace = true }
+
+# Additional for benchmarks
+rand = "0.8"
+rust_decimal_macros = "1.33"

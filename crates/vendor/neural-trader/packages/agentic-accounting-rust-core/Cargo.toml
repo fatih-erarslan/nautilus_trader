@@ -1,0 +1,45 @@
+[package]
+name = "agentic-accounting-rust-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["Neural Trader Team"]
+description = "High-performance Rust addon for crypto tax calculations"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+napi = "2"
+napi-derive = "2"
+rust_decimal = "1.33"
+rust_decimal_macros = "1.33"
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+uuid = { version = "1.6", features = ["v4"] }
+
+[build-dependencies]
+napi-build = "2"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+strip = true
+
+[[bench]]
+name = "tax_calculations"
+harness = false
+
+[[bench]]
+name = "fifo_benchmark"
+harness = false
+
+[[bench]]
+name = "wash_sale_benchmark"
+harness = false

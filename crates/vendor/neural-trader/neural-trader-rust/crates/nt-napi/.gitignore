@@ -1,0 +1,17 @@
+# NAPI build artifacts
+*.node
+index.js
+index.d.ts
+
+# Cargo build
+/target
+Cargo.lock
+
+# NPM
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build artifacts
+/dist
+/build

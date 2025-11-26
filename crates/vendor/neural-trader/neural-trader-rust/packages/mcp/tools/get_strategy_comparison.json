@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_strategy_comparison.json",
+  "title": "get_strategy_comparison",
+  "description": "Compare multiple strategies across metrics.",
+  "category": "strategy",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "sharpe_ratio",
+            "total_return",
+            "max_drawdown"
+          ]
+        }
+      },
+      "required": [
+        "strategies"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "comparison": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "strategy": {
+                "type": "string"
+              },
+              "metrics": {
+                "type": "object"
+              },
+              "rank": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "best_overall": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

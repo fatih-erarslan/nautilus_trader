@@ -1,0 +1,63 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Rust build artifacts
+target/
+**/*.rs.bk
+*.pdb
+
+# Cargo lock for libraries (keep for binaries)
+# Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CI/CD
+.github/
+
+# Documentation
+*.md
+docs/
+VALIDATION_REPORT.md
+RELEASE.md
+SECURITY.md
+
+# Node.js
+node_modules/
+npm/
+index.js
+index.d.ts
+package.json
+package-lock.json
+
+# Test data
+tests/fixtures/
+tests/data/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+
+# Database
+*.db
+*.sqlite
+
+# Models (large files)
+models/
+*.pt
+*.onnx
+
+# Temporary files
+tmp/
+temp/

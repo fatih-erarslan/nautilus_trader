@@ -1,0 +1,88 @@
+# Docker Compose for local GPU testing
+version: '3.8'
+
+services:
+  ruvtrade:
+    build:
+      context: ..
+      dockerfile: fly_deployment/Dockerfile
+    ports:
+      - "8080:8080"
+      - "9090:9090"  # Metrics port
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - RAPIDS_NO_INITIALIZE=1
+      - CUPY_CACHE_DIR=/tmp/.cupy
+      - PYTHONPATH=/app
+      - LOG_LEVEL=DEBUG
+      - TRADING_MODE=development
+      - MAX_CONCURRENT_TRADES=5
+      - RISK_MULTIPLIER=0.5
+    volumes:
+      - ../src:/app/src
+      - ../memory:/app/memory
+      - ../results:/app/results
+      - gpu_cache:/tmp/.cupy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - ruvtrade_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ruvtrade_network
+    command: redis-server --appendonly yes
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=ruvtrade
+      - POSTGRES_USER=trading
+      - POSTGRES_PASSWORD=secure_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ruvtrade_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - ruvtrade_network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+volumes:
+  redis_data:
+  postgres_data:
+  prometheus_data:
+  gpu_cache:
+
+networks:
+  ruvtrade_network:
+    driver: bridge

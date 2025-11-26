@@ -1,0 +1,1 @@
+"""Asset trading module for stocks, bonds, and multi-asset strategies."""

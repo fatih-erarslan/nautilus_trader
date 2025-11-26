@@ -1,0 +1,254 @@
+name: Build Backend Multi-Platform
+
+on:
+  push:
+    branches: [main, rust-port]
+    paths:
+      - 'neural-trader-rust/packages/neural-trader-backend/**'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x64 GNU
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux-x64-gnu
+
+          # Linux x64 MUSL
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            platform: linux-x64-musl
+            musl: true
+
+          # Linux ARM64 GNU
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            platform: linux-arm64-gnu
+            cross: true
+
+          # Linux ARM64 MUSL
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            platform: linux-arm64-musl
+            cross: true
+            musl: true
+
+          # macOS Intel
+          - os: macos-13
+            target: x86_64-apple-darwin
+            platform: darwin-x64
+
+          # macOS ARM (M1/M2/M3)
+          - os: macos-14
+            target: aarch64-apple-darwin
+            platform: darwin-arm64
+
+          # Windows x64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: win32-x64-msvc
+
+          # Windows ARM64
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            platform: win32-arm64-msvc
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: neural-trader-rust
+          key: ${{ matrix.target }}
+
+      # Linux MUSL setup
+      - name: Install MUSL tools
+        if: matrix.musl && !matrix.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      # Linux ARM64 cross-compilation
+      - name: Install cross-compilation tools (ARM64)
+        if: matrix.cross
+        run: |
+          sudo apt-get update
+          if [ "${{ matrix.musl }}" = "true" ]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu musl-tools
+          else
+            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          fi
+
+      - name: Install dependencies
+        working-directory: neural-trader-rust/packages/neural-trader-backend
+        run: npm install
+
+      - name: Build binary
+        working-directory: neural-trader-rust
+        env:
+          CARGO_BUILD_TARGET: ${{ matrix.target }}
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+          CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
+        run: |
+          cargo build --package nt-napi-bindings --release --target ${{ matrix.target }}
+
+      - name: Copy binary
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          BINARY=$(find neural-trader-rust/target/${{ matrix.target }}/release -name "*.node" -type f | head -n 1)
+          if [ -f "$BINARY" ]; then
+            cp "$BINARY" "artifacts/neural-trader-backend.${{ matrix.platform }}.node"
+            ls -lh "artifacts/neural-trader-backend.${{ matrix.platform }}.node"
+          else
+            echo "ERROR: Binary not found!"
+            exit 1
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-${{ matrix.platform }}
+          path: artifacts/*.node
+          retention-days: 7
+          if-no-files-found: error
+
+  create-platform-packages:
+    name: Create Platform Packages
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform:
+          - linux-x64-gnu
+          - linux-x64-musl
+          - linux-arm64-gnu
+          - linux-arm64-musl
+          - darwin-x64
+          - darwin-arm64
+          - win32-x64-msvc
+          - win32-arm64-msvc
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download binary
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-${{ matrix.platform }}
+          path: binaries
+
+      - name: Create platform package
+        working-directory: neural-trader-rust/packages/neural-trader-backend
+        run: |
+          mkdir -p npm/${{ matrix.platform }}
+          cp ../../../binaries/neural-trader-backend.${{ matrix.platform }}.node npm/${{ matrix.platform }}/
+
+          # Create platform-specific package.json
+          cat > npm/${{ matrix.platform }}/package.json << EOF
+          {
+            "name": "@neural-trader/backend-${{ matrix.platform }}",
+            "version": "2.1.1",
+            "description": "Neural Trader backend native binary for ${{ matrix.platform }}",
+            "main": "neural-trader-backend.${{ matrix.platform }}.node",
+            "repository": {
+              "type": "git",
+              "url": "https://github.com/ruvnet/neural-trader.git"
+            },
+            "license": "MIT",
+            "os": ["$(echo ${{ matrix.platform }} | cut -d- -f1)"],
+            "cpu": ["$(echo ${{ matrix.platform }} | cut -d- -f2)"]
+          }
+          EOF
+
+          # Create README
+          cat > npm/${{ matrix.platform }}/README.md << EOF
+          # @neural-trader/backend-${{ matrix.platform }}
+
+          Native binary for @neural-trader/backend on ${{ matrix.platform }}.
+
+          This package is automatically installed as an optional dependency of @neural-trader/backend.
+          EOF
+
+      - name: Publish platform package
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        working-directory: neural-trader-rust/packages/neural-trader-backend/npm/${{ matrix.platform }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public || echo "Package may already exist"
+
+  update-main-package:
+    name: Update Main Package
+    needs: create-platform-packages
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Update package.json with optional dependencies
+        working-directory: neural-trader-rust/packages/neural-trader-backend
+        run: |
+          # Add optional dependencies back
+          npm pkg set 'optionalDependencies.@neural-trader/backend-linux-x64-gnu'="2.1.1"
+          npm pkg set 'optionalDependencies.@neural-trader/backend-linux-x64-musl'="2.1.1"
+          npm pkg set 'optionalDependencies.@neural-trader/backend-linux-arm64-gnu'="2.1.1"
+          npm pkg set 'optionalDependencies.@neural-trader/backend-linux-arm64-musl'="2.1.1"
+          npm pkg set 'optionalDependencies.@neural-trader/backend-darwin-x64'="2.1.1"
+          npm pkg set 'optionalDependencies.@neural-trader/backend-darwin-arm64'="2.1.1"
+          npm pkg set 'optionalDependencies.@neural-trader/backend-win32-x64-msvc'="2.1.1"
+          npm pkg set 'optionalDependencies.@neural-trader/backend-win32-arm64-msvc'="2.1.1"
+
+          # Remove .node files from main package
+          npm pkg set 'files[0]'="index.js"
+          npm pkg set 'files[1]'="index.d.ts"
+          npm pkg set 'files[2]'="README.md"
+          npm pkg set 'files[3]'="LICENSE"
+          npm pkg set 'files[4]'="scripts/postinstall.js"
+
+          cat package.json
+
+      - name: Publish main package
+        working-directory: neural-trader-rust/packages/neural-trader-backend
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm version patch --no-git-tag-version
+          npm publish --access public

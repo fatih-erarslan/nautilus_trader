@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/calculate_expected_value_tool.json",
+  "title": "calculate_expected_value_tool",
+  "description": "Calculate expected value for prediction markets.",
+  "category": "prediction",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "confidence_adjustment": {
+          "type": "number",
+          "default": 1
+        },
+        "include_fees": {
+          "type": "boolean",
+          "default": true
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "market_id",
+        "investment_amount"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "expected_value": {
+          "type": "number"
+        },
+        "kelly_criterion": {
+          "type": "number"
+        },
+        "recommended_size": {
+          "type": "number"
+        },
+        "risk_reward_ratio": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "medium",
+    "latency": "fast",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

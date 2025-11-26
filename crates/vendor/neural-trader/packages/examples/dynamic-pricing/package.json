@@ -1,0 +1,85 @@
+{
+  "name": "@neural-trader/example-dynamic-pricing",
+  "version": "1.0.0",
+  "description": "Neural AI dynamic pricing with self-learning reinforcement learning optimization, swarm-based strategy exploration, demand elasticity modeling, and real-time price adaptation for e-commerce",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint src tests --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "dynamic-pricing",
+    "reinforcement-learning",
+    "price-optimization",
+    "swarm-intelligence",
+    "neural-trader",
+    "ai",
+    "neural-network",
+    "machine-learning",
+    "self-learning",
+    "optimization",
+    "typescript",
+    "agentdb",
+    "agentic-flow",
+    "revenue-management",
+    "demand-elasticity",
+    "real-time",
+    "e-commerce",
+    "pricing-strategy",
+    "competitive-pricing",
+    "market-analysis",
+    "algorithmic-pricing",
+    "deep-learning"
+  ],
+  "author": "Neural Trader Team",
+  "license": "MIT OR Apache-2.0",
+  "homepage": "https://github.com/ruvnet/neural-trader#readme",
+  "bugs": {
+    "url": "https://github.com/ruvnet/neural-trader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/neural-trader.git",
+    "directory": "packages/examples/dynamic-pricing"
+  },
+  "dependencies": {
+    "@neural-trader/predictor": "workspace:*",
+    "agentdb": "^1.0.0",
+    "agentic-flow": "^2.0.0",
+    "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/jest": "^29.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "ts-node": "^10.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

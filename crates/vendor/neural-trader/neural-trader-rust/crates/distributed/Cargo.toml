@@ -1,0 +1,89 @@
+[package]
+name = "neural-trader-distributed"
+version = "2.0.0"
+edition = "2021"
+authors = ["Neural Trader Contributors"]
+description = "Distributed systems integration for Neural Trader - E2B sandboxes, agentic-flow, and consensus"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ruvnet/neural-trader"
+documentation = "https://docs.rs/neural-trader-distributed"
+readme = "README.md"
+keywords = ["trading", "distributed", "e2b", "consensus", "federation"]
+categories = ["network-programming", "asynchronous", "finance"]
+
+[dependencies]
+# Core async runtime
+tokio = { version = "1.35", features = ["full"] }
+tokio-util = { version = "0.7", features = ["codec"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# HTTP client for E2B API
+reqwest = { version = "0.11", features = ["json", "stream"] }
+hyper = { version = "0.14", features = ["full"] }
+
+# Node.js bridge for NPM packages
+napi = "2.16"
+napi-derive = "2.16"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Async channels and synchronization
+async-trait = "0.1"
+futures = "0.3"
+crossbeam = "0.8"
+
+# UUID generation
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Configuration
+config = "0.14"
+
+# Database for state persistence
+sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "sqlite", "postgres"] }
+
+# Metrics and monitoring
+prometheus = "0.13"
+
+# Load balancing and service discovery
+tower = { version = "0.4", features = ["full"] }
+
+# gRPC for inter-node communication
+tonic = "0.10"
+prost = "0.12"
+
+# Consensus protocols (Raft)
+raft = "0.7"
+
+# Distributed tracing
+opentelemetry = "0.21"
+
+# Random number generation
+rand = "0.8"
+
+[dev-dependencies]
+mockall = "0.12"
+criterion = "0.5"
+
+[build-dependencies]
+tonic-build = "0.10"
+
+# Benchmarks temporarily disabled - files not created yet
+# [[bench]]
+# name = "sandbox_bench"
+# harness = false
+#
+# [[bench]]
+# name = "federation_bench"
+# harness = false

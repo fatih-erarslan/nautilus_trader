@@ -1,0 +1,238 @@
+{
+  "timestamp": "2025-11-15T00:48:33.162Z",
+  "environment": {
+    "nodeVersion": "v22.17.0",
+    "platform": "linux",
+    "e2bApiKey": "✅ Configured",
+    "e2bAccessToken": "✅ Configured"
+  },
+  "benchmarks": [
+    {
+      "name": "Tool 1: create_e2b_sandbox - Basic Creation",
+      "category": "sandboxCreation",
+      "success": false,
+      "duration": 1,
+      "error": {
+        "message": "Cannot read properties of undefined (reading 'create')",
+        "code": "UNKNOWN",
+        "stack": "TypeError: Cannot read properties of undefined (reading 'create')\n    at /workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:191:45\n    at runTest (/workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:104:28)\n    at main (/workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:188:30)\n    at Object.<anonymous> (/workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:904:1)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)"
+      },
+      "details": null,
+      "metrics": {}
+    },
+    {
+      "name": "Tool 3: list_e2b_sandboxes - Sandbox Inventory",
+      "category": "statusCheck",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "count": 0,
+        "sandboxIds": []
+      },
+      "metrics": {
+        "performance": "GOOD",
+        "vsTarget": "0.0%"
+      }
+    },
+    {
+      "name": "Tool 7: deploy_e2b_template - Deploy Trading Template",
+      "category": "functionality",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "template": "momentum-trading",
+        "category": "trading",
+        "status": "configured"
+      },
+      "metrics": {
+        "performance": "GOOD",
+        "vsTarget": "0.0%"
+      }
+    },
+    {
+      "name": "Tool 9: monitor_e2b_health - Health Check",
+      "category": "healthMonitor",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "timestamp": "2025-11-15T00:48:33.171Z",
+        "totalSandboxes": 0,
+        "healthy": 0,
+        "degraded": 0,
+        "unhealthy": 0,
+        "metrics": {
+          "avgResponseTime": 0,
+          "errorRate": 0.3333333333333333
+        }
+      },
+      "metrics": {
+        "performance": "GOOD",
+        "vsTarget": "0.0%"
+      }
+    },
+    {
+      "name": "Parallel Sandbox Creation (10 concurrent)",
+      "category": "functionality",
+      "success": false,
+      "duration": 0,
+      "error": {
+        "message": "Cannot read properties of undefined (reading 'create')",
+        "code": "UNKNOWN",
+        "stack": "TypeError: Cannot read properties of undefined (reading 'create')\n    at /workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:396:25\n    at Array.map (<anonymous>)\n    at /workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:395:48\n    at runTest (/workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:104:28)\n    at main (/workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:387:32)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)"
+      },
+      "details": null,
+      "metrics": {}
+    },
+    {
+      "name": "API Latency - Multiple Status Checks",
+      "category": "statusCheck",
+      "success": true,
+      "duration": 255,
+      "error": null,
+      "details": {
+        "iterations": 5,
+        "avg": 50.6,
+        "min": 50,
+        "max": 53,
+        "latencies": [
+          53,
+          50,
+          50,
+          50,
+          50
+        ]
+      },
+      "metrics": {
+        "performance": "GOOD",
+        "vsTarget": "51.0%"
+      }
+    },
+    {
+      "name": "Connection Resilience - Multiple Operations",
+      "category": "functionality",
+      "success": false,
+      "duration": 1,
+      "error": {
+        "message": "No sandboxes available",
+        "code": "UNKNOWN",
+        "stack": "Error: No sandboxes available\n    at /workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:507:15\n    at runTest (/workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:104:28)\n    at main (/workspaces/neural-trader/tests/e2b_mcp_comprehensive_benchmark.js:503:9)"
+      },
+      "details": null,
+      "metrics": {}
+    },
+    {
+      "name": "Tool 5: terminate_e2b_sandbox - Cleanup All Sandboxes",
+      "category": "cleanup",
+      "success": true,
+      "duration": 0,
+      "error": null,
+      "details": {
+        "totalSandboxes": 0,
+        "successful": 0,
+        "failed": 0,
+        "duration": 0,
+        "results": []
+      },
+      "metrics": {
+        "performance": "GOOD",
+        "vsTarget": "0.0%"
+      }
+    }
+  ],
+  "tools": {},
+  "summary": {
+    "totalTests": 8,
+    "passed": 5,
+    "failed": 3,
+    "duration": 261,
+    "totalCost": 0.001
+  },
+  "performance": {
+    "sandboxCreation": [],
+    "codeExecution": [],
+    "parallelCreation": null,
+    "apiLatency": [
+      {
+        "iteration": 1,
+        "latency": 53
+      },
+      {
+        "iteration": 2,
+        "latency": 50
+      },
+      {
+        "iteration": 3,
+        "latency": 50
+      },
+      {
+        "iteration": 4,
+        "latency": 50
+      },
+      {
+        "iteration": 5,
+        "latency": 50
+      }
+    ]
+  },
+  "reliability": {
+    "errorRecovery": [],
+    "failoverTests": [],
+    "cleanupCompleteness": [
+      {
+        "total": 0,
+        "successful": 0,
+        "failed": 0,
+        "duration": 0
+      }
+    ]
+  },
+  "costs": {
+    "byOperation": {
+      "terminate_e2b_sandbox": {
+        "operation": "terminate_e2b_sandbox",
+        "duration": 0,
+        "sandboxCount": 0,
+        "breakdown": {
+          "sandbox": 0,
+          "execution": 0,
+          "api": 0.001
+        },
+        "total": 0.001
+      }
+    },
+    "totalEstimated": 0.001,
+    "breakdown": [
+      {
+        "operation": "terminate_e2b_sandbox",
+        "cost": 0.001,
+        "percentage": 100
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "category": "Cost",
+      "priority": "MEDIUM",
+      "issue": "terminate_e2b_sandbox accounts for 100.0% of total costs",
+      "recommendation": "Implement aggressive cleanup of idle sandboxes and sandbox pooling",
+      "estimatedSavings": "30-50% cost reduction"
+    },
+    {
+      "category": "Reliability",
+      "priority": "HIGH",
+      "issue": "Error rate of 37.5% exceeds 10% threshold",
+      "recommendation": "Implement retry logic with exponential backoff for transient failures",
+      "estimatedImprovement": "Reduce error rate to <5%"
+    },
+    {
+      "category": "Integration",
+      "priority": "MEDIUM",
+      "issue": "Limited integration with ReasoningBank and swarm coordination",
+      "recommendation": "Implement E2B sandbox state persistence to ReasoningBank for cross-session learning",
+      "estimatedImprovement": "Enable multi-session strategy optimization"
+    }
+  ]
+}

@@ -1,0 +1,273 @@
+name: Build Multi-Platform NAPI Bindings
+
+on:
+  push:
+    branches: [main, develop, rust-port]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x64 GNU
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            build: npm run build
+
+          # Linux x64 MUSL (Alpine)
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            build: |
+              npm run build -- --target x86_64-unknown-linux-musl
+            docker: true
+
+          # Linux ARM64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            build: |
+              sudo apt-get update
+              sudo apt-get install -y gcc-aarch64-linux-gnu
+              npm run build -- --target aarch64-unknown-linux-gnu
+
+          # macOS Intel
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            build: npm run build
+
+          # macOS ARM (M1/M2)
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            build: npm run build -- --target aarch64-apple-darwin
+
+          # Windows x64
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            build: npm run build
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: neural-trader-rust/package-lock.json
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+          profile: minimal
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry/cache
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache Cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry/index
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-
+
+      - name: Cache target directory
+        uses: actions/cache@v3
+        with:
+          path: neural-trader-rust/target
+          key: ${{ matrix.target }}-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.target }}-target-
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./neural-trader-rust
+
+      - name: Install NAPI CLI
+        run: npm install -g @napi-rs/cli
+
+      - name: Build bindings (Docker)
+        if: matrix.docker
+        uses: docker://ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+        with:
+          args: sh -c "cd neural-trader-rust/packages && ${{ matrix.build }}"
+
+      - name: Build bindings (Native)
+        if: ${{ !matrix.docker }}
+        run: ${{ matrix.build }}
+        working-directory: ./neural-trader-rust/packages
+        env:
+          CARGO_BUILD_TARGET: ${{ matrix.target }}
+
+      - name: List built bindings
+        run: |
+          echo "Built bindings for ${{ matrix.target }}:"
+          find packages -name "*.node" -type f
+        working-directory: ./neural-trader-rust
+
+      - name: Test bindings (Non-Docker)
+        if: ${{ !matrix.docker && matrix.target == runner.arch }}
+        run: |
+          node -e "
+          const packages = [
+            'backtesting', 'neural', 'risk', 'strategies',
+            'portfolio', 'execution', 'brokers', 'market-data', 'features'
+          ];
+          packages.forEach(pkg => {
+            try {
+              const binding = require('./' + pkg);
+              console.log('✓ ' + pkg + ' loaded successfully');
+            } catch (err) {
+              console.error('✗ ' + pkg + ' failed:', err.message);
+              process.exit(1);
+            }
+          });
+          "
+        working-directory: ./neural-trader-rust/packages
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: bindings-${{ matrix.target }}
+          path: |
+            neural-trader-rust/packages/backtesting/*.node
+            neural-trader-rust/packages/neural/*.node
+            neural-trader-rust/packages/risk/*.node
+            neural-trader-rust/packages/strategies/*.node
+            neural-trader-rust/packages/portfolio/*.node
+            neural-trader-rust/packages/execution/*.node
+            neural-trader-rust/packages/brokers/*.node
+            neural-trader-rust/packages/market-data/*.node
+            neural-trader-rust/packages/features/*.node
+          if-no-files-found: error
+          retention-days: 7
+
+  test-bindings:
+    name: Test Bindings
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ['18', '20']
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Download artifacts (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-x86_64-unknown-linux-gnu
+          path: neural-trader-rust/packages
+
+      - name: Download artifacts (macOS)
+        if: runner.os == 'macOS'
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-aarch64-apple-darwin
+          path: neural-trader-rust/packages
+
+      - name: Download artifacts (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/download-artifact@v3
+        with:
+          name: bindings-x86_64-pc-windows-msvc
+          path: neural-trader-rust/packages
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./neural-trader-rust
+
+      - name: Test all bindings
+        run: |
+          node -e "
+          const packages = [
+            'backtesting', 'neural', 'risk', 'strategies',
+            'portfolio', 'execution', 'brokers', 'market-data', 'features'
+          ];
+          let failed = false;
+          packages.forEach(pkg => {
+            try {
+              const binding = require('./' + pkg);
+              console.log('✓ ' + pkg + ' loaded successfully on Node ' + process.version);
+              console.log('  Functions:', Object.keys(binding).slice(0, 5).join(', '));
+            } catch (err) {
+              console.error('✗ ' + pkg + ' failed:', err.message);
+              failed = true;
+            }
+          });
+          if (failed) process.exit(1);
+          "
+        working-directory: ./neural-trader-rust/packages
+
+  publish:
+    name: Publish to NPM
+    needs: [build, test-bindings]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Copy bindings to packages
+        run: |
+          for artifact in artifacts/bindings-*; do
+            echo "Copying from $artifact"
+            cp -r $artifact/* neural-trader-rust/packages/
+          done
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./neural-trader-rust
+
+      - name: Publish packages
+        run: |
+          packages=(backtesting neural risk strategies portfolio execution brokers market-data features)
+          for pkg in "${packages[@]}"; do
+            echo "Publishing @neural-trader/$pkg..."
+            cd $pkg
+            npm publish --access public
+            cd ..
+          done
+        working-directory: ./neural-trader-rust/packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

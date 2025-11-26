@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/scale_e2b_deployment.json",
+  "title": "scale_e2b_deployment",
+  "description": "Scale E2B deployment to multiple instances.",
+  "category": "e2b",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "deployment_id": {
+          "type": "string"
+        },
+        "instance_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "auto_scale": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "deployment_id",
+        "instance_count"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "deployment_id": {
+          "type": "string"
+        },
+        "instances": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sandbox_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "total_instances": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "deployment_id",
+        "instances"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "very_high",
+    "latency": "slow",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

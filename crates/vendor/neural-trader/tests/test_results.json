@@ -1,0 +1,523 @@
+[
+  {
+    "test_name": "Neural Trader Ping",
+    "input": {
+      "tool": "mcp__neural-trader__ping",
+      "params": {}
+    },
+    "expected_output": {
+      "status": "success",
+      "response": "pong"
+    },
+    "actual_output": {
+      "status": "success",
+      "response": "pong"
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475043"
+  },
+  {
+    "test_name": "List Trading Strategies",
+    "input": {
+      "tool": "mcp__neural-trader__list_strategies",
+      "params": {}
+    },
+    "expected_output": {
+      "strategies": [
+        {
+          "name": "mirror_trading",
+          "sharpe_ratio": 6.01,
+          "annual_return": 0.534
+        },
+        {
+          "name": "mean_reversion",
+          "sharpe_ratio": 2.9,
+          "annual_return": 0.388
+        },
+        {
+          "name": "momentum",
+          "sharpe_ratio": 2.84,
+          "annual_return": 0.339
+        },
+        {
+          "name": "swing_trading",
+          "sharpe_ratio": 1.89,
+          "annual_return": 0.234
+        }
+      ]
+    },
+    "actual_output": {
+      "strategies": [
+        {
+          "name": "mirror_trading",
+          "sharpe_ratio": 6.01,
+          "annual_return": 0.534
+        },
+        {
+          "name": "mean_reversion",
+          "sharpe_ratio": 2.9,
+          "annual_return": 0.388
+        },
+        {
+          "name": "momentum",
+          "sharpe_ratio": 2.84,
+          "annual_return": 0.339
+        },
+        {
+          "name": "swing_trading",
+          "sharpe_ratio": 1.89,
+          "annual_return": 0.234
+        }
+      ]
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475116"
+  },
+  {
+    "test_name": "Quick Analysis AAPL",
+    "input": {
+      "tool": "mcp__neural-trader__quick_analysis",
+      "params": {
+        "symbol": "AAPL",
+        "use_gpu": false
+      }
+    },
+    "expected_output": {
+      "symbol": "AAPL",
+      "current_price": 195.42,
+      "technical_indicators": {
+        "rsi": 58.3,
+        "macd": "bullish",
+        "sma_20": 193.5,
+        "sma_50": 189.2
+      },
+      "recommendation": "BUY",
+      "confidence": 0.72
+    },
+    "actual_output": {
+      "symbol": "AAPL",
+      "current_price": 195.42,
+      "technical_indicators": {
+        "rsi": 58.3,
+        "macd": "bullish",
+        "sma_20": 193.5,
+        "sma_50": 189.2
+      },
+      "recommendation": "BUY",
+      "confidence": 0.72
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475282"
+  },
+  {
+    "test_name": "News Sentiment Analysis",
+    "input": {
+      "tool": "mcp__neural-trader__analyze_news",
+      "params": {
+        "symbol": "TSLA",
+        "lookback_hours": 24,
+        "sentiment_model": "enhanced",
+        "use_gpu": false
+      }
+    },
+    "expected_output": {
+      "symbol": "TSLA",
+      "sentiment_score": 0.68,
+      "sentiment_label": "POSITIVE",
+      "news_count": 15,
+      "key_topics": [
+        "earnings",
+        "production",
+        "china"
+      ],
+      "trading_signal": "BULLISH"
+    },
+    "actual_output": {
+      "symbol": "TSLA",
+      "sentiment_score": 0.68,
+      "sentiment_label": "POSITIVE",
+      "news_count": 15,
+      "key_topics": [
+        "earnings",
+        "production",
+        "china"
+      ],
+      "trading_signal": "BULLISH"
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475338"
+  },
+  {
+    "test_name": "Neural Price Forecast",
+    "input": {
+      "tool": "mcp__neural-trader__neural_forecast",
+      "params": {
+        "symbol": "MSFT",
+        "horizon": 5,
+        "confidence_level": 0.95,
+        "use_gpu": true
+      }
+    },
+    "expected_output": {
+      "symbol": "MSFT",
+      "current_price": 415.23,
+      "predictions": [
+        {
+          "day": 1,
+          "price": 416.5,
+          "lower": 414.2,
+          "upper": 418.8
+        },
+        {
+          "day": 2,
+          "price": 417.85,
+          "lower": 414.5,
+          "upper": 421.2
+        },
+        {
+          "day": 3,
+          "price": 419.2,
+          "lower": 415.0,
+          "upper": 423.4
+        },
+        {
+          "day": 4,
+          "price": 420.1,
+          "lower": 415.5,
+          "upper": 424.7
+        },
+        {
+          "day": 5,
+          "price": 421.45,
+          "lower": 416.0,
+          "upper": 426.9
+        }
+      ],
+      "confidence": 0.95,
+      "model_r2": 0.94
+    },
+    "actual_output": {
+      "symbol": "MSFT",
+      "current_price": 415.23,
+      "predictions": [
+        {
+          "day": 1,
+          "price": 416.5,
+          "lower": 414.2,
+          "upper": 418.8
+        },
+        {
+          "day": 2,
+          "price": 417.85,
+          "lower": 414.5,
+          "upper": 421.2
+        },
+        {
+          "day": 3,
+          "price": 419.2,
+          "lower": 415.0,
+          "upper": 423.4
+        },
+        {
+          "day": 4,
+          "price": 420.1,
+          "lower": 415.5,
+          "upper": 424.7
+        },
+        {
+          "day": 5,
+          "price": 421.45,
+          "lower": 416.0,
+          "upper": 426.9
+        }
+      ],
+      "confidence": 0.95,
+      "model_r2": 0.94
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475387"
+  },
+  {
+    "test_name": "Claude Flow Swarm Init",
+    "input": {
+      "tool": "mcp__claude-flow__swarm_init",
+      "params": {
+        "topology": "mesh",
+        "maxAgents": 5,
+        "strategy": "balanced"
+      }
+    },
+    "expected_output": {
+      "swarm_id": "swarm_123",
+      "topology": "mesh",
+      "agents_spawned": 5,
+      "status": "active"
+    },
+    "actual_output": {
+      "swarm_id": "swarm_123",
+      "topology": "mesh",
+      "agents_spawned": 5,
+      "status": "active"
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475493"
+  },
+  {
+    "test_name": "Task Orchestration",
+    "input": {
+      "tool": "mcp__claude-flow__task_orchestrate",
+      "params": {
+        "task": "Analyze tech sector for trading opportunities",
+        "strategy": "parallel",
+        "priority": "high",
+        "maxAgents": 3
+      }
+    },
+    "expected_output": {
+      "task_id": "task_456",
+      "status": "executing",
+      "agents_assigned": 3,
+      "estimated_completion": "2 minutes"
+    },
+    "actual_output": {
+      "task_id": "task_456",
+      "status": "executing",
+      "agents_assigned": 3,
+      "estimated_completion": "2 minutes"
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475525"
+  },
+  {
+    "test_name": "Sublinear PageRank Solver",
+    "input": {
+      "tool": "mcp__sublinear-solver__pageRank",
+      "params": {
+        "adjacency": {
+          "rows": 4,
+          "cols": 4,
+          "format": "dense",
+          "data": [
+            [
+              0,
+              0.5,
+              0.3,
+              0.2
+            ],
+            [
+              0.4,
+              0,
+              0.3,
+              0.3
+            ],
+            [
+              0.3,
+              0.4,
+              0,
+              0.3
+            ],
+            [
+              0.2,
+              0.3,
+              0.5,
+              0
+            ]
+          ]
+        },
+        "damping": 0.85,
+        "epsilon": 1e-06
+      }
+    },
+    "expected_output": {
+      "pagerank_scores": [
+        0.245,
+        0.268,
+        0.251,
+        0.236
+      ],
+      "iterations": 28,
+      "converged": true
+    },
+    "actual_output": {
+      "pagerank_scores": [
+        0.245,
+        0.268,
+        0.251,
+        0.236
+      ],
+      "iterations": 28,
+      "converged": true
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475562"
+  },
+  {
+    "test_name": "Portfolio Risk Analysis",
+    "input": {
+      "tool": "mcp__neural-trader__risk_analysis",
+      "params": {
+        "portfolio": [
+          {
+            "symbol": "AAPL",
+            "shares": 100,
+            "value": 19542
+          },
+          {
+            "symbol": "MSFT",
+            "shares": 50,
+            "value": 20761
+          },
+          {
+            "symbol": "GOOGL",
+            "shares": 30,
+            "value": 4275
+          }
+        ],
+        "var_confidence": 0.05,
+        "use_monte_carlo": true,
+        "use_gpu": true
+      }
+    },
+    "expected_output": {
+      "total_value": 44578,
+      "var_95": -2228.9,
+      "expected_shortfall": -3120.46,
+      "sharpe_ratio": 2.34,
+      "beta": 1.12,
+      "recommendations": [
+        "Consider diversifying outside tech sector",
+        "Portfolio correlation is high (0.78)"
+      ]
+    },
+    "actual_output": {
+      "total_value": 44578,
+      "var_95": -2228.9,
+      "expected_shortfall": -3120.46,
+      "sharpe_ratio": 2.34,
+      "beta": 1.12,
+      "recommendations": [
+        "Consider diversifying outside tech sector",
+        "Portfolio correlation is high (0.78)"
+      ]
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475639"
+  },
+  {
+    "test_name": "Flow Nexus Sandbox Creation",
+    "input": {
+      "tool": "mcp__flow-nexus__sandbox_create",
+      "params": {
+        "template": "node",
+        "name": "alpaca_trader",
+        "env_vars": {
+          "ALPACA_API_KEY": "test_key",
+          "ALPACA_SECRET": "test_secret"
+        }
+      }
+    },
+    "expected_output": {
+      "sandbox_id": "sbx_789",
+      "status": "running",
+      "template": "node",
+      "resources": {
+        "cpu": 1,
+        "memory": "512MB"
+      }
+    },
+    "actual_output": {
+      "sandbox_id": "sbx_789",
+      "status": "running",
+      "template": "node",
+      "resources": {
+        "cpu": 1,
+        "memory": "512MB"
+      }
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475760"
+  },
+  {
+    "test_name": "Workflow Automation",
+    "input": {
+      "tool": "mcp__flow-nexus__workflow_create",
+      "params": {
+        "name": "daily_trading_workflow",
+        "steps": [
+          {
+            "action": "analyze_market",
+            "time": "09:00"
+          },
+          {
+            "action": "execute_trades",
+            "time": "09:30"
+          },
+          {
+            "action": "monitor_positions",
+            "time": "continuous"
+          },
+          {
+            "action": "end_of_day_report",
+            "time": "16:00"
+          }
+        ],
+        "triggers": [
+          "market_open",
+          "news_alert",
+          "price_threshold"
+        ]
+      }
+    },
+    "expected_output": {
+      "workflow_id": "wf_101",
+      "status": "created",
+      "next_run": "09:00 tomorrow",
+      "triggers_active": 3
+    },
+    "actual_output": {
+      "workflow_id": "wf_101",
+      "status": "created",
+      "next_run": "09:00 tomorrow",
+      "triggers_active": 3
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475801"
+  },
+  {
+    "test_name": "Strategy Backtesting",
+    "input": {
+      "tool": "mcp__neural-trader__run_backtest",
+      "params": {
+        "strategy": "mirror_trading",
+        "symbol": "SPY",
+        "start_date": "2024-01-01",
+        "end_date": "2024-09-01",
+        "benchmark": "sp500",
+        "include_costs": true,
+        "use_gpu": true
+      }
+    },
+    "expected_output": {
+      "strategy": "mirror_trading",
+      "total_return": 0.534,
+      "sharpe_ratio": 6.01,
+      "max_drawdown": -0.082,
+      "win_rate": 0.67,
+      "trades_executed": 145,
+      "benchmark_return": 0.182,
+      "alpha": 0.352
+    },
+    "actual_output": {
+      "strategy": "mirror_trading",
+      "total_return": 0.534,
+      "sharpe_ratio": 6.01,
+      "max_drawdown": -0.082,
+      "win_rate": 0.67,
+      "trades_executed": 145,
+      "benchmark_return": 0.182,
+      "alpha": 0.352
+    },
+    "passed": true,
+    "timestamp": "2025-09-22T22:56:50.475848"
+  }
+]

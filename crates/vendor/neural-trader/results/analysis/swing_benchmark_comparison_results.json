@@ -1,0 +1,157 @@
+{
+  "timestamp": "2025-06-23T21:35:33.119477",
+  "results": {
+    "original": {
+      "bull": {
+        "strategy_name": "swing",
+        "total_return": 0.013332606973506578,
+        "annualized_return": 0.013332606973506689,
+        "sharpe_ratio": -0.1100512443771423,
+        "sortino_ratio": -0.10978616399071475,
+        "max_drawdown": 0.1493409523309252,
+        "win_rate": 0.6428571428571429,
+        "profit_factor": 1.05031313710077,
+        "total_trades": 14,
+        "avg_trade_duration": 5.928571428571429,
+        "volatility": 0.06058444013267453,
+        "beta": 0.006854073806219866,
+        "alpha": -0.010535765938940296,
+        "calmar_ratio": 0.08927629538589597
+      },
+      "bear": {
+        "strategy_name": "swing",
+        "total_return": 0.3175755631432551,
+        "annualized_return": 0.3175755631432551,
+        "sharpe_ratio": 1.6769578178440174,
+        "sortino_ratio": 1.2979268857759472,
+        "max_drawdown": 0.19477006633261967,
+        "win_rate": 0.56,
+        "profit_factor": 1.6090034339163644,
+        "total_trades": 25,
+        "avg_trade_duration": 5.28,
+        "volatility": 0.1774496412353612,
+        "beta": -0.01676925867860674,
+        "alpha": 0.2969289385719285,
+        "calmar_ratio": 1.63051524868772
+      },
+      "sideways": {
+        "strategy_name": "swing",
+        "total_return": 0.10829396348977019,
+        "annualized_return": 0.10829396348977016,
+        "sharpe_ratio": 3.097725372359807,
+        "sortino_ratio": 0,
+        "max_drawdown": 0.008114215212379195,
+        "win_rate": 0.8333333333333334,
+        "profit_factor": 15.318608251685397,
+        "total_trades": 6,
+        "avg_trade_duration": 9.0,
+        "volatility": 0.028502837687806058,
+        "beta": -0.007716899224068524,
+        "alpha": 0.08916514662334904,
+        "calmar_ratio": 13.346203009818487
+      },
+      "volatile": {
+        "strategy_name": "swing",
+        "total_return": -0.1844139645711503,
+        "annualized_return": -0.18441396457115034,
+        "sharpe_ratio": -0.8032283991422102,
+        "sortino_ratio": -0.6452008365881374,
+        "max_drawdown": 0.45621184395810976,
+        "win_rate": 0.4444444444444444,
+        "profit_factor": 0.8101354787593874,
+        "total_trades": 27,
+        "avg_trade_duration": 3.2222222222222223,
+        "volatility": 0.2544904597365452,
+        "beta": 0.0010175677031543677,
+        "alpha": -0.20404491820470982,
+        "calmar_ratio": -0.4042287963661101
+      }
+    },
+    "optimized": {
+      "bull": {
+        "strategy_name": "swing_optimized",
+        "total_return": 0.08319840374235488,
+        "annualized_return": 0.08319840374235499,
+        "sharpe_ratio": 0.8877582813387747,
+        "sortino_ratio": 0.9301611591309741,
+        "max_drawdown": 0.18469707314611483,
+        "win_rate": 0.4117647058823529,
+        "profit_factor": 1.0302456246801597,
+        "total_trades": 17,
+        "avg_trade_duration": 8.764705882352942,
+        "volatility": 0.07118875156765565,
+        "beta": -0.015793551174051408,
+        "alpha": 0.06964313979809604,
+        "calmar_ratio": 0.45045870151140016
+      },
+      "bear": {
+        "strategy_name": "swing_optimized",
+        "total_return": 0.05824688223534936,
+        "annualized_return": 0.05824688223534946,
+        "sharpe_ratio": 0.3448622096122452,
+        "sortino_ratio": 0.6354431880301397,
+        "max_drawdown": 0.2633292383889954,
+        "win_rate": 0.55,
+        "profit_factor": 1.706428998915872,
+        "total_trades": 20,
+        "avg_trade_duration": 7.9,
+        "volatility": 0.11090482276487568,
+        "beta": 0.007350696685617778,
+        "alpha": 0.035247347840421814,
+        "calmar_ratio": 0.22119413169496188
+      },
+      "sideways": {
+        "strategy_name": "swing_optimized",
+        "total_return": -0.028910036837241138,
+        "annualized_return": -0.028910036837241138,
+        "sharpe_ratio": -1.0280408432922128,
+        "sortino_ratio": -1.2631089133010234,
+        "max_drawdown": 0.1347940881069262,
+        "win_rate": 0.42857142857142855,
+        "profit_factor": 0.9339670990126493,
+        "total_trades": 21,
+        "avg_trade_duration": 8.0,
+        "volatility": 0.04757596661297126,
+        "beta": 0.006173522741312575,
+        "alpha": -0.051429212174276394,
+        "calmar_ratio": -0.21447555485006198
+      },
+      "volatile": {
+        "strategy_name": "swing_optimized",
+        "total_return": -0.36412628387057744,
+        "annualized_return": -0.36412628387057744,
+        "sharpe_ratio": -2.3570385053154554,
+        "sortino_ratio": -1.6022765141077941,
+        "max_drawdown": 0.5086923106217401,
+        "win_rate": 0.4444444444444444,
+        "profit_factor": 0.30784647238682195,
+        "total_trades": 18,
+        "avg_trade_duration": 8.61111111111111,
+        "volatility": 0.1629698806380627,
+        "beta": -0.008841911896802291,
+        "alpha": -0.380518242349388,
+        "calmar_ratio": -0.7158085079476246
+      }
+    }
+  },
+  "summary": {
+    "original": {
+      "avg_annual_return": 0.0636970422588454,
+      "avg_sharpe_ratio": 0.9653508866711181,
+      "avg_max_drawdown": 0.20210926945850846,
+      "avg_win_rate": 0.6201587301587301
+    },
+    "optimized": {
+      "avg_annual_return": -0.06289775868252853,
+      "avg_sharpe_ratio": -0.538114714414162,
+      "avg_max_drawdown": 0.2728781775659441,
+      "avg_win_rate": 0.45869514472455647
+    },
+    "improvements": {
+      "return_boost_pct": -198.74517944951222,
+      "sharpe_improvement": -1.50346560108528,
+      "drawdown_reduction_pct": -35.01517189045305,
+      "win_rate_gain_pct": -16.146358543417367
+    }
+  }
+}

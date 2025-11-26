@@ -1,0 +1,36 @@
+{
+  "symbols": [
+    "AAPL",
+    "MSFT",
+    "GOOGL"
+  ],
+  "weights": [
+    0.41007194244604317,
+    0.3597122302158273,
+    0.23021582733812948
+  ],
+  "metrics": {
+    "return": 0.08978417266187051,
+    "risk": 0.15235086541004922,
+    "sharpe": 0.5893249928066917
+  },
+  "solver_performance": {
+    "solution": [
+      0.057,
+      0.05,
+      0.032
+    ],
+    "iterations": 11,
+    "converged": true,
+    "computeTime": 4
+  },
+  "insights": {
+    "regime": "adaptive_volatility",
+    "emergent_patterns": [
+      "momentum_persistence",
+      "correlation_breakdown"
+    ],
+    "optimization_guidance": "Focus on diversification benefits",
+    "temporal_advantage": "4ms computational lead over light speed"
+  }
+}

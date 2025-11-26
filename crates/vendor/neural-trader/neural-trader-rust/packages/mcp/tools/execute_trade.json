@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/execute_trade.json",
+  "title": "execute_trade",
+  "description": "Execute live trade with advanced order management.",
+  "category": "trading",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "description": "Strategy name"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "description": "Trade action"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of shares"
+        },
+        "order_type": {
+          "type": "string",
+          "default": "market",
+          "enum": [
+            "market",
+            "limit",
+            "stop_loss"
+          ],
+          "description": "Order type"
+        },
+        "limit_price": {
+          "type": "number",
+          "description": "Limit price (for limit orders)"
+        }
+      },
+      "required": [
+        "strategy",
+        "symbol",
+        "action",
+        "quantity"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "trade_id": {
+          "type": "string"
+        },
+        "order_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "filled",
+            "partial",
+            "cancelled",
+            "rejected"
+          ]
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "filled_quantity": {
+          "type": "integer"
+        },
+        "average_price": {
+          "type": "number"
+        },
+        "commission": {
+          "type": "number"
+        },
+        "execution_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "trade_id",
+        "status",
+        "symbol"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "high",
+    "latency": "medium",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

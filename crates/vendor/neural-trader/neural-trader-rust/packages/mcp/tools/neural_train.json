@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/neural_train.json",
+  "title": "neural_train",
+  "description": "Train a neural forecasting model with custom configuration.",
+  "category": "neural",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "data_path": {
+          "type": "string",
+          "description": "Path to training data"
+        },
+        "model_type": {
+          "type": "string",
+          "description": "Model architecture",
+          "enum": [
+            "lstm",
+            "gru",
+            "transformer",
+            "cnn_lstm"
+          ]
+        },
+        "epochs": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "batch_size": {
+          "type": "integer",
+          "default": 32,
+          "minimum": 1,
+          "maximum": 512
+        },
+        "learning_rate": {
+          "type": "number",
+          "default": 0.001,
+          "minimum": 0.00001,
+          "maximum": 1
+        },
+        "validation_split": {
+          "type": "number",
+          "default": 0.2,
+          "minimum": 0.1,
+          "maximum": 0.4
+        },
+        "use_gpu": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "data_path",
+        "model_type"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "model_id": {
+          "type": "string"
+        },
+        "training_metrics": {
+          "type": "object",
+          "properties": {
+            "train_loss": {
+              "type": "number"
+            },
+            "val_loss": {
+              "type": "number"
+            },
+            "epochs_completed": {
+              "type": "integer"
+            },
+            "training_time": {
+              "type": "string"
+            }
+          }
+        },
+        "model_info": {
+          "type": "object",
+          "properties": {
+            "architecture": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "integer"
+            },
+            "size_mb": {
+              "type": "number"
+            }
+          }
+        },
+        "gpu_accelerated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "model_id",
+        "training_metrics"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "very_high",
+    "latency": "slow",
+    "gpu_capable": true,
+    "version": "2.0.0"
+  }
+}

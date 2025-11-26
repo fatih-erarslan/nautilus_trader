@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "noEmitOnError": false,
+    "incremental": true,
+    "paths": {
+      "@neural-trader/agentic-accounting-core": ["packages/agentic-accounting-core/src"],
+      "@neural-trader/agentic-accounting-rust-core": ["packages/agentic-accounting-rust-core"],
+      "@neural-trader/agentic-accounting-agents": ["packages/agentic-accounting-agents/src"],
+      "@neural-trader/agentic-accounting-types": ["packages/agentic-accounting-types/src"],
+      "@neural-trader/agentic-accounting-mcp": ["packages/agentic-accounting-mcp/src"],
+      "@neural-trader/agentic-accounting-api": ["packages/agentic-accounting-api/src"],
+      "@neural-trader/agentic-accounting-cli": ["packages/agentic-accounting-cli/src"]
+    }
+  }
+}

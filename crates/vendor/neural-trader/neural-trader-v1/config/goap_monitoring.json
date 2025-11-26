@@ -1,0 +1,32 @@
+{
+  "mode": "ACTIVE_MONITORING",
+  "status": "WAITING_FOR_SIGNALS",
+  "market_regime": "BULLISH",
+  "vix_level": 16.1,
+  "spy_price": 666.18,
+  "scan_interval": "5_minutes",
+  "alert_thresholds": {
+    "confidence": 0.78,
+    "volume_surge": 1.5,
+    "correlation_limit": 0.35
+  },
+  "watched_symbols": [
+    "SPY",
+    "QQQ",
+    "AAPL",
+    "MSFT",
+    "GOOGL",
+    "NVDA",
+    "META",
+    "TSLA",
+    "AMZN",
+    "AMD"
+  ],
+  "risk_parameters": {
+    "max_position_size": 0.02,
+    "stop_loss": -0.06,
+    "take_profit": 0.25,
+    "max_daily_trades": 5
+  },
+  "activated": "2025-09-23T15:28:06.110859"
+}

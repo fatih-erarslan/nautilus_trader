@@ -1,0 +1,110 @@
+# Polymarket Test Dependencies
+# Following TDD principles - install these before running tests
+
+# Core testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+pytest-xdist>=3.3.0
+pytest-timeout>=2.1.0
+pytest-benchmark>=4.0.0
+
+# HTTP and async testing
+aiohttp>=3.8.0
+aiofiles>=23.0.0
+aioresponses>=0.7.4
+httpx>=0.24.0
+websockets>=11.0.0
+
+# Mocking and fixtures
+responses>=0.23.0
+factory-boy>=3.3.0
+freezegun>=1.2.0
+faker>=19.0.0
+
+# Data and crypto
+pandas>=2.0.0
+numpy>=1.24.0
+web3>=6.8.0
+eth-account>=0.9.0
+cryptography>=41.0.0
+
+# Rate limiting and utilities
+asyncio-throttle>=1.0.2
+tenacity>=8.2.0
+redis>=4.6.0
+diskcache>=5.6.0
+
+# Performance and monitoring
+memory-profiler>=0.60.0
+psutil>=5.9.0
+py-spy>=0.3.14
+
+# Code quality
+ruff>=0.0.280
+mypy>=1.5.0
+black>=23.7.0
+isort>=5.12.0
+
+# Documentation testing
+sphinx>=7.1.0
+sphinx-rtd-theme>=1.3.0
+doctest>=1.0.0
+
+# Security testing
+safety>=2.3.0
+bandit>=1.7.5
+semgrep>=1.34.0
+
+# API validation
+jsonschema>=4.19.0
+cerberus>=1.3.4
+marshmallow>=3.20.0
+
+# Data validation
+pydantic>=2.1.0
+validators>=0.20.0
+
+# Logging and debugging
+structlog>=23.1.0
+rich>=13.5.0
+ipdb>=0.13.13
+
+# Environment and configuration
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+toml>=0.10.2
+
+# Database testing (if needed)
+sqlalchemy>=2.0.0
+alembic>=1.11.0
+pytest-postgresql>=5.0.0
+
+# Cloud and deployment testing
+boto3>=1.28.0
+docker>=6.1.0
+
+# Machine learning (for strategy testing)
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# Time series analysis
+ta-lib>=0.4.25
+matplotlib>=3.7.0
+plotly>=5.15.0
+
+# Market data simulation
+yfinance>=0.2.18
+ccxt>=4.0.0
+
+# Webhook testing
+ngrok>=1.0.0
+
+# Load testing
+locust>=2.16.0
+
+# Jupyter for analysis
+jupyter>=1.0.0
+notebook>=7.0.0
+ipywidgets>=8.0.0

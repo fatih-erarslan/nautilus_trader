@@ -1,0 +1,264 @@
+# Performance Test Configuration for AI News Trading Benchmark System
+# This configuration defines settings for running performance validation tests
+
+test_categories:
+  performance:
+    enabled: true
+    timeout: 2400  # 40 minutes for thorough performance testing
+    parallel_execution: false  # Sequential for accurate performance measurement
+    max_workers: 1
+    warmup_enabled: true
+    warmup_duration_seconds: 60
+    
+performance_validation:
+  enabled: true
+  strict_mode: true  # Strict validation for performance tests
+  tolerance_percent: 5  # Very tight tolerance
+
+reporting:
+  formats: ["json", "html", "junit", "csv"]
+  output_dir: "./test_results/performance"
+  detailed_logs: true
+  include_metrics: true
+  include_charts: true
+  include_profiling: true
+
+environment_checks:
+  system_resources: true
+  dependencies: true
+  connectivity: true
+  performance_mode: true  # Enable performance mode checks
+
+performance_targets:
+  # Core performance targets that must be met
+  signal_generation:
+    avg_latency_ms: 25
+    p95_latency_ms: 50
+    p99_latency_ms: 100
+    max_latency_ms: 200
+    throughput_per_sec: 1000
+    
+  trade_execution:
+    avg_latency_ms: 15
+    p95_latency_ms: 30
+    p99_latency_ms: 75
+    max_latency_ms: 150
+    throughput_per_sec: 1500
+    
+  data_processing:
+    avg_latency_ms: 5
+    p95_latency_ms: 15
+    p99_latency_ms: 30
+    max_latency_ms: 50
+    throughput_per_sec: 5000
+    
+  memory_usage:
+    max_peak_mb: 2048  # 2GB limit
+    max_growth_rate_mb_per_hour: 100
+    max_sustained_mb: 1024
+    gc_efficiency_min: 0.8
+    
+  scalability:
+    max_concurrent_symbols: 100
+    max_concurrent_users: 50
+    linear_scaling_efficiency_min: 0.7
+    load_degradation_max_percent: 20
+
+test_suites:
+  latency_targets:
+    enabled: true
+    timeout: 600  # 10 minutes
+    test_cases:
+      - "test_single_signal_generation_latency"
+      - "test_batch_signal_generation_latency"
+      - "test_concurrent_signal_generation_latency"
+    
+    configuration:
+      warmup_iterations: 100
+      measurement_iterations: 1000
+      statistical_confidence: 0.95
+      outlier_removal: true
+      
+  throughput_targets:
+    enabled: true
+    timeout: 600  # 10 minutes
+    test_cases:
+      - "test_single_thread_trade_throughput"
+      - "test_concurrent_trade_throughput"
+      - "test_batch_trade_throughput"
+      - "test_sustained_throughput"
+    
+    configuration:
+      ramp_up_duration_seconds: 30
+      sustained_duration_seconds: 300
+      ramp_down_duration_seconds: 30
+      
+  memory_usage:
+    enabled: true
+    timeout: 1200  # 20 minutes
+    test_cases:
+      - "test_memory_usage_during_simulation"
+      - "test_memory_leak_detection"
+      - "test_memory_efficiency_optimization"
+    
+    configuration:
+      simulation_duration_minutes: 8  # Compressed 8-hour test
+      memory_sampling_interval_seconds: 10
+      gc_force_interval_seconds: 60
+      
+  scalability:
+    enabled: true
+    timeout: 900  # 15 minutes
+    test_cases:
+      - "test_concurrent_symbol_processing_scaling"
+      - "test_horizontal_scaling_throughput"
+      - "test_performance_degradation_under_load"
+    
+    configuration:
+      max_symbols_tested: 200
+      max_concurrent_users: 100
+      load_increment_steps: 10
+
+load_testing:
+  # Load testing configuration
+  enabled: true
+  
+  load_patterns:
+    steady_state:
+      duration_seconds: 300
+      requests_per_second: 1000
+      
+    spike:
+      duration_seconds: 60
+      peak_requests_per_second: 5000
+      spike_duration_seconds: 10
+      
+    ramp_up:
+      duration_seconds: 600
+      start_rps: 100
+      end_rps: 2000
+      
+    stress:
+      duration_seconds: 180
+      requests_per_second: 10000  # Beyond normal capacity
+
+resource_monitoring:
+  # Detailed resource monitoring during performance tests
+  enabled: true
+  sampling_interval_seconds: 1
+  
+  metrics:
+    system:
+      - "cpu_usage_percent"
+      - "memory_usage_mb"
+      - "memory_usage_percent"
+      - "disk_io_read_mb"
+      - "disk_io_write_mb"
+      - "network_io_recv_mb"
+      - "network_io_sent_mb"
+      
+    application:
+      - "response_time_ms"
+      - "throughput_per_sec"
+      - "error_rate_percent"
+      - "queue_depth"
+      - "connection_count"
+      
+    custom:
+      - "signal_generation_rate"
+      - "trade_execution_rate"
+      - "data_processing_rate"
+      - "memory_gc_frequency"
+
+profiling:
+  # Performance profiling configuration
+  enabled: true
+  
+  profiler_types:
+    - "cProfile"
+    - "memory_profiler"
+    - "line_profiler"
+    
+  output_formats:
+    - "stats"
+    - "callgraph"
+    - "flamegraph"
+    
+  profiling_duration_seconds: 60
+  sample_rate: 100  # Samples per second
+
+benchmarking:
+  # Benchmarking specific settings
+  statistical_analysis:
+    enabled: true
+    confidence_interval: 0.95
+    min_sample_size: 100
+    max_sample_size: 10000
+    outlier_detection: "iqr"  # interquartile range
+    
+  baseline_comparison:
+    enabled: true
+    baseline_file: "./test_results/performance_baseline.json"
+    regression_threshold_percent: 10
+    
+  trend_analysis:
+    enabled: true
+    history_file: "./test_results/performance_history.json"
+    trend_window_days: 30
+
+quality_gates:
+  # Performance quality gates
+  latency:
+    p99_threshold_ms: 100
+    p95_threshold_ms: 50
+    avg_threshold_ms: 25
+    
+  throughput:
+    min_requests_per_sec: 1000
+    min_transactions_per_sec: 500
+    
+  reliability:
+    max_error_rate_percent: 1
+    min_uptime_percent: 99.9
+    
+  efficiency:
+    max_cpu_usage_percent: 80
+    max_memory_usage_percent: 75
+    min_resource_utilization: 0.6
+
+alerts:
+  # Performance alerting
+  enabled: true
+  
+  thresholds:
+    latency_p99_ms: 150  # Alert if P99 > 150ms
+    throughput_drop_percent: 20  # Alert if throughput drops > 20%
+    memory_usage_mb: 1536  # Alert if memory > 1.5GB
+    error_rate_percent: 5  # Alert if error rate > 5%
+    
+  actions:
+    - type: "log"
+      level: "WARNING"
+    - type: "abort_on_critical"
+      enabled: true
+
+cleanup:
+  # Cleanup settings for performance tests
+  after_each_test: true
+  after_suite: true
+  preserve_on_failure: true
+  clear_caches: true
+  
+optimization:
+  # System optimization for performance testing
+  enabled: true
+  
+  system_tuning:
+    disable_swap: false  # Careful with this in containers
+    set_cpu_governor: "performance"
+    disable_frequency_scaling: false
+    
+  application_tuning:
+    gc_tuning: true
+    thread_pool_optimization: true
+    connection_pooling: true

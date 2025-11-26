@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_market_orderbook_tool.json",
+  "title": "get_market_orderbook_tool",
+  "description": "Get market depth and orderbook data.",
+  "category": "prediction",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "depth": {
+          "type": "integer",
+          "default": 10,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "market_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "market_id": {
+          "type": "string"
+        },
+        "bids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number"
+              },
+              "size": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "asks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number"
+              },
+              "size": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "metadata": {
+    "platform": "linux",
+    "arch": "x64",
+    "nodeVersion": "v22.17.0",
+    "cpus": 8,
+    "totalMemory": 33657851904,
+    "timestamp": "2025-11-14T20:00:49.223Z",
+    "duration": 1626
+  },
+  "metrics": {
+    "apiCalls": [
+      {
+        "timestamp": 1763150447603,
+        "category": "apiCalls",
+        "operation": "getSystemInfo",
+        "duration": 0,
+        "success": true
+      },
+      {
+        "timestamp": 1763150447603,
+        "category": "apiCalls",
+        "operation": "healthCheck",
+        "duration": 0,
+        "success": true
+      },
+      {
+        "timestamp": 1763150447603,
+        "category": "apiCalls",
+        "operation": "listStrategies",
+        "duration": 0,
+        "success": true
+      },
+      {
+        "timestamp": 1763150447604,
+        "category": "apiCalls",
+        "operation": "quickAnalysis",
+        "duration": 0,
+        "success": true,
+        "symbol": "AAPL"
+      },
+      {
+        "timestamp": 1763150447705,
+        "category": "apiCalls",
+        "operation": "quickAnalysis",
+        "duration": 1,
+        "success": true,
+        "symbol": "TSLA"
+      },
+      {
+        "timestamp": 1763150447805,
+        "category": "apiCalls",
+        "operation": "quickAnalysis",
+        "duration": 0,
+        "success": true,
+        "symbol": "SPY"
+      },
+      {
+        "timestamp": 1763150448812,
+        "category": "apiCalls",
+        "operation": "getPortfolioStatus",
+        "duration": 0,
+        "success": true
+      },
+      {
+        "timestamp": 1763150448819,
+        "category": "apiCalls",
+        "operation": "riskAnalysis",
+        "duration": 7,
+        "success": true
+      },
+      {
+        "timestamp": 1763150448820,
+        "category": "apiCalls",
+        "operation": "runBacktest",
+        "duration": 0,
+        "success": true,
+        "strategy": "momentum_trading",
+        "symbol": "AAPL",
+        "days": 30
+      },
+      {
+        "timestamp": 1763150449021,
+        "category": "apiCalls",
+        "operation": "runBacktest",
+        "duration": 1,
+        "success": true,
+        "strategy": "mean_reversion",
+        "symbol": "SPY",
+        "days": 60
+      }
+    ],
+    "trades": [
+      {
+        "timestamp": 1763150447906,
+        "category": "trades",
+        "operation": "simulateTrade",
+        "duration": 0,
+        "success": true,
+        "strategy": "momentum_trading",
+        "symbol": "AAPL",
+        "action": "buy"
+      },
+      {
+        "timestamp": 1763150448006,
+        "category": "trades",
+        "operation": "simulateTrade",
+        "duration": 0,
+        "success": true,
+        "strategy": "mean_reversion",
+        "symbol": "TSLA",
+        "action": "sell"
+      },
+      {
+        "timestamp": 1763150448107,
+        "category": "trades",
+        "operation": "simulateTrade",
+        "duration": 0,
+        "success": true,
+        "strategy": "trend_following",
+        "symbol": "SPY",
+        "action": "buy"
+      }
+    ],
+    "forecasts": [
+      {
+        "timestamp": 1763150448208,
+        "category": "forecasts",
+        "operation": "neuralForecast",
+        "duration": 1,
+        "success": true,
+        "symbol": "AAPL",
+        "horizon": 1
+      },
+      {
+        "timestamp": 1763150448308,
+        "category": "forecasts",
+        "operation": "neuralForecast",
+        "duration": 0,
+        "success": true,
+        "symbol": "AAPL",
+        "horizon": 5
+      },
+      {
+        "timestamp": 1763150448408,
+        "category": "forecasts",
+        "operation": "neuralForecast",
+        "duration": 0,
+        "success": true,
+        "symbol": "AAPL",
+        "horizon": 10
+      },
+      {
+        "timestamp": 1763150448509,
+        "category": "forecasts",
+        "operation": "neuralForecast",
+        "duration": 0,
+        "success": true,
+        "symbol": "SPY",
+        "horizon": 1
+      },
+      {
+        "timestamp": 1763150448610,
+        "category": "forecasts",
+        "operation": "neuralForecast",
+        "duration": 0,
+        "success": true,
+        "symbol": "SPY",
+        "horizon": 5
+      },
+      {
+        "timestamp": 1763150448710,
+        "category": "forecasts",
+        "operation": "neuralForecast",
+        "duration": 0,
+        "success": true,
+        "symbol": "SPY",
+        "horizon": 10
+      }
+    ],
+    "errors": [],
+    "startTime": 1763150447595
+  },
+  "summary": {
+    "apiCalls": {
+      "count": 10,
+      "avg": 0.9,
+      "median": 0,
+      "min": 0,
+      "max": 7,
+      "successful": 10
+    },
+    "trades": {
+      "count": 3,
+      "avg": 0,
+      "median": 0,
+      "min": 0,
+      "max": 0,
+      "successful": 3
+    },
+    "forecasts": {
+      "count": 6,
+      "avg": 0.16666666666666666,
+      "median": 0,
+      "min": 0,
+      "max": 1,
+      "successful": 6
+    },
+    "errors": [],
+    "totalOperations": 10,
+    "throughput": 6.150061500615006,
+    "successRate": 1
+  }
+}

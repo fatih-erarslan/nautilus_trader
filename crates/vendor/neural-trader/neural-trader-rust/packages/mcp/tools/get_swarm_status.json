@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/tools/get_swarm_status.json",
+  "title": "get_swarm_status",
+  "description": "Get comprehensive status and health metrics for an E2B trading swarm.",
+  "category": "e2b_swarm",
+  "type": "object",
+  "properties": {
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "include_metrics": {
+          "type": "boolean",
+          "default": true
+        },
+        "include_agents": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "swarm_id"
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "swarm_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "degraded",
+            "stopped"
+          ]
+        },
+        "topology": {
+          "type": "string"
+        },
+        "agent_count": {
+          "type": "integer"
+        },
+        "active_agents": {
+          "type": "integer"
+        },
+        "total_trades": {
+          "type": "integer"
+        },
+        "uptime_seconds": {
+          "type": "number"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent_id": {
+                "type": "string"
+              },
+              "agent_type": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "trades": {
+                "type": "integer"
+              },
+              "pnl": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "avg_latency_ms": {
+              "type": "number"
+            },
+            "success_rate": {
+              "type": "number"
+            },
+            "total_pnl": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": [
+        "swarm_id",
+        "status",
+        "agent_count"
+      ]
+    }
+  },
+  "metadata": {
+    "cost": "low",
+    "latency": "fast",
+    "gpu_capable": false,
+    "version": "2.0.0"
+  }
+}
