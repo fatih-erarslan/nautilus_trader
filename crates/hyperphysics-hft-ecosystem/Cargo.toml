@@ -24,9 +24,13 @@ hyperphysics-market = { path = "../hyperphysics-market", optional = true }
 hyperphysics-risk = { path = "../hyperphysics-risk", optional = true }
 active-inference-agent = { path = "../active-inference-agent" }
 
+# REAL optimization algorithms (NOT stubs)
+hyperphysics-optimization = { path = "../hyperphysics-optimization", optional = true }
+
 # Physics engines (all optional, for modular deployment)
 rapier-hyperphysics = { path = "../physics-engines/rapier-hyperphysics", optional = true }
-# TODO: Add other physics engines: jolt, avian, warp, taichi, mujoco, genesis
+jolt-hyperphysics = { path = "../physics-engines/jolt-hyperphysics", optional = true }
+warp-hyperphysics = { path = "../physics-engines/warp-hyperphysics", optional = true }
 
 # Trading systems (optional until we fix ats-core compilation issues)
 ats-core = { path = "../ats-core", optional = true }
@@ -34,28 +38,14 @@ ats-core = { path = "../ats-core", optional = true }
 # cwts-intelligence = { path = "../cwts-intelligence", optional = true }
 # cwts-ultra = { path = "../cwts-ultra", optional = true }
 
-# Bio-inspired algorithms (via workspace members)
-dynamic-swarm-selector = { path = "../bio-inspired-workspace/dynamic-swarm-selector", optional = true }
+# Bio-inspired workspace (DEPRECATED - use hyperphysics-optimization instead)
+# These are thin interface stubs, kept for backwards compatibility
 whale-optimization = { path = "../bio-inspired-workspace/whale-optimization", optional = true }
 cuckoo-search = { path = "../bio-inspired-workspace/cuckoo-search", optional = true }
-particle-swarm = { path = "../bio-inspired-workspace/particle-swarm", optional = true }
-ant-colony = { path = "../bio-inspired-workspace/ant-colony", optional = true }
-genetic-algorithm = { path = "../bio-inspired-workspace/genetic-algorithm", optional = true }
-differential-evolution = { path = "../bio-inspired-workspace/differential-evolution", optional = true }
-grey-wolf = { path = "../bio-inspired-workspace/grey-wolf", optional = true }
-artificial-bee-colony = { path = "../bio-inspired-workspace/artificial-bee-colony", optional = true }
 bat-algorithm = { path = "../bio-inspired-workspace/bat-algorithm", optional = true }
 firefly-algorithm = { path = "../bio-inspired-workspace/firefly-algorithm", optional = true }
-bacterial-foraging = { path = "../bio-inspired-workspace/bacterial-foraging", optional = true }
-social-spider = { path = "../bio-inspired-workspace/social-spider", optional = true }
-moth-flame = { path = "../bio-inspired-workspace/moth-flame", optional = true }
-salp-swarm = { path = "../bio-inspired-workspace/salp-swarm", optional = true }
+dynamic-swarm-selector = { path = "../bio-inspired-workspace/dynamic-swarm-selector", optional = true }
 market-regime-detector = { path = "../bio-inspired-workspace/market-regime-detector", optional = true }
-
-# Physics engines (will be added as created)
-jolt-hyperphysics = { path = "../physics-engines/jolt-hyperphysics", optional = true }
-rapier3d = { version = "0.22", optional = true }
-# avian3d = { version = "0.4", optional = true }
 
 # Core dependencies
 tokio = { version = "1.40", features = ["full", "macros", "rt-multi-thread"] }
@@ -116,50 +106,29 @@ approx = "0.5"
 tokio-test = "0.4"
 
 [features]
-default = ["hft-core", "biomimetic-tier1", "simd"]
+default = ["hft-core", "optimization-real", "simd"]
 
 # Core features
-hft-core = ["hyperphysics-market", "hyperphysics-risk"] # , "ats-core"] # Disabled until websocket modules complete
+hft-core = ["hyperphysics-market", "hyperphysics-risk"]
 simd = ["wide"]
 
-# Biomimetic algorithm tiers
+# REAL optimization algorithms via hyperphysics-optimization
+# This is the PRIMARY way to use biomimetic algorithms
+optimization-real = ["hyperphysics-optimization"]
+
+# DEPRECATED: Legacy bio-inspired-workspace stubs (use optimization-real instead)
 biomimetic-tier1 = [
     "whale-optimization",
     "bat-algorithm",
     "firefly-algorithm",
     "cuckoo-search"
 ]
-biomimetic-tier2 = [
-    "particle-swarm",
-    "genetic-algorithm",
-    "differential-evolution",
-    "grey-wolf",
-    "artificial-bee-colony"
-]
-biomimetic-tier3 = [
-    "ant-colony",
-    "bacterial-foraging",
-    "social-spider",
-    "moth-flame",
-    "salp-swarm"
-]
-biomimetic-all = [
-    "biomimetic-tier1",
-    "biomimetic-tier2",
-    "biomimetic-tier3",
-    "dynamic-swarm-selector",
-    "market-regime-detector"
-]
 
 # Physics engine features (modular selection)
 physics-rapier = ["rapier-hyperphysics"]
 physics-jolt = ["jolt-hyperphysics"]
-physics-avian = []  # TODO
-physics-warp = []  # TODO
-physics-taichi = []  # TODO
-physics-mujoco = []  # TODO
-physics-genesis = []  # TODO
-gpu = []
+physics-warp = ["warp-hyperphysics"]
+physics-all = ["physics-rapier", "physics-jolt", "physics-warp"]
 
 # Language binding features
 python-bindings = ["pyo3"]
@@ -171,8 +140,8 @@ verification = []
 # Full feature set (for testing)
 full = [
     "hft-core",
-    "biomimetic-all",
-    "physics-rapier",
+    "optimization-real",
+    "physics-all",
     "simd",
     "verification"
 ]
@@ -189,6 +158,10 @@ inherits = "release"
 
 [profile.dev]
 opt-level = 0
+
+[[bench]]
+name = "latency_benchmarks"
+harness = false
 
 [package.metadata.docs.rs]
 all-features = true
