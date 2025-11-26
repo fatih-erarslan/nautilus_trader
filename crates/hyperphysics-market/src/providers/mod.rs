@@ -11,7 +11,9 @@ pub mod binance;
 pub mod binance_websocket;
 pub mod bybit;
 pub mod coinbase;
-pub mod interactive_brokers;
+// NOTE: interactive_brokers temporarily disabled due to rustc ICE (internal compiler error)
+// tracking: https://github.com/rust-lang/rust/issues - evaluate_obligation crash
+// pub mod interactive_brokers;
 pub mod kraken;
 pub mod okx;
 
@@ -20,7 +22,7 @@ pub use binance::BinanceProvider;
 pub use binance_websocket::BinanceWebSocketClient;
 pub use bybit::BybitProvider;
 pub use coinbase::CoinbaseProvider;
-pub use interactive_brokers::InteractiveBrokersProvider;
+// pub use interactive_brokers::InteractiveBrokersProvider;
 pub use kraken::KrakenProvider;
 pub use okx::OKXProvider;
 

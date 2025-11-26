@@ -78,34 +78,50 @@ impl WgpuAccelerator {
             ..Default::default()
         });
 
-        // Select power preference based on GPU choice
-        let power_pref = match preference {
+        // FIXED: Enumerate ALL adapters to properly detect multi-GPU systems
+        let mut adapters: Vec<_> = instance.enumerate_adapters(
+            #[cfg(target_os = "macos")]
+            wgpu::Backends::METAL,
+            #[cfg(not(target_os = "macos"))]
+            wgpu::Backends::all(),
+        );
+
+        if adapters.is_empty() {
+            return Err("No GPU adapters found".to_string());
+        }
+
+        // Sort by max_buffer_size (proxy for VRAM) descending
+        adapters.sort_by(|a, b| b.limits().max_buffer_size.cmp(&a.limits().max_buffer_size));
+
+        // Select adapter based on preference
+        let adapter = match preference {
             GpuDevicePreference::Primary | GpuDevicePreference::Auto => {
-                wgpu::PowerPreference::HighPerformance // RX 6800 XT
+                // Primary = highest VRAM (first after sort)
+                adapters.remove(0)
             }
             GpuDevicePreference::Secondary => {
-                wgpu::PowerPreference::LowPower // RX 5500 XT
+                // Secondary = second best, or first if only one GPU
+                if adapters.len() > 1 {
+                    adapters.remove(1)
+                } else {
+                    adapters.remove(0)
+                }
             }
         };
 
-        let adapter = instance
-            .request_adapter(&wgpu::RequestAdapterOptions {
-                power_preference: power_pref,
-                compatible_surface: None,
-                force_fallback_adapter: false,
-            })
-            .await
-            .ok_or_else(|| "Failed to find GPU adapter".to_string())?;
-
         let adapter_info = adapter.get_info();
+        let adapter_limits = adapter.limits();
+
         log::info!(
-            "wgpu GPU ({:?}): {} ({:?})",
+            "wgpu GPU ({:?}): {} ({:?}) - VRAM: {}GB, device_id=0x{:x}",
             preference,
             adapter_info.name,
-            adapter_info.backend
+            adapter_info.backend,
+            adapter_limits.max_buffer_size / 1024 / 1024 / 1024,
+            adapter_info.device
         );
 
-        // Request device with compute capabilities
+        // FIXED: Request device with ACTUAL adapter limits, not default (256MB)
         let (device, queue) = adapter
             .request_device(
                 &wgpu::DeviceDescriptor {
@@ -115,7 +131,8 @@ impl WgpuAccelerator {
                         GpuDevicePreference::Auto => "cwts-ultra GPU",
                     }),
                     required_features: wgpu::Features::empty(),
-                    required_limits: wgpu::Limits::default(),
+                    // Use adapter's actual limits for proper VRAM detection
+                    required_limits: adapter_limits.clone(),
                     memory_hints: wgpu::MemoryHints::Performance,
                 },
                 None,

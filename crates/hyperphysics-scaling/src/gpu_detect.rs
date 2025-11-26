@@ -7,23 +7,53 @@ use hyperphysics_gpu::{GPUBackend, backend::wgpu::WGPUBackend};
 
 /// Detect all available GPUs on the system
 ///
-/// Returns a list of GPUs with their capabilities, sorted by performance.
+/// Returns a list of GPUs with their capabilities, sorted by performance (VRAM descending).
 pub async fn detect_all_gpus() -> Vec<GPUInfo> {
     let mut gpus = Vec::new();
 
-    // Try WGPU backend
-    if let Ok(backend) = WGPUBackend::new().await {
-        let caps = backend.capabilities();
+    // FIXED: Enumerate ALL adapters instead of just getting one
+    let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+        #[cfg(target_os = "macos")]
+        backends: wgpu::Backends::METAL,
+        #[cfg(not(target_os = "macos"))]
+        backends: wgpu::Backends::all(),
+        ..Default::default()
+    });
+
+    let adapters: Vec<_> = instance.enumerate_adapters(
+        #[cfg(target_os = "macos")]
+        wgpu::Backends::METAL,
+        #[cfg(not(target_os = "macos"))]
+        wgpu::Backends::all(),
+    );
+
+    for adapter in adapters {
+        let info = adapter.get_info();
+        let limits = adapter.limits();
+
         gpus.push(GPUInfo {
-            device_name: caps.device_name.clone(),
-            max_buffer_size: caps.max_buffer_size,
-            max_workgroup_size: caps.max_workgroup_size,
-            available: caps.supports_compute,
+            device_name: format!("{} ({:?})", info.name, info.backend),
+            max_buffer_size: limits.max_buffer_size,
+            max_workgroup_size: limits.max_compute_workgroup_size_x,
+            available: true, // If enumerated, it's available
         });
     }
 
-    // TODO: Try CUDA backend if available
-    // TODO: Try Metal backend if available
+    // Sort by max_buffer_size (VRAM proxy) descending
+    gpus.sort_by(|a, b| b.max_buffer_size.cmp(&a.max_buffer_size));
+
+    // Fallback to WGPU backend if direct enumeration failed
+    if gpus.is_empty() {
+        if let Ok(backend) = WGPUBackend::new().await {
+            let caps = backend.capabilities();
+            gpus.push(GPUInfo {
+                device_name: caps.device_name.clone(),
+                max_buffer_size: caps.max_buffer_size,
+                max_workgroup_size: caps.max_workgroup_size,
+                available: caps.supports_compute,
+            });
+        }
+    }
 
     gpus
 }

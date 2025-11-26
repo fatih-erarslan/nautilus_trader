@@ -62,35 +62,56 @@ impl WGPUBackend {
     /// - No suitable GPU adapter found
     /// - Device request fails
     pub async fn new() -> Result<Self> {
-        // Create WGPU instance
+        // Create WGPU instance with Metal on macOS for AMD GPU support
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+            #[cfg(target_os = "macos")]
+            backends: wgpu::Backends::METAL,
+            #[cfg(not(target_os = "macos"))]
             backends: wgpu::Backends::all(),
             ..Default::default()
         });
 
-        // Request adapter (GPU device)
-        let adapter = instance
-            .request_adapter(&wgpu::RequestAdapterOptions {
-                power_preference: wgpu::PowerPreference::HighPerformance,
-                force_fallback_adapter: false,
-                compatible_surface: None,
-            })
-            .await
-            .ok_or_else(|| hyperphysics_core::EngineError::Configuration {
-                message: "No suitable GPU adapter found".to_string(),
-            })?;
+        // FIXED: Enumerate ALL adapters to properly detect multi-GPU systems
+        let adapters: Vec<_> = instance.enumerate_adapters(
+            #[cfg(target_os = "macos")]
+            wgpu::Backends::METAL,
+            #[cfg(not(target_os = "macos"))]
+            wgpu::Backends::all(),
+        );
 
-        // Get adapter info
-        let adapter_info = adapter.get_info();
+        if adapters.is_empty() {
+            return Err(hyperphysics_core::EngineError::Configuration {
+                message: "No GPU adapters found".to_string(),
+            });
+        }
 
-        // Request device and queue
-        let (device, queue) = adapter
+        // Select best adapter by max_buffer_size (proxy for VRAM capability)
+        let best_adapter = adapters
+            .into_iter()
+            .max_by_key(|a| a.limits().max_buffer_size)
+            .unwrap();
+
+        let adapter_info = best_adapter.get_info();
+        let adapter_limits = best_adapter.limits();
+
+        // Log detected GPU
+        eprintln!(
+            "[hyperphysics-gpu] Detected: {} ({:?}) - VRAM limit: {}GB, device_id=0x{:x}",
+            adapter_info.name,
+            adapter_info.backend,
+            adapter_limits.max_buffer_size / 1024 / 1024 / 1024,
+            adapter_info.device
+        );
+
+        // FIXED: Request device with ACTUAL adapter limits, not default (256MB)
+        let (device, queue) = best_adapter
             .request_device(
                 &wgpu::DeviceDescriptor {
                     label: Some("HyperPhysics GPU Device"),
                     required_features: wgpu::Features::empty(),
-                    required_limits: wgpu::Limits::default(),
-                    memory_hints: Default::default(),
+                    // Use adapter's actual limits for proper VRAM detection
+                    required_limits: adapter_limits.clone(),
+                    memory_hints: wgpu::MemoryHints::Performance,
                 },
                 None,
             )
@@ -99,8 +120,6 @@ impl WGPUBackend {
                 message: format!("Failed to request device: {}", e),
             })?;
 
-        let limits = device.limits();
-
         let capabilities = GPUCapabilities {
             backend: BackendType::WGPU,
             device_name: format!(
@@ -108,8 +127,9 @@ impl WGPUBackend {
                 adapter_info.name,
                 Self::backend_name(adapter_info.backend)
             ),
-            max_buffer_size: limits.max_buffer_size,
-            max_workgroup_size: limits.max_compute_workgroup_size_x,
+            // FIXED: Use adapter limits, not device limits (which reflect requested limits)
+            max_buffer_size: adapter_limits.max_buffer_size,
+            max_workgroup_size: adapter_limits.max_compute_workgroup_size_x,
             supports_compute: true,
         };
 

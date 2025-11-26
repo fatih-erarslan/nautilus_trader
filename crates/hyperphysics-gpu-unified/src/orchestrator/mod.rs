@@ -94,26 +94,89 @@ impl GpuOrchestrator {
             ..Default::default()
         });
 
-        // Initialize primary GPU (high performance)
-        let (primary_device, primary_queue, primary_info) =
-            Self::init_gpu(&instance, wgpu::PowerPreference::HighPerformance).await?;
+        // FIXED: Enumerate ALL adapters instead of using request_adapter
+        // This ensures we detect both RX 6800 XT and RX 5500 XT
+        let adapters: Vec<_> = instance.enumerate_adapters(
+            #[cfg(target_os = "macos")]
+            wgpu::Backends::METAL,
+            #[cfg(not(target_os = "macos"))]
+            wgpu::Backends::all(),
+        );
+
+        tracing::info!("Found {} GPU adapter(s)", adapters.len());
+
+        if adapters.is_empty() {
+            return Err(GpuError::NoAdapterFound("No GPU adapters found".to_string()));
+        }
+
+        // Collect adapter info and sort by VRAM/capability (highest first)
+        let mut adapter_infos: Vec<_> = adapters.iter()
+            .map(|a| (a, a.get_info(), a.limits()))
+            .collect();
+
+        // Sort by max_buffer_size (proxy for VRAM capability) descending
+        adapter_infos.sort_by(|a, b| b.2.max_buffer_size.cmp(&a.2.max_buffer_size));
+
+        // Log all detected GPUs
+        for (i, (_, info, limits)) in adapter_infos.iter().enumerate() {
+            tracing::info!(
+                "GPU {}: {} ({:?}) - device_id=0x{:x}, max_buffer={}GB, backend={:?}",
+                i, info.name, info.device_type, info.device,
+                limits.max_buffer_size / 1024 / 1024 / 1024,
+                info.backend
+            );
+        }
+
+        // Primary GPU = highest capability (first after sort)
+        let (primary_adapter, primary_info, primary_limits) = adapter_infos.remove(0);
+        let primary_info = primary_info.clone();
+
+        // Request device with ACTUAL adapter limits, not default
+        let (primary_device, primary_queue) = primary_adapter
+            .request_device(
+                &wgpu::DeviceDescriptor {
+                    label: Some("HyperPhysics-Primary"),
+                    required_features: wgpu::Features::empty(),
+                    // FIXED: Use adapter's actual limits instead of default
+                    required_limits: primary_limits.clone(),
+                },
+                None,
+            )
+            .await?;
 
         let primary_specs = Self::detect_specs(&primary_info);
 
-        // Initialize secondary GPU if dual-GPU enabled
+        // Initialize secondary GPU if dual-GPU enabled and we have more adapters
         let (secondary_device, secondary_queue, secondary_info, secondary_specs) =
-            if config.dual_gpu {
-                match Self::init_gpu(&instance, wgpu::PowerPreference::LowPower).await {
-                    Ok((device, queue, info)) => {
-                        // Only use as secondary if it's a different GPU
-                        if info.device != primary_info.device {
-                            let specs = Self::detect_specs(&info);
-                            (Some(device), Some(queue), Some(info), Some(specs))
-                        } else {
+            if config.dual_gpu && !adapter_infos.is_empty() {
+                let (secondary_adapter, sec_info, sec_limits) = adapter_infos.remove(0);
+                let sec_info = sec_info.clone();
+
+                // Only use if different device (compare by name since device ID may be unreliable on Metal)
+                if sec_info.name != primary_info.name {
+                    match secondary_adapter
+                        .request_device(
+                            &wgpu::DeviceDescriptor {
+                                label: Some("HyperPhysics-Secondary"),
+                                required_features: wgpu::Features::empty(),
+                                required_limits: sec_limits.clone(),
+                            },
+                            None,
+                        )
+                        .await
+                    {
+                        Ok((device, queue)) => {
+                            let specs = Self::detect_specs(&sec_info);
+                            tracing::info!("Secondary GPU initialized: {}", sec_info.name);
+                            (Some(Arc::new(device)), Some(Arc::new(queue)), Some(sec_info), Some(specs))
+                        }
+                        Err(e) => {
+                            tracing::warn!("Failed to initialize secondary GPU: {:?}", e);
                             (None, None, None, None)
                         }
                     }
-                    Err(_) => (None, None, None, None),
+                } else {
+                    (None, None, None, None)
                 }
             } else {
                 (None, None, None, None)
@@ -123,8 +186,8 @@ impl GpuOrchestrator {
         let scheduler = Arc::new(PipelineScheduler::new(config.pipeline_caching));
 
         Ok(Self {
-            primary_device,
-            primary_queue,
+            primary_device: Arc::new(primary_device),
+            primary_queue: Arc::new(primary_queue),
             primary_info,
             primary_specs,
             secondary_device,
@@ -180,9 +243,27 @@ impl GpuOrchestrator {
         // Device IDs: RX 6800 XT = 0x73bf, RX 5500 XT = 0x7340
         let name_lower = info.name.to_lowercase();
 
-        if name_lower.contains("6800 xt") || info.device == 0x73bf {
+        // Log device info for debugging
+        tracing::debug!(
+            "Detecting specs for: {} (device_id=0x{:x})",
+            info.name,
+            info.device
+        );
+
+        // Check device ID first (most reliable when available)
+        // RX 6800 XT device IDs: 0x73bf (main), 0x73a5, 0x73b1
+        // RX 5500 XT device IDs: 0x7340 (main), 0x7341
+        if info.device == 0x73bf || info.device == 0x73a5 || info.device == 0x73b1 {
+            return GpuSpecs::rx_6800_xt();
+        }
+        if info.device == 0x7340 || info.device == 0x7341 {
+            return GpuSpecs::rx_5500_xt();
+        }
+
+        // Fall back to name matching
+        if name_lower.contains("6800 xt") {
             GpuSpecs::rx_6800_xt()
-        } else if name_lower.contains("5500 xt") || info.device == 0x7340 {
+        } else if name_lower.contains("5500 xt") {
             GpuSpecs::rx_5500_xt()
         } else if name_lower.contains("6800") || name_lower.contains("navi 21") {
             // RDNA2 Navi 21 family (6800/6800XT/6900XT)
@@ -190,8 +271,19 @@ impl GpuOrchestrator {
         } else if name_lower.contains("5500") || name_lower.contains("navi 14") {
             // RDNA1 Navi 14 family (5500/5500XT)
             GpuSpecs::rx_5500_xt()
+        } else if name_lower.contains("gfx10") && name_lower.contains("unknown prototype") {
+            // "GFX10 Family Unknown Prototype" on macOS Metal typically indicates RX 6000 series
+            // Since this system has RX 6800 XT as primary, assume high-end RDNA2
+            GpuSpecs {
+                name: "AMD Radeon RX 6800 XT (Metal)".to_string(),
+                compute_units: 72,
+                wavefront_size: 64,
+                vram_bytes: 16 * 1024 * 1024 * 1024, // 16GB
+                memory_bandwidth_gbps: 512.0,
+                infinity_cache_bytes: 128 * 1024 * 1024, // 128MB
+            }
         } else if name_lower.contains("gfx10") {
-            // GFX10 = RDNA1/RDNA2, assume mid-range if unknown
+            // Generic GFX10 = RDNA1/RDNA2, assume mid-range
             GpuSpecs {
                 name: info.name.clone(),
                 compute_units: 40,

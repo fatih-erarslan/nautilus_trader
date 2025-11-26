@@ -22,7 +22,7 @@
 //!     let provider = AlpacaProvider::new(
 //!         "your_api_key".to_string(),
 //!         "your_api_secret".to_string(),
-//!         true, // paper trading
+//!         "https://paper-api.alpaca.markets".to_string(), // paper trading URL
 //!     );
 //!
 //!     let bar = provider.fetch_latest_bar("AAPL").await?;
@@ -35,9 +35,12 @@
 pub mod arbitrage;
 pub mod backtest;
 pub mod data;
+pub mod enactive;
 pub mod error;
+pub mod hnsw;
 pub mod providers;
 pub mod risk;
+pub mod subsumption;
 pub mod topology;
 pub mod validation;
 
@@ -51,7 +54,7 @@ pub use providers::{
     BinanceWebSocketClient,
     BybitProvider,
     CoinbaseProvider,
-    InteractiveBrokersProvider,
+    // InteractiveBrokersProvider disabled due to rustc ICE
     KrakenProvider,
     OKXProvider,
     MarketDataProvider
@@ -86,4 +89,35 @@ pub use validation::{
     ValidationConfig,
     ValidationError,
     SymbolValidationRules,
+};
+pub use enactive::{
+    EnactiveMarketPerception,
+    EnactiveConfig,
+    CouplingState,
+    CouplingEvent,
+    EnactedPatterns,
+    MarketRegime,
+    ActionSignal,
+};
+pub use subsumption::{
+    SubsumptionTradingSystem,
+    SubsumptionConfig,
+    SurvivalConfig,
+    RiskConfig as SubsumptionRiskConfig,
+    PositionConfig,
+    ExecutionConfig,
+    StrategyConfig,
+    ExplorationConfig,
+    MarketState as SubsumptionMarketState,
+    StateUpdate,
+    TradingAction,
+    Order,
+    OrderSide,
+};
+pub use hnsw::{
+    HNSWIndex,
+    HNSWNode,
+    HNSWLayer,
+    SearchResult,
+    HNSWStats,
 };

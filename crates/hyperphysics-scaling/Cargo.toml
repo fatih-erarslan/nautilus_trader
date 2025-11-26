@@ -13,6 +13,9 @@ description = "Auto-scaling orchestrator - 48 nodes to 1B nodes"
 hyperphysics-core = { path = "../hyperphysics-core" }
 hyperphysics-gpu = { path = "../hyperphysics-gpu" }
 
+# GPU enumeration - must match hyperphysics-gpu version
+wgpu = { version = "22", features = ["wgsl"] }
+
 # System monitoring
 sysinfo = "0.30"
 num_cpus = "1.16"
