@@ -5980,6 +5980,7 @@ dependencies = [
  "hyperphysics-core",
  "hyperphysics-geometry",
  "hyperphysics-market",
+ "hyperphysics-neural-trader",
  "hyperphysics-optimization",
  "hyperphysics-pbit",
  "hyperphysics-risk",
@@ -6046,10 +6047,14 @@ dependencies = [
  "mockito",
  "nalgebra 0.34.1",
  "ordered-float 4.6.0",
+ "parking_lot",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
  "reqwest",
  "serde",
  "serde_json",
  "sha2",
+ "simsimd",
  "sntpc",
  "thiserror 1.0.69",
  "tokio",
@@ -6137,6 +6142,29 @@ dependencies = [
  "tracing",
  "uuid",
  "wgpu 0.20.1",
+]
+
+[[package]]
+name = "hyperphysics-neural-trader"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "approx 0.5.1",
+ "async-trait",
+ "chrono",
+ "criterion",
+ "futures",
+ "hyperphysics-core",
+ "nalgebra 0.33.2",
+ "ndarray 0.15.6",
+ "proptest",
+ "serde",
+ "serde_json",
+ "statrs 0.16.1",
+ "thiserror 1.0.69",
+ "tokio",
+ "tokio-test",
+ "tracing",
 ]
 
 [[package]]

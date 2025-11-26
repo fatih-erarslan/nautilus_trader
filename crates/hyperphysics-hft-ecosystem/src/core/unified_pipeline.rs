@@ -1,7 +1,7 @@
 //! Unified HFT Pipeline Integration
 //!
-//! Connects market data providers, consensus mechanisms, and optimization
-//! algorithms into a cohesive trading pipeline.
+//! Connects market data providers, consensus mechanisms, neural forecasting,
+//! and optimization algorithms into a cohesive trading pipeline.
 //!
 //! # Architecture
 //!
@@ -9,6 +9,8 @@
 //! Market Data (hyperphysics-market)
 //!        ↓
 //! Physics Simulation (rapier/jolt/warp)
+//!        ↓
+//! Neural Forecasting (hyperphysics-neural-trader)  [OPTIONAL]
 //!        ↓
 //! Biomimetic Optimization (hyperphysics-optimization)
 //!        ↓
@@ -25,6 +27,12 @@ use tokio::sync::RwLock;
 
 #[cfg(feature = "optimization-real")]
 use crate::swarms::{MarketObjective, OptimizationSignal, RealOptimizer};
+
+// Neural forecasting imports
+#[cfg(feature = "neural-forecasting")]
+use hyperphysics_neural_trader::{
+    NeuralBridgeConfig, NeuralDataAdapter, NeuralForecastEngine, ForecastResult,
+};
 
 /// Market data feed abstraction
 #[derive(Debug, Clone)]
@@ -52,6 +60,21 @@ impl Default for MarketFeed {
             vwap: 100.0,
             spread: 0.01,
             timestamp: 0.0,
+        }
+    }
+}
+
+/// Convert local MarketFeed to neural-trader's MarketFeed
+#[cfg(feature = "neural-forecasting")]
+impl From<&MarketFeed> for hyperphysics_neural_trader::MarketFeed {
+    fn from(feed: &MarketFeed) -> Self {
+        hyperphysics_neural_trader::MarketFeed {
+            price: feed.price,
+            returns: feed.returns.clone(),
+            volatility: feed.volatility,
+            vwap: feed.vwap,
+            spread: feed.spread,
+            timestamp: feed.timestamp,
         }
     }
 }
@@ -94,6 +117,8 @@ pub struct PipelineResult {
     pub market_data_latency_us: u64,
     /// Physics simulation latency
     pub physics_latency_us: u64,
+    /// Neural forecasting latency (0 if feature not enabled)
+    pub neural_latency_us: u64,
     /// Optimization latency
     pub optimization_latency_us: u64,
     /// Consensus validation latency
@@ -102,6 +127,23 @@ pub struct PipelineResult {
     pub consensus_state: ConsensusState,
     /// Whether Byzantine consensus was reached
     pub consensus_reached: bool,
+    /// Neural forecast result (if neural-forecasting feature enabled)
+    #[cfg(feature = "neural-forecasting")]
+    pub neural_forecast: Option<NeuralForecastSummary>,
+}
+
+/// Summary of neural forecast for pipeline result
+#[cfg(feature = "neural-forecasting")]
+#[derive(Debug, Clone)]
+pub struct NeuralForecastSummary {
+    /// Primary prediction value
+    pub prediction: f64,
+    /// Confidence interval width
+    pub confidence_interval: f64,
+    /// Quality score [0, 1]
+    pub quality_score: f64,
+    /// Model type used
+    pub model: String,
 }
 
 /// Unified HFT Pipeline
@@ -117,6 +159,14 @@ pub struct UnifiedPipeline {
     /// Real optimizer (when feature enabled)
     #[cfg(feature = "optimization-real")]
     optimizer: Arc<RealOptimizer>,
+
+    /// Neural forecast engine (when feature enabled)
+    #[cfg(feature = "neural-forecasting")]
+    neural_engine: Arc<NeuralForecastEngine>,
+
+    /// Neural data adapter (when feature enabled)
+    #[cfg(feature = "neural-forecasting")]
+    neural_adapter: Arc<NeuralDataAdapter>,
 
     /// Pipeline statistics
     stats: Arc<RwLock<PipelineStats>>,
@@ -140,8 +190,29 @@ pub struct PipelineStats {
 }
 
 impl UnifiedPipeline {
-    /// Create a new unified pipeline
-    #[cfg(feature = "optimization-real")]
+    /// Create a new unified pipeline with optimization and neural forecasting
+    #[cfg(all(feature = "optimization-real", feature = "neural-forecasting"))]
+    pub fn new(config: EcosystemConfig) -> Result<Self> {
+        let optimizer = RealOptimizer::hft_optimized()?;
+        let neural_config = NeuralBridgeConfig::default();
+        let neural_engine = NeuralForecastEngine::new(neural_config.clone());
+        let neural_adapter = NeuralDataAdapter::new(neural_config);
+
+        Ok(Self {
+            config,
+            consensus_state: Arc::new(RwLock::new(ConsensusState::default())),
+            optimizer: Arc::new(optimizer),
+            neural_engine: Arc::new(neural_engine),
+            neural_adapter: Arc::new(neural_adapter),
+            stats: Arc::new(RwLock::new(PipelineStats {
+                min_latency_us: u64::MAX,
+                ..Default::default()
+            })),
+        })
+    }
+
+    /// Create a new unified pipeline with optimization only
+    #[cfg(all(feature = "optimization-real", not(feature = "neural-forecasting")))]
     pub fn new(config: EcosystemConfig) -> Result<Self> {
         let optimizer = RealOptimizer::hft_optimized()?;
 
@@ -156,8 +227,27 @@ impl UnifiedPipeline {
         })
     }
 
-    /// Create a new unified pipeline (fallback without optimization)
-    #[cfg(not(feature = "optimization-real"))]
+    /// Create a new unified pipeline with neural forecasting only
+    #[cfg(all(not(feature = "optimization-real"), feature = "neural-forecasting"))]
+    pub fn new(config: EcosystemConfig) -> Result<Self> {
+        let neural_config = NeuralBridgeConfig::default();
+        let neural_engine = NeuralForecastEngine::new(neural_config.clone());
+        let neural_adapter = NeuralDataAdapter::new(neural_config);
+
+        Ok(Self {
+            config,
+            consensus_state: Arc::new(RwLock::new(ConsensusState::default())),
+            neural_engine: Arc::new(neural_engine),
+            neural_adapter: Arc::new(neural_adapter),
+            stats: Arc::new(RwLock::new(PipelineStats {
+                min_latency_us: u64::MAX,
+                ..Default::default()
+            })),
+        })
+    }
+
+    /// Create a new unified pipeline (fallback without optimization or neural)
+    #[cfg(all(not(feature = "optimization-real"), not(feature = "neural-forecasting")))]
     pub fn new(config: EcosystemConfig) -> Result<Self> {
         Ok(Self {
             config,
@@ -183,12 +273,32 @@ impl UnifiedPipeline {
         let physics_signal = self.run_physics_simulation(&market_tick).await?;
         let physics_latency_us = physics_start.elapsed().as_micros() as u64;
 
-        // Phase 3: Biomimetic optimization
+        // Phase 3: Neural forecasting (optional)
+        #[cfg(feature = "neural-forecasting")]
+        let (neural_latency_us, neural_forecast) = {
+            let neural_start = Instant::now();
+            let forecast_result = self.run_neural_forecasting(feed).await;
+            let latency = neural_start.elapsed().as_micros() as u64;
+
+            let summary = forecast_result.ok().map(|f| NeuralForecastSummary {
+                prediction: f.primary_prediction(),
+                confidence_interval: f.interval_width(0),
+                quality_score: f.quality_score(),
+                model: format!("{:?}", f.model_type),
+            });
+
+            (latency, summary)
+        };
+
+        #[cfg(not(feature = "neural-forecasting"))]
+        let neural_latency_us: u64 = 0;
+
+        // Phase 4: Biomimetic optimization
         let opt_start = Instant::now();
         let opt_signal = self.run_optimization(feed).await?;
         let optimization_latency_us = opt_start.elapsed().as_micros() as u64;
 
-        // Phase 4: Consensus validation
+        // Phase 5: Consensus validation
         let consensus_start = Instant::now();
         let (consensus_reached, consensus_state) = self.validate_consensus(&opt_signal).await?;
         let consensus_latency_us = consensus_start.elapsed().as_micros() as u64;
@@ -210,10 +320,13 @@ impl UnifiedPipeline {
             total_latency_us,
             market_data_latency_us,
             physics_latency_us,
+            neural_latency_us,
             optimization_latency_us,
             consensus_latency_us,
             consensus_state,
             consensus_reached,
+            #[cfg(feature = "neural-forecasting")]
+            neural_forecast,
         })
     }
 
@@ -240,16 +353,31 @@ impl UnifiedPipeline {
         })
     }
 
+    /// Run neural forecasting on market data
+    #[cfg(feature = "neural-forecasting")]
+    async fn run_neural_forecasting(&self, feed: &MarketFeed) -> Result<ForecastResult> {
+        // Convert local MarketFeed to neural-trader's MarketFeed
+        let neural_feed: hyperphysics_neural_trader::MarketFeed = feed.into();
+
+        // Process feed through neural adapter to get features
+        let features = self.neural_adapter.process_feed(&neural_feed).await
+            .map_err(|e| EcosystemError::HyperPhysics(format!("Neural adapter error: {}", e)))?;
+
+        // Generate forecast using the neural engine
+        self.neural_engine.forecast(&features).await
+            .map_err(|e| EcosystemError::HyperPhysics(format!("Neural forecast error: {}", e)))
+    }
+
     /// Run biomimetic optimization algorithms
     #[cfg(feature = "optimization-real")]
     async fn run_optimization(&self, feed: &MarketFeed) -> Result<OptimizationSignal> {
         // Create market objective from feed
-        let objective = MarketObjective {
-            returns: feed.returns.clone(),
-            volatility: feed.volatility,
-            trend: self.compute_trend(&feed.returns),
-            risk_aversion: 1.0,
-        };
+        let objective = MarketObjective::new(
+            feed.returns.clone(),
+            feed.volatility,
+            self.compute_trend(&feed.returns),
+            1.0, // risk_aversion
+        );
 
         // Use whale optimization for speed (could use ensemble for higher confidence)
         self.optimizer.optimize_whale(&objective)

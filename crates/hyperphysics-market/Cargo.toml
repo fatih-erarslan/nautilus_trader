@@ -56,6 +56,12 @@ governor = { version = "0.6", default-features = false, features = ["std", "jitt
 
 # Linear algebra for topology mapping
 
+# HNSW index for high-dimensional vector similarity search
+simsimd.workspace = true
+parking_lot.workspace = true
+rand.workspace = true
+rand_chacha.workspace = true
+
 [dev-dependencies]
 tokio-test = "0.4"
 mockito = "1.2"

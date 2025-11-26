@@ -13,14 +13,18 @@ name = "tengri"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-# Nautilus Trader integration - commenting out for standalone build
-# nautilus-core = { path = "../core" }
-# nautilus-model = { path = "../model" }
-# nautilus-common = { path = "../common" }
-# nautilus-indicators = { path = "../indicators" }
-# nautilus-execution = { path = "../execution" }
-# nautilus-portfolio = { path = "../portfolio" }
-# nautilus-risk = { path = "../risk" }
+# Nautilus Trader integration via vendor directory
+# Uncomment these when ready for full Nautilus integration
+# nautilus-core = { path = "../vendor/nautilus_trader/crates/core" }
+# nautilus-model = { path = "../vendor/nautilus_trader/crates/model" }
+# nautilus-common = { path = "../vendor/nautilus_trader/crates/common" }
+# nautilus-indicators = { path = "../vendor/nautilus_trader/crates/indicators" }
+# nautilus-execution = { path = "../vendor/nautilus_trader/crates/execution" }
+# nautilus-portfolio = { path = "../vendor/nautilus_trader/crates/portfolio" }
+# nautilus-risk = { path = "../vendor/nautilus_trader/crates/risk" }
+
+# HyperPhysics integration
+# hyperphysics-nautilus = { path = "../hyperphysics-nautilus" }
 
 # Async runtime and networking
 tokio = { version = "1.46", features = ["full"] }

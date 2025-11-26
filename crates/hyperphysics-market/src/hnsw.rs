@@ -489,8 +489,19 @@ impl HNSWIndex {
 
     /// Select M best neighbors using heuristic from Algorithm 4.
     ///
-    /// This implements a greedy heuristic that prefers diverse neighbors
-    /// to create better graph connectivity and search performance.
+    /// This implements Algorithm 4 from Malkov & Yashunin (2020):
+    /// A greedy heuristic that prefers diverse neighbors to create better
+    /// graph connectivity and search performance.
+    ///
+    /// The heuristic works by:
+    /// 1. Starting with the nearest candidate
+    /// 2. For each subsequent candidate, check if it's closer to the base vector
+    ///    than to any already-selected neighbor
+    /// 3. This creates diverse connections that improve navigability
+    ///
+    /// # References
+    ///
+    /// Algorithm 4 ("SELECT-NEIGHBORS-HEURISTIC") from the HNSW paper.
     fn select_neighbors_heuristic(
         &self,
         nodes: &[HNSWNode],
@@ -503,18 +514,70 @@ impl HNSWIndex {
             return candidates.iter().map(|r| r.id).collect();
         }
 
-        // Use simple selection: take M nearest neighbors
-        // For production, could implement more sophisticated heuristic
-        // from Algorithm 4 that considers diversity
-        let mut sorted = candidates.to_vec();
+        // Recalculate distances relative to base_vector for robustness
+        // This ensures correctness even if candidates were computed relative to different query
+        let mut sorted: Vec<SearchResult> = candidates.iter()
+            .map(|c| SearchResult {
+                id: c.id,
+                distance: Self::distance_simd_static(&nodes[c.id].vector, base_vector),
+            })
+            .collect();
+
+        // Sort by distance to base_vector (ascending)
         sorted.sort_by(|a, b| {
             a.distance.partial_cmp(&b.distance)
                 .unwrap_or(Ordering::Equal)
                 .then_with(|| a.id.cmp(&b.id))
         });
 
-        sorted.truncate(m);
-        sorted.iter().map(|r| r.id).collect()
+        // Apply diversity heuristic: prefer candidates that are closer to base_vector
+        // than to already-selected neighbors
+        let mut selected = Vec::with_capacity(m);
+        let mut discarded = Vec::new();
+
+        // Always take the closest candidate first
+        if !sorted.is_empty() {
+            selected.push(sorted[0].id);
+        }
+
+        // For remaining candidates, apply diversity check
+        for candidate in sorted.iter().skip(1) {
+            if selected.len() >= m {
+                break;
+            }
+
+            // Check if candidate is closer to base_vector than to any selected neighbor
+            let dist_to_base = candidate.distance;
+            let mut is_diverse = true;
+
+            for &selected_id in &selected {
+                // Calculate distance from candidate to selected neighbor
+                let dist_to_neighbor = Self::distance_simd_static(
+                    &nodes[candidate.id].vector,
+                    &nodes[selected_id].vector
+                );
+
+                // If candidate is closer to a neighbor than to base, it's not diverse
+                if dist_to_neighbor < dist_to_base {
+                    is_diverse = false;
+                    break;
+                }
+            }
+
+            if is_diverse {
+                selected.push(candidate.id);
+            } else {
+                discarded.push(candidate.id);
+            }
+        }
+
+        // If we don't have M neighbors yet, fill from discarded (nearest first)
+        if selected.len() < m {
+            let needed = m - selected.len();
+            selected.extend(discarded.iter().take(needed));
+        }
+
+        selected
     }
 
     /// Get the number of vectors in the index

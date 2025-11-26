@@ -25,7 +25,7 @@
 
 use chrono::{DateTime, Utc};
 use sntpc::{NtpContext, NtpTimestampGenerator, NtpUdpSocket, Result as NtpResult};
-use std::net::UdpSocket;
+use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::error::{MarketError, MarketResult};
@@ -49,6 +49,7 @@ const MAX_RTT_US: u64 = 2_000;
 #[derive(Debug)]
 struct StdUdpSocket {
     socket: UdpSocket,
+    server_addr: SocketAddr,
 }
 
 impl StdUdpSocket {
@@ -56,18 +57,33 @@ impl StdUdpSocket {
         let socket = UdpSocket::bind("0.0.0.0:0")?;
         socket.set_read_timeout(Some(Duration::from_secs(2)))?;
         socket.set_write_timeout(Some(Duration::from_secs(2)))?;
-        socket.connect(addr)?;
-        Ok(Self { socket })
+
+        // Resolve the server address
+        let server_addr = addr.to_socket_addrs()?
+            .next()
+            .ok_or_else(|| std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Failed to resolve NTP server address"
+            ))?;
+
+        Ok(Self { socket, server_addr })
     }
 }
 
 impl NtpUdpSocket for StdUdpSocket {
-    fn send(&self, buf: &[u8]) -> NtpResult<usize> {
-        self.socket.send(buf).map_err(|e| sntpc::Error::Network(e.to_string()))
+    fn send_to<T: ToSocketAddrs>(&self, buf: &[u8], addr: T) -> NtpResult<usize> {
+        // sntpc 0.3+ expects us to send to the provided address
+        // but we use our pre-resolved server_addr for efficiency
+        let _ = addr; // Acknowledge the parameter
+        self.socket
+            .send_to(buf, self.server_addr)
+            .map_err(|_| sntpc::Error::Network)
     }
 
-    fn recv(&self, buf: &mut [u8]) -> NtpResult<usize> {
-        self.socket.recv(buf).map_err(|e| sntpc::Error::Network(e.to_string()))
+    fn recv_from(&self, buf: &mut [u8]) -> NtpResult<(usize, SocketAddr)> {
+        self.socket
+            .recv_from(buf)
+            .map_err(|_| sntpc::Error::Network)
     }
 }
 
@@ -260,11 +276,13 @@ impl TimestampValidator {
 
         let context = NtpContext::new(StdTimestampGen::default());
 
-        let result = sntpc::get_time(server, socket, context)
+        // sntpc 0.3+ expects a socket reference
+        let result = sntpc::get_time(server, &socket, context)
             .map_err(|e| MarketError::NetworkError(format!("NTP error: {:?}", e)))?;
 
         // Convert NTP response to microseconds
-        let offset_us = result.sec_offset() * 1_000_000 + (result.usec_offset() as i64);
+        // sntpc 0.3+ uses offset() returning i64 microseconds
+        let offset_us = result.offset();
         let delay_us = result.roundtrip() as u64;
 
         Ok(NtpMeasurement {

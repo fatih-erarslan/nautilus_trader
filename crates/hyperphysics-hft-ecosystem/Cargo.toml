@@ -27,6 +27,9 @@ active-inference-agent = { path = "../active-inference-agent" }
 # REAL optimization algorithms (NOT stubs)
 hyperphysics-optimization = { path = "../hyperphysics-optimization", optional = true }
 
+# Neural forecasting integration
+hyperphysics-neural-trader = { path = "../hyperphysics-neural-trader", optional = true }
+
 # Physics engines (all optional, for modular deployment)
 rapier-hyperphysics = { path = "../physics-engines/rapier-hyperphysics", optional = true }
 jolt-hyperphysics = { path = "../physics-engines/jolt-hyperphysics", optional = true }
@@ -116,6 +119,9 @@ simd = ["wide"]
 # This is the PRIMARY way to use biomimetic algorithms
 optimization-real = ["hyperphysics-optimization"]
 
+# Neural forecasting via hyperphysics-neural-trader
+neural-forecasting = ["hyperphysics-neural-trader"]
+
 # DEPRECATED: Legacy bio-inspired-workspace stubs (use optimization-real instead)
 biomimetic-tier1 = [
     "whale-optimization",
@@ -141,6 +147,7 @@ verification = []
 full = [
     "hft-core",
     "optimization-real",
+    "neural-forecasting",
     "physics-all",
     "simd",
     "verification"

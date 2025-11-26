@@ -13,20 +13,21 @@ use std::time::Instant;
 
 #[cfg(feature = "optimization-real")]
 use hyperphysics_optimization::{
+    // Re-exported types from algorithms module (not submodules)
     algorithms::{
-        whale::WhaleOptimizer,
-        bat::BatOptimizer,
-        firefly::FireflyOptimizer,
-        cuckoo::CuckooOptimizer,
-        pso::ParticleSwarmOptimizer,
-        genetic::GeneticOptimizer,
-        differential_evolution::DifferentialEvolution,
-        grey_wolf::GreyWolfOptimizer,
+        WhaleOptimizer, WOAConfig,
+        BatOptimizer, BatConfig,
+        FireflyOptimizer, FireflyConfig,
+        CuckooSearch, CuckooConfig,
+        AlgorithmConfig, Algorithm,
     },
-    core::{Bounds, Individual, ObjectiveFunction, OptimizationConfig},
-    algorithms::{AlgorithmConfig, WOAConfig, BatConfig, FireflyConfig, CuckooConfig},
+    // Core types
+    Bounds, ObjectiveFunction, OptimizationConfig,
     OptimizationError,
 };
+
+#[cfg(feature = "optimization-real")]
+use ndarray::ArrayView1;
 
 /// Trading signal from optimization
 #[derive(Debug, Clone)]
@@ -54,11 +55,27 @@ pub struct MarketObjective {
     pub trend: f64,
     /// Risk aversion parameter
     pub risk_aversion: f64,
+    /// Search space bounds (10-dimensional strategy space)
+    bounds: Bounds,
+}
+
+#[cfg(feature = "optimization-real")]
+impl MarketObjective {
+    /// Create new market objective with default 10-dimensional bounds
+    pub fn new(returns: Vec<f64>, volatility: f64, trend: f64, risk_aversion: f64) -> Self {
+        Self {
+            returns,
+            volatility,
+            trend,
+            risk_aversion,
+            bounds: Bounds::new(vec![(-1.0, 1.0); 10]),
+        }
+    }
 }
 
 #[cfg(feature = "optimization-real")]
 impl ObjectiveFunction for MarketObjective {
-    fn evaluate(&self, solution: &ndarray::ArrayView1<f64>) -> f64 {
+    fn evaluate(&self, solution: ArrayView1<f64>) -> f64 {
         // Solution encodes trading strategy parameters:
         // [0]: position size weight
         // [1]: momentum weight
@@ -82,6 +99,10 @@ impl ObjectiveFunction for MarketObjective {
 
         // Maximize risk-adjusted return (negative because optimizers minimize)
         -(expected_return / risk.max(0.001))
+    }
+
+    fn bounds(&self) -> &Bounds {
+        &self.bounds
     }
 
     fn dimension(&self) -> usize {
@@ -108,7 +129,7 @@ impl RealOptimizer {
             max_iterations: 50,   // Limited iterations for <1ms
             tolerance: 1e-4,
             seed: None,
-            parallel: true,
+            ..OptimizationConfig::default()
         };
 
         Ok(Self { config, bounds })
@@ -122,7 +143,7 @@ impl RealOptimizer {
             max_iterations: 25,   // Very limited iterations
             tolerance: 1e-3,      // Relaxed tolerance
             seed: None,
-            parallel: true,
+            ..OptimizationConfig::default()
         };
 
         Ok(Self { config, bounds })
@@ -199,7 +220,7 @@ impl RealOptimizer {
         let start = Instant::now();
 
         let cs_config = CuckooConfig::hft_optimized();
-        let mut optimizer = CuckooOptimizer::new(cs_config, self.config.clone(), self.bounds.clone())
+        let mut optimizer = CuckooSearch::new(cs_config, self.config.clone(), self.bounds.clone())
             .map_err(|e| EcosystemError::BiomimeticAlgorithm(e.to_string()))?;
 
         let result = optimizer.optimize(objective)
@@ -220,30 +241,9 @@ impl RealOptimizer {
     pub async fn optimize_tier1_ensemble(&self, objective: &MarketObjective) -> Result<OptimizationSignal> {
         let start = Instant::now();
 
-        // Clone objective for parallel execution
-        let obj1 = MarketObjective { returns: objective.returns.clone(), ..*objective };
-        let obj2 = MarketObjective { returns: objective.returns.clone(), ..*objective };
-        let obj3 = MarketObjective { returns: objective.returns.clone(), ..*objective };
-        let obj4 = MarketObjective { returns: objective.returns.clone(), ..*objective };
-
-        // Run optimizers in parallel using rayon
-        let results: Vec<Result<OptimizationSignal>> = rayon::scope(|s| {
-            let mut handles = Vec::new();
-
-            let opt1 = Self::hft_optimized().unwrap();
-            let opt2 = Self::hft_optimized().unwrap();
-            let opt3 = Self::hft_optimized().unwrap();
-            let opt4 = Self::hft_optimized().unwrap();
-
-            handles.push(s.spawn(move |_| opt1.optimize_whale(&obj1)));
-            handles.push(s.spawn(move |_| opt2.optimize_bat(&obj2)));
-            handles.push(s.spawn(move |_| opt3.optimize_firefly(&obj3)));
-            handles.push(s.spawn(move |_| opt4.optimize_cuckoo(&obj4)));
-
-            // Note: rayon spawn doesn't return values directly
-            // We need a different approach
-            vec![]
-        });
+        // Note: Rayon scope spawn requires () return type, not compatible with Result<T>
+        // For production parallel execution, use crossbeam channels or separate thread pool
+        // For now, sequential execution ensures correctness (parallel optimization is complex)
 
         // Sequential fallback for now (parallel requires more complex setup)
         let whale = self.optimize_whale(objective)?;
@@ -331,12 +331,12 @@ mod tests {
     #[cfg(feature = "optimization-real")]
     fn test_whale_optimization() {
         let optimizer = RealOptimizer::hft_optimized().unwrap();
-        let objective = MarketObjective {
-            returns: vec![0.01, -0.005, 0.02, -0.01, 0.015],
-            volatility: 0.02,
-            trend: 0.3,
-            risk_aversion: 1.0,
-        };
+        let objective = MarketObjective::new(
+            vec![0.01, -0.005, 0.02, -0.01, 0.015],
+            0.02,  // volatility
+            0.3,   // trend
+            1.0,   // risk_aversion
+        );
 
         let result = optimizer.optimize_whale(&objective);
         assert!(result.is_ok());
@@ -351,12 +351,12 @@ mod tests {
     #[cfg(feature = "optimization-real")]
     fn test_hft_latency_target() {
         let optimizer = RealOptimizer::hft_optimized().unwrap();
-        let objective = MarketObjective {
-            returns: vec![0.01; 10],
-            volatility: 0.02,
-            trend: 0.0,
-            risk_aversion: 1.0,
-        };
+        let objective = MarketObjective::new(
+            vec![0.01; 10],
+            0.02,  // volatility
+            0.0,   // trend
+            1.0,   // risk_aversion
+        );
 
         let result = optimizer.optimize_whale(&objective).unwrap();
 

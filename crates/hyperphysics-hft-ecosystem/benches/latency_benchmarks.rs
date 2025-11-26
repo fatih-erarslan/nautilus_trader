@@ -12,13 +12,13 @@ use hyperphysics_hft_ecosystem::swarms::{RealOptimizer, MarketObjective};
 
 /// Create test market objective
 #[cfg(feature = "optimization-real")]
-fn create_test_objective(dimension: usize) -> MarketObjective {
-    MarketObjective {
-        returns: vec![0.01, -0.005, 0.02, -0.01, 0.015, 0.008, -0.003, 0.012, -0.007, 0.005],
-        volatility: 0.02,
-        trend: 0.3,
-        risk_aversion: 1.0,
-    }
+fn create_test_objective(_dimension: usize) -> MarketObjective {
+    MarketObjective::new(
+        vec![0.01, -0.005, 0.02, -0.01, 0.015, 0.008, -0.003, 0.012, -0.007, 0.005],
+        0.02,  // volatility
+        0.3,   // trend
+        1.0,   // risk_aversion
+    )
 }
 
 #[cfg(feature = "optimization-real")]

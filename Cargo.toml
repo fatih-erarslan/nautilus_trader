@@ -42,6 +42,8 @@ members = [
     "crates/hyperphysics-gpu-unified",
     # Nautilus Trader integration bridge
     "crates/hyperphysics-nautilus",
+    # Neural Trader integration bridge
+    "crates/hyperphysics-neural-trader",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
