@@ -30,6 +30,9 @@ hyperphysics-optimization = { path = "../hyperphysics-optimization", optional = 
 # Neural forecasting integration
 hyperphysics-neural-trader = { path = "../hyperphysics-neural-trader", optional = true }
 
+# Quantum-inspired ML forecasting (hyperphysics-ml)
+hyperphysics-ml = { path = "../hyperphysics-ml", optional = true, features = ["cpu"] }
+
 # Physics engines (all optional, for modular deployment)
 rapier-hyperphysics = { path = "../physics-engines/rapier-hyperphysics", optional = true }
 jolt-hyperphysics = { path = "../physics-engines/jolt-hyperphysics", optional = true }
@@ -122,6 +125,9 @@ optimization-real = ["hyperphysics-optimization"]
 # Neural forecasting via hyperphysics-neural-trader
 neural-forecasting = ["hyperphysics-neural-trader"]
 
+# Quantum-inspired ML forecasting via hyperphysics-ml
+quantum-forecasting = ["hyperphysics-ml"]
+
 # DEPRECATED: Legacy bio-inspired-workspace stubs (use optimization-real instead)
 biomimetic-tier1 = [
     "whale-optimization",
@@ -148,6 +154,7 @@ full = [
     "hft-core",
     "optimization-real",
     "neural-forecasting",
+    "quantum-forecasting",
     "physics-all",
     "simd",
     "verification"

@@ -360,7 +360,20 @@ mod tests {
 
         let result = optimizer.optimize_whale(&objective).unwrap();
 
-        // Should complete in <10ms for HFT use
-        assert!(result.latency_us < 10_000, "Latency {}us exceeds 10ms target", result.latency_us);
+        // Latency targets vary by build profile:
+        // - Release: <10ms (HFT production target)
+        // - Debug: <100ms (development/testing acceptable)
+        #[cfg(debug_assertions)]
+        let latency_target_us = 100_000; // 100ms for debug builds
+        #[cfg(not(debug_assertions))]
+        let latency_target_us = 10_000; // 10ms for release builds (HFT target)
+
+        assert!(
+            result.latency_us < latency_target_us,
+            "Latency {}us exceeds {}ms target (debug={})",
+            result.latency_us,
+            latency_target_us / 1000,
+            cfg!(debug_assertions)
+        );
     }
 }

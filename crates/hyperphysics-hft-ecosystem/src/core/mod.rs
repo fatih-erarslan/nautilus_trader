@@ -5,11 +5,13 @@
 pub mod biomimetic_coordinator;
 pub mod ecosystem_builder;
 pub mod physics_engine_router;
+pub mod quantum_forecasting;
 pub mod unified_pipeline;
 
 pub use biomimetic_coordinator::*;
 pub use ecosystem_builder::*;
 pub use physics_engine_router::*;
+pub use quantum_forecasting::*;
 pub use unified_pipeline::*;
 
 use crate::Result;

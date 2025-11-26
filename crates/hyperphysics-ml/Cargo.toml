@@ -1,0 +1,142 @@
+[package]
+name = "hyperphysics-ml"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+description = "Multi-backend ML framework for HFT neural forecasting"
+license = "MIT"
+repository = "https://github.com/fatih-erarslan/HyperPhysics"
+keywords = ["machine-learning", "neural-network", "hft", "trading", "gpu"]
+categories = ["science", "mathematics", "algorithms"]
+
+[dependencies]
+# Core burn framework (backend-agnostic)
+# Using 0.16 for bincode 2.x compatibility
+burn = { version = "0.16", default-features = false }
+
+# Async runtime
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Logging
+tracing = "0.1"
+
+# Numeric utilities
+num-traits = "0.2"
+
+# Random number generation (for initialization)
+rand = "0.8"
+rand_distr = "0.4"
+
+# ============================================================================
+# BACKEND DEPENDENCIES (feature-gated)
+# ============================================================================
+
+# CPU Backend - Pure Rust, always available
+[dependencies.burn-ndarray]
+version = "0.16"
+optional = true
+
+# WASM Backend - Browser/Edge deployment
+[dependencies.burn-wgpu]
+version = "0.16"
+optional = true
+
+# Candle for optimized inference
+[dependencies.candle-core]
+version = "0.8"
+default-features = false
+optional = true
+
+[dependencies.candle-nn]
+version = "0.8"
+optional = true
+
+# ============================================================================
+# PLATFORM-SPECIFIC BACKENDS
+# ============================================================================
+
+# Linux: CUDA (NVIDIA)
+[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dependencies]
+burn-cuda = { version = "0.16", optional = true }
+
+# Linux: LibTorch with CUDA (alternative, heavier)
+[target.'cfg(target_os = "linux")'.dependencies]
+burn-tch = { version = "0.16", optional = true }
+
+# macOS: Metal backend for Apple Silicon (wgpu auto-selects Metal on macOS)
+# Note: burn-wgpu doesn't need explicit metal feature - wgpu handles this automatically
+
+# ============================================================================
+# FEATURES
+# ============================================================================
+[features]
+default = ["cpu", "std"]
+
+# Standard library support (required for most use cases)
+std = []
+
+# CPU Backend (always available, pure Rust)
+cpu = ["burn-ndarray"]
+
+# WebGPU/Vulkan Backend (cross-platform GPU)
+wgpu = ["burn-wgpu"]
+vulkan = ["wgpu"]  # Vulkan via wgpu
+
+# NVIDIA CUDA Backend (Linux only) - via LibTorch
+cuda = ["tch"]  # CUDA through LibTorch
+
+# LibTorch Backend (CUDA via PyTorch C++)
+tch = ["burn-tch"]
+
+# AMD ROCm-HIP Backend (via wgpu or tch)
+rocm = ["wgpu"]  # ROCm through wgpu Vulkan backend
+
+# Apple Metal Backend (macOS)
+metal = ["wgpu"]  # Metal through wgpu
+
+# Candle inference optimization
+candle = ["candle-core", "candle-nn"]
+candle-cuda = ["candle", "candle-core/cuda"]
+candle-metal = ["candle", "candle-core/metal"]
+
+# Quantization support
+quantization = ["candle"]
+
+# Full feature set
+full = ["cpu", "wgpu", "candle"]
+full-cuda = ["full", "cuda", "candle-cuda"]
+full-metal = ["full", "metal", "candle-metal"]
+
+# HFT optimizations (latency-focused)
+hft = ["cpu"]  # Minimal dependencies for lowest latency
+
+# Training features
+training = ["burn/autodiff"]
+
+# ============================================================================
+# DEVELOPMENT DEPENDENCIES
+# ============================================================================
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1"
+approx = "0.5"
+
+[[bench]]
+name = "inference_benchmark"
+harness = false
+
+[[bench]]
+name = "training_benchmark"
+harness = false
+
+[package.metadata.docs.rs]
+features = ["full"]

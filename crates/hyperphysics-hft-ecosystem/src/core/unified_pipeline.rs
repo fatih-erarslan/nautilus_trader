@@ -34,6 +34,12 @@ use hyperphysics_neural_trader::{
     NeuralBridgeConfig, NeuralDataAdapter, NeuralForecastEngine, ForecastResult,
 };
 
+// Quantum-inspired forecasting imports
+#[cfg(feature = "quantum-forecasting")]
+use crate::core::quantum_forecasting::{
+    QuantumForecastEngine, QuantumForecastConfig, QuantumForecastResult, QuantumModelType,
+};
+
 /// Market data feed abstraction
 #[derive(Debug, Clone)]
 pub struct MarketFeed {
@@ -130,6 +136,11 @@ pub struct PipelineResult {
     /// Neural forecast result (if neural-forecasting feature enabled)
     #[cfg(feature = "neural-forecasting")]
     pub neural_forecast: Option<NeuralForecastSummary>,
+    /// Quantum forecast result (if quantum-forecasting feature enabled)
+    #[cfg(feature = "quantum-forecasting")]
+    pub quantum_forecast: Option<QuantumForecastSummary>,
+    /// Quantum forecasting latency (0 if feature not enabled)
+    pub quantum_latency_us: u64,
 }
 
 /// Summary of neural forecast for pipeline result
@@ -144,6 +155,26 @@ pub struct NeuralForecastSummary {
     pub quality_score: f64,
     /// Model type used
     pub model: String,
+}
+
+/// Summary of quantum-inspired forecast for pipeline result
+#[cfg(feature = "quantum-forecasting")]
+#[derive(Debug, Clone)]
+pub struct QuantumForecastSummary {
+    /// Primary prediction value
+    pub prediction: f64,
+    /// Prediction confidence [0, 1]
+    pub confidence: f64,
+    /// Phase coherence metric
+    pub phase_coherence: f64,
+    /// Biological rhythm signal strength
+    pub rhythm_signal: f64,
+    /// Quantum tunneling events
+    pub tunneling_events: usize,
+    /// Inference latency in microseconds
+    pub latency_us: u64,
+    /// Model type used
+    pub model_type: String,
 }
 
 /// Unified HFT Pipeline
@@ -167,6 +198,10 @@ pub struct UnifiedPipeline {
     /// Neural data adapter (when feature enabled)
     #[cfg(feature = "neural-forecasting")]
     neural_adapter: Arc<NeuralDataAdapter>,
+
+    /// Quantum forecast engine (when feature enabled)
+    #[cfg(feature = "quantum-forecasting")]
+    quantum_engine: Arc<RwLock<QuantumForecastEngine>>,
 
     /// Pipeline statistics
     stats: Arc<RwLock<PipelineStats>>,
@@ -204,6 +239,8 @@ impl UnifiedPipeline {
             optimizer: Arc::new(optimizer),
             neural_engine: Arc::new(neural_engine),
             neural_adapter: Arc::new(neural_adapter),
+            #[cfg(feature = "quantum-forecasting")]
+            quantum_engine: Arc::new(RwLock::new(QuantumForecastEngine::hft_optimized())),
             stats: Arc::new(RwLock::new(PipelineStats {
                 min_latency_us: u64::MAX,
                 ..Default::default()
@@ -220,6 +257,8 @@ impl UnifiedPipeline {
             config,
             consensus_state: Arc::new(RwLock::new(ConsensusState::default())),
             optimizer: Arc::new(optimizer),
+            #[cfg(feature = "quantum-forecasting")]
+            quantum_engine: Arc::new(RwLock::new(QuantumForecastEngine::hft_optimized())),
             stats: Arc::new(RwLock::new(PipelineStats {
                 min_latency_us: u64::MAX,
                 ..Default::default()
@@ -239,6 +278,8 @@ impl UnifiedPipeline {
             consensus_state: Arc::new(RwLock::new(ConsensusState::default())),
             neural_engine: Arc::new(neural_engine),
             neural_adapter: Arc::new(neural_adapter),
+            #[cfg(feature = "quantum-forecasting")]
+            quantum_engine: Arc::new(RwLock::new(QuantumForecastEngine::hft_optimized())),
             stats: Arc::new(RwLock::new(PipelineStats {
                 min_latency_us: u64::MAX,
                 ..Default::default()
@@ -252,6 +293,8 @@ impl UnifiedPipeline {
         Ok(Self {
             config,
             consensus_state: Arc::new(RwLock::new(ConsensusState::default())),
+            #[cfg(feature = "quantum-forecasting")]
+            quantum_engine: Arc::new(RwLock::new(QuantumForecastEngine::hft_optimized())),
             stats: Arc::new(RwLock::new(PipelineStats {
                 min_latency_us: u64::MAX,
                 ..Default::default()
@@ -293,6 +336,29 @@ impl UnifiedPipeline {
         #[cfg(not(feature = "neural-forecasting"))]
         let neural_latency_us: u64 = 0;
 
+        // Phase 3b: Quantum-inspired forecasting (optional)
+        #[cfg(feature = "quantum-forecasting")]
+        let (quantum_latency_us, quantum_forecast) = {
+            let quantum_start = Instant::now();
+            let forecast_result = self.run_quantum_forecasting(feed).await;
+            let latency = quantum_start.elapsed().as_micros() as u64;
+
+            let summary = forecast_result.ok().map(|f| QuantumForecastSummary {
+                prediction: f.prediction,
+                confidence: f.confidence,
+                phase_coherence: f.phase_coherence,
+                rhythm_signal: f.rhythm_signal,
+                tunneling_events: f.tunneling_events,
+                latency_us: f.latency_us,
+                model_type: format!("{:?}", f.model_type),
+            });
+
+            (latency, summary)
+        };
+
+        #[cfg(not(feature = "quantum-forecasting"))]
+        let quantum_latency_us: u64 = 0;
+
         // Phase 4: Biomimetic optimization
         let opt_start = Instant::now();
         let opt_signal = self.run_optimization(feed).await?;
@@ -327,6 +393,9 @@ impl UnifiedPipeline {
             consensus_reached,
             #[cfg(feature = "neural-forecasting")]
             neural_forecast,
+            #[cfg(feature = "quantum-forecasting")]
+            quantum_forecast,
+            quantum_latency_us,
         })
     }
 
@@ -366,6 +435,14 @@ impl UnifiedPipeline {
         // Generate forecast using the neural engine
         self.neural_engine.forecast(&features).await
             .map_err(|e| EcosystemError::HyperPhysics(format!("Neural forecast error: {}", e)))
+    }
+
+    /// Run quantum-inspired forecasting on market data
+    #[cfg(feature = "quantum-forecasting")]
+    async fn run_quantum_forecasting(&self, feed: &MarketFeed) -> Result<QuantumForecastResult> {
+        let mut engine = self.quantum_engine.write().await;
+        engine.forecast(&feed.returns)
+            .map_err(|e| EcosystemError::HyperPhysics(format!("Quantum forecast error: {:?}", e)))
     }
 
     /// Run biomimetic optimization algorithms
