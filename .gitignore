@@ -46,8 +46,35 @@ coordination/orchestration/*
 claude-flow
 # Removed Windows wrapper files per user request
 hive-mind-prompt-*.txt
-# Vendored external dependencies (cloned from GitHub forks)
-crates/vendor/
+
+# Vendored external dependencies - include source, exclude artifacts
+# Include nautilus_trader source code
+!crates/vendor/nautilus_trader/
+# Exclude build artifacts in vendor
+crates/vendor/**/target/
+crates/vendor/**/.git/
+crates/vendor/**/*.pyc
+crates/vendor/**/__pycache__/
+crates/vendor/**/*.so
+crates/vendor/**/*.dylib
+crates/vendor/**/*.dll
+crates/vendor/**/*.egg-info/
+crates/vendor/**/dist/
+crates/vendor/**/build/
+crates/vendor/**/.pytest_cache/
+crates/vendor/**/.mypy_cache/
+crates/vendor/**/.ruff_cache/
+crates/vendor/**/node_modules/
+crates/vendor/**/.venv/
+crates/vendor/**/venv/
+crates/vendor/**/*.whl
+# Exclude other vendor directories not yet needed
+crates/vendor/neural-trader/
+crates/vendor/physics/
+crates/vendor/ruv-fann/
+crates/vendor/ruvector/
+crates/vendor/.claude-flow/
+crates/vendor/.DS_Store
 
 # Embedded git repositories (external clones)
 crates/cwts-ultra/freqtrade/strategies/core/complex_adaptive_agentic_orchestrator/
