@@ -5,3 +5,4 @@ import HyperPhysics.Gillespie
 import HyperPhysics.Entropy
 import HyperPhysics.ConsciousnessEmergence
 import HyperPhysics.FinancialModels
+import HyperPhysics.HyperbolicGeometry
