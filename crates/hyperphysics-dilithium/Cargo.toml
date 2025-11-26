@@ -32,10 +32,14 @@ curve25519-dalek-ng = { version = "4.1.1" }
 merlin = "3.0"
 
 # HyperPhysics integration
-hyperphysics-core = { path = "../hyperphysics-core" }
+# Note: hyperphysics-core depends on hyperphysics-dilithium for crypto,
+# so we cannot depend on hyperphysics-core here (cyclic dependency).
+# hyperphysics-verify also creates a cycle through hyperphysics-core.
+# Use DilithiumResult internally instead of hyperphysics_core::Result.
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
 # hyperphysics-gpu = { path = "../hyperphysics-gpu" }
-hyperphysics-verify = { path = "../hyperphysics-verify" }
+# hyperphysics-verify = { path = "../hyperphysics-verify" }  # Creates cycle
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }

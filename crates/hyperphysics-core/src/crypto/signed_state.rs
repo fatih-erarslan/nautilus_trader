@@ -1,14 +1,22 @@
 //! Cryptographically Signed Consciousness States
 //!
 //! Provides tamper-evident, verifiable consciousness metric measurements
-//! using post-quantum CRYSTALS-Dilithium signatures.
+//! using post-quantum CRYSTALS-Dilithium signatures (FIPS 204 compliant).
 //!
 //! # Security Model
 //!
 //! - **Integrity**: SHA3-512 hashing prevents metric tampering
-//! - **Authenticity**: Dilithium signatures prove origin
+//! - **Authenticity**: Dilithium signatures prove origin (quantum-resistant)
 //! - **Non-repudiation**: Signer cannot deny creating state
-//! - **Quantum-resistance**: Based on lattice cryptography
+//! - **Quantum-resistance**: Based on Module-LWE lattice cryptography
+//!
+//! # FIPS 204 Compliance
+//!
+//! This module uses CRYSTALS-Dilithium (ML-DSA) as standardized in NIST FIPS 204.
+//! Key sizes and signature sizes depend on security level:
+//! - Standard (ML-DSA-44): 1312 byte public key, 2420 byte signature
+//! - High (ML-DSA-65): 1952 byte public key, 3293 byte signature
+//! - Maximum (ML-DSA-87): 2592 byte public key, 4595 byte signature
 //!
 //! # Use Cases
 //!
@@ -22,6 +30,9 @@ use sha3::{Digest, Sha3_512};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::{EngineError, Result};
+
+// Import real Dilithium implementation
+use hyperphysics_dilithium::{DilithiumKeypair, DilithiumSignature, SecurityLevel};
 
 /// Consciousness metrics to be signed
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,13 +75,16 @@ pub struct SignedConsciousnessState {
     #[serde(with = "serde_bytes")]
     pub state_hash: [u8; 64],
 
-    /// Dilithium signature (placeholder - will use actual signature when integrated)
+    /// CRYSTALS-Dilithium signature (FIPS 204 ML-DSA compliant)
     #[serde(with = "serde_bytes")]
     pub signature: Vec<u8>,
 
-    /// Signer public key (placeholder - will use actual key when integrated)
+    /// Signer's Dilithium public key (quantum-resistant)
     #[serde(with = "serde_bytes")]
     pub public_key: Vec<u8>,
+
+    /// Security level used for signing
+    pub security_level: u8,
 
     /// Optional metadata
     pub metadata: Option<StateMetadata>,
@@ -93,17 +107,22 @@ pub struct StateMetadata {
 }
 
 impl SignedConsciousnessState {
-    /// Create and sign a consciousness state
+    /// Create and sign a consciousness state using CRYSTALS-Dilithium
+    ///
+    /// Uses post-quantum ML-DSA (FIPS 204) for quantum-resistant signatures.
     ///
     /// # Arguments
     ///
     /// * `metrics` - Consciousness measurements to sign
-    /// * `signing_key` - Private key for signing (placeholder)
+    /// * `keypair` - Dilithium keypair for signing (quantum-resistant)
     /// * `metadata` - Optional additional metadata
     ///
     /// # Example
     ///
     /// ```ignore
+    /// use hyperphysics_dilithium::{DilithiumKeypair, SecurityLevel};
+    ///
+    /// let keypair = DilithiumKeypair::generate(SecurityLevel::High)?;
     /// let metrics = ConsciousnessMetrics {
     ///     phi: 2.5,
     ///     ci: 0.8,
@@ -111,15 +130,15 @@ impl SignedConsciousnessState {
     ///     negentropy: 3.4,
     /// };
     ///
-    /// let signed_state = SignedConsciousnessState::create_and_sign(
+    /// let signed_state = SignedConsciousnessState::create_and_sign_dilithium(
     ///     metrics,
-    ///     &signing_key,
+    ///     &keypair,
     ///     None,
     /// )?;
     /// ```
-    pub fn create_and_sign(
+    pub fn create_and_sign_dilithium(
         metrics: ConsciousnessMetrics,
-        signing_key: &[u8],
+        keypair: &DilithiumKeypair,
         metadata: Option<StateMetadata>,
     ) -> Result<Self> {
         // Validate metrics
@@ -131,11 +150,20 @@ impl SignedConsciousnessState {
         // Compute state hash (SHA3-512)
         let state_hash = Self::compute_hash(&metrics, timestamp);
 
-        // Sign the hash (placeholder - will use Dilithium when integrated)
-        let signature = Self::sign_placeholder(&state_hash, signing_key);
+        // Sign using CRYSTALS-Dilithium (FIPS 204 compliant)
+        let dilithium_sig = keypair.sign(&state_hash)
+            .map_err(|e| EngineError::Configuration {
+                message: format!("Dilithium signing failed: {}", e),
+            })?;
 
-        // Extract public key from signing key (placeholder)
-        let public_key = Self::derive_public_key_placeholder(signing_key);
+        // Extract signature bytes and public key
+        let signature = dilithium_sig.signature_bytes.clone();
+        let public_key = keypair.public_key_bytes().to_vec();
+        let security_level = match keypair.security_level() {
+            SecurityLevel::Standard => 0,
+            SecurityLevel::High => 1,
+            SecurityLevel::Maximum => 2,
+        };
 
         Ok(Self {
             phi: metrics.phi,
@@ -146,16 +174,46 @@ impl SignedConsciousnessState {
             state_hash,
             signature,
             public_key,
+            security_level,
             metadata,
         })
     }
 
-    /// Verify signature authenticity and data integrity
+    /// Create and sign a consciousness state (legacy API with raw bytes)
+    ///
+    /// For backward compatibility. Generates a new Dilithium keypair internally.
+    /// For production use, prefer `create_and_sign_dilithium` with managed keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `metrics` - Consciousness measurements to sign
+    /// * `_signing_key` - Ignored (kept for API compatibility)
+    /// * `metadata` - Optional additional metadata
+    pub fn create_and_sign(
+        metrics: ConsciousnessMetrics,
+        _signing_key: &[u8],
+        metadata: Option<StateMetadata>,
+    ) -> Result<Self> {
+        // Generate a fresh Dilithium keypair for signing
+        let keypair = DilithiumKeypair::generate(SecurityLevel::High)
+            .map_err(|e| EngineError::Configuration {
+                message: format!("Failed to generate Dilithium keypair: {}", e),
+            })?;
+
+        Self::create_and_sign_dilithium(metrics, &keypair, metadata)
+    }
+
+    /// Verify signature authenticity and data integrity using CRYSTALS-Dilithium
     ///
     /// Returns `true` if:
-    /// 1. Signature is cryptographically valid
-    /// 2. State hash matches recomputed hash
-    /// 3. All metrics are within valid ranges
+    /// 1. All metrics are within valid ranges
+    /// 2. State hash matches recomputed hash (integrity check)
+    /// 3. Dilithium signature is cryptographically valid (authenticity check)
+    ///
+    /// # Security
+    ///
+    /// Verification uses FIPS 204 compliant ML-DSA verification algorithm.
+    /// Provides quantum-resistant signature verification.
     pub fn verify(&self) -> Result<bool> {
         // Verify metrics are valid
         let metrics = ConsciousnessMetrics {
@@ -165,11 +223,11 @@ impl SignedConsciousnessState {
             negentropy: self.negentropy,
         };
 
-        if let Err(_) = Self::validate_metrics(&metrics) {
+        if Self::validate_metrics(&metrics).is_err() {
             return Ok(false);
         }
 
-        // Recompute hash from metrics
+        // Recompute hash from metrics (integrity check)
         let computed_hash = Self::compute_hash(&metrics, self.timestamp);
 
         // Verify hash matches stored hash
@@ -177,12 +235,23 @@ impl SignedConsciousnessState {
             return Ok(false);
         }
 
-        // Verify signature (placeholder - will use Dilithium when integrated)
-        let signature_valid = Self::verify_signature_placeholder(
-            &self.state_hash,
-            &self.signature,
-            &self.public_key,
-        );
+        // Determine security level from stored value
+        let security_level = match self.security_level {
+            0 => SecurityLevel::Standard,
+            1 => SecurityLevel::High,
+            2 => SecurityLevel::Maximum,
+            _ => SecurityLevel::High, // Default fallback
+        };
+
+        // Decode the Dilithium signature
+        let dilithium_sig = DilithiumSignature::decode(&self.signature, security_level)
+            .map_err(|e| EngineError::Configuration {
+                message: format!("Failed to decode Dilithium signature: {}", e),
+            })?;
+
+        // Verify using Dilithium (FIPS 204 compliant)
+        let signature_valid = dilithium_sig.verify_standalone(&self.state_hash, &self.public_key, security_level)
+            .unwrap_or(false);
 
         Ok(signature_valid)
     }
@@ -278,32 +347,20 @@ impl SignedConsciousnessState {
         Ok(())
     }
 
-    /// Placeholder signing (will use Dilithium when NTT integration is complete)
-    fn sign_placeholder(hash: &[u8; 64], signing_key: &[u8]) -> Vec<u8> {
-        // Placeholder: Simple signature using key material
-        // In production, this will use CRYSTALS-Dilithium
-        let mut signature = Vec::new();
-        signature.extend_from_slice(hash);
-        signature.extend_from_slice(&signing_key[..std::cmp::min(signing_key.len(), 32)]);
-        signature
-    }
-
-    /// Placeholder signature verification
-    fn verify_signature_placeholder(hash: &[u8; 64], signature: &[u8], _public_key: &[u8]) -> bool {
-        // Placeholder verification
-        // In production, this will use CRYSTALS-Dilithium verification
-        if signature.len() < 64 {
-            return false;
-        }
-
-        // Check if first 64 bytes match the hash
-        &signature[..64] == hash
-    }
-
-    /// Placeholder public key derivation
-    fn derive_public_key_placeholder(signing_key: &[u8]) -> Vec<u8> {
-        // Placeholder: In production, derive from Dilithium key pair
-        signing_key[..std::cmp::min(signing_key.len(), 32)].to_vec()
+    /// Generate a new Dilithium keypair for signing consciousness states
+    ///
+    /// # Arguments
+    ///
+    /// * `level` - Security level (Standard, High, or Maximum)
+    ///
+    /// # Returns
+    ///
+    /// A new quantum-resistant Dilithium keypair
+    pub fn generate_keypair(level: SecurityLevel) -> Result<DilithiumKeypair> {
+        DilithiumKeypair::generate(level)
+            .map_err(|e| EngineError::Configuration {
+                message: format!("Failed to generate Dilithium keypair: {}", e),
+            })
     }
 }
 
@@ -554,5 +611,63 @@ mod tests {
         let hash2 = SignedConsciousnessState::compute_hash(&metrics2, timestamp);
 
         assert_ne!(hash1, hash2);
+    }
+
+    #[test]
+    fn test_dilithium_create_and_sign() {
+        let metrics = example_metrics();
+
+        // Generate a proper Dilithium keypair
+        let keypair = SignedConsciousnessState::generate_keypair(SecurityLevel::High)
+            .expect("Failed to generate Dilithium keypair");
+
+        let signed_state = SignedConsciousnessState::create_and_sign_dilithium(
+            metrics,
+            &keypair,
+            None,
+        );
+
+        assert!(signed_state.is_ok());
+        let state = signed_state.unwrap();
+
+        assert_eq!(state.phi, 2.5);
+        assert_eq!(state.security_level, 1); // High = 1
+        assert!(!state.signature.is_empty());
+        assert!(!state.public_key.is_empty());
+    }
+
+    #[test]
+    fn test_dilithium_verify() {
+        let metrics = example_metrics();
+
+        let keypair = SignedConsciousnessState::generate_keypair(SecurityLevel::Standard)
+            .expect("Failed to generate keypair");
+
+        let signed_state = SignedConsciousnessState::create_and_sign_dilithium(
+            metrics,
+            &keypair,
+            None,
+        ).unwrap();
+
+        // Verification should succeed
+        assert!(signed_state.verify().unwrap());
+        assert!(!signed_state.is_tampered());
+    }
+
+    #[test]
+    fn test_dilithium_all_security_levels() {
+        for level in [SecurityLevel::Standard, SecurityLevel::High, SecurityLevel::Maximum] {
+            let metrics = example_metrics();
+            let keypair = SignedConsciousnessState::generate_keypair(level)
+                .expect("Failed to generate keypair");
+
+            let signed_state = SignedConsciousnessState::create_and_sign_dilithium(
+                metrics,
+                &keypair,
+                None,
+            ).expect("Failed to sign");
+
+            assert!(signed_state.verify().expect("Verification failed"));
+        }
     }
 }

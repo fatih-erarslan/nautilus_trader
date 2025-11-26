@@ -30,6 +30,9 @@ serde_json.workspace = true
 # Time handling
 chrono.workspace = true
 
+# NTP synchronization for HFT precision (RFC 5905)
+sntpc = "0.3"
+
 # Error handling
 thiserror.workspace = true
 

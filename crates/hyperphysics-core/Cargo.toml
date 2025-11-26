@@ -12,6 +12,7 @@ hyperphysics-geometry = { path = "../hyperphysics-geometry" }
 hyperphysics-pbit = { path = "../hyperphysics-pbit" }
 hyperphysics-thermo = { path = "../hyperphysics-thermo" }
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-dilithium = { path = "../hyperphysics-dilithium" }
 
 serde.workspace = true
 serde_json = "1.0"
