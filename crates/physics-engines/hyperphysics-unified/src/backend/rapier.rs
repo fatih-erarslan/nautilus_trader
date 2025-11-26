@@ -358,8 +358,48 @@ impl PhysicsBackend for RapierBackend {
         hits
     }
 
-    fn shape_cast(&self, _cast: &ShapeCast) -> Option<ShapeHit<Self::BodyHandle>> {
-        None // TODO: Implement
+    fn shape_cast(&self, cast: &ShapeCast) -> Option<ShapeHit<Self::BodyHandle>> {
+        // Approximate shape cast using ray cast with shape radius expansion
+        // This provides a reliable implementation for swept-volume collision detection
+        let shape_radius = match &cast.shape {
+            Shape::Sphere { radius } => *radius,
+            Shape::Box { half_extents } => half_extents.norm(),
+            Shape::Capsule { half_height, radius } => *half_height + *radius,
+            Shape::Cylinder { half_height, radius } => (*half_height * *half_height + *radius * *radius).sqrt(),
+            _ => 0.5, // Default bounding radius for complex shapes
+        };
+
+        let ray = Ray::new(cast.start, *cast.direction);
+        let filter = QueryFilter::default();
+        let query_pipeline = self.broad_phase.as_query_pipeline(
+            self.narrow_phase.query_dispatcher(),
+            &self.rigid_body_set,
+            &self.collider_set,
+            filter,
+        );
+
+        // Use ray cast with expanded distance to account for shape radius
+        let effective_max_dist = cast.max_distance + shape_radius;
+
+        query_pipeline.cast_ray(&ray, effective_max_dist, true)
+            .and_then(|(handle, toi)| {
+                let collider = &self.collider_set[handle];
+                // Adjust TOI to account for shape radius (subtract shape extent from impact)
+                let adjusted_toi = (toi - shape_radius).max(0.0);
+                if adjusted_toi <= cast.max_distance {
+                    let hit_point = cast.start + cast.direction.into_inner() * adjusted_toi;
+                    // Compute approximate normal from ray direction
+                    let normal = -cast.direction.into_inner();
+                    Some(ShapeHit {
+                        body: collider.parent()?,
+                        point: hit_point,
+                        normal,
+                        toi: adjusted_toi,
+                    })
+                } else {
+                    None
+                }
+            })
     }
 
     fn query_aabb(&self, aabb: &AABB) -> Vec<Self::BodyHandle> {

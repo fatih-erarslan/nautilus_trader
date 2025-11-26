@@ -269,9 +269,9 @@ mod tests {
             symbol: "TEST".to_string(),
             timestamp: Utc::now(),
             bid_price: 100.0,
-            bid_size: 100,
+            bid_size: 100.0,
             ask_price: 100.5,  // bid < ask (valid)
-            ask_size: 100,
+            ask_size: 100.0,
             exchange: None,
         };
 
@@ -281,9 +281,9 @@ mod tests {
             symbol: "TEST".to_string(),
             timestamp: Utc::now(),
             bid_price: 100.5,
-            bid_size: 100,
+            bid_size: 100.0,
             ask_price: 100.0,  // bid > ask (arbitrage!)
-            ask_size: 100,
+            ask_size: 100.0,
             exchange: None,
         };
 

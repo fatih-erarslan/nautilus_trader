@@ -59,10 +59,11 @@ impl TestUtils {
     }
 
     /// Assert CQGS compliance
-    pub fn assert_cqgs_compliant<T>(result: &Result<T, Box<dyn std::error::Error + Send + Sync>>) {
+    pub fn assert_cqgs_compliant<T, E: std::fmt::Debug>(result: &Result<T, E>) {
         assert!(
             result.is_ok(),
-            "CQGS compliance failure: operation must succeed with real implementation"
+            "CQGS compliance failure: operation must succeed with real implementation. Error: {:?}",
+            result.as_ref().err()
         );
     }
 }

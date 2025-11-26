@@ -11,12 +11,10 @@
 use hyperphysics_market::providers::BinanceWebSocketClient;
 use std::time::Duration;
 use tokio::time::{timeout, sleep};
-use tracing_subscriber::{self, EnvFilter};
-
 /// Initialize tracing for test output
 fn init_tracing() {
     let _ = tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::new("debug"))
+        .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
         .try_init();
 }

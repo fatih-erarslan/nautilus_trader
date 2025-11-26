@@ -336,7 +336,8 @@ impl HftAlgorithmEngine {
                         side: OrderSide::Buy,
                         price: optimal_bid,
                         quantity: bid_size,
-                        expected_profit: self.estimate_mm_profit(spread, target_spread),
+                        // Scale profit by quantity since filter compares against MIN_PROFIT_THRESHOLD * quantity
+                        expected_profit: self.estimate_mm_profit(spread, target_spread) * bid_size,
                         risk_score: self
                             .calculate_mm_risk(current_inventory, mm_state.max_inventory),
                         execution_urgency: 5000, // 5ms urgency for market making
@@ -354,7 +355,8 @@ impl HftAlgorithmEngine {
                         side: OrderSide::Sell,
                         price: optimal_ask,
                         quantity: ask_size,
-                        expected_profit: self.estimate_mm_profit(spread, target_spread),
+                        // Scale profit by quantity since filter compares against MIN_PROFIT_THRESHOLD * quantity
+                        expected_profit: self.estimate_mm_profit(spread, target_spread) * ask_size,
                         risk_score: self
                             .calculate_mm_risk(current_inventory, mm_state.max_inventory),
                         execution_urgency: 5000,
@@ -726,6 +728,8 @@ impl HftAlgorithmEngine {
         };
 
         self.mm_states.insert(symbol, mm_state);
+        // Enable market making when a symbol is initialized
+        self.market_making_enabled.store(true, Ordering::Relaxed);
     }
 
     /// Get performance metrics

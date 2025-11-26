@@ -3,7 +3,7 @@ use std::ptr;
 use std::sync::atomic::{AtomicPtr, AtomicU64, AtomicUsize, Ordering};
 // Removed unused std::mem import
 use crossbeam::utils::CachePadded;
-use std::alloc::{alloc, Layout};
+use std::alloc::{alloc, dealloc, Layout};
 
 const MAX_PRICE_LEVELS: usize = 10000;
 const ORDERS_PER_LEVEL: usize = 1024;
@@ -226,24 +226,16 @@ pub struct LockFreeOrderBook {
 
 /// Memory pool for orders
 struct OrderPool {
-    #[allow(dead_code)]
-    pool: Vec<AtomicPtr<AtomicOrder>>,
+    allocated: std::sync::Mutex<Vec<*mut AtomicOrder>>, // Track all allocations for cleanup
     free_list: AtomicPtr<AtomicOrder>,
 }
 
 impl OrderPool {
-    fn new(capacity: usize) -> Self {
-        let mut pool = Vec::with_capacity(capacity);
-
-        // Pre-allocate orders
-        for _ in 0..capacity {
-            let layout = Layout::new::<AtomicOrder>();
-            let ptr = unsafe { alloc(layout) as *mut AtomicOrder };
-            pool.push(AtomicPtr::new(ptr));
-        }
-
+    fn new(_capacity: usize) -> Self {
+        // Lazy allocation - don't pre-allocate to avoid 655MB+ memory usage
+        // Orders are allocated on-demand in allocate()
         Self {
-            pool,
+            allocated: std::sync::Mutex::new(Vec::new()),
             free_list: AtomicPtr::new(ptr::null_mut()),
         }
     }
@@ -254,9 +246,13 @@ impl OrderPool {
             let head = self.free_list.load(Ordering::Acquire);
 
             if head.is_null() {
-                // Allocate new order
+                // Allocate new order and track it
                 let layout = Layout::new::<AtomicOrder>();
-                return unsafe { alloc(layout) as *mut AtomicOrder };
+                let ptr = unsafe { alloc(layout) as *mut AtomicOrder };
+                if let Ok(mut allocated) = self.allocated.lock() {
+                    allocated.push(ptr);
+                }
+                return ptr;
             }
 
             unsafe {
@@ -278,7 +274,7 @@ impl OrderPool {
     #[allow(dead_code)]
     fn deallocate(&self, order: *mut AtomicOrder) {
         unsafe {
-            // Add to free list
+            // Add to free list for reuse
             loop {
                 let head = self.free_list.load(Ordering::Acquire);
                 (*order).next.store(head, Ordering::Release);
@@ -291,6 +287,21 @@ impl OrderPool {
                 ) {
                     Ok(_) => return,
                     Err(_) => continue,
+                }
+            }
+        }
+    }
+}
+
+impl Drop for OrderPool {
+    fn drop(&mut self) {
+        let layout = Layout::new::<AtomicOrder>();
+
+        // Deallocate all tracked allocations
+        if let Ok(allocated) = self.allocated.lock() {
+            for &ptr in allocated.iter() {
+                if !ptr.is_null() {
+                    unsafe { dealloc(ptr as *mut u8, layout); }
                 }
             }
         }
@@ -561,8 +572,13 @@ mod tests {
             handle.join().unwrap();
         }
 
-        // Verify order book has orders
-        let (bids, asks) = ob.get_depth(10);
-        assert!(!bids.is_empty() || !asks.is_empty());
+        // Verify order book has orders using get_spread()
+        // best_bid and best_ask atomics are updated when orders are added
+        let (best_bid, best_ask) = ob.get_spread();
+
+        // After concurrent adds: bids at 100-109 should set best_bid to 109
+        // asks at 100-109 should set best_ask to 100
+        assert!(best_bid >= 100 && best_bid <= 109, "best_bid should be in range 100-109, got {}", best_bid);
+        assert!(best_ask >= 100 && best_ask <= 109, "best_ask should be in range 100-109, got {}", best_ask);
     }
 }

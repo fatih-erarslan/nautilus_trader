@@ -41,6 +41,14 @@ members = [
     # Unified GPU orchestration layer
     "crates/hyperphysics-gpu-unified",
 ]
+# Exclude legacy/external crates not part of core workspace
+exclude = [
+    "crates/cwts-ultra",
+    "crates/tengri",
+    "crates/game-theory-engine",
+    "crates/bio-inspired-workspace",
+    "crates/ats-core",
+]
 resolver = "2"
 
 [workspace.package]

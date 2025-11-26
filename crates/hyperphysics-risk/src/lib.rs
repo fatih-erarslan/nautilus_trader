@@ -9,6 +9,7 @@
 //! - **Landauer Transaction Costs**: Fundamental limits on trading costs
 //! - **Thermodynamic VaR**: Value-at-Risk with entropy constraints
 //! - **Free Energy Optimization**: Risk-return balance via thermodynamics
+//! - **Codependent Risk**: Network-based risk propagation (Pratītyasamutpāda)
 //!
 //! ## Example
 //!
@@ -32,6 +33,7 @@ pub mod portfolio;
 pub mod entropy;
 pub mod landauer;
 pub mod var;
+pub mod codependent;
 
 // Re-export main types
 pub use error::{RiskError, Result};
@@ -39,3 +41,7 @@ pub use portfolio::{Portfolio, Position};
 pub use entropy::PortfolioEntropy;
 pub use landauer::TransactionCostModel;
 pub use var::ThermodynamicVaR;
+pub use codependent::{
+    CodependentRiskModel, AssetNode, DependencyEdge, DependencyType,
+    CodependentRisk, SystemicRisk, CodependentRiskError,
+};

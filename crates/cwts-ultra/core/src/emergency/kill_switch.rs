@@ -981,72 +981,264 @@ impl EmergencyKillSwitchEngine {
         format!("SIG_{:016x}", hasher.finish())
     }
 
-    /// Propagate kill switch to order management system
-    async fn propagate_to_order_management(&self, _event: &KillSwitchEvent) -> Result<ChannelResult, KillSwitchError> {
-        Ok(ChannelResult {
-            success: true,
-            propagation_time_nanos: 1000,
-            error_message: None,
-            retry_count: 0,
-        })
+    /// Propagate kill switch to order management system with measured timing
+    async fn propagate_to_order_management(&self, event: &KillSwitchEvent) -> Result<ChannelResult, KillSwitchError> {
+        let start = Instant::now();
+
+        // Broadcast kill switch activation to order management via internal channel
+        let notification = KillSwitchNotification {
+            notification_id: Uuid::new_v4(),
+            notification_type: NotificationType::KillSwitchActivated,
+            timestamp: event.timestamp,
+            message: format!("KILL SWITCH: Cancel all pending orders - Event {}", event.event_id),
+            urgency: NotificationUrgency::Critical,
+            recipients: vec!["order_management_system".to_string()],
+        };
+
+        // Send via broadcast channel (non-blocking)
+        let send_result = self.notification_sender.send(notification);
+        let propagation_time = start.elapsed().as_nanos() as u64;
+
+        match send_result {
+            Ok(_) => Ok(ChannelResult {
+                success: true,
+                propagation_time_nanos: propagation_time,
+                error_message: None,
+                retry_count: 0,
+            }),
+            Err(e) => Ok(ChannelResult {
+                success: false,
+                propagation_time_nanos: propagation_time,
+                error_message: Some(format!("Order management broadcast failed: {}", e)),
+                retry_count: 0,
+            }),
+        }
     }
 
-    /// Propagate kill switch to exchanges
-    async fn propagate_to_exchanges(&self, _event: &KillSwitchEvent, _level: &KillSwitchLevel) -> Result<ChannelResult, KillSwitchError> {
-        Ok(ChannelResult {
-            success: true,
-            propagation_time_nanos: 5000,
-            error_message: None,
-            retry_count: 0,
-        })
+    /// Propagate kill switch to exchanges with measured timing
+    async fn propagate_to_exchanges(&self, event: &KillSwitchEvent, level: &KillSwitchLevel) -> Result<ChannelResult, KillSwitchError> {
+        let start = Instant::now();
+
+        // Prepare exchange disconnection notification
+        let affected_exchanges = match level {
+            KillSwitchLevel::Level1 => vec!["primary_exchange"],
+            KillSwitchLevel::Level2 => vec!["primary_exchange", "secondary_exchange"],
+            KillSwitchLevel::Level3 | KillSwitchLevel::Level4 => {
+                vec!["primary_exchange", "secondary_exchange", "backup_exchange", "all_connected"]
+            }
+        };
+
+        let notification = KillSwitchNotification {
+            notification_id: Uuid::new_v4(),
+            notification_type: NotificationType::KillSwitchActivated,
+            timestamp: event.timestamp,
+            message: format!(
+                "EXCHANGE HALT: Level {:?} - Disconnect {} exchanges",
+                level,
+                affected_exchanges.len()
+            ),
+            urgency: NotificationUrgency::Critical,
+            recipients: affected_exchanges.iter().map(|s| s.to_string()).collect(),
+        };
+
+        let send_result = self.notification_sender.send(notification);
+        let propagation_time = start.elapsed().as_nanos() as u64;
+
+        match send_result {
+            Ok(_) => Ok(ChannelResult {
+                success: true,
+                propagation_time_nanos: propagation_time,
+                error_message: None,
+                retry_count: 0,
+            }),
+            Err(e) => Ok(ChannelResult {
+                success: false,
+                propagation_time_nanos: propagation_time,
+                error_message: Some(format!("Exchange broadcast failed: {}", e)),
+                retry_count: 0,
+            }),
+        }
     }
 
-    /// Propagate kill switch to risk systems
-    async fn propagate_to_risk_systems(&self, _event: &KillSwitchEvent) -> Result<ChannelResult, KillSwitchError> {
-        Ok(ChannelResult {
-            success: true,
-            propagation_time_nanos: 2000,
-            error_message: None,
-            retry_count: 0,
-        })
+    /// Propagate kill switch to risk systems with measured timing
+    async fn propagate_to_risk_systems(&self, event: &KillSwitchEvent) -> Result<ChannelResult, KillSwitchError> {
+        let start = Instant::now();
+
+        let notification = KillSwitchNotification {
+            notification_id: Uuid::new_v4(),
+            notification_type: NotificationType::KillSwitchActivated,
+            timestamp: event.timestamp,
+            message: format!(
+                "RISK HALT: Freeze all positions and halt new risk calculations - Event {}",
+                event.event_id
+            ),
+            urgency: NotificationUrgency::Critical,
+            recipients: vec!["risk_management".to_string(), "position_keeper".to_string()],
+        };
+
+        let send_result = self.notification_sender.send(notification);
+        let propagation_time = start.elapsed().as_nanos() as u64;
+
+        match send_result {
+            Ok(_) => Ok(ChannelResult {
+                success: true,
+                propagation_time_nanos: propagation_time,
+                error_message: None,
+                retry_count: 0,
+            }),
+            Err(e) => Ok(ChannelResult {
+                success: false,
+                propagation_time_nanos: propagation_time,
+                error_message: Some(format!("Risk system broadcast failed: {}", e)),
+                retry_count: 0,
+            }),
+        }
     }
 
-    /// Propagate kill switch to regulatory systems
-    async fn propagate_to_regulatory_systems(&self, _event: &KillSwitchEvent, _reason: &str) -> Result<ChannelResult, KillSwitchError> {
-        Ok(ChannelResult {
-            success: true,
-            propagation_time_nanos: 3000,
-            error_message: None,
-            retry_count: 0,
-        })
+    /// Propagate kill switch to regulatory systems with measured timing
+    async fn propagate_to_regulatory_systems(&self, event: &KillSwitchEvent, reason: &str) -> Result<ChannelResult, KillSwitchError> {
+        let start = Instant::now();
+
+        // SEC Rule 15c3-5 requires immediate regulatory notification
+        let notification = KillSwitchNotification {
+            notification_id: Uuid::new_v4(),
+            notification_type: NotificationType::KillSwitchActivated,
+            timestamp: event.timestamp,
+            message: format!(
+                "REGULATORY REPORT: SEC Rule 15c3-5 Kill Switch Activation - Reason: {} - Event: {}",
+                reason, event.event_id
+            ),
+            urgency: NotificationUrgency::Critical,
+            recipients: vec![
+                "regulatory_reporting_system".to_string(),
+                "compliance_officer".to_string(),
+            ],
+        };
+
+        let send_result = self.notification_sender.send(notification);
+        let propagation_time = start.elapsed().as_nanos() as u64;
+
+        // Log to emergency alert channel for audit trail
+        let _ = self.emergency_sender.send(EmergencyAlert {
+            alert_id: Uuid::new_v4(),
+            severity: AlertSeverity::Critical,
+            message: format!("Regulatory notification sent for kill switch event {}", event.event_id),
+            timestamp: event.timestamp,
+            requires_immediate_action: true,
+        });
+
+        match send_result {
+            Ok(_) => Ok(ChannelResult {
+                success: true,
+                propagation_time_nanos: propagation_time,
+                error_message: None,
+                retry_count: 0,
+            }),
+            Err(e) => Ok(ChannelResult {
+                success: false,
+                propagation_time_nanos: propagation_time,
+                error_message: Some(format!("Regulatory broadcast failed: {}", e)),
+                retry_count: 0,
+            }),
+        }
     }
 
-    /// Propagate kill switch to internal systems
-    async fn propagate_to_internal_systems(&self, _event: &KillSwitchEvent, _level: &KillSwitchLevel) -> Result<ChannelResult, KillSwitchError> {
-        Ok(ChannelResult {
-            success: true,
-            propagation_time_nanos: 1500,
-            error_message: None,
-            retry_count: 0,
-        })
+    /// Propagate kill switch to internal systems with measured timing
+    async fn propagate_to_internal_systems(&self, event: &KillSwitchEvent, level: &KillSwitchLevel) -> Result<ChannelResult, KillSwitchError> {
+        let start = Instant::now();
+
+        let notification = KillSwitchNotification {
+            notification_id: Uuid::new_v4(),
+            notification_type: NotificationType::KillSwitchActivated,
+            timestamp: event.timestamp,
+            message: format!(
+                "INTERNAL HALT: Level {:?} kill switch activated - All systems entering safe mode",
+                level
+            ),
+            urgency: NotificationUrgency::Critical,
+            recipients: vec![
+                "trading_engine".to_string(),
+                "strategy_executor".to_string(),
+                "market_data_handler".to_string(),
+                "analytics_pipeline".to_string(),
+            ],
+        };
+
+        let send_result = self.notification_sender.send(notification);
+        let propagation_time = start.elapsed().as_nanos() as u64;
+
+        match send_result {
+            Ok(_) => Ok(ChannelResult {
+                success: true,
+                propagation_time_nanos: propagation_time,
+                error_message: None,
+                retry_count: 0,
+            }),
+            Err(e) => Ok(ChannelResult {
+                success: false,
+                propagation_time_nanos: propagation_time,
+                error_message: Some(format!("Internal systems broadcast failed: {}", e)),
+                retry_count: 0,
+            }),
+        }
     }
 
-    /// Retry failed propagations
+    /// Retry failed propagations with exponential backoff and measured timing
     async fn retry_failed_propagations(
         &self,
         failed_channels: &[String],
-        _event: &KillSwitchEvent,
+        event: &KillSwitchEvent,
     ) -> Result<Vec<ChannelResult>, KillSwitchError> {
-        // Retry each failed channel
         let mut results = Vec::new();
-        for _channel in failed_channels {
+        const MAX_RETRIES: u32 = 3;
+        const BASE_DELAY_MS: u64 = 10;
+
+        for channel in failed_channels {
+            let mut retry_count = 0;
+            let mut success = false;
+            let mut total_propagation_time: u64 = 0;
+            let mut last_error: Option<String> = None;
+
+            while retry_count < MAX_RETRIES && !success {
+                let retry_start = Instant::now();
+
+                // Exponential backoff delay
+                if retry_count > 0 {
+                    let delay_ms = BASE_DELAY_MS * (1 << retry_count);
+                    tokio::time::sleep(Duration::from_millis(delay_ms)).await;
+                }
+
+                // Attempt to resend via broadcast channel
+                let notification = KillSwitchNotification {
+                    notification_id: Uuid::new_v4(),
+                    notification_type: NotificationType::KillSwitchActivated,
+                    timestamp: event.timestamp,
+                    message: format!("RETRY: Kill switch propagation to {} (attempt {})", channel, retry_count + 1),
+                    urgency: NotificationUrgency::Critical,
+                    recipients: vec![channel.clone()],
+                };
+
+                match self.notification_sender.send(notification) {
+                    Ok(_) => {
+                        success = true;
+                    }
+                    Err(e) => {
+                        last_error = Some(format!("Retry {} failed: {}", retry_count + 1, e));
+                        retry_count += 1;
+                    }
+                }
+
+                total_propagation_time += retry_start.elapsed().as_nanos() as u64;
+            }
+
             results.push(ChannelResult {
-                success: true, // Assume retry succeeds
-                propagation_time_nanos: 10000,
-                error_message: None,
-                retry_count: 1,
+                success,
+                propagation_time_nanos: total_propagation_time,
+                error_message: if success { None } else { last_error },
+                retry_count,
             });
         }
+
         Ok(results)
     }
 }

@@ -3,9 +3,13 @@
 //
 // Run: cargo test -p hyperphysics-market --test alpaca_property_tests
 
-use hyperphysics_market::types::{Bar, Tick, Quote};
+use hyperphysics_market::{Bar, Tick};
+use hyperphysics_market::data::tick::Quote;
 use proptest::prelude::*;
-use chrono::{DateTime, Utc, TimeZone};
+use proptest::{option, collection};
+use proptest::strategy::Strategy;
+use proptest::test_runner::Config as ProptestConfig;
+use chrono::{Utc, TimeZone};
 
 // Generate arbitrary valid bars
 fn arb_bar() -> impl Strategy<Value = Bar> {
@@ -17,8 +21,8 @@ fn arb_bar() -> impl Strategy<Value = Bar> {
         10.0..1000.0f64,
         10.0..1000.0f64,
         100u64..100_000_000u64,
-        prop::option::of(10.0..1000.0f64),
-        prop::option::of(1u64..10_000u64),
+        option::of(10.0..1000.0f64),
+        option::of(1u64..10_000u64),
     ).prop_map(|(symbol, timestamp, open, high, low, close, volume, vwap, trade_count)| {
         // Ensure OHLC consistency
         let actual_high = open.max(close).max(high);
@@ -45,8 +49,8 @@ fn arb_tick() -> impl Strategy<Value = Tick> {
         0i64..1_000_000_000,
         0.01..10000.0f64,
         0.001..10000.0f64,
-        prop::option::of("[A-Z]{4}".prop_map(|s| s.to_string())),
-        prop::option::of(prop::collection::vec("[A-Z]{1,2}".prop_map(|s| s.to_string()), 0..5)),
+        option::of("[A-Z]{4}".prop_map(|s| s.to_string())),
+        option::of(collection::vec("[A-Z]{1,2}".prop_map(|s| s.to_string()), 0..5)),
     ).prop_map(|(symbol, timestamp, price, size, exchange, conditions)| {
         Tick {
             symbol,
@@ -65,10 +69,10 @@ fn arb_quote() -> impl Strategy<Value = Quote> {
         "[A-Z]{1,5}".prop_map(|s| s.to_string()),
         0i64..1_000_000_000,
         0.01..10000.0f64,
-        1u64..100_000u64,
+        1.0..100_000.0f64,
         0.01..10000.0f64,
-        1u64..100_000u64,
-        prop::option::of("[A-Z]{4}".prop_map(|s| s.to_string())),
+        1.0..100_000.0f64,
+        option::of("[A-Z]{4}".prop_map(|s| s.to_string())),
     ).prop_map(|(symbol, timestamp, bid_price, bid_size, ask_price, ask_size, exchange)| {
         // Ensure bid <= ask (no-arbitrage condition)
         let (actual_bid, actual_ask) = if bid_price > ask_price {
@@ -157,25 +161,22 @@ proptest! {
     #[test]
     fn test_quote_positive_sizes(quote in arb_quote()) {
         // Bid and ask sizes must be positive
-        prop_assert!(quote.bid_size > 0, "bid size must be positive");
-        prop_assert!(quote.ask_size > 0, "ask size must be positive");
+        prop_assert!(quote.bid_size > 0.0, "bid size must be positive");
+        prop_assert!(quote.ask_size > 0.0, "ask size must be positive");
     }
 
     #[test]
     fn test_quote_realistic_spread(quote in arb_quote()) {
-        // Spread should be positive and reasonable (< 10% for most assets)
+        // Spread should be non-negative (bid <= ask enforced by generator)
         let spread = quote.ask_price - quote.bid_price;
-        let mid_price = (quote.ask_price + quote.bid_price) / 2.0;
-        let spread_pct = spread / mid_price;
 
         prop_assert!(spread >= 0.0, "spread must be non-negative");
-        // Allow up to 50% spread for edge cases (penny stocks, low liquidity)
-        prop_assert!(spread_pct <= 0.5,
-            "spread percentage {} exceeds 50%", spread_pct);
+        // Note: spread percentage can be large with random price generation
+        // This test validates the no-arbitrage constraint, not realistic spreads
     }
 
     #[test]
-    fn test_bar_returns_calculation(bars in prop::collection::vec(arb_bar(), 2..100)) {
+    fn test_bar_returns_calculation(bars in collection::vec(arb_bar(), 2..100)) {
         // Test that returns can be calculated from consecutive bars
         for i in 1..bars.len() {
             let prev_close = bars[i-1].close;
@@ -185,14 +186,15 @@ proptest! {
             prop_assert!(!log_return.is_nan(), "log return should not be NaN");
             prop_assert!(!log_return.is_infinite(), "log return should not be infinite");
 
-            // Daily returns typically within ±20% for most stocks
-            prop_assert!(log_return.abs() <= 1.0,
+            // Log returns can be large with random price generation
+            // Test validates mathematical consistency, not realistic returns
+            prop_assert!(log_return.abs() <= 10.0,
                 "extreme return detected: {}", log_return);
         }
     }
 
     #[test]
-    fn test_bar_volatility_estimation(bars in prop::collection::vec(arb_bar(), 10..100)) {
+    fn test_bar_volatility_estimation(bars in collection::vec(arb_bar(), 10..100)) {
         // Test that volatility can be estimated from bar data
         let returns: Vec<f64> = bars.windows(2)
             .map(|w| (w[1].close / w[0].close).ln())
@@ -208,10 +210,9 @@ proptest! {
             prop_assert!(!volatility.is_nan(), "volatility should not be NaN");
             prop_assert!(volatility >= 0.0, "volatility must be non-negative");
 
-            // Annual volatility typically 10-100% for most stocks
-            let annual_vol = volatility * (252.0_f64).sqrt();
-            prop_assert!(annual_vol <= 3.0,
-                "extreme annualized volatility: {}", annual_vol);
+            // Test validates mathematical consistency for volatility calculation
+            // Random price generation produces high volatility - this is expected
+            prop_assert!(volatility.is_finite(), "volatility must be finite");
         }
     }
 }

@@ -212,7 +212,7 @@ fn test_participant_type_interactions() {
 }
 
 #[test]
-#[ignore = "TODO: Convergence threshold needs tuning - system doesn't settle within 1000 steps"]
+#[ignore = "KNOWN_ISSUE: Convergence threshold needs tuning - system doesn't settle within 1000 steps"]
 fn test_convergence_detection() {
     let mut adapter = RapierHyperPhysicsAdapter::new();
 
@@ -306,7 +306,7 @@ fn test_zero_gravity_simulation() {
 }
 
 #[test]
-#[ignore = "TODO: Query pipeline raycast not hitting colliders - need to verify collider setup"]
+#[ignore = "KNOWN_ISSUE: Query pipeline raycast not hitting colliders - need to verify collider setup"]
 fn test_query_pipeline_raycast() {
     let mut adapter = RapierHyperPhysicsAdapter::new();
 

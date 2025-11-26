@@ -51,6 +51,7 @@ dashmap = "6.1"
 # Math
 num-traits = "0.2"
 statrs = "0.16"
+nalgebra = { workspace = true }
 
 # Optional GPU
 wgpu = { version = "0.20", optional = true }

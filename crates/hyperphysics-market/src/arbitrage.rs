@@ -91,10 +91,11 @@ pub struct ArbitrageDetector {
     /// Minimum profit threshold percentage
     min_profit_pct: f64,
 
-    /// Maximum latency tolerance in milliseconds
-    /// TODO: Implement latency checks in opportunity detection
-    #[allow(dead_code)]
+    /// Maximum latency tolerance in milliseconds for opportunity validity
     max_latency_ms: u64,
+
+    /// Timestamp of last price update per exchange (for latency calculation)
+    price_timestamps: Arc<RwLock<HashMap<String, std::time::Instant>>>,
 
     /// Detected opportunities
     opportunities: Arc<RwLock<Vec<ArbitrageOpportunity>>>,
@@ -113,6 +114,7 @@ impl ArbitrageDetector {
             min_profit_pct,
             max_latency_ms,
             opportunities: Arc::new(RwLock::new(Vec::new())),
+            price_timestamps: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -121,10 +123,33 @@ impl ArbitrageDetector {
         self.providers.insert(name, provider);
     }
 
-    /// Update price for a symbol on an exchange
+    /// Update price for a symbol on an exchange with timestamp for latency tracking
     pub async fn update_price(&self, exchange: &str, symbol: &str, price: f64) {
         let mut prices = self.prices.write().await;
         prices.insert((exchange.to_string(), symbol.to_string()), price);
+
+        // Track update timestamp for latency validation
+        let mut timestamps = self.price_timestamps.write().await;
+        timestamps.insert(format!("{}:{}", exchange, symbol), std::time::Instant::now());
+    }
+
+    /// Check if price data is stale based on max_latency_ms
+    pub async fn is_price_stale(&self, exchange: &str, symbol: &str) -> bool {
+        let timestamps = self.price_timestamps.read().await;
+        let key = format!("{}:{}", exchange, symbol);
+
+        if let Some(timestamp) = timestamps.get(&key) {
+            timestamp.elapsed().as_millis() as u64 > self.max_latency_ms
+        } else {
+            true // No timestamp means stale
+        }
+    }
+
+    /// Get price age in milliseconds
+    pub async fn price_age_ms(&self, exchange: &str, symbol: &str) -> Option<u64> {
+        let timestamps = self.price_timestamps.read().await;
+        let key = format!("{}:{}", exchange, symbol);
+        timestamps.get(&key).map(|t| t.elapsed().as_millis() as u64)
     }
 
     /// Detect cross-exchange arbitrage opportunities
@@ -160,7 +185,19 @@ impl ArbitrageDetector {
 
         let profit_pct = ((high_price - low_price) / low_price) * 100.0;
 
-        if profit_pct >= self.min_profit_pct {
+        // Validate latency before accepting opportunity
+        let low_stale = self.is_price_stale(low_exchange, symbol).await;
+        let high_stale = self.is_price_stale(high_exchange, symbol).await;
+
+        if profit_pct >= self.min_profit_pct && !low_stale && !high_stale {
+            // Calculate confidence based on price freshness
+            let low_age = self.price_age_ms(low_exchange, symbol).await.unwrap_or(self.max_latency_ms);
+            let high_age = self.price_age_ms(high_exchange, symbol).await.unwrap_or(self.max_latency_ms);
+            let avg_latency = (low_age + high_age) / 2;
+            let latency_confidence = 1.0 - (avg_latency as f64 / self.max_latency_ms as f64).min(1.0);
+            let base_confidence = 0.8;
+            let adjusted_confidence = base_confidence * (0.5 + 0.5 * latency_confidence);
+
             opportunities.push(ArbitrageOpportunity {
                 arbitrage_type: ArbitrageType::CrossExchange,
                 timestamp: Utc::now(),
@@ -173,7 +210,7 @@ impl ArbitrageDetector {
                         symbol: symbol.to_string(),
                         side: TradeSide::Buy,
                         price: *low_price,
-                        quantity: 1.0, // Would calculate based on available liquidity
+                        quantity: 1.0,
                     },
                     TradeAction {
                         exchange: high_exchange.clone(),
@@ -183,8 +220,8 @@ impl ArbitrageDetector {
                         quantity: 1.0,
                     },
                 ],
-                confidence: 0.8, // Would calculate based on order book depth
-                window_secs: 5, // Typical execution window
+                confidence: adjusted_confidence,
+                window_secs: (self.max_latency_ms / 1000).max(1),
             });
         }
 

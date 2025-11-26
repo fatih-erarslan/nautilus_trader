@@ -109,7 +109,7 @@ async fn test_performance_aggregation() {
     assert_eq!(stats.total_samples, 100);
     assert!(stats.average_latency_ns > 0);
     assert!(stats.percentile_95_latency_ns >= stats.average_latency_ns);
-    assert!(stats.max_throughput > 0.0);
+    assert!(stats.peak_tps > 0.0);
 }
 
 #[tokio::test]

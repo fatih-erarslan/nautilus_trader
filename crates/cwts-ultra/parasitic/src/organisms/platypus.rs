@@ -1420,7 +1420,8 @@ mod tests {
 
         assert_eq!(platypus.organism_type(), "platypus");
         assert!(platypus.electroreceptors.len() > 0);
-        assert_eq!(platypus.get_status().current_depth, 0.0);
+        let status = platypus.get_status().await;
+        assert_eq!(status.current_depth, 0.0);
     }
 
     #[tokio::test]
@@ -1431,7 +1432,7 @@ mod tests {
         let quality = platypus.calibrate_electroreceptors().await.unwrap();
         assert!(quality > 0.0 && quality <= 1.0);
 
-        let status = platypus.get_status();
+        let status = platypus.get_status().await;
         assert_eq!(status.processing_mode, ProcessingMode::Passive);
     }
 
@@ -1454,7 +1455,7 @@ mod tests {
         let platypus = PlatypusOrganism::new(config).unwrap();
 
         let signals = platypus.dive_underwater(3.0).await.unwrap();
-        let status = platypus.get_status();
+        let status = platypus.get_status().await;
 
         assert_eq!(status.current_depth, 3.0);
         assert_eq!(status.processing_mode, ProcessingMode::Diving);
@@ -1470,7 +1471,7 @@ mod tests {
         assert_eq!(result.potency_used, 0.5);
         assert!(result.effectiveness > 0.0);
 
-        let status = platypus.get_status();
+        let status = platypus.get_status().await;
         assert!(status.venom_level < 1.0);
     }
 
@@ -1480,10 +1481,10 @@ mod tests {
         let platypus = PlatypusOrganism::new(config).unwrap();
 
         let egg_id = platypus.lay_egg().await.unwrap();
-        let status = platypus.get_status();
+        let status = platypus.get_status().await;
 
         assert!(status.incubation_status.is_some());
-        assert_eq!(status.incubation_status.unwrap().egg_id, egg_id);
+        assert_eq!(status.incubation_status.clone().unwrap().egg_id, egg_id);
         assert_eq!(status.processing_mode, ProcessingMode::Reproduction);
     }
 
@@ -1492,13 +1493,20 @@ mod tests {
         let config = PlatypusConfig::default();
         let platypus = PlatypusOrganism::new(config).unwrap();
 
-        let raw_signals = vec![0.001, 0.002, 0.0015, 0.0008, 0.0012];
+        // Need at least filter_coefficients.len() + output_count samples (5 + N)
+        // FIR filter has 5 taps, so provide 15 samples to get 10 outputs
+        let raw_signals = vec![
+            0.001, 0.002, 0.0015, 0.0008, 0.0012,
+            0.0018, 0.0022, 0.0011, 0.0009, 0.0013,
+            0.0017, 0.0021, 0.0014, 0.0010, 0.0016,
+        ];
         let processed = platypus
             .process_signals_advanced(raw_signals)
             .await
             .unwrap();
 
-        assert!(processed.len() > 0);
+        // Should get 10 filtered outputs (15 - 5 = 10)
+        assert!(processed.len() > 0, "Expected filtered signals, got empty");
     }
 
     #[tokio::test]
@@ -1509,7 +1517,7 @@ mod tests {
         let platypus = PlatypusOrganism::new(config).unwrap();
         assert!(platypus.quantum_state.is_some());
 
-        let status = platypus.get_status();
+        let status = platypus.get_status().await;
         assert!(status.quantum_status.is_some());
     }
 
@@ -1563,7 +1571,7 @@ mod tests {
         assert!(platypus.fitness() > initial_fitness);
     }
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn test_performance_under_100_microseconds() {
         let config = PlatypusConfig::default();
         let platypus = PlatypusOrganism::new(config).unwrap();

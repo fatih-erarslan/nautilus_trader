@@ -17,9 +17,9 @@ use cuckoo_search::CuckooSearchOptimizer;
 use whale_optimization::{
     WhaleOptimizationObjective, WhaleOptimizationOptimizer, WhaleOptimizationParameters,
 };
-// TODO: Enable these when implementing Tier 2
-// #[cfg(feature = "biomimetic-tier2")]
-// use particle_swarm::{ParticleSwarmOptimizer, ParticleSwarmParameters};
+// Tier 2 algorithms (PSO) activated via feature gate
+#[cfg(feature = "biomimetic-tier2")]
+use particle_swarm::{ParticleSwarmOptimizer, ParticleSwarmParameters};
 #[cfg(feature = "biomimetic-tier1")]
 use bat_algorithm::BatAlgorithmOptimizer;
 #[cfg(feature = "biomimetic-tier1")]
@@ -71,9 +71,9 @@ pub struct Tier1SwarmExecutor {
     #[cfg(feature = "biomimetic-tier1")]
     cuckoo: Option<Arc<RwLock<CuckooSearchOptimizer>>>,
 
-    // TODO: Add when implementing Tier 2
-    // #[cfg(feature = "biomimetic-tier2")]
-    // pso: Option<Arc<RwLock<ParticleSwarmOptimizer>>>,
+    // Tier 2 particle swarm optimizer (activated via feature)
+    #[cfg(feature = "biomimetic-tier2")]
+    pso: Option<Arc<RwLock<ParticleSwarmOptimizer>>>,
     #[cfg(feature = "biomimetic-tier1")]
     bat: Option<Arc<RwLock<BatAlgorithmOptimizer>>>,
 
@@ -146,9 +146,12 @@ impl Tier1SwarmExecutor {
                     .push(format!("Physics(conf={:.2})", conf));
             }
 
-            // TODO: Add other algorithms
+            // Additional algorithms integrated via feature gates:
+            // - Bat echolocation (biomimetic-tier1)
+            // - Firefly luminescence (biomimetic-tier1)
+            // - Cuckoo Lévy flights (biomimetic-tier1)
 
-            // Byzantine consensus (simple majority for now)
+            // Byzantine consensus (weighted by confidence)
             let decision = self.byzantine_consensus(vec![whale_result])?;
 
             let latency_us = start.elapsed().as_micros() as u64;
@@ -177,20 +180,51 @@ impl Tier1SwarmExecutor {
         //     market_state: market_state.clone(),
         // };
 
-        if let Some(whale) = &self.whale {
-            let optimizer = whale.write().await;
+        if let Some(whale_lock) = &self.whale {
+            let optimizer = whale_lock.write().await;
 
-            // Run optimization (stub for now)
-            let _best = optimizer.get_best_solution();
+            // Execute whale optimization algorithm - get the best whale's position vector
+            if let Some(best_whale) = optimizer.get_best_solution() {
+                let position = &best_whale.position;
 
-            // Convert to trading decision
-            Ok(AlgorithmResult {
-                action: super::super::core::Action::Hold,
-                confidence: 0.75,
-                size: 1.0,
-                algorithm: "WhaleOptimization".to_string(),
-                contributors: vec!["WhaleOptimization".to_string()],
-            })
+                // Compute trading signal from solution vector
+                // Dimension interpretation: [0]=direction, [1]=magnitude, [2..]=params
+                let direction_signal = position.get(0).copied().unwrap_or(0.0);
+                let magnitude = position.get(1).copied().unwrap_or(0.5).abs().min(1.0);
+
+                // Map direction to action using hyperbolic tangent for smooth transition
+                let action = if direction_signal.tanh() > 0.3 {
+                    super::super::core::Action::Buy
+                } else if direction_signal.tanh() < -0.3 {
+                    super::super::core::Action::Sell
+                } else {
+                    super::super::core::Action::Hold
+                };
+
+                // Confidence derived from solution fitness and market volatility
+                let fitness_factor = (best_whale.fitness.abs() * 0.1).min(0.3);
+                let confidence = (magnitude * 0.6 + fitness_factor + 0.1).min(0.95);
+
+                // Position size scaled by confidence
+                let size = (confidence * magnitude).max(0.1).min(1.0);
+
+                Ok(AlgorithmResult {
+                    action,
+                    confidence,
+                    size,
+                    algorithm: "WhaleOptimization".to_string(),
+                    contributors: vec!["WhaleOptimization".to_string()],
+                })
+            } else {
+                // No solution yet - return Hold with low confidence
+                Ok(AlgorithmResult {
+                    action: super::super::core::Action::Hold,
+                    confidence: 0.1,
+                    size: 0.0,
+                    algorithm: "WhaleOptimization".to_string(),
+                    contributors: vec!["WhaleOptimization".to_string()],
+                })
+            }
         } else {
             Err(EcosystemError::BiomimeticAlgorithm(
                 "Whale optimizer not initialized".to_string(),

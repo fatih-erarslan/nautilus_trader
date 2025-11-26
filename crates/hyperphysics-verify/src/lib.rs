@@ -5,15 +5,20 @@
 //! - Static verification via Lean 4 (FFI integration)
 //! - Property-based testing with formal guarantees
 //!
-//! # Example
-//! ```
+//! # Example (requires z3 feature)
+//! ```ignore
 //! use hyperphysics_verify::z3::Z3Verifier;
 //!
-//! # #[cfg(feature = "z3")]
-//! # {
 //! let verifier = Z3Verifier::new();
 //! assert!(verifier.verify_probability_bounds(0.5));
-//! # }
+//! ```
+//!
+//! # Property-based verification (always available)
+//! ```
+//! use hyperphysics_verify::{verify_probability_bounds_pure, verify_second_law};
+//!
+//! assert!(verify_probability_bounds_pure(0.5).is_verified());
+//! assert!(verify_second_law(1.0, 0.5).is_verified());  // Entropy must increase
 //! ```
 
 #[cfg(feature = "z3")]

@@ -26,6 +26,8 @@
 
 pub mod core;
 pub mod algorithms;
+pub mod natural_drift;
+pub mod error;
 
 #[cfg(feature = "benchmarks")]
 pub mod benchmarks;
@@ -51,6 +53,7 @@ pub use crate::algorithms::{
 pub mod prelude {
     pub use crate::core::*;
     pub use crate::algorithms::*;
+    pub use crate::natural_drift::*;
 
     #[cfg(feature = "benchmarks")]
     pub use crate::benchmarks::*;

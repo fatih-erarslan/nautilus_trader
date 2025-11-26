@@ -95,7 +95,7 @@ proptest! {
     }
 
     #[test]
-    #[ignore = "TODO: Momentum conservation has numerical drift - needs tighter integration params"]
+    #[ignore = "KNOWN_ISSUE: Momentum conservation has numerical drift - needs tighter integration params"]
     fn test_momentum_conservation_closed_system(num_bodies in 2..10usize) {
         let mut adapter = RapierHyperPhysicsAdapter::new()
             .with_gravity(Vector3::zeros());  // No external forces
@@ -128,7 +128,7 @@ proptest! {
     }
 
     #[test]
-    #[ignore = "TODO: Velocity bounds fail with zero initial velocity - gravity effects need accounting"]
+    #[ignore = "KNOWN_ISSUE: Velocity bounds fail with zero initial velocity - gravity effects need accounting"]
     fn test_avg_velocity_bounded(
         num_bodies in 1..50usize,
         initial_vel in 0.0..100.0f32,

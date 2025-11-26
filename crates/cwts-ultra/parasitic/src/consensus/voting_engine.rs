@@ -504,15 +504,16 @@ mod tests {
 
         let engine = ConsensusVotingEngine::new(config).await.unwrap();
 
-        // This test would need mock organisms
-        // For now, just test the timeout mechanism
-        let timeout_duration = Duration::from_micros(100);
+        // Test the timeout mechanism with longer durations for reliability
+        // Use 10ms timeout and 50ms sleep to ensure consistent timeout
+        let timeout_duration = Duration::from_millis(10);
         let result = timeout(timeout_duration, async {
-            tokio::time::sleep(Duration::from_micros(200)).await;
+            tokio::time::sleep(Duration::from_millis(50)).await;
         })
         .await;
 
-        assert!(result.is_err()); // Should timeout
+        assert!(result.is_err(), "Expected timeout but operation completed"); // Should timeout
+        let _ = engine; // Use engine to suppress warning
     }
 
     #[tokio::test]

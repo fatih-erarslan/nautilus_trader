@@ -239,7 +239,7 @@ pub struct CapturedPrey {
     pub resistance_level: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TrapStatus {
     Constructing,
     Armed,

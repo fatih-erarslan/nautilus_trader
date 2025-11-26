@@ -1,4 +1,10 @@
 // Comprehensive Exchange Integration Tests - REAL TESTS with 100% Coverage
+//
+// NOTE: These tests are disabled because the exchange module is currently
+// disabled in lib.rs. Re-enable when exchange module is restored.
+
+#![cfg(feature = "exchange")]
+
 use cwts_ultra::exchange::{binance_ultra::*, okx_ultra::*};
 use std::time::{Duration, Instant};
 use tokio;

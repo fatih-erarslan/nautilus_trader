@@ -537,7 +537,10 @@ mod tests {
         let org2 = OrganismVector::new("org2".to_string(), vec![0.0, 1.0, 0.0], vec![0.0, 1.0]);
 
         let distance = org1.distance_to(&org2);
-        let expected_distance = (2.0_f32).sqrt(); // sqrt(1^2 + 1^2) for each vector
+        // Combined vectors: [1,0,0,1,0] vs [0,1,0,0,1]
+        // Distance = sqrt((1-0)^2 + (0-1)^2 + (0-0)^2 + (1-0)^2 + (0-1)^2)
+        //          = sqrt(1 + 1 + 0 + 1 + 1) = sqrt(4) = 2.0
+        let expected_distance = 2.0_f32;
 
         assert!((distance - expected_distance).abs() < 1e-6);
 

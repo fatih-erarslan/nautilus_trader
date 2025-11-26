@@ -40,7 +40,7 @@ thiserror = "1.0"
 anyhow = "1.0"
 log = "0.4"
 tracing = "0.1"
-nalgebra.workspace = true
+nalgebra = { version = "0.34", features = ["serde-serialize", "rayon"] }
 ndarray = { version = "0.15", features = ["rayon", "serde"] }
 num-traits = "0.2"
 num-complex = "0.4"

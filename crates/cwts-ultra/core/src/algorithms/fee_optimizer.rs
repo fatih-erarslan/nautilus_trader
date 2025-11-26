@@ -725,7 +725,12 @@ mod tests {
             )
             .unwrap();
 
-        // Profit should be close to 5000 minus fees
-        assert!(net_profit > 4900.0 && net_profit < 5000.0);
+        // Profit should be close to 5000 minus fees (entry ~$50 + exit ~$55 = ~$105 fees)
+        // With taker fees at 0.1% on $50k entry and $55k exit, net profit ≈ $4,895
+        assert!(
+            net_profit > 4800.0 && net_profit < 5000.0,
+            "Expected net_profit between 4800 and 5000, got {}",
+            net_profit
+        );
     }
 }

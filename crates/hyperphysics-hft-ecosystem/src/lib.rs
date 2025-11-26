@@ -74,12 +74,11 @@ pub mod bindings;
 /// Prelude module for convenient imports
 pub mod prelude {
     pub use crate::core::*;
-    // execution, swarms, trading are stubs - don't export yet
-
-    // Re-export HyperPhysics core types when available
-    // pub use hyperphysics_core::*;
-    // pub use hyperphysics_geometry::*;
-    // pub use hyperphysics_consciousness::*;
+    // Swarms module provides biomimetic algorithms
+    #[cfg(feature = "biomimetic-tier1")]
+    pub use crate::swarms::*;
+    // Execution infrastructure (requires explicit import)
+    // pub use crate::execution::*;
 }
 
 use thiserror::Error;

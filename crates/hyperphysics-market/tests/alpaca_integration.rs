@@ -8,14 +8,14 @@
 // Run: cargo test -p hyperphysics-market --test alpaca_integration -- --ignored
 
 use hyperphysics_market::providers::alpaca::{AlpacaProvider, AlpacaWebSocketClient};
-use hyperphysics_market::types::{Bar, Timeframe};
+use hyperphysics_market::{Bar, Timeframe};
 use hyperphysics_market::providers::MarketDataProvider;
 use chrono::{Duration, Utc};
-use tracing_subscriber::{self, EnvFilter};
 
 fn init_tracing() {
+    // Simple tracing initialization without EnvFilter (which requires env-filter feature)
     let _ = tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::new("debug"))
+        .with_max_level(tracing::Level::DEBUG)
         .try_init();
 }
 

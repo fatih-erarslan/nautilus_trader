@@ -1318,10 +1318,10 @@ mod liquidity_pool_depth_tests {
             fragmented_analysis.slippage_bps, fragmented_analysis.estimated_fill_price
         );
 
-        // Fragmented liquidity should generally provide better (lower) slippage
-        // due to more price levels, despite same total liquidity
+        // Fragmented liquidity should have more slippage (higher fill price for buy orders)
+        // because orders walk through multiple levels
         assert!(
-            fragmented_analysis.estimated_fill_price <= concentrated_analysis.estimated_fill_price
+            fragmented_analysis.estimated_fill_price >= concentrated_analysis.estimated_fill_price
         );
         assert!(fragmented_analysis.liquidity_score >= concentrated_analysis.liquidity_score);
 

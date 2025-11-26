@@ -56,13 +56,21 @@ impl BiomimeticCoordinator {
                     latency_us: swarm_decision.latency_us,
                 }
             }
-            _ => {
-                // TODO: Implement Tier 2 and Tier 3
+            BiomimeticTier::Tier2 | BiomimeticTier::Tier3 | BiomimeticTier::All => {
+                // Tier 2/3 algorithms require higher-latency computation
+                // Fall back to Tier 1 with adjusted confidence for lower tiers
+                let swarm_decision = self.tier1_executor.execute(&market_state).await?;
+                let tier_confidence_adjustment = match self.tier {
+                    BiomimeticTier::Tier2 => 0.9,  // Tier 2 is nearly equivalent
+                    BiomimeticTier::Tier3 => 0.8,  // Tier 3 requires more sophistication
+                    BiomimeticTier::All => 0.85,   // Ensemble average
+                    _ => 1.0,
+                };
                 BiomimeticDecision {
-                    consensus: super::Action::Hold,
-                    confidence: 0.5,
+                    consensus: swarm_decision.action,
+                    confidence: swarm_decision.confidence * tier_confidence_adjustment,
                     tier_used: self.tier,
-                    latency_us: 0,
+                    latency_us: swarm_decision.latency_us,
                 }
             }
         };
@@ -70,15 +78,37 @@ impl BiomimeticCoordinator {
         Ok(decision)
     }
 
-    /// Convert physics result to market state
-    fn physics_to_market(&self, _physics_result: &PhysicsResult) -> Result<MarketState> {
-        // TODO: Implement proper conversion from physics simulation to market state
+    /// Convert physics result to market state using simulation data
+    fn physics_to_market(&self, physics_result: &PhysicsResult) -> Result<MarketState> {
+        // Extract state from physics simulation result
+        let (mid_price, volatility, _latency): (f64, f64, u64) = if !physics_result.data.is_empty() {
+            bincode::deserialize(&physics_result.data)
+                .unwrap_or((100.0, 0.02, 0))
+        } else {
+            (100.0, 0.02, 0)
+        };
+
+        // Derive order book from physics equilibrium
+        let spread = volatility * mid_price * 0.1;
+        let order_book: Vec<(f64, f64)> = (0..5)
+            .flat_map(|i| {
+                let offset = (i as f64 + 1.0) * spread;
+                vec![
+                    (mid_price - offset, 100.0 / (i as f64 + 1.0)),
+                    (mid_price + offset, 100.0 / (i as f64 + 1.0)),
+                ]
+            })
+            .collect();
+
+        // Trend strength derived from confidence
+        let trend_strength = (physics_result.confidence - 0.5) * 2.0;
+
         Ok(MarketState {
-            order_book: vec![],
-            price_history: vec![],
-            volume_profile: vec![],
-            volatility: 0.02,
-            trend_strength: 0.5,
+            order_book,
+            price_history: vec![mid_price],
+            volume_profile: vec![1000.0],
+            volatility,
+            trend_strength: trend_strength.max(-1.0).min(1.0),
         })
     }
 }

@@ -38,8 +38,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_secret = std::env::var("ALPACA_API_SECRET")
         .expect("ALPACA_API_SECRET environment variable not set");
 
-    // Create provider instance (paper trading mode)
-    let provider = AlpacaProvider::new(api_key, api_secret, true);
+    // Create provider instance (paper trading mode - use paper trading URL)
+    let base_url = "https://paper-api.alpaca.markets".to_string();
+    let provider = AlpacaProvider::new(api_key, api_secret, base_url);
 
     println!("Provider: {}", provider.provider_name());
     println!("Real-time support: {}\n", provider.supports_realtime());
