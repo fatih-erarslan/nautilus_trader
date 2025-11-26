@@ -1,6 +1,21 @@
 //! NVIDIA Warp differentiable physics backend
 //!
 //! Fork: https://github.com/fatih-erarslan/warp
+//!
+//! ## Python Integration
+//!
+//! NVIDIA Warp is a Python framework for high-performance differentiable
+//! simulation. This backend uses PyO3 to call Warp's Python API from Rust.
+//!
+//! ### Requirements
+//! - Python 3.8+ with Warp installed: `pip install warp-lang`
+//! - NVIDIA GPU with CUDA support
+//!
+//! ### Features
+//! - GPU kernel compilation
+//! - Automatic differentiation
+//! - USD/USDRT interop
+//! - Rigid body and soft body simulation
 
 use crate::backend::{BackendCapabilities, BackendError, BackendInfo, PhysicsBackend, SimulationStats};
 use crate::body::BodyDesc;
