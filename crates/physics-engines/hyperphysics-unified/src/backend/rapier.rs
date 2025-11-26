@@ -7,10 +7,30 @@ use crate::constraint::ConstraintDesc;
 use crate::query::{RayCast, RayHit, ShapeCast, ShapeHit};
 use crate::shape::Shape;
 use crate::{ContactManifold, PhysicsMaterial, Transform, AABB};
-use nalgebra::{Point3, Vector3};
+use nalgebra::{Point3, UnitQuaternion, Vector3};
 use rapier3d::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::any::Any;
 use std::collections::HashMap;
+
+/// Serializable body state for state save/restore
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SerializableBodyState {
+    pub position: [f32; 3],
+    pub rotation: [f32; 4], // quaternion (x, y, z, w)
+    pub linvel: [f32; 3],
+    pub angvel: [f32; 3],
+    pub is_dynamic: bool,
+    pub is_enabled: bool,
+}
+
+/// Serializable physics state
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SerializablePhysicsState {
+    pub gravity: [f32; 3],
+    pub bodies: Vec<(u64, SerializableBodyState)>, // (index, state)
+    pub integration_dt: f32,
+}
 
 /// Rapier3D configuration
 #[derive(Debug, Clone)]
@@ -301,8 +321,85 @@ impl PhysicsBackend for RapierBackend {
         })
     }
 
-    fn create_constraint(&mut self, _desc: &ConstraintDesc) -> Result<Self::ConstraintHandle, BackendError> {
-        Err(BackendError::Unsupported("Constraint creation not implemented".into()))
+    fn create_constraint(&mut self, desc: &ConstraintDesc) -> Result<Self::ConstraintHandle, BackendError> {
+        use crate::constraint::ConstraintType;
+        use rapier3d::dynamics::*;
+
+        // Get body handles - body_a is required, body_b defaults to ground if None
+        let body_a_handle = self.handle_map.iter()
+            .find(|(_, &v)| v == desc.body_a)
+            .map(|(&k, _)| k)
+            .ok_or_else(|| BackendError::InvalidHandle("Body A not found".into()))?;
+
+        // body_b is optional (connects to world/ground if None)
+        let body_b_handle = if let Some(body_b) = desc.body_b {
+            self.handle_map.iter()
+                .find(|(_, &v)| v == body_b)
+                .map(|(&k, _)| k)
+                .ok_or_else(|| BackendError::InvalidHandle("Body B not found".into()))?
+        } else {
+            // For world-attached constraints, we need a static body
+            // Create a static ground body if needed
+            let ground = RigidBodyBuilder::fixed().build();
+            self.rigid_body_set.insert(ground)
+        };
+
+        let joint = match &desc.constraint_type {
+            ConstraintType::Fixed => {
+                GenericJointBuilder::new(JointAxesMask::LOCKED_FIXED_AXES)
+                    .local_anchor1(Point3::origin())
+                    .local_anchor2(Point3::origin())
+                    .build()
+            }
+            ConstraintType::Ball { anchor_a, anchor_b } => {
+                GenericJointBuilder::new(JointAxesMask::LOCKED_SPHERICAL_AXES)
+                    .local_anchor1(*anchor_a)
+                    .local_anchor2(*anchor_b)
+                    .build()
+            }
+            ConstraintType::Hinge { anchor_a, anchor_b, axis_a, axis_b } => {
+                GenericJointBuilder::new(JointAxesMask::LOCKED_REVOLUTE_AXES)
+                    .local_anchor1(*anchor_a)
+                    .local_anchor2(*anchor_b)
+                    .local_axis1(*axis_a)
+                    .local_axis2(*axis_b)
+                    .build()
+            }
+            ConstraintType::Slider { anchor_a, anchor_b, axis } => {
+                GenericJointBuilder::new(JointAxesMask::LOCKED_PRISMATIC_AXES)
+                    .local_anchor1(*anchor_a)
+                    .local_anchor2(*anchor_b)
+                    .local_axis1(*axis)
+                    .local_axis2(*axis)
+                    .build()
+            }
+            ConstraintType::Distance { anchor_a, anchor_b, distance } => {
+                let mut joint = GenericJointBuilder::new(JointAxesMask::X)
+                    .local_anchor1(*anchor_a)
+                    .local_anchor2(*anchor_b)
+                    .build();
+                joint.set_limits(JointAxis::X, [*distance, *distance]);
+                joint
+            }
+            ConstraintType::Spring { anchor_a, anchor_b, rest_length, stiffness, damping } => {
+                let mut joint = GenericJointBuilder::new(JointAxesMask::X)
+                    .local_anchor1(*anchor_a)
+                    .local_anchor2(*anchor_b)
+                    .build();
+                joint.set_limits(JointAxis::X, [*rest_length * 0.5, *rest_length * 2.0]);
+                joint.set_motor(
+                    JointAxis::X,
+                    *rest_length,
+                    0.0,
+                    *stiffness,
+                    *damping,
+                );
+                joint
+            }
+        };
+
+        let handle = self.impulse_joints.insert(body_a_handle, body_b_handle, joint, true);
+        Ok(handle)
     }
 
     fn remove_constraint(&mut self, handle: Self::ConstraintHandle) -> Result<(), BackendError> {
@@ -426,11 +523,81 @@ impl PhysicsBackend for RapierBackend {
     }
 
     fn serialize_state(&self) -> Result<Vec<u8>, BackendError> {
-        Err(BackendError::Unsupported("Serialization not implemented".into()))
+        let mut bodies = Vec::new();
+
+        for (handle, rb) in self.rigid_body_set.iter() {
+            let pos = rb.translation();
+            let rot = rb.rotation();
+            let linvel = rb.linvel();
+            let angvel = rb.angvel();
+
+            let state = SerializableBodyState {
+                position: [pos.x, pos.y, pos.z],
+                rotation: [rot.i, rot.j, rot.k, rot.w],
+                linvel: [linvel.x, linvel.y, linvel.z],
+                angvel: [angvel.x, angvel.y, angvel.z],
+                is_dynamic: rb.is_dynamic(),
+                is_enabled: rb.is_enabled(),
+            };
+
+            bodies.push((handle.into_raw_parts().0 as u64, state));
+        }
+
+        let physics_state = SerializablePhysicsState {
+            gravity: [self.gravity.x, self.gravity.y, self.gravity.z],
+            bodies,
+            integration_dt: self.integration_params.dt,
+        };
+
+        bincode::serialize(&physics_state)
+            .map_err(|e| BackendError::SerializationError(e.to_string()))
     }
 
-    fn deserialize_state(&mut self, _data: &[u8]) -> Result<(), BackendError> {
-        Err(BackendError::Unsupported("Deserialization not implemented".into()))
+    fn deserialize_state(&mut self, data: &[u8]) -> Result<(), BackendError> {
+        let physics_state: SerializablePhysicsState = bincode::deserialize(data)
+            .map_err(|e| BackendError::DeserializationError(e.to_string()))?;
+
+        // Restore gravity
+        self.gravity = Vector3::new(
+            physics_state.gravity[0],
+            physics_state.gravity[1],
+            physics_state.gravity[2],
+        );
+
+        // Restore integration params
+        self.integration_params.dt = physics_state.integration_dt;
+
+        // Restore body states
+        for (raw_index, state) in physics_state.bodies {
+            // Try to find the body by raw index
+            let handle = RigidBodyHandle::from_raw_parts(raw_index as u32, 0);
+            if let Some(rb) = self.rigid_body_set.get_mut(handle) {
+                rb.set_translation(
+                    Vector3::new(state.position[0], state.position[1], state.position[2]),
+                    true,
+                );
+                rb.set_rotation(
+                    UnitQuaternion::from_quaternion(nalgebra::Quaternion::new(
+                        state.rotation[3], // w
+                        state.rotation[0], // i
+                        state.rotation[1], // j
+                        state.rotation[2], // k
+                    )),
+                    true,
+                );
+                rb.set_linvel(
+                    Vector3::new(state.linvel[0], state.linvel[1], state.linvel[2]),
+                    true,
+                );
+                rb.set_angvel(
+                    Vector3::new(state.angvel[0], state.angvel[1], state.angvel[2]),
+                    true,
+                );
+                rb.set_enabled(state.is_enabled);
+            }
+        }
+
+        Ok(())
     }
 
     fn reset(&mut self) {

@@ -1,0 +1,22 @@
+[package]
+name = "mujoco-hyperphysics"
+version = "0.1.0"
+edition = "2021"
+description = "MuJoCo physics integration for HyperPhysics (Google DeepMind robotics simulator)"
+authors = ["HyperPhysics Team"]
+
+[dependencies]
+nalgebra = { workspace = true }
+thiserror = "1.0"
+bitflags = "2.4"
+
+[build-dependencies]
+cc = "1.0"
+bindgen = "0.69"
+cmake = "0.1"
+shellexpand = "3.1"
+
+[features]
+default = []
+simd = []
+opengl = []  # Enable MuJoCo rendering

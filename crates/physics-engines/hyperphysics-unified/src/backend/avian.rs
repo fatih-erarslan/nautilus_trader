@@ -2,6 +2,19 @@
 //!
 //! ECS-native physics for Bevy game engine.
 //! Fork: https://github.com/fatih-erarslan/avian
+//!
+//! ## Important Note
+//!
+//! Avian is tightly integrated with Bevy ECS and cannot be used standalone.
+//! This backend provides a compatibility layer for scenarios where Avian
+//! components are managed through a Bevy World/App context.
+//!
+//! For standalone physics (without Bevy), use:
+//! - RapierBackend - Pure Rust, high performance
+//! - JoltBackend - AAA game physics via C++ FFI
+//!
+//! If you're building a Bevy application, use avian3d/avian2d directly
+//! with their native Bevy plugin system.
 
 use crate::backend::{BackendCapabilities, BackendError, BackendInfo, PhysicsBackend, SimulationStats};
 use crate::body::BodyDesc;

@@ -2,6 +2,21 @@
 //!
 //! High-performance GPU compute for physics simulation.
 //! Fork: https://github.com/fatih-erarslan/taichi
+//!
+//! ## Python Integration
+//!
+//! Taichi is a Python DSL for high-performance GPU computing. This backend
+//! uses PyO3 to call Taichi's Python API from Rust.
+//!
+//! ### Requirements
+//! - Python 3.8+ with Taichi installed: `pip install taichi`
+//! - CUDA/Vulkan/Metal capable GPU
+//!
+//! ### Features
+//! - GPU-accelerated particle simulation
+//! - MPM (Material Point Method)
+//! - SPH (Smoothed Particle Hydrodynamics)
+//! - Differentiable simulation
 
 use crate::backend::{BackendCapabilities, BackendError, BackendInfo, PhysicsBackend, SimulationStats};
 use crate::body::BodyDesc;

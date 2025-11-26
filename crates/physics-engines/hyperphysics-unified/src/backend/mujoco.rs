@@ -2,6 +2,18 @@
 //!
 //! High-fidelity robotics simulation with contact-rich dynamics.
 //! Fork: https://github.com/fatih-erarslan/mujoco
+//!
+//! ## Model Loading
+//!
+//! MuJoCo uses MJCF (MuJoCo XML Format) for model definitions.
+//! Unlike other backends, bodies and constraints are defined in XML
+//! rather than created programmatically.
+//!
+//! ```rust,ignore
+//! let mut backend = MujocoBackend::new(MujocoConfig::default())?;
+//! backend.load_mjcf("models/humanoid.xml")?;
+//! backend.step(0.002);
+//! ```
 
 use crate::backend::{BackendCapabilities, BackendError, BackendInfo, PhysicsBackend, SimulationStats};
 use crate::body::BodyDesc;
@@ -11,6 +23,11 @@ use crate::query::{RayCast, RayHit, ShapeCast, ShapeHit};
 use crate::{ContactManifold, PhysicsMaterial, Transform, AABB};
 use nalgebra::{Point3, Vector3};
 use std::any::Any;
+use std::path::Path;
+
+// Import MuJoCo adapter when feature is enabled
+#[cfg(feature = "mujoco")]
+use mujoco_hyperphysics::MuJoCoAdapter;
 
 /// MuJoCo configuration
 #[derive(Debug, Clone)]
@@ -23,6 +40,8 @@ pub struct MujocoConfig {
     pub tolerance: f64,
     /// Enable multi-threaded simulation
     pub nthread: i32,
+    /// Path to MJCF model file (optional, can be loaded later)
+    pub model_path: Option<String>,
 }
 
 impl Default for MujocoConfig {
@@ -32,6 +51,7 @@ impl Default for MujocoConfig {
             iterations: 100,
             tolerance: 1e-8,
             nthread: 0, // Auto
+            model_path: None,
         }
     }
 }
@@ -50,9 +70,159 @@ pub struct MujocoBackend {
     gravity: Vector3<f32>,
     contacts: Vec<ContactManifold>,
     stats: SimulationStats,
-    _config: MujocoConfig,
-    // FFI: mjModel* model;
-    // FFI: mjData* data;
+    config: MujocoConfig,
+
+    // Real MuJoCo adapter when feature is enabled
+    #[cfg(feature = "mujoco")]
+    adapter: Option<MuJoCoAdapter>,
+
+    // Cached body count from model
+    body_count_cache: usize,
+}
+
+impl MujocoBackend {
+    /// Load an MJCF model from file
+    pub fn load_mjcf<P: AsRef<Path>>(&mut self, path: P) -> Result<(), BackendError> {
+        #[cfg(feature = "mujoco")]
+        {
+            if self.adapter.is_none() {
+                self.adapter = Some(MuJoCoAdapter::new(
+                    mujoco_hyperphysics::MuJoCoConfig {
+                        timestep: self.config.timestep,
+                        gravity: nalgebra::Vector3::new(
+                            self.gravity.x as f64,
+                            self.gravity.y as f64,
+                            self.gravity.z as f64,
+                        ),
+                        enable_contact: true,
+                        solver_iterations: self.config.iterations,
+                    }
+                ));
+            }
+
+            if let Some(ref mut adapter) = self.adapter {
+                adapter.load_xml(path)
+                    .map_err(|e| BackendError::InitializationFailed(e.to_string()))?;
+                self.body_count_cache = adapter.body_count() as usize;
+            }
+        }
+
+        #[cfg(not(feature = "mujoco"))]
+        {
+            let _ = path;
+            return Err(BackendError::Unsupported("MuJoCo feature not enabled".into()));
+        }
+
+        Ok(())
+    }
+
+    /// Check if a model is loaded
+    pub fn is_model_loaded(&self) -> bool {
+        #[cfg(feature = "mujoco")]
+        {
+            self.adapter.as_ref().map(|a| a.is_loaded()).unwrap_or(false)
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            false
+        }
+    }
+
+    /// Get generalized coordinates (joint positions)
+    pub fn get_qpos(&self) -> Vec<f64> {
+        #[cfg(feature = "mujoco")]
+        {
+            self.adapter.as_ref().map(|a| a.get_qpos()).unwrap_or_default()
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            Vec::new()
+        }
+    }
+
+    /// Set generalized coordinates
+    pub fn set_qpos(&mut self, qpos: &[f64]) -> Result<(), BackendError> {
+        #[cfg(feature = "mujoco")]
+        {
+            if let Some(ref mut adapter) = self.adapter {
+                adapter.set_qpos(qpos)
+                    .map_err(|e| BackendError::FfiError(e.to_string()))?;
+            }
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            let _ = qpos;
+        }
+        Ok(())
+    }
+
+    /// Get generalized velocities
+    pub fn get_qvel(&self) -> Vec<f64> {
+        #[cfg(feature = "mujoco")]
+        {
+            self.adapter.as_ref().map(|a| a.get_qvel()).unwrap_or_default()
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            Vec::new()
+        }
+    }
+
+    /// Set generalized velocities
+    pub fn set_qvel(&mut self, qvel: &[f64]) -> Result<(), BackendError> {
+        #[cfg(feature = "mujoco")]
+        {
+            if let Some(ref mut adapter) = self.adapter {
+                adapter.set_qvel(qvel)
+                    .map_err(|e| BackendError::FfiError(e.to_string()))?;
+            }
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            let _ = qvel;
+        }
+        Ok(())
+    }
+
+    /// Get actuator control signals
+    pub fn get_ctrl(&self) -> Vec<f64> {
+        #[cfg(feature = "mujoco")]
+        {
+            self.adapter.as_ref().map(|a| a.get_ctrl()).unwrap_or_default()
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            Vec::new()
+        }
+    }
+
+    /// Set actuator control signals
+    pub fn set_ctrl(&mut self, ctrl: &[f64]) -> Result<(), BackendError> {
+        #[cfg(feature = "mujoco")]
+        {
+            if let Some(ref mut adapter) = self.adapter {
+                adapter.set_ctrl(ctrl)
+                    .map_err(|e| BackendError::FfiError(e.to_string()))?;
+            }
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            let _ = ctrl;
+        }
+        Ok(())
+    }
+
+    /// Get simulation time
+    pub fn simulation_time(&self) -> f64 {
+        #[cfg(feature = "mujoco")]
+        {
+            self.adapter.as_ref().map(|a| a.time()).unwrap_or(0.0)
+        }
+        #[cfg(not(feature = "mujoco"))]
+        {
+            0.0
+        }
+    }
 }
 
 impl PhysicsBackend for MujocoBackend {
@@ -62,12 +232,22 @@ impl PhysicsBackend for MujocoBackend {
     type ConstraintHandle = MujocoConstraintHandle;
 
     fn new(config: Self::Config) -> Result<Self, BackendError> {
-        Ok(Self {
+        let mut backend = Self {
             gravity: Vector3::new(0.0, 0.0, -9.81), // MuJoCo uses Z-up
             contacts: Vec::new(),
             stats: SimulationStats::default(),
-            _config: config,
-        })
+            config: config.clone(),
+            #[cfg(feature = "mujoco")]
+            adapter: None,
+            body_count_cache: 0,
+        };
+
+        // Load model if path is provided
+        if let Some(ref path) = config.model_path {
+            backend.load_mjcf(path)?;
+        }
+
+        Ok(backend)
     }
 
     fn info(&self) -> BackendInfo {
@@ -98,7 +278,15 @@ impl PhysicsBackend for MujocoBackend {
     }
 
     fn step(&mut self, _dt: f32) {
-        // mj_step(model, data);
+        let start = std::time::Instant::now();
+
+        #[cfg(feature = "mujoco")]
+        if let Some(ref mut adapter) = self.adapter {
+            let _ = adapter.step();
+        }
+
+        self.stats.total_us = start.elapsed().as_micros() as u64;
+        self.stats.active_bodies = self.body_count_cache as u32;
     }
 
     fn set_gravity(&mut self, gravity: Vector3<f32>) {
@@ -144,7 +332,7 @@ impl PhysicsBackend for MujocoBackend {
     fn apply_torque(&mut self, _handle: Self::BodyHandle, _torque: Vector3<f32>) {}
 
     fn body_count(&self) -> usize {
-        0
+        self.body_count_cache
     }
 
     fn create_collider(&mut self, _body: Self::BodyHandle, _desc: &ColliderDesc) -> Result<Self::ColliderHandle, BackendError> {
@@ -200,7 +388,10 @@ impl PhysicsBackend for MujocoBackend {
     }
 
     fn reset(&mut self) {
-        // mj_resetData(model, data);
+        #[cfg(feature = "mujoco")]
+        if let Some(ref mut adapter) = self.adapter {
+            let _ = adapter.reset();
+        }
     }
 
     fn stats(&self) -> SimulationStats {

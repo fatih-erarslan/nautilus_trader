@@ -259,6 +259,10 @@ pub enum BackendError {
     #[error("Serialization error: {0}")]
     SerializationError(String),
 
+    /// Deserialization error
+    #[error("Deserialization error: {0}")]
+    DeserializationError(String),
+
     /// Resource limit exceeded
     #[error("Resource limit exceeded: {0}")]
     ResourceLimit(String),
