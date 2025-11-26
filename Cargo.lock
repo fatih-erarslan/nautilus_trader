@@ -4248,6 +4248,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperphysics-nautilus"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "approx 0.5.1",
+ "async-trait",
+ "chrono",
+ "criterion",
+ "csv",
+ "dashmap",
+ "futures",
+ "hyperphysics-core",
+ "hyperphysics-geometry",
+ "hyperphysics-hft-ecosystem",
+ "hyperphysics-market",
+ "hyperphysics-optimization",
+ "indexmap",
+ "nalgebra 0.33.2",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "tokio",
+ "tokio-test",
+ "tracing",
+ "ustr",
+ "uuid",
+]
+
+[[package]]
 name = "hyperphysics-neural"
 version = "0.1.0"
 dependencies = [
@@ -4706,6 +4736,8 @@ checksum = "6717a8d2a5a929a1a2eb43a12812498ed141a0bcfb7e8f7844fbdbe4303bba9f"
 dependencies = [
  "equivalent",
  "hashbrown 0.16.0",
+ "serde",
+ "serde_core",
 ]
 
 [[package]]
@@ -9086,6 +9118,19 @@ dependencies = [
  "form_urlencoded",
  "idna",
  "percent-encoding",
+ "serde",
+]
+
+[[package]]
+name = "ustr"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18b19e258aa08450f93369cf56dd78063586adf19e92a75b338a800f799a0208"
+dependencies = [
+ "ahash",
+ "byteorder",
+ "lazy_static",
+ "parking_lot",
  "serde",
 ]
 
