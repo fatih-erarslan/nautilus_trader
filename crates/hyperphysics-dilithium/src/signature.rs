@@ -387,6 +387,36 @@ impl DilithiumSignature {
     pub fn timestamp(&self) -> SystemTime {
         self.timestamp
     }
+
+    /// Verify signature standalone without needing a keypair
+    ///
+    /// This method allows verification using just the message hash and public key bytes,
+    /// which is useful for external verification without access to the full keypair.
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The original message (or hash) that was signed
+    /// * `public_key_bytes` - The serialized public key bytes
+    /// * `security_level` - The security level used for signing
+    ///
+    /// # Returns
+    ///
+    /// `Ok(true)` if signature is valid, `Ok(false)` or error otherwise
+    pub fn verify_standalone(
+        &self,
+        message: &[u8],
+        public_key_bytes: &[u8],
+        security_level: SecurityLevel,
+    ) -> DilithiumResult<bool> {
+        // Create ModuleLWE engine for this security level
+        let mlwe = ModuleLWE::new(security_level.clone());
+
+        // Decode the public key from bytes
+        let public_key = PublicKey::from_bytes(public_key_bytes, security_level)?;
+
+        // Use the existing verify_with_key method
+        self.verify_with_key(message, &public_key, &mlwe)
+    }
 }
 
 #[cfg(test)]

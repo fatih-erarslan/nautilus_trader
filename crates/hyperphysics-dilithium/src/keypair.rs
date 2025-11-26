@@ -573,10 +573,60 @@ impl PublicKey {
     pub fn security_level(&self) -> SecurityLevel {
         self.security_level
     }
-    
+
     /// Get public key bytes
     pub fn as_bytes(&self) -> &[u8] {
         &self.bytes
+    }
+
+    /// Decode public key from bytes
+    ///
+    /// # Arguments
+    ///
+    /// * `bytes` - Serialized public key bytes
+    /// * `security_level` - Security level for the key
+    ///
+    /// # Returns
+    ///
+    /// Decoded public key or error
+    pub fn from_bytes(bytes: &[u8], security_level: SecurityLevel) -> crate::DilithiumResult<Self> {
+        let mlwe = ModuleLWE::new(security_level);
+        let (k, _l, _eta) = mlwe.params();
+
+        // Extract ρ (first SEED_BYTES)
+        if bytes.len() < SEED_BYTES {
+            return Err(crate::DilithiumError::KeyGenerationFailed(
+                "Public key too short for rho".to_string()
+            ));
+        }
+        let mut rho = [0u8; SEED_BYTES];
+        rho.copy_from_slice(&bytes[..SEED_BYTES]);
+
+        // Decode t1 polynomials (10 bits per coefficient)
+        let poly_bytes = (POLY_DEGREE * 10 + 7) / 8;
+        let expected_len = SEED_BYTES + k * poly_bytes;
+
+        if bytes.len() < expected_len {
+            return Err(crate::DilithiumError::KeyGenerationFailed(
+                format!("Public key too short: got {}, expected {}", bytes.len(), expected_len)
+            ));
+        }
+
+        let mut t1 = Vec::with_capacity(k);
+        let mut offset = SEED_BYTES;
+
+        for _ in 0..k {
+            let poly = mlwe.poly_decode(&bytes[offset..offset + poly_bytes], 10);
+            t1.push(poly);
+            offset += poly_bytes;
+        }
+
+        Ok(Self {
+            rho,
+            t1,
+            security_level,
+            bytes: bytes.to_vec(),
+        })
     }
 }
 
