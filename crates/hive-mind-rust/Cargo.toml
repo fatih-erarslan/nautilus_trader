@@ -70,6 +70,12 @@ validator = { version = "0.18", features = ["derive"] }
 base64 = "0.22"
 rust_decimal = "1.36"
 
+# TLS certificate management
+rcgen = "0.12"
+x509-parser = "0.15"
+pem = "3.0"
+time = { version = "0.3", features = ["formatting", "parsing"] }
+
 # Additional compliance and security dependencies
 aes-gcm = "0.10"
 secrecy = { version = "0.8", features = ["alloc", "serde"] }
