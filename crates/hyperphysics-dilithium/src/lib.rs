@@ -36,7 +36,10 @@
 //! ```
 
 
-pub use hyperphysics_core::{Result, EngineError};
+// Note: We define our own Result type to avoid cyclic dependency with hyperphysics-core.
+// hyperphysics-core depends on this crate for crypto, so we can't depend back on it.
+pub type Result<T> = std::result::Result<T, DilithiumError>;
+
 pub use hyperphysics_consciousness::{EmergenceEvent, HierarchicalResult};
 
 pub mod keypair;
@@ -136,14 +139,8 @@ pub enum DilithiumError {
     ZKVerificationFailed,
 }
 
-impl From<DilithiumError> for EngineError {
-    fn from(err: DilithiumError) -> Self {
-        // Map to appropriate EngineError variant
-        EngineError::Simulation {
-            message: format!("Dilithium cryptography error: {}", err),
-        }
-    }
-}
+// Note: Conversion to EngineError (from hyperphysics-core) is implemented
+// in hyperphysics-core itself to avoid cyclic dependencies.
 
 /// Post-quantum signature result type
 pub type DilithiumResult<T> = std::result::Result<T, DilithiumError>;
