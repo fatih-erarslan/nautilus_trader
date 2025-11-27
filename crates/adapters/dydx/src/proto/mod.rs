@@ -15,5 +15,8 @@
 
 //! Protocol Buffer definitions for dYdX v4.
 //!
-//! This module will contain generated protobuf code for the dYdX protocol.
-//! Generated files will be included here once proto compilation is set up.
+//! This module re-exports types from the `dydx-proto` crate which contains
+//! pre-generated Protocol Buffer definitions for the dYdX v4 protocol.
+
+// Re-export all dydx proto types
+pub use dydx_proto::*;

@@ -36,36 +36,43 @@
 //! (placing orders, transfers, etc.). The HTTP/REST API (Indexer) is read-only and used
 //! for querying market data and historical information.
 
-// TODO: Enable when proto is generated
+// Full gRPC implementation modules exist but are disabled due to tonic/prost version
+// mismatches between dydx-proto (0.13.x) and nautilus workspace (0.14.x).
+// Enable these when versions are aligned:
 // pub mod builder;
 // pub mod client;
 // pub mod order;
 pub mod types;
 pub mod wallet;
 
-// Re-exports
-// TODO: Enable when proto is generated
-// pub use builder::TxBuilder;
-// pub use client::{DydxGrpcClient, Height, TxHash};
-// pub use order::{
-//     DEFAULT_RUST_CLIENT_METADATA, OrderBuilder, OrderFlags, OrderGoodUntil, OrderMarketParams,
-//     SHORT_TERM_ORDER_MAXIMUM_LIFETIME,
-// };
+// Re-exports - using stubs until version alignment
+// Future: pub use builder::TxBuilder;
+// Future: pub use client::{DydxGrpcClient, Height, TxHash};
+// Future: pub use order::{...};
 pub use types::ChainId;
 pub use wallet::{Account, Subaccount, Wallet};
 
-// Temporary stubs until proto is generated
+// Temporary stubs until tonic/prost versions are aligned
+// The full implementations exist in builder.rs, client.rs, and order.rs
 #[derive(Debug, Clone)]
 pub struct DydxGrpcClient;
 
 impl DydxGrpcClient {
     /// Creates a new dYdX gRPC client.
     ///
+    /// NOTE: This is a stub implementation. The full gRPC client is available in
+    /// `client.rs` but is disabled due to tonic/prost version conflicts.
+    /// The `dydx-proto` crate uses tonic 0.13.x while nautilus uses 0.14.x.
+    ///
     /// # Errors
     ///
-    /// This is a stub that currently never fails. Will return connection errors when implemented.
+    /// This stub currently never fails. The real implementation will return
+    /// connection errors when enabled.
     pub async fn new(endpoint: String) -> anyhow::Result<Self> {
-        tracing::info!("Initialized stub dYdX gRPC client for endpoint: {endpoint}");
+        tracing::warn!(
+            "Using stub dYdX gRPC client for endpoint: {endpoint}. \
+             Enable full client by aligning tonic/prost versions."
+        );
         Ok(Self)
     }
 
@@ -73,30 +80,24 @@ impl DydxGrpcClient {
     ///
     /// # Errors
     ///
-    /// This is a stub that currently never fails. Will return connection errors when implemented.
+    /// This stub currently never fails.
     pub async fn new_with_fallback(endpoints: &[String]) -> anyhow::Result<Self> {
         if endpoints.is_empty() {
             anyhow::bail!("No dYdX gRPC endpoints provided");
         }
 
-        // In stub mode we don't perform real network connections, but we still
-        // honour the fallback configuration and log which node would be used.
         for (idx, url) in endpoints.iter().enumerate() {
             tracing::info!(
-                "Attempting to initialize dYdX gRPC client (attempt {}/{}) with endpoint: {url}",
+                "Stub: Would connect to dYdX gRPC endpoint ({}/{}): {url}",
                 idx + 1,
                 endpoints.len()
             );
 
-            // Treat the first endpoint as successful to mirror the real client's
-            // behaviour where the first reachable node is selected.
             if idx == 0 {
-                tracing::info!("Selected dYdX gRPC endpoint: {url}");
                 return Self::new(url.clone()).await;
             }
         }
 
-        // Fallback (should not be reached with non-empty endpoints).
         Self::new(endpoints[0].clone()).await
     }
 }

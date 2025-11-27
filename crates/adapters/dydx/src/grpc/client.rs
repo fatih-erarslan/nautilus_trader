@@ -18,11 +18,7 @@
 //! This module provides the main gRPC client for interacting with dYdX v4 validator nodes.
 //! It handles transaction signing, broadcasting, and querying account state.
 
-use prost::Message as ProstMessage;
-use tonic::transport::Channel;
-
-use crate::error::DydxError;
-use crate::proto::{
+use dydx_proto::{
     cosmos_sdk_proto::cosmos::{
         auth::v1beta1::{
             BaseAccount, QueryAccountRequest, query_client::QueryClient as AuthClient,
@@ -51,6 +47,10 @@ use crate::proto::{
         },
     },
 };
+use prost::Message as ProstMessage;
+use tonic::transport::Channel;
+
+use crate::error::DydxError;
 
 /// Transaction hash type (internally uses tendermint::Hash).
 pub type TxHash = String;

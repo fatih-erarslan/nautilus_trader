@@ -24,16 +24,15 @@
 //! See [dYdX order types](https://help.dydx.trade/en/articles/166985-short-term-vs-long-term-order-types).
 
 use chrono::{DateTime, Utc};
-use nautilus_model::enums::OrderType;
-use rust_decimal::{Decimal, prelude::ToPrimitive};
-
-use crate::proto::dydxprotocol::{
+use dydx_proto::dydxprotocol::{
     clob::{
         Order, OrderId,
         order::{ConditionType, GoodTilOneof, Side as OrderSide, TimeInForce as OrderTimeInForce},
     },
     subaccounts::SubaccountId,
 };
+use nautilus_model::enums::OrderType;
+use rust_decimal::{Decimal, prelude::ToPrimitive};
 
 /// Maximum short-term order lifetime in blocks.
 ///
