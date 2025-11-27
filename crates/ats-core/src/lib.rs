@@ -24,6 +24,9 @@ pub mod temperature;
 pub mod test_utils;
 pub mod utils;
 pub mod benchmarks;
+pub mod scores;
+pub mod conditional;
+pub mod cqr;
 
 // API Integration Layer
 pub mod api;
@@ -46,6 +49,9 @@ pub use memory_optimized::*;
 pub use performance_bottleneck_analyzer::*;
 pub use performance_analysis_integration::*;
 pub use error::*;
+pub use scores::NonconformityScorer;
+pub use conditional::{MondrianCalibrator, KandinskyCalibrator, LocalizedCalibrator, GroupId};
+pub use cqr::{CqrCalibrator, CqrConfig, AsymmetricCqrCalibrator, AsymmetricCqrConfig};
 #[cfg(not(feature = "minimal-ml"))]
 pub use ruv_fann_integration::*;
 

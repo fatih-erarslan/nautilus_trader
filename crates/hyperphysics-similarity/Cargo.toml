@@ -1,0 +1,46 @@
+[package]
+name = "hyperphysics-similarity"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+description = "Unified similarity search integrating HNSW (Processing) and LSH (Acquisition)"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/hyperphysics/hyperphysics-similarity"
+keywords = ["similarity", "hnsw", "lsh", "trading", "hyperphysics"]
+categories = ["algorithms", "data-structures", "science"]
+
+[dependencies]
+# Internal crates
+hyperphysics-hnsw = { path = "../hyperphysics-hnsw" }
+hyperphysics-lsh = { path = "../hyperphysics-lsh" }
+
+# Error handling
+thiserror = "1.0"
+
+# Observability
+tracing = "0.1"
+
+# Concurrency
+parking_lot = "0.12"
+crossbeam = "0.8"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
+
+[features]
+default = []
+
+# Enable GPU acceleration (future)
+gpu = ["hyperphysics-hnsw/gpu"]
+
+# Enable pBit integration
+pbit = ["hyperphysics-lsh/pbit"]
+
+# Benchmarks - TODO: uncomment when benchmark files are created
+# [[bench]]
+# name = "hybrid_search"
+# harness = false

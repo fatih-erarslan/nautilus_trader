@@ -44,6 +44,10 @@ members = [
     "crates/hyperphysics-nautilus",
     # Neural Trader integration bridge
     "crates/hyperphysics-neural-trader",
+    # Similarity search components
+    "crates/hyperphysics-hnsw",
+    "crates/hyperphysics-lsh",
+    "crates/hyperphysics-similarity",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
@@ -212,3 +216,9 @@ proptest = "1.4"
 ruvector-core = { path = "crates/vendor/ruvector/crates/ruvector-core", default-features = false, features = ["simd"] }
 hnsw_rs = "0.3"
 simsimd = "5.9"
+
+# Serialization (binary)
+bincode = "1.3"
+
+# Concurrent data structures
+crossbeam = "0.8"

@@ -1,0 +1,77 @@
+[package]
+name = "hyperphysics-lsh"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+description = "Zero-allocation LSH for streaming ingestion, MinHash whale detection, and pBit integration"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/hyperphysics/hyperphysics-similarity"
+keywords = ["lsh", "similarity", "streaming", "minhash", "trading"]
+categories = ["algorithms", "data-structures", "science"]
+
+[dependencies]
+# Error handling
+thiserror = "1.0"
+
+# Observability
+tracing = "0.1"
+
+# Concurrency - lock-free structures
+crossbeam = "0.8"
+parking_lot = "0.12"
+
+# Fixed-size containers (zero allocation)
+arrayvec = "0.7"
+tinyvec = { version = "1.6", features = ["alloc"] }
+
+# Bit manipulation for signatures
+bitvec = "1.0"
+
+# SIMD operations - portable across architectures
+simsimd = "5.9"  # Latest version with f32 support
+
+# Hashing
+ahash = "0.8"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
+
+# Memory mapping for persistence
+memmap2 = "0.9"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+rand = "0.8"
+rand_xoshiro = "0.6"
+
+[features]
+default = ["portable-simd"]
+
+# Portable SIMD via simsimd (works on stable Rust, all architectures)
+portable-simd = []
+
+# Nightly-only std::simd support (requires nightly Rust, maximum performance)
+nightly-simd = []
+
+# Architecture-specific features (auto-detected by simsimd)
+avx2 = ["portable-simd"]
+avx512 = ["portable-simd"]
+neon = ["portable-simd"]
+
+# pBit integration (thermodynamic memory)
+pbit = []
+
+# FPGA interface stubs
+fpga = []
+
+# Benchmarks - TODO: uncomment when benchmark files are created
+# [[bench]]
+# name = "hash_latency"
+# harness = false
+#
+# [[bench]]
+# name = "streaming_insert"
+# harness = false

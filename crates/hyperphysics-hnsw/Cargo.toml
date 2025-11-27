@@ -1,0 +1,79 @@
+# hyperphysics-hnsw
+# ==================
+# The PROCESSING layer in our triangular architecture.
+#
+# This crate provides sub-microsecond similarity search using USearch's
+# HNSW implementation with custom hyperbolic distance metrics for
+# HyperPhysics consciousness space.
+#
+# Role in the triangular model:
+# - Constrains ACQUISITION: Only patterns retrievable in <1μs are useful
+# - Constrains EVOLUTION: Processing requirements shape optimization goals
+# - Receives from ACQUISITION: Patterns promoted from streaming LSH
+# - Receives from EVOLUTION: Optimized parameters from thermodynamic tuning
+
+[package]
+name = "hyperphysics-hnsw"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Sub-microsecond HNSW similarity search with hyperbolic metrics for HyperPhysics"
+keywords = ["hnsw", "similarity-search", "hyperbolic", "trading", "hft"]
+categories = ["algorithms", "science"]
+
+[dependencies]
+# Core HNSW implementation - 10x faster than FAISS
+usearch = "2.12"
+
+# SIMD-optimized distance computations
+simsimd = "4.0"
+
+# Lock-free synchronization for concurrent access
+parking_lot.workspace = true
+crossbeam.workspace = true
+
+# Error handling
+thiserror.workspace = true
+
+# Observability
+tracing.workspace = true
+
+# Serialization for persistence
+serde.workspace = true
+bincode.workspace = true
+
+# Memory-mapped files for fast index loading
+memmap2 = "0.9"
+
+# Fast floating-point operations
+num-traits = "0.2"
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true
+rand = "0.8"
+approx = "0.5"
+
+[features]
+default = ["simd"]
+
+# SIMD acceleration levels
+simd = []
+avx2 = ["simd"]
+avx512 = ["simd"]
+neon = ["simd"]
+
+# Future GPU acceleration (CAGRA)
+gpu = []
+rocm = ["gpu"]
+cuda = ["gpu"]
+
+# Benchmarks - TODO: uncomment when benchmark files are created
+# [[bench]]
+# name = "query_latency"
+# harness = false
+#
+# [[bench]]
+# name = "hyperbolic_distance"
+# harness = false

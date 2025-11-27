@@ -754,7 +754,7 @@ dependencies = [
  "itertools 0.13.0",
  "libm",
  "nalgebra 0.34.1",
- "parry2d 0.25.3",
+ "parry2d",
  "parry2d-f64",
  "serde",
  "slab",
@@ -783,7 +783,7 @@ dependencies = [
  "itertools 0.13.0",
  "libm",
  "nalgebra 0.34.1",
- "parry3d 0.25.3",
+ "parry3d",
  "parry3d-f64",
  "serde",
  "slab",
@@ -2210,6 +2210,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bitvec"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1bc2832c24239b0141d5674bb9174f9d68a8b5b3f2753311927c172ca46f7e9c"
+dependencies = [
+ "funty",
+ "radium",
+ "tap",
+ "wyz",
+]
+
+[[package]]
 name = "blake2-rfc"
 version = "0.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3217,6 +3229,7 @@ checksum = "75835f0c7bf681bfd05abe44e965760fea999a5286c6eb2d59883634fd02011a"
 dependencies = [
  "anstyle",
  "clap_lex",
+ "strsim 0.11.1",
 ]
 
 [[package]]
@@ -3287,6 +3300,17 @@ name = "codespan-reporting"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fe6d2e5af09e8c8ad56c969f2157a3d4238cebc7c55f0a517728c38f7b200f81"
+dependencies = [
+ "serde",
+ "termcolor",
+ "unicode-width",
+]
+
+[[package]]
+name = "codespan-reporting"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af491d569909a7e4dee0ad7db7f5341fef5c614d5b8ec8cf765732aba3cff681"
 dependencies = [
  "serde",
  "termcolor",
@@ -4196,6 +4220,68 @@ dependencies = [
  "serde",
  "subtle-ng",
  "zeroize",
+]
+
+[[package]]
+name = "cxx"
+version = "1.0.189"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b788601e7e3e6944d9b37efbae0bee7ee44d9aab533838d4854f631534a1a49"
+dependencies = [
+ "cc",
+ "cxx-build",
+ "cxxbridge-cmd",
+ "cxxbridge-flags",
+ "cxxbridge-macro",
+ "foldhash 0.2.0",
+ "link-cplusplus",
+]
+
+[[package]]
+name = "cxx-build"
+version = "1.0.189"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e11d62eb0de451f6d3aa83f2cec0986af61c23bd7515f1e2d6572c6c9e53c96"
+dependencies = [
+ "cc",
+ "codespan-reporting 0.13.1",
+ "indexmap",
+ "proc-macro2",
+ "quote",
+ "scratch",
+ "syn 2.0.110",
+]
+
+[[package]]
+name = "cxxbridge-cmd"
+version = "1.0.189"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a368ed4a0fd83ebd3f2808613842d942a409c41cc24cd9d83f1696a00d78afe"
+dependencies = [
+ "clap 4.5.51",
+ "codespan-reporting 0.13.1",
+ "indexmap",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.110",
+]
+
+[[package]]
+name = "cxxbridge-flags"
+version = "1.0.189"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9571a7c69f236d7202f517553241496125ed56a86baa1ce346d02aa72357c74"
+
+[[package]]
+name = "cxxbridge-macro"
+version = "1.0.189"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eba2aaae28ca1d721d3f364bb29d51811921e7194c08bb9eaf745c8ab8d81309"
+dependencies = [
+ "indexmap",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.110",
 ]
 
 [[package]]
@@ -5128,6 +5214,12 @@ name = "fst"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ab85b9b05e3978cc9a9cf8fea7f01b494e1a09ed3037e16ba39edc7a29eb61a"
+
+[[package]]
+name = "funty"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
 
 [[package]]
 name = "futures"
@@ -6671,6 +6763,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperphysics-hnsw"
+version = "0.1.0"
+dependencies = [
+ "approx 0.5.1",
+ "bincode 1.3.3",
+ "criterion",
+ "crossbeam",
+ "memmap2",
+ "num-traits",
+ "parking_lot",
+ "proptest",
+ "rand 0.8.5",
+ "serde",
+ "simsimd 4.4.0",
+ "thiserror 1.0.69",
+ "tracing",
+ "usearch",
+]
+
+[[package]]
 name = "hyperphysics-homomorphic"
 version = "0.1.0"
 dependencies = [
@@ -6683,6 +6795,29 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "hyperphysics-lsh"
+version = "0.1.0"
+dependencies = [
+ "ahash",
+ "arrayvec 0.7.6",
+ "bincode 1.3.3",
+ "bitvec",
+ "criterion",
+ "crossbeam",
+ "memmap2",
+ "parking_lot",
+ "proptest",
+ "rand 0.8.5",
+ "rand_xoshiro",
+ "serde",
+ "simsimd 5.9.11",
+ "thiserror 1.0.69",
+ "tinyvec",
+ "tracing",
+ "xxhash-rust",
 ]
 
 [[package]]
@@ -6709,7 +6844,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "simsimd",
+ "simsimd 5.9.11",
  "sntpc",
  "thiserror 1.0.69",
  "tokio",
@@ -6977,6 +7112,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperphysics-similarity"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "crossbeam",
+ "hyperphysics-hnsw",
+ "hyperphysics-lsh",
+ "parking_lot",
+ "serde",
+ "thiserror 1.0.69",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "hyperphysics-syntergic"
 version = "0.1.0"
 dependencies = [
@@ -7015,9 +7165,14 @@ dependencies = [
  "bumpalo",
  "criterion",
  "crossbeam",
+ "cxx",
+ "cxx-build",
+ "jolt-hyperphysics",
+ "mujoco-hyperphysics",
  "nalgebra 0.34.1",
- "parry2d 0.17.6",
- "parry3d 0.17.6",
+ "parry2d",
+ "parry3d",
+ "pyo3",
  "rand 0.8.5",
  "rapier2d",
  "rapier3d",
@@ -7651,6 +7806,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "link-cplusplus"
+version = "1.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f78c730aaa7d0b9336a299029ea49f9ee53b0ed06e9202e8cb7db9bae7b8c82"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "linux-raw-sys"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8039,6 +8203,19 @@ checksum = "0fbdd3d7436f8b5e892b8b7ea114271ff0fa00bc5acae845d53b07d498616ef6"
 dependencies = [
  "num-traits",
  "pxfm",
+]
+
+[[package]]
+name = "mujoco-hyperphysics"
+version = "0.1.0"
+dependencies = [
+ "bindgen 0.69.5",
+ "bitflags 2.10.0",
+ "cc",
+ "cmake",
+ "nalgebra 0.34.1",
+ "shellexpand",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -9271,31 +9448,6 @@ dependencies = [
 
 [[package]]
 name = "parry2d"
-version = "0.17.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87edd53b1639e011e4765eecfceb0fa2c486da696dcdcfbc9a38bfc3574fb7e0"
-dependencies = [
- "approx 0.5.1",
- "arrayvec 0.7.6",
- "bitflags 2.10.0",
- "downcast-rs 1.2.1",
- "either",
- "ena",
- "log",
- "nalgebra 0.33.2",
- "num-derive",
- "num-traits",
- "ordered-float 4.6.0",
- "rustc-hash 2.1.1",
- "simba 0.9.1",
- "slab",
- "smallvec",
- "spade",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "parry2d"
 version = "0.25.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef681740349cec3ab9b5996b03b459b383b6998e1ffcb2804e8b57eb1e8491d9"
@@ -9352,32 +9504,6 @@ dependencies = [
  "smallvec",
  "spade",
  "thiserror 2.0.17",
-]
-
-[[package]]
-name = "parry3d"
-version = "0.17.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aeb9659a05b1783fb2e9bc94f48225ae5b40817eb45b62569c0e4dd767a6e51"
-dependencies = [
- "approx 0.5.1",
- "arrayvec 0.7.6",
- "bitflags 2.10.0",
- "downcast-rs 1.2.1",
- "either",
- "ena",
- "log",
- "nalgebra 0.33.2",
- "num-derive",
- "num-traits",
- "ordered-float 4.6.0",
- "rstar",
- "rustc-hash 2.1.1",
- "simba 0.9.1",
- "slab",
- "smallvec",
- "spade",
- "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -10234,6 +10360,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "radium"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
+
+[[package]]
 name = "radsort"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10380,6 +10512,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rand_xoshiro"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6f97cdb2a36ed4183de61b2f824cc45c9f1037f28afe0a322e9fff4c108b5aaa"
+dependencies = [
+ "rand_core 0.6.4",
+]
+
+[[package]]
 name = "range-alloc"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10428,7 +10569,7 @@ dependencies = [
  "num-traits",
  "oorandom",
  "ordered-float 5.1.0",
- "parry2d 0.25.3",
+ "parry2d",
  "profiling",
  "rayon",
  "rustc-hash 2.1.1",
@@ -10458,7 +10599,7 @@ dependencies = [
  "num-traits",
  "oorandom",
  "ordered-float 5.1.0",
- "parry3d 0.25.3",
+ "parry3d",
  "profiling",
  "rayon",
  "rustc-hash 2.1.1",
@@ -11055,7 +11196,7 @@ dependencies = [
  "rkyv",
  "serde",
  "serde_json",
- "simsimd",
+ "simsimd 5.9.11",
  "tempfile",
  "thiserror 2.0.17",
  "tracing",
@@ -11166,6 +11307,12 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
+
+[[package]]
+name = "scratch"
+version = "1.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d68f2ec51b097e4c1a75b681a8bec621909b5e91f15bb7b840c4f2f7b01148b2"
 
 [[package]]
 name = "sctk-adwaita"
@@ -11376,6 +11523,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "shellexpand"
+version = "3.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b1fdf65dd6331831494dd616b30351c38e96e45921a27745cf98490458b90bb"
+dependencies = [
+ "dirs",
+]
+
+[[package]]
 name = "shlex"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11507,6 +11663,15 @@ dependencies = [
  "num-traits",
  "thiserror 2.0.17",
  "time",
+]
+
+[[package]]
+name = "simsimd"
+version = "4.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efc843bc8f12d9c8e6b734a0fe8918fc497b42f6ae0f347dbfdad5b5138ab9b4"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
@@ -12045,6 +12210,12 @@ dependencies = [
  "serde",
  "slotmap",
 ]
+
+[[package]]
+name = "tap"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "target-lexicon"
@@ -12891,6 +13062,16 @@ dependencies = [
  "idna",
  "percent-encoding",
  "serde",
+]
+
+[[package]]
+name = "usearch"
+version = "2.21.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e98bf7a95537e9393055eaadcfa39ca7a7da0ed032f1d21b769c91bda21ea98"
+dependencies = [
+ "cxx",
+ "cxx-build",
 ]
 
 [[package]]
@@ -14720,6 +14901,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9edde0db4769d2dc68579893f2306b26c6ecfbe0ef499b013d731b7b9247e0b9"
 
 [[package]]
+name = "wyz"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
+dependencies = [
+ "tap",
+]
+
+[[package]]
 name = "x11-dl"
 version = "2.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -14781,6 +14971,12 @@ name = "xml-rs"
 version = "0.8.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ae8337f8a065cfc972643663ea4279e04e7256de865aa66fe25cec5fb912d3f"
+
+[[package]]
+name = "xxhash-rust"
+version = "0.8.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fdd20c5420375476fbd4394763288da7eb0cc0b8c11deed431a91562af7335d3"
 
 [[package]]
 name = "y4m"
