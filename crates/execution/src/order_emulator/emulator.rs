@@ -554,9 +554,9 @@ impl OrderEmulator {
             && order.is_open()
             && !order.is_pending_cancel()
         {
-            // Order not held in the emulator
+            // Order not held in the emulator - route through RiskEngine for trading state checks
             self.manager
-                .send_exec_command(TradingCommand::CancelOrder(command));
+                .send_risk_command(TradingCommand::CancelOrder(command));
         } else {
             self.manager.cancel_order(&order);
         }
@@ -978,8 +978,10 @@ impl OrderEmulator {
             if let Some(exec_algorithm_id) = order.exec_algorithm_id() {
                 self.manager.send_algo_command(command, exec_algorithm_id);
             } else {
+                // Route through RiskEngine for re-validation before execution
+                // This ensures the transformed order passes risk checks at release time
                 self.manager
-                    .send_exec_command(TradingCommand::SubmitOrder(command));
+                    .send_risk_command(TradingCommand::SubmitOrder(command));
             }
         }
     }
@@ -1105,8 +1107,10 @@ impl OrderEmulator {
             if let Some(exec_algorithm_id) = order.exec_algorithm_id() {
                 self.manager.send_algo_command(command, exec_algorithm_id);
             } else {
+                // Route through RiskEngine for re-validation before execution
+                // This ensures the transformed order passes risk checks at release time
                 self.manager
-                    .send_exec_command(TradingCommand::SubmitOrder(command));
+                    .send_risk_command(TradingCommand::SubmitOrder(command));
             }
         }
     }
