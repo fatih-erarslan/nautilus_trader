@@ -2499,6 +2499,7 @@ fn test_submit_order_when_trading_halted_then_denies_order(
     instrument_eth_usdt: InstrumentAny,
     venue_order_id: VenueOrderId,
     process_order_event_handler: ShareableMessageHandler,
+    cash_account_state_million_usd: AccountState,
     mut simple_cache: Cache,
 ) {
     msgbus::register(
@@ -2508,6 +2509,11 @@ fn test_submit_order_when_trading_halted_then_denies_order(
 
     simple_cache
         .add_instrument(instrument_eth_usdt.clone())
+        .unwrap();
+
+    // Add account so risk checks can proceed to trading state check
+    simple_cache
+        .add_account(AccountAny::Cash(cash_account(cash_account_state_million_usd)))
         .unwrap();
 
     let mut risk_engine =
@@ -3360,7 +3366,11 @@ fn test_submit_order_when_market_order_and_over_free_balance_then_denies_with_be
     risk_engine.execute(TradingCommand::SubmitOrder(submit_order));
     let saved_process_messages =
         get_process_order_event_handler_messages(process_order_event_handler);
-    assert_eq!(saved_process_messages.len(), 0); // Currently, it executes because check_orders_risk returns true for margin_account
+    // With proper margin account risk checks implemented, the order should now be denied
+    // because it exceeds free balance (100000 AUD/USD notional vs available margin)
+    assert_eq!(saved_process_messages.len(), 1);
+    let first_message = saved_process_messages.first().unwrap();
+    assert_eq!(first_message.event_type(), OrderEventType::Denied);
 }
 
 #[rstest]

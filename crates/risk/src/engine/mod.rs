@@ -616,22 +616,70 @@ impl RiskEngine {
         }
 
         // Get account for risk checks
-        let account_exists = {
+        let account = {
             let cache = self.cache.borrow();
-            cache.account_for_venue(&instrument.id().venue).cloned()
+            // First try to get venue-specific account
+            if let Some(account) = cache.account_for_venue(&instrument.id().venue) {
+                account.clone()
+            } else {
+                // Fallback to first available account for multi-venue routing
+                if let Some(account) = cache.account_first() {
+                    log::debug!(
+                        "No account for venue {}, using fallback account {}",
+                        instrument.id().venue,
+                        account.id()
+                    );
+                    account.clone()
+                } else {
+                    log::error!(
+                        "Cannot perform risk check: no accounts available for venue {} or fallback",
+                        instrument.id().venue
+                    );
+                    return false; // DENY order when no account available
+                }
+            }
         };
 
-        let account = if let Some(account) = account_exists {
-            account
-        } else {
-            log::debug!("Cannot find account for venue {}", instrument.id().venue);
-            return true; // TODO: Temporary early return until handling routing/multiple venues
+        // Get free balance based on account type
+        let (free, is_margin_account) = match &account {
+            AccountAny::Cash(cash_account) => {
+                (cash_account.balance_free(Some(instrument.quote_currency())), false)
+            }
+            AccountAny::Margin(margin_account) => {
+                // For margin accounts, use balance_free from base account
+                // This represents the available margin for trading
+                (margin_account.balance_free(Some(instrument.quote_currency())), true)
+            }
         };
-        let cash_account = match account {
-            AccountAny::Cash(cash_account) => cash_account,
-            AccountAny::Margin(_) => return true, // TODO: Determine risk controls for margin
+
+        // For margin accounts, we also need to check leverage limits
+        if is_margin_account {
+            if let AccountAny::Margin(margin_account) = &account {
+                let leverage = margin_account.get_leverage(&instrument.id());
+                if self.config.debug {
+                    log::debug!(
+                        "Margin account leverage for {}: {}",
+                        instrument.id(),
+                        leverage
+                    );
+                }
+                // Check if leverage is within acceptable bounds (non-zero)
+                if leverage <= Decimal::ZERO {
+                    log::error!(
+                        "Invalid leverage {} for instrument {}",
+                        leverage,
+                        instrument.id()
+                    );
+                    return false; // DENY order with invalid leverage
+                }
+            }
+        }
+
+        // Extract cash_account for balance impact calculations (if cash account)
+        let cash_account = match &account {
+            AccountAny::Cash(ca) => Some(ca.clone()),
+            AccountAny::Margin(_) => None,
         };
-        let free = cash_account.balance_free(Some(instrument.quote_currency()));
         if self.config.debug {
             log::debug!("Free cash: {free:?}");
         }
@@ -939,7 +987,13 @@ impl RiskEngine {
                     return false; // Denied
                 }
             } else if order.is_sell() {
-                if cash_account.base_currency.is_some() {
+                // Check if we have a cash account with base_currency for sell-side checks
+                let has_base_currency = cash_account
+                    .as_ref()
+                    .map(|ca| ca.base_currency.is_some())
+                    .unwrap_or(false);
+
+                if has_base_currency {
                     if order.is_reduce_only() {
                         if self.config.debug {
                             log::debug!(
@@ -970,7 +1024,7 @@ impl RiskEngine {
                         }
                     }
                 }
-                // Account is already of type Cash, so no check
+                // For margin accounts or cash accounts without base_currency, check base currency balance
                 else if let Some(base_currency) = base_currency {
                     if order.is_reduce_only() {
                         if self.config.debug {
@@ -992,15 +1046,17 @@ impl RiskEngine {
 
                     if self.config.debug {
                         log::debug!("Cash value: {cash_value:?}");
-                        log::debug!(
-                            "Total: {:?}",
-                            cash_account.balance_total(Some(base_currency))
-                        );
-                        log::debug!(
-                            "Locked: {:?}",
-                            cash_account.balance_locked(Some(base_currency))
-                        );
-                        log::debug!("Free: {:?}", cash_account.balance_free(Some(base_currency)));
+                        if let Some(ref ca) = cash_account {
+                            log::debug!(
+                                "Total: {:?}",
+                                ca.balance_total(Some(base_currency))
+                            );
+                            log::debug!(
+                                "Locked: {:?}",
+                                ca.balance_locked(Some(base_currency))
+                            );
+                            log::debug!("Free: {:?}", ca.balance_free(Some(base_currency)));
+                        }
                     }
 
                     match cum_notional_sell {

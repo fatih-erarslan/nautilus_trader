@@ -3341,6 +3341,19 @@ impl Cache {
             .collect()
     }
 
+    /// Returns references to all accounts in the cache.
+    #[must_use]
+    pub fn accounts_all(&self) -> Vec<&AccountAny> {
+        self.accounts.values().collect()
+    }
+
+    /// Returns the first account in the cache (if any).
+    /// Useful as a fallback when a venue-specific account is not found.
+    #[must_use]
+    pub fn account_first(&self) -> Option<&AccountAny> {
+        self.accounts.values().next()
+    }
+
     /// Updates the own order book with an order.
     ///
     /// This method adds, updates, or removes an order from the own order book
