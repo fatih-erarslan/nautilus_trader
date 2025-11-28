@@ -53,6 +53,13 @@ pyo3 = { version = "0.22", features = ["auto-initialize"], optional = true }
 avian3d = { path = "../../vendor/physics/avian/crates/avian3d", optional = true }
 avian2d = { path = "../../vendor/physics/avian/crates/avian2d", optional = true }
 
+# Bevy ECS (for Avian integration)
+bevy_ecs = { version = "0.15", optional = true }
+bevy_app = { version = "0.15", optional = true }
+bevy_time = { version = "0.15", optional = true }
+bevy_transform = { version = "0.15", optional = true }
+bevy_math = { version = "0.15", optional = true }
+
 # Memory management
 bumpalo = { version = "3.16", features = ["collections"] }
 typed-arena = "2.0"
