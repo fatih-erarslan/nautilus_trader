@@ -17,7 +17,19 @@ path = "src/lib.rs"
 default = ["simd"]
 simd = []                    # Portable SIMD for fast-path operations
 gpu = ["wgpu", "bytemuck"]   # GPU acceleration for slow-path Monte Carlo
-full = ["simd", "gpu"]       # All features
+similarity = ["hyperphysics-similarity", "hyperphysics-lsh"] # HNSW + MinHash pattern detection
+ml = ["hyperphysics-ml"]     # ML forecasting models (N-HiTS, DeepAR)
+active-inference = ["active-inference-agent"] # Free Energy Principle for conscious decisions
+
+# CWTS - Complex Weighted Trading System integrations
+cwts-autopoiesis = ["autopoiesis"] # Self-organizing systems, boundary maintenance, emergence
+cwts-game-theory = ["game-theory-engine"] # Nash equilibrium, multi-agent coordination
+cwts-physics = ["rapier-hyperphysics"] # Market-physics bridge, simulation
+cwts-nautilus = ["hyperphysics-nautilus"] # NautilusTrader execution bridge, backtest
+cwts-neural = ["hyperphysics-neural-trader"] # Neural forecasting, ensemble prediction
+cwts-full = ["cwts-autopoiesis", "cwts-game-theory", "cwts-physics", "cwts-nautilus", "cwts-neural"]
+
+full = ["simd", "gpu", "similarity", "ml", "active-inference", "cwts-full"] # All features
 
 [dependencies]
 # Core mathematical libraries
@@ -54,9 +66,39 @@ rand = "0.8"
 rand_chacha = "0.3"
 rand_distr = "0.4"
 
+# Cryptographic hashing (for BFT consensus signatures)
+sha2 = "0.10"
+
 # Optional GPU support
 wgpu = { version = "0.20", optional = true }
 bytemuck = { version = "1.14", features = ["derive"], optional = true }
+
+# Optional similarity search (HNSW + LSH for pattern detection)
+hyperphysics-similarity = { path = "../hyperphysics-similarity", optional = true }
+hyperphysics-lsh = { path = "../hyperphysics-lsh", optional = true }
+
+# Optional ML forecasting (N-HiTS, DeepAR)
+hyperphysics-ml = { path = "../hyperphysics-ml", optional = true, default-features = false, features = ["cpu", "std"] }
+
+# Optional Active Inference (Free Energy Principle)
+# Note: We disable default features to avoid pulling in hyperphysics-unified via reasoning-backends
+active-inference-agent = { path = "../active-inference-agent", optional = true, default-features = false }
+
+# CWTS - Complex Weighted Trading System dependencies
+# Autopoiesis: self-organizing systems with boundary maintenance
+autopoiesis = { path = "../autopoiesis/autopoiesis", optional = true, default-features = false, features = ["engines", "finance"] }
+
+# Game Theory: Nash equilibrium, multi-agent coordination, Machiavellian tactics
+game-theory-engine = { path = "../game-theory-engine", optional = true, default-features = false }
+
+# Physics Bridge: Market-physics simulation via Rapier
+rapier-hyperphysics = { path = "../physics-engines/rapier-hyperphysics", optional = true }
+
+# Nautilus Integration: Execution bridge, backtesting
+hyperphysics-nautilus = { path = "../hyperphysics-nautilus", optional = true, default-features = false }
+
+# Neural Trader: Ensemble forecasting, uncertainty quantification
+hyperphysics-neural-trader = { path = "../hyperphysics-neural-trader", optional = true, default-features = false }
 
 [dev-dependencies]
 criterion = "0.5"

@@ -98,6 +98,17 @@ pub mod medium_path;
 pub mod slow_path;
 pub mod simd;
 
+// CWTS - Complex Weighted Trading System integrations
+#[cfg(any(
+    feature = "cwts-autopoiesis",
+    feature = "cwts-game-theory",
+    feature = "cwts-physics",
+    feature = "cwts-nautilus",
+    feature = "cwts-neural",
+    feature = "cwts-full"
+))]
+pub mod cwts;
+
 // Re-export primary types
 pub use crate::core::{
     EngineConfig, HyperRiskEngine, RiskDecision, RiskLevel,
@@ -130,6 +141,60 @@ pub use crate::evt::{
 pub use crate::position_sizing::{
     KellyCriterion, FractionalKelly, RiskTolerance,
     PPOPositionSizer, PositionSizeResult,
+};
+
+// CWTS - Complex Weighted Trading System re-exports
+#[cfg(any(
+    feature = "cwts-autopoiesis",
+    feature = "cwts-game-theory",
+    feature = "cwts-physics",
+    feature = "cwts-nautilus",
+    feature = "cwts-neural",
+    feature = "cwts-full"
+))]
+pub use crate::cwts::{
+    CWTSCoordinator, CWTSConfig, CWTSDecision, IntegratedRiskMetrics,
+    SubsystemRisk, SubsystemId,
+};
+
+#[cfg(feature = "cwts-autopoiesis")]
+pub use crate::cwts::{
+    AutopoiesisRiskAdapter, BoundaryState, EmergenceAlert, SystemHealth,
+};
+
+#[cfg(feature = "cwts-game-theory")]
+pub use crate::cwts::{
+    GameTheoryRiskAdapter, NashAnalysis, StrategicPosition, MultiAgentRisk,
+};
+
+#[cfg(feature = "cwts-physics")]
+pub use crate::cwts::{
+    PhysicsRiskAdapter, MarketPhysicsState, OrderFlowDynamics, SimulationSignal,
+};
+
+#[cfg(feature = "cwts-nautilus")]
+pub use crate::cwts::{
+    NautilusRiskAdapter, ExecutionRisk, BacktestRiskMetrics, LiveTradingGuard,
+};
+
+#[cfg(feature = "cwts-neural")]
+pub use crate::cwts::{
+    NeuralRiskAdapter, EnsembleForecast, ConfidenceBounds, ModelDisagreement,
+};
+
+// BFT consensus re-exports (always available when CWTS is enabled)
+#[cfg(any(
+    feature = "cwts-autopoiesis",
+    feature = "cwts-game-theory",
+    feature = "cwts-physics",
+    feature = "cwts-nautilus",
+    feature = "cwts-neural",
+    feature = "cwts-full"
+))]
+pub use crate::cwts::{
+    BftConsensusEngine, BftConsensusConfig, BftConsensusResult,
+    BftRiskMessage, ConsensusPhase, ConsensusProof, ConsensusRound,
+    RiskProposal, ProposalContext, SubsystemVote, ViewChangeReason,
 };
 
 // ============================================================================

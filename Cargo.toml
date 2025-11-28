@@ -58,6 +58,8 @@ exclude = [
     "crates/game-theory-engine",
     "crates/bio-inspired-workspace",
     "crates/ats-core",
+    # Autopoiesis has its own workspace - exclude to avoid conflict
+    "crates/autopoiesis",
 ]
 resolver = "2"
 

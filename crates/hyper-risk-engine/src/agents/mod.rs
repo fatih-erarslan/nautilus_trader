@@ -33,6 +33,8 @@ pub mod reconciliation;
 pub mod nav_calculation;
 pub mod quant_researcher;
 pub mod macro_researcher;
+pub mod conscious_risk;
+pub mod byzantine_coordinator;
 
 pub use base::{Agent, AgentId, AgentStatus, AgentConfig};
 pub use portfolio_manager::PortfolioManagerAgent;
@@ -42,8 +44,25 @@ pub use market_maker::{MarketMakerAgent, MarketMakerConfig, Quote, InventoryStat
 pub use execution::ExecutionAgent;
 pub use arbitrage::{ArbitrageAgent, ArbitrageConfig, ArbitrageOpportunity, VenueQuote};
 pub use anomaly_detection::{AnomalyDetectionAgent, AnomalyDetectionConfig, Anomaly, AnomalyType};
+
+// Conditional exports for similarity-based anomaly detection
+#[cfg(feature = "similarity")]
+pub use anomaly_detection::{MarketPattern, WhalePattern};
 pub use asset_allocation::{AssetAllocationAgent, AssetAllocationConfig, AssetTarget, AllocationAction, AllocationRecommendation, AssetStats};
+
+// Conditional exports for ML-enhanced asset allocation
+#[cfg(feature = "ml")]
+pub use asset_allocation::{MLForecast, PriceHistory};
 pub use reconciliation::{ReconciliationAgent, ReconciliationConfig, ReconciliationResult, Discrepancy, DiscrepancyType, ExternalPosition, ExternalCashBalance};
 pub use nav_calculation::{NAVCalculationAgent, NAVCalculationConfig, NAVResult, NAVComponent, PositionValuation};
 pub use quant_researcher::{QuantResearcherAgent, QuantResearcherConfig, StrategyMetrics, FactorExposure, ResearchFinding, FindingType};
 pub use macro_researcher::{MacroResearcherAgent, MacroResearcherConfig, EconomicIndicator, Trend, MacroRegime, MacroInsight, InsightCategory, PortfolioAdjustment};
+pub use conscious_risk::{ConsciousRiskAgent, ConsciousRiskConfig, RiskAction, RiskExperience, MarketObservation};
+pub use byzantine_coordinator::{
+    ByzantineCoordinator, ByzantineConfig, ConsensusMessage, ConsensusResult,
+    RiskProposal, MessageType, ConsensusPhase, AgentTrust,
+};
+
+// Conditional exports for active-inference conscious risk processing
+#[cfg(feature = "active-inference")]
+pub use conscious_risk::RiskAction as ConsciousRiskAction;

@@ -33,7 +33,8 @@ hyperphysics-syntergic = { path = "../hyperphysics-syntergic" }
 # Optimization and reasoning
 hyperphysics-optimization = { path = "../hyperphysics-optimization" }
 hyperphysics-reasoning-router = { path = "../hyperphysics-reasoning-router" }
-hyperphysics-reasoning-backends = { path = "../hyperphysics-reasoning-backends" }
+# Note: Disable default features to avoid pulling in hyperphysics-unified (physics feature)
+hyperphysics-reasoning-backends = { path = "../hyperphysics-reasoning-backends", default-features = false, features = ["optimization", "statistical"] }
 
 # Neural and GPU (optional)
 hyperphysics-neural = { path = "../hyperphysics-neural", optional = true }

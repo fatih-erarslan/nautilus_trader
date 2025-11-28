@@ -38,6 +38,7 @@ pub mod compliance;
 pub mod data_feed;
 pub mod system_health;
 pub mod strategy_kill_switch;
+pub mod complex_systems;
 
 pub use base::{Sentinel, SentinelId, SentinelStatus, SentinelConfig, SentinelStats};
 pub use kill_switch::GlobalKillSwitch;
@@ -71,3 +72,6 @@ pub use compliance::{
 pub use data_feed::{DataFeedSentinel, DataFeedConfig, FeedStatus};
 pub use system_health::{SystemHealthSentinel, SystemHealthConfig, HealthMetrics, HealthLevel};
 pub use strategy_kill_switch::{StrategyKillSwitchSentinel, StrategyKillSwitchConfig, KillReason, KillEvent, StrategyPerformance};
+pub use complex_systems::{
+    ComplexSystemsSentinel, ComplexSystemsConfig, SOCRegime, SOCMetrics, BlackSwanEvent,
+};

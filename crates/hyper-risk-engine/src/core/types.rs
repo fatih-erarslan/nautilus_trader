@@ -394,6 +394,46 @@ impl Portfolio {
     pub fn get_position_value(&self, symbol: &Symbol) -> Option<f64> {
         self.get_position(symbol).map(|p| p.market_value())
     }
+
+    /// Get total portfolio value.
+    #[inline]
+    pub fn total_value(&self) -> f64 {
+        self.total_value
+    }
+
+    /// Estimate portfolio volatility (simplified using position weights).
+    ///
+    /// In production, this would use historical returns and correlation matrix.
+    /// For now, returns a reasonable estimate based on position concentration.
+    #[inline]
+    pub fn volatility_estimate(&self) -> f64 {
+        if self.total_value <= 0.0 || self.positions.is_empty() {
+            return 0.0;
+        }
+
+        // Simplified: use Herfindahl index of position weights as proxy
+        // Higher concentration = higher volatility estimate
+        let mut hhi = 0.0;
+        for pos in &self.positions {
+            let weight = pos.market_value().abs() / self.total_value;
+            hhi += weight * weight;
+        }
+
+        // Scale HHI to volatility range [0.1, 0.5]
+        // HHI of 1 (single position) -> 0.5 vol
+        // HHI of 1/n (equal weights) -> 0.1 vol
+        0.1 + 0.4 * hhi.sqrt()
+    }
+
+    /// Get current drawdown as decimal (0.0 to 1.0).
+    #[inline]
+    pub fn current_drawdown(&self) -> f64 {
+        if self.peak_value > 0.0 {
+            (self.peak_value - self.total_value) / self.peak_value
+        } else {
+            0.0
+        }
+    }
 }
 
 // ============================================================================

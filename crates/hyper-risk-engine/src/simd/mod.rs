@@ -12,12 +12,32 @@ pub mod matrix_ops;
 pub mod risk_ops {
     //! Scalar fallback implementations for risk operations
 
+    /// Calculate historical Value at Risk using quantile method.
     pub fn simd_var_historical(returns: &[f64], confidence: f64) -> f64 {
-        crate::var::var_historical(returns, confidence)
+        if returns.is_empty() {
+            return 0.0;
+        }
+        let mut sorted = returns.to_vec();
+        sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+        let index = ((1.0 - confidence) * returns.len() as f64).floor() as usize;
+        let index = index.min(returns.len() - 1);
+        -sorted[index]
     }
 
+    /// Calculate historical Conditional Value at Risk (Expected Shortfall).
     pub fn simd_cvar_historical(returns: &[f64], confidence: f64) -> f64 {
-        crate::cvar::cvar_historical(returns, confidence)
+        if returns.is_empty() {
+            return 0.0;
+        }
+        let var = simd_var_historical(returns, confidence);
+        let tail_returns: Vec<f64> = returns.iter()
+            .filter(|&&r| -r >= var)
+            .copied()
+            .collect();
+        if tail_returns.is_empty() {
+            return var;
+        }
+        -tail_returns.iter().sum::<f64>() / tail_returns.len() as f64
     }
 
     pub fn simd_portfolio_variance(weights: &[f64], covariance: &[f64]) -> f64 {
@@ -145,7 +165,8 @@ pub mod matrix_ops {
 
                 if j == i {
                     for k in 0..j {
-                        sum += l[j * n + k].powi(2);
+                        let val: f64 = l[j * n + k];
+                        sum += val.powi(2);
                     }
                     let diag = matrix[j * n + j] - sum;
                     if diag <= 0.0 {

@@ -121,3 +121,16 @@ pub use hnsw::{
     SearchResult,
     HNSWStats,
 };
+
+// Lock-free order book for HFT (ultra-low latency)
+pub use data::lockfree_orderbook::{
+    LockFreeOrderBook,
+    LockFreeSkipList,
+    PriceLevel as LockFreePriceLevel,
+    Order as LockFreeOrder,
+    OrderSide as LockFreeOrderSide,
+    OrderStatus,
+    AtomicOrderStatus,
+    OrderBookStats,
+    MarketDepth,
+};
