@@ -17,8 +17,12 @@ pub mod base;
 pub mod portfolio_manager;
 pub mod alpha_generator;
 pub mod regime_detection;
+pub mod market_maker;
+pub mod execution;
 
 pub use base::{Agent, AgentId, AgentStatus, AgentConfig};
 pub use portfolio_manager::PortfolioManagerAgent;
 pub use alpha_generator::AlphaGeneratorAgent;
 pub use regime_detection::RegimeDetectionAgent;
+pub use market_maker::{MarketMakerAgent, MarketMakerConfig, Quote, InventoryState, ToxicityScore};
+pub use execution::ExecutionAgent;

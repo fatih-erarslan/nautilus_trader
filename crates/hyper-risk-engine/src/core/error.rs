@@ -263,6 +263,10 @@ pub enum RiskError {
     #[error("Stress test failed: {0}")]
     StressTestFailed(String),
 
+    /// Stress test breach (scenario exceeds loss threshold).
+    #[error("Stress test breach: {0}")]
+    StressTestBreach(String),
+
     /// FRTB calculation failed.
     #[error("FRTB calculation failed: {0}")]
     FRTBCalculationFailed(String),

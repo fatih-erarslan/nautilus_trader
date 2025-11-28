@@ -13,6 +13,11 @@
 //! | CircuitBreakerSentinel | <10μs | Volatility/loss triggers |
 //! | VaRSentinel | <20μs | Real-time VaR monitoring |
 //! | WhaleSentinel | <15μs | Large flow detection |
+//! | GreeksSentinel | <25μs | Portfolio Greeks monitoring |
+//! | CounterpartySentinel | <20μs | Counterparty credit risk (Basel III) |
+//! | TradeSurveillanceSentinel | <50μs | Market manipulation detection |
+//! | ChiefRiskOfficerSentinel | <50μs | Firm-wide risk orchestration |
+//! | RegulatoryComplianceSentinel | <100μs | MiFID II, Dodd-Frank, CFTC compliance |
 
 pub mod base;
 pub mod kill_switch;
@@ -21,6 +26,12 @@ pub mod drawdown;
 pub mod circuit_breaker;
 pub mod var_sentinel;
 pub mod whale;
+pub mod greeks;
+pub mod counterparty;
+pub mod surveillance;
+pub mod cro;
+pub mod stress_test;
+pub mod compliance;
 
 pub use base::{Sentinel, SentinelId, SentinelStatus, SentinelConfig};
 pub use kill_switch::GlobalKillSwitch;
@@ -29,3 +40,25 @@ pub use drawdown::DrawdownSentinel;
 pub use circuit_breaker::CircuitBreakerSentinel;
 pub use var_sentinel::VaRSentinel;
 pub use whale::WhaleSentinel;
+pub use greeks::GreeksSentinel;
+pub use counterparty::{
+    CounterpartySentinel, CounterpartyConfig, CounterpartyExposure,
+    NettingSet, Trade, AssetClass, AddOnFactors, MaturityBuckets,
+    ExposureAlert, AlertSeverity, ExposureType,
+};
+pub use surveillance::{
+    TradeSurveillanceSentinel, SurveillanceConfig, ManipulationType,
+    SurveillanceAlert, OrderFlowStats,
+};
+pub use cro::{
+    ChiefRiskOfficerSentinel, CROConfig, AggregateRiskMetrics, LiquidityCrisis,
+    CounterpartyReport, VetoDecision, HaltReason, PositionReductionMandate,
+};
+pub use stress_test::{
+    StressTestSentinel, StressConfig, Scenario, StressResult, Factor,
+};
+pub use compliance::{
+    RegulatoryComplianceSentinel, ComplianceConfig, ComplianceCheckType,
+    ComplianceViolation, ViolationSeverity, RegulatoryReport, ReportType,
+    ShortSaleStatus, PositionLimitConfig,
+};

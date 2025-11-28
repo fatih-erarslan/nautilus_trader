@@ -96,11 +96,13 @@ pub mod position_sizing;
 pub mod fast_path;
 pub mod medium_path;
 pub mod slow_path;
+pub mod simd;
 
 // Re-export primary types
 pub use crate::core::{
     EngineConfig, HyperRiskEngine, RiskDecision, RiskLevel,
     Timestamp, Price, Quantity, Symbol, PositionId,
+    Order, OrderSide, Portfolio, Position, MarketRegime,
 };
 
 pub use crate::core::error::{RiskError, Result};
@@ -109,11 +111,15 @@ pub use crate::sentinels::{
     Sentinel, SentinelStatus, SentinelId,
     GlobalKillSwitch, PositionLimitSentinel, DrawdownSentinel,
     CircuitBreakerSentinel, VaRSentinel, WhaleSentinel,
+    TradeSurveillanceSentinel, SurveillanceConfig, ManipulationType,
+    SurveillanceAlert, OrderFlowStats, StressTestSentinel, StressConfig,
+    Scenario, StressResult, Factor,
 };
 
 pub use crate::agents::{
     Agent, AgentId, AgentStatus,
     PortfolioManagerAgent, AlphaGeneratorAgent, RegimeDetectionAgent,
+    MarketMakerAgent, MarketMakerConfig, Quote, InventoryState, ToxicityScore,
 };
 
 pub use crate::evt::{
