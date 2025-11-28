@@ -15,8 +15,8 @@ use crate::core::types::{
     MarketRegime, Order, Portfolio, RiskDecision, RiskLevel, Timestamp,
 };
 use crate::sentinels::{Sentinel, SentinelId, SentinelStatus};
-use crate::agents::{Agent, AgentId, AgentStatus};
-use crate::{FAST_PATH_LATENCY_NS, PRE_TRADE_CHECK_LATENCY_NS};
+use crate::agents::{Agent, AgentId};
+use crate::PRE_TRADE_CHECK_LATENCY_NS;
 
 /// Engine configuration.
 #[derive(Debug, Clone)]
@@ -378,12 +378,12 @@ impl HyperRiskEngine {
     }
 
     /// Get portfolio reference.
-    pub fn portfolio(&self) -> parking_lot::RwLockReadGuard<Portfolio> {
+    pub fn portfolio(&self) -> parking_lot::RwLockReadGuard<'_, Portfolio> {
         self.portfolio.read()
     }
 
     /// Get mutable portfolio reference.
-    pub fn portfolio_mut(&self) -> parking_lot::RwLockWriteGuard<Portfolio> {
+    pub fn portfolio_mut(&self) -> parking_lot::RwLockWriteGuard<'_, Portfolio> {
         self.portfolio.write()
     }
 

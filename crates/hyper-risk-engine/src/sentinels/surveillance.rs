@@ -510,6 +510,7 @@ impl TradeSurveillanceSentinel {
     }
 
     /// Check if window needs rotation.
+    #[allow(dead_code)]
     #[inline]
     fn should_rotate_window(&self, window_secs: u64) -> bool {
         let window_start = self.window_start_ns.load(Ordering::Relaxed);

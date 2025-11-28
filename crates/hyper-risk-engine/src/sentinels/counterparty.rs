@@ -53,7 +53,7 @@ use std::sync::RwLock;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::{Result, RiskError};
-use crate::core::types::{Order, Portfolio, Symbol, Timestamp};
+use crate::core::types::{Order, Portfolio, Timestamp};
 use crate::sentinels::base::{Sentinel, SentinelId, SentinelStats, SentinelStatus};
 
 // ============================================================================
@@ -730,6 +730,7 @@ impl Sentinel for CounterpartySentinel {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::types::Symbol;
 
     #[test]
     fn test_basel_addon_factors() {

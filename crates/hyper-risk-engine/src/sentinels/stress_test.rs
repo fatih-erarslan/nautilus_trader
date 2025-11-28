@@ -30,12 +30,12 @@
 //! - Glasserman et al. (2015): "Stress Testing Banks"
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::{Result, RiskError};
-use crate::core::types::{Order, Portfolio, Symbol};
+use crate::core::types::{Order, Portfolio};
 use crate::sentinels::base::{Sentinel, SentinelId, SentinelStatus, SentinelStats};
 
 // ============================================================================
@@ -668,7 +668,7 @@ impl Sentinel for StressTestSentinel {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::types::{Position, Price, Quantity, Timestamp, PositionId};
+    use crate::core::types::{Position, Price, Quantity, Symbol, Timestamp, PositionId};
 
     fn create_test_portfolio() -> Portfolio {
         let mut portfolio = Portfolio::new(1_000_000.0);

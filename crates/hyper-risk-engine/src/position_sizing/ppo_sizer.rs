@@ -224,7 +224,7 @@ impl PPOPositionSizer {
         // PPO update (simplified - gradient descent on clipped objective)
         let lr = self.config.learning_rate;
 
-        for (i, (state, action, advantage)) in states.iter().zip(actions.iter()).zip(advantages.iter()).map(|((s, a), adv)| (s, a, adv)).enumerate() {
+        for (i, (state, _action, advantage)) in states.iter().zip(actions.iter()).zip(advantages.iter()).map(|((s, a), adv)| (s, a, adv)).enumerate() {
             let features = self.normalize(&state.to_vec());
 
             // Policy gradient

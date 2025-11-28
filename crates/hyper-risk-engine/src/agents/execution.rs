@@ -23,7 +23,7 @@ use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 
 use crate::core::types::{
-    MarketRegime, Portfolio, RiskDecision, RiskLevel, Symbol, Timestamp,
+    MarketRegime, Portfolio, RiskDecision, Symbol, Timestamp,
     Price, Quantity, OrderSide,
 };
 use crate::core::error::Result;
@@ -504,8 +504,8 @@ impl ExecutionAgent {
     fn generate_is_children(
         &self,
         parent: &ParentOrder,
-        volatility: f64,
-        adv: f64,
+        _volatility: f64,
+        _adv: f64,
     ) -> Vec<ChildOrder> {
         // Almgren-Chriss optimal trajectory: exponential decay
         // Trading rate: dQ/dt = Q₀ * κ * exp(-κt)
@@ -638,7 +638,7 @@ impl Agent for ExecutionAgent {
         Self::status_from_u8(self.status.load(Ordering::Relaxed))
     }
 
-    fn process(&self, portfolio: &Portfolio, regime: MarketRegime) -> Result<Option<RiskDecision>> {
+    fn process(&self, _portfolio: &Portfolio, regime: MarketRegime) -> Result<Option<RiskDecision>> {
         let start = Instant::now();
         self.status.store(AgentStatus::Processing as u8, Ordering::Relaxed);
 

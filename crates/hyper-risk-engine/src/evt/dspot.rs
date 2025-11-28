@@ -222,7 +222,7 @@ mod tests {
 
         // Process normal values
         for i in 0..100 {
-            let (event, stats) = detector.process(i as f64 / 10.0);
+            let (_event, _stats) = detector.process(i as f64 / 10.0);
             // Should calibrate after initial batch
             if i >= 50 {
                 assert!(detector.is_calibrated());
@@ -251,7 +251,7 @@ mod tests {
 
         // Drift period (sudden shift in mean)
         for _ in 0..50 {
-            let (_, stats) = detector.process(10.0);
+            let (_, _stats) = detector.process(10.0);
             // Should detect drift after enough observations
         }
 

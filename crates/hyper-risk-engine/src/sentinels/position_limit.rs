@@ -8,7 +8,7 @@ use std::sync::atomic::{AtomicU8, Ordering};
 use dashmap::DashMap;
 
 use crate::core::error::{Result, RiskError};
-use crate::core::types::{Order, Portfolio, Price, Symbol};
+use crate::core::types::{Order, Portfolio, Symbol};
 use crate::sentinels::base::{Sentinel, SentinelId, SentinelStats, SentinelStatus};
 
 /// Position limit configuration.
@@ -248,7 +248,7 @@ impl Sentinel for PositionLimitSentinel {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::types::{OrderSide, Quantity, Timestamp};
+    use crate::core::types::{OrderSide, Price, Quantity, Timestamp};
 
     fn test_order(symbol: &str, quantity: f64, price: f64) -> Order {
         Order {

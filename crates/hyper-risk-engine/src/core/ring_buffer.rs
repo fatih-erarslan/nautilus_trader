@@ -20,7 +20,7 @@ use std::cell::UnsafeCell;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::core::Timestamp;
-use crate::{CACHE_LINE_SIZE, RING_BUFFER_SIZE};
+use crate::RING_BUFFER_SIZE;
 
 /// Configuration for ring buffer.
 #[derive(Debug, Clone)]
@@ -75,26 +75,38 @@ pub enum RiskEventType {
 pub enum EventPayload {
     /// Price update payload.
     Price {
+        /// Hash of the symbol for fast lookup.
         symbol_hash: u64,
+        /// Price value.
         price: f64,
+        /// Volume value.
         volume: f64,
     },
     /// Order payload.
     Order {
+        /// Hash of the symbol for fast lookup.
         symbol_hash: u64,
-        side: u8, // 0 = buy, 1 = sell
+        /// Order side: 0 = buy, 1 = sell.
+        side: u8,
+        /// Order quantity.
         quantity: f64,
+        /// Order price.
         price: f64,
     },
     /// Risk check result.
     RiskCheck {
+        /// Whether the order is allowed.
         allowed: bool,
+        /// Risk level (0-255).
         risk_level: u8,
+        /// Latency in nanoseconds.
         latency_ns: u64,
     },
     /// Alert payload.
     Alert {
+        /// Alert severity (0-255).
         severity: u8,
+        /// Alert code.
         code: u32,
     },
     /// Empty payload.
@@ -318,7 +330,7 @@ mod tests {
 
     #[test]
     fn test_publish_consume() {
-        let config = RingBufferConfig {
+        let _config = RingBufferConfig {
             size: 16,
             enable_stats: true,
         };

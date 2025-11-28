@@ -18,6 +18,9 @@
 //! | TradeSurveillanceSentinel | <50μs | Market manipulation detection |
 //! | ChiefRiskOfficerSentinel | <50μs | Firm-wide risk orchestration |
 //! | RegulatoryComplianceSentinel | <100μs | MiFID II, Dodd-Frank, CFTC compliance |
+//! | DataFeedSentinel | <20μs | Market data quality monitoring |
+//! | SystemHealthSentinel | <20μs | Infrastructure health monitoring |
+//! | StrategyKillSwitchSentinel | <20μs | Strategy-level emergency halt |
 
 pub mod base;
 pub mod kill_switch;
@@ -32,8 +35,11 @@ pub mod surveillance;
 pub mod cro;
 pub mod stress_test;
 pub mod compliance;
+pub mod data_feed;
+pub mod system_health;
+pub mod strategy_kill_switch;
 
-pub use base::{Sentinel, SentinelId, SentinelStatus, SentinelConfig};
+pub use base::{Sentinel, SentinelId, SentinelStatus, SentinelConfig, SentinelStats};
 pub use kill_switch::GlobalKillSwitch;
 pub use position_limit::PositionLimitSentinel;
 pub use drawdown::DrawdownSentinel;
@@ -62,3 +68,6 @@ pub use compliance::{
     ComplianceViolation, ViolationSeverity, RegulatoryReport, ReportType,
     ShortSaleStatus, PositionLimitConfig,
 };
+pub use data_feed::{DataFeedSentinel, DataFeedConfig, FeedStatus};
+pub use system_health::{SystemHealthSentinel, SystemHealthConfig, HealthMetrics, HealthLevel};
+pub use strategy_kill_switch::{StrategyKillSwitchSentinel, StrategyKillSwitchConfig, KillReason, KillEvent, StrategyPerformance};

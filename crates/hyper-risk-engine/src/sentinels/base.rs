@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use serde::{Deserialize, Serialize};
 
-use crate::core::error::{Result, RiskError};
+use crate::core::error::Result;
 use crate::core::types::{Order, Portfolio};
 
 /// Unique identifier for a sentinel.

@@ -27,6 +27,7 @@ use crate::sentinels::base::{Sentinel, SentinelId, SentinelStats, SentinelStatus
 const SCALE: f64 = 1_000_000.0;
 
 /// Standard normal cumulative distribution approximation accuracy.
+#[allow(dead_code)]
 const NORM_CDF_EPSILON: f64 = 1e-8;
 
 // ============================================================================
@@ -457,7 +458,7 @@ impl Sentinel for GreeksSentinel {
                 GreekType::Theta => greeks.theta,
                 GreekType::Rho => greeks.rho,
             };
-            let limit = self.limits.get_limit(violated_greek);
+            let _limit = self.limits.get_limit(violated_greek);
 
             // Trigger sentinel
             self.status.store(SentinelStatus::Triggered as u8, Ordering::SeqCst);

@@ -367,7 +367,7 @@ mod tests {
         let order = test_order();
         // 6% drawdown is above warning (5%) but below critical (10%)
         // Warning level should allow trading to continue
-        let mut portfolio = Portfolio::new(94_000.0);
+        let portfolio = Portfolio::new(94_000.0);
 
         // Need to set daily/weekly start values to avoid triggering loss limits
         sentinel.reset_daily(94_000.0);

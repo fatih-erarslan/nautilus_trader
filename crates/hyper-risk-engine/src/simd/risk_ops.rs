@@ -9,6 +9,7 @@ use std::cmp::Ordering;
 const SIMD_WIDTH: usize = 4;
 
 /// Kahan summation for improved numerical stability
+#[allow(dead_code)]
 #[inline(always)]
 fn kahan_sum(values: &[f64]) -> f64 {
     let mut sum = 0.0;

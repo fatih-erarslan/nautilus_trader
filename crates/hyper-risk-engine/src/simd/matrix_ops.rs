@@ -7,6 +7,7 @@
 const SIMD_WIDTH: usize = 4;
 
 /// Cache line size for optimal memory access
+#[allow(dead_code)]
 const CACHE_LINE_SIZE: usize = 64;
 
 /// SIMD-optimized covariance matrix calculation
@@ -425,7 +426,7 @@ mod tests {
     fn test_large_matrix_multiply() {
         let n = 100;
         let a: Vec<f64> = (0..n * n).map(|i| i as f64).collect();
-        let b: Vec<f64> = (0..n * n).map(|i| (i as f64 * 0.5)).collect();
+        let b: Vec<f64> = (0..n * n).map(|i| i as f64 * 0.5).collect();
 
         let result = simd_matrix_multiply(&a, &b, n);
         assert_eq!(result.len(), n * n);

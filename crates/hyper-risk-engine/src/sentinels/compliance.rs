@@ -27,7 +27,7 @@ use std::sync::RwLock;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::{Result, RiskError};
-use crate::core::types::{Order, OrderSide, Portfolio, Symbol, Timestamp};
+use crate::core::types::{Order, Portfolio, Symbol, Timestamp};
 use crate::sentinels::base::{Sentinel, SentinelId, SentinelStats, SentinelStatus};
 
 // ============================================================================
@@ -741,7 +741,7 @@ impl Sentinel for RegulatoryComplianceSentinel {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::types::{Quantity, Price};
+    use crate::core::types::{OrderSide, Price, Quantity};
 
     fn create_test_order(symbol: &str, side: OrderSide, qty: f64, price: f64) -> Order {
         Order {

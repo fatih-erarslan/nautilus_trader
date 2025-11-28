@@ -11,7 +11,7 @@
 use std::sync::atomic::{AtomicU8, AtomicU64, Ordering};
 
 use crate::core::error::{Result, RiskError};
-use crate::core::types::{Order, Portfolio, Price};
+use crate::core::types::{Order, Portfolio};
 use crate::sentinels::base::{Sentinel, SentinelId, SentinelStats, SentinelStatus};
 
 /// Whale detection configuration.
@@ -72,6 +72,7 @@ impl WhaleConfig {
 }
 
 /// Flow bucket for VPIN calculation.
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, Default)]
 struct FlowBucket {
     /// Buy volume.
@@ -343,7 +344,7 @@ impl Sentinel for WhaleSentinel {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::types::{OrderSide, Quantity, Symbol, Timestamp};
+    use crate::core::types::{OrderSide, Price, Quantity, Symbol, Timestamp};
 
     fn test_order(quantity: f64, price: f64) -> Order {
         Order {

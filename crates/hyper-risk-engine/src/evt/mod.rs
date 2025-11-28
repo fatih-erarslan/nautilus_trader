@@ -129,7 +129,7 @@ mod tests {
         // Process some normal observations
         for i in 0..20 {
             let value = (i as f64 - 10.0) / 10.0;
-            let (upper, lower) = evt.process(value);
+            let (upper, _lower) = evt.process(value);
             // Early observations shouldn't trigger (model not calibrated)
             if i < 10 {
                 assert!(upper.is_none());

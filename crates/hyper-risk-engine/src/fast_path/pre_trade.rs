@@ -4,7 +4,7 @@
 
 use std::time::Instant;
 
-use crate::core::types::{Order, Portfolio, RiskDecision, RiskLevel, Timestamp};
+use crate::core::types::{Order, Portfolio, RiskLevel};
 use super::limit_checker::{LimitChecker, LimitConfig};
 use super::anomaly_detector::{FastAnomalyDetector, AnomalyConfig};
 
@@ -220,7 +220,7 @@ impl PreTradeChecker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::types::{Symbol, OrderSide, Quantity};
+    use crate::core::types::{OrderSide, Quantity, Symbol, Timestamp};
 
     fn create_test_order() -> Order {
         Order {

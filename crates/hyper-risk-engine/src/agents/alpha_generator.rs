@@ -123,7 +123,7 @@ impl AlphaGeneratorAgent {
     }
 
     /// Update price history.
-    pub fn update_price(&self, symbol: Symbol, price: f64, volume: f64) {
+    pub fn update_price(&self, _symbol: Symbol, price: f64, volume: f64) {
         let obs = PriceObservation {
             price,
             volume,

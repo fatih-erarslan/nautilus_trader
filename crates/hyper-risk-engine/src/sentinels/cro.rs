@@ -18,7 +18,7 @@ use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::{Result, RiskError};
-use crate::core::types::{Order, Portfolio, Symbol, Timestamp};
+use crate::core::types::{Order, Portfolio, Timestamp};
 use crate::sentinels::base::{Sentinel, SentinelId, SentinelStats, SentinelStatus};
 
 // ============================================================================
@@ -153,9 +153,15 @@ pub enum VetoDecision {
     /// Approve order.
     Approve,
     /// Reject order with reason.
-    Reject { reason: String },
+    Reject {
+        /// Rejection reason.
+        reason: String,
+    },
     /// Require manual approval.
-    RequireApproval { reason: String },
+    RequireApproval {
+        /// Reason for requiring approval.
+        reason: String,
+    },
 }
 
 /// Reasons for global trading halt.
@@ -180,6 +186,7 @@ pub enum HaltReason {
 // ============================================================================
 
 /// Strategy-level risk tracking (cache-line aligned).
+#[allow(dead_code)]
 #[repr(align(64))]
 #[derive(Debug)]
 struct StrategyRisk {
@@ -1036,7 +1043,7 @@ mod tests {
         order.quantity = Quantity::from_f64(100.0);
         order.limit_price = Some(Price::from_f64(150.0)); // $15,000
 
-        let mut portfolio = Portfolio::new(100_000.0);
+        let portfolio = Portfolio::new(100_000.0);
 
         let decision = sentinel.veto_order(&order, &portfolio);
         match decision {

@@ -50,7 +50,7 @@ use std::time::Instant;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 
-use crate::core::types::{MarketRegime, Portfolio, RiskDecision, RiskLevel, Symbol, Timestamp, OrderSide, Price, Quantity, Position, PositionId};
+use crate::core::types::{MarketRegime, Portfolio, RiskDecision, RiskLevel, Symbol, Timestamp, OrderSide};
 use crate::core::error::Result;
 use super::base::{Agent, AgentId, AgentStatus, AgentConfig, AgentStats};
 
@@ -241,6 +241,7 @@ impl Default for MarketMakerConfig {
 }
 
 /// Recent fill information for toxicity detection.
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct FillEvent {
     /// Fill price.
@@ -682,6 +683,7 @@ impl Agent for MarketMakerAgent {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::types::{Price, Quantity};
 
     #[test]
     fn test_market_maker_creation() {

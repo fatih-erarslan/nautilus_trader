@@ -76,6 +76,7 @@ pub struct PortfolioManagerAgent {
     /// Target allocations.
     targets: RwLock<Vec<TargetAllocation>>,
     /// Last rebalance timestamp.
+    #[allow(dead_code)]
     last_rebalance: RwLock<Timestamp>,
     /// Statistics.
     stats: AgentStats,
