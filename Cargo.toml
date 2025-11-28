@@ -48,6 +48,8 @@ members = [
     "crates/hyperphysics-hnsw",
     "crates/hyperphysics-lsh",
     "crates/hyperphysics-similarity",
+    # Enterprise risk engine
+    "crates/hyper-risk-engine",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
