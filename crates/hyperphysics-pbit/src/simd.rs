@@ -22,7 +22,7 @@
 
 
 
-#[cfg(target_arch = "x86_64")]
+#[cfg(all(target_arch = "x86_64", any(target_feature = "avx2", target_feature = "avx512f")))]
 use std::arch::x86_64::*;
 
 #[cfg(target_arch = "aarch64")]
@@ -67,6 +67,16 @@ mod exp_constants {
 }
 
 /// Vectorized state update using AVX2 intrinsics (4x f64 at once)
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - The CPU supports AVX2 instructions (guaranteed by cfg attribute)
+/// - `states` and `probabilities` slices have equal length (asserted)
+/// - Both slices contain valid f64 values (not uninitialized memory)
+///
+/// This function uses unaligned loads/stores (_mm256_loadu_pd/_mm256_storeu_pd)
+/// so alignment is not required.
 #[cfg(all(target_arch = "x86_64", target_feature = "avx2"))]
 pub unsafe fn update_states_avx2(states: &mut [f64], probabilities: &[f64]) {
     assert_eq!(states.len(), probabilities.len());
@@ -75,22 +85,75 @@ pub unsafe fn update_states_avx2(states: &mut [f64], probabilities: &[f64]) {
 
     for i in 0..chunks {
         let idx = i * 4;
+        // SAFETY: idx + 4 <= chunks * 4 <= len, so we're within bounds.
+        // _mm256_loadu_pd handles unaligned access safely.
         let probs = _mm256_loadu_pd(probabilities.as_ptr().add(idx));
         let threshold = _mm256_set1_pd(0.5);
         let mask = _mm256_cmp_pd(probs, threshold, _CMP_GT_OQ);
         let ones = _mm256_set1_pd(1.0);
         let zeros = _mm256_setzero_pd();
         let result = _mm256_blendv_pd(zeros, ones, mask);
+        // SAFETY: Same bounds reasoning; _mm256_storeu_pd handles unaligned writes.
         _mm256_storeu_pd(states.as_mut_ptr().add(idx), result);
     }
 
-    // Handle remaining elements
+    // Handle remaining elements (safe Rust indexing)
     for i in (chunks * 4)..len {
         states[i] = if probabilities[i] > 0.5 { 1.0 } else { 0.0 };
     }
 }
 
+/// ARM NEON vectorized state update (2x f64 at once)
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - The CPU supports NEON instructions (guaranteed by cfg attribute on aarch64)
+/// - `states` and `probabilities` slices have equal length (asserted)
+/// - Both slices contain valid f64 values (not uninitialized memory)
+///
+/// vld1q_f64/vst1q_f64 handle unaligned access on modern ARM processors.
+#[cfg(target_arch = "aarch64")]
+pub unsafe fn update_states_neon(states: &mut [f64], probabilities: &[f64]) {
+    assert_eq!(states.len(), probabilities.len());
+    let len = states.len();
+    let chunks = len / 2;
+
+    let threshold = vdupq_n_f64(0.5);
+    let ones = vdupq_n_f64(1.0);
+    let zeros = vdupq_n_f64(0.0);
+
+    for i in 0..chunks {
+        let idx = i * 2;
+        // SAFETY: idx + 2 <= chunks * 2 <= len, so we're within bounds.
+        let probs = vld1q_f64(probabilities.as_ptr().add(idx));
+
+        // Compare: probs > threshold
+        let mask = vcgtq_f64(probs, threshold);
+
+        // Select based on mask: mask ? ones : zeros
+        let result = vbslq_f64(mask, ones, zeros);
+
+        // SAFETY: Same bounds reasoning as above.
+        vst1q_f64(states.as_mut_ptr().add(idx), result);
+    }
+
+    // Handle remaining elements (safe Rust indexing)
+    for i in (chunks * 2)..len {
+        states[i] = if probabilities[i] > 0.5 { 1.0 } else { 0.0 };
+    }
+}
+
 /// Vectorized metropolis energy calculation (dot product)
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - The CPU supports AVX2 instructions (guaranteed by cfg attribute)
+/// - `a` and `b` slices have equal length (asserted)
+/// - Both slices contain valid f64 values
+///
+/// Uses unaligned loads for memory access safety.
 #[cfg(all(target_arch = "x86_64", target_feature = "avx2"))]
 pub unsafe fn dot_product_avx2(a: &[f64], b: &[f64]) -> f64 {
     assert_eq!(a.len(), b.len());
@@ -101,19 +164,63 @@ pub unsafe fn dot_product_avx2(a: &[f64], b: &[f64]) -> f64 {
 
     for i in 0..chunks {
         let idx = i * 4;
+        // SAFETY: idx + 4 <= chunks * 4 <= len, within bounds.
         let va = _mm256_loadu_pd(a.as_ptr().add(idx));
         let vb = _mm256_loadu_pd(b.as_ptr().add(idx));
         let prod = _mm256_mul_pd(va, vb);
         sum = _mm256_add_pd(sum, prod);
     }
 
-    // Horizontal sum
+    // Horizontal sum - extract 4 f64 values and sum them
     let mut result_array = [0.0; 4];
+    // SAFETY: result_array is a properly sized, aligned stack array.
     _mm256_storeu_pd(result_array.as_mut_ptr(), sum);
     let mut total = result_array.iter().sum::<f64>();
 
-    // Handle remaining elements
+    // Handle remaining elements (safe Rust indexing)
     for i in (chunks * 4)..len {
+        total += a[i] * b[i];
+    }
+
+    total
+}
+
+/// ARM NEON vectorized dot product (2x f64 at once)
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - The CPU supports NEON instructions (guaranteed by cfg attribute on aarch64)
+/// - `a` and `b` slices have equal length (asserted)
+/// - Both slices contain valid f64 values
+///
+/// Uses FMA (fused multiply-add) for improved accuracy and performance.
+#[cfg(target_arch = "aarch64")]
+pub unsafe fn dot_product_neon(a: &[f64], b: &[f64]) -> f64 {
+    assert_eq!(a.len(), b.len());
+    let len = a.len();
+    let chunks = len / 2;
+
+    let mut sum = vdupq_n_f64(0.0);
+
+    for i in 0..chunks {
+        let idx = i * 2;
+        // SAFETY: idx + 2 <= chunks * 2 <= len, within bounds.
+        let va = vld1q_f64(a.as_ptr().add(idx));
+        let vb = vld1q_f64(b.as_ptr().add(idx));
+
+        // Multiply and accumulate using FMA: sum = sum + (va * vb)
+        sum = vfmaq_f64(sum, va, vb);
+    }
+
+    // Horizontal sum: extract both f64 values and add them
+    let mut result_array = [0.0f64; 2];
+    // SAFETY: result_array is a properly sized stack array.
+    vst1q_f64(result_array.as_mut_ptr(), sum);
+    let mut total = result_array[0] + result_array[1];
+
+    // Handle remaining elements (safe Rust indexing)
+    for i in (chunks * 2)..len {
         total += a[i] * b[i];
     }
 
@@ -126,6 +233,19 @@ pub unsafe fn dot_product_avx2(a: &[f64], b: &[f64]) -> f64 {
 /// where k = round(x/ln2) and |r| < ln(2)/2
 ///
 /// Achieves 4-8× speedup over scalar baseline with relative error < 1e-12
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - The CPU supports AVX2 and FMA instructions (guaranteed by cfg attribute)
+/// - `x` and `result` slices have equal length (asserted)
+/// - `result` slice is writable
+/// - Input values should be in range [-700, 700] to avoid overflow/underflow
+///
+/// # Mathematical Background
+///
+/// Uses 6th-order Remez polynomial approximation on reduced range.
+/// Based on Hart et al., "Computer Approximations" (1968), Table 6.2.
 #[cfg(all(target_arch = "x86_64", target_feature = "avx2"))]
 pub unsafe fn exp_avx2(x: &[f64], result: &mut [f64]) {
     use exp_constants::*;
@@ -205,6 +325,16 @@ pub unsafe fn exp_avx2(x: &[f64], result: &mut [f64]) {
 }
 
 /// AVX-512 vectorized exponential (8x f64 at once)
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - The CPU supports AVX-512F instructions (guaranteed by cfg attribute)
+/// - `x` and `result` slices have equal length (asserted)
+/// - `result` slice is writable
+/// - Input values should be in range [-700, 700] to avoid overflow/underflow
+///
+/// Uses _mm512_scalef_pd for efficient 2^k reconstruction.
 #[cfg(all(target_arch = "x86_64", target_feature = "avx512f"))]
 pub unsafe fn exp_avx512(x: &[f64], result: &mut [f64]) {
     use exp_constants::*;
@@ -257,6 +387,16 @@ pub unsafe fn exp_avx512(x: &[f64], result: &mut [f64]) {
 }
 
 /// ARM NEON vectorized exponential (2x f64 at once)
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - The CPU supports NEON instructions (guaranteed by cfg attribute on aarch64)
+/// - `x` and `result` slices have equal length (asserted)
+/// - `result` slice is writable
+/// - Input values should be in range [-700, 700] to avoid overflow/underflow
+///
+/// Uses vrndnq_f64 for round-to-nearest and manual 2^k reconstruction via bit manipulation.
 #[cfg(target_arch = "aarch64")]
 pub unsafe fn exp_neon(x: &[f64], result: &mut [f64]) {
     use exp_constants::*;
@@ -369,7 +509,16 @@ impl SimdOps {
             return;
         }
 
-        #[cfg(not(all(target_arch = "x86_64", target_feature = "avx2")))]
+        #[cfg(all(target_arch = "aarch64", not(all(target_arch = "x86_64", target_feature = "avx2"))))]
+        unsafe {
+            update_states_neon(states, probabilities);
+            return;
+        }
+
+        #[cfg(not(any(
+            all(target_arch = "x86_64", target_feature = "avx2"),
+            target_arch = "aarch64"
+        )))]
         portable::update_states(states, probabilities);
     }
 
@@ -380,7 +529,15 @@ impl SimdOps {
             return dot_product_avx2(a, b);
         }
 
-        #[cfg(not(all(target_arch = "x86_64", target_feature = "avx2")))]
+        #[cfg(all(target_arch = "aarch64", not(all(target_arch = "x86_64", target_feature = "avx2"))))]
+        unsafe {
+            return dot_product_neon(a, b);
+        }
+
+        #[cfg(not(any(
+            all(target_arch = "x86_64", target_feature = "avx2"),
+            target_arch = "aarch64"
+        )))]
         portable::dot_product(a, b)
     }
 

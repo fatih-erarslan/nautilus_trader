@@ -406,9 +406,14 @@ where
 
             // Check if key already exists
             if let Some(succ) = succs[0] {
+                // SAFETY: succ was obtained from an Atomic load with Acquire ordering
+                // in the find() method. The crossbeam_epoch guard ensures the pointer
+                // remains valid for the duration of this operation.
                 let succ_node = unsafe { succ.deref() };
                 if succ_node.key == key && !succ_node.marked.load(Ordering::Relaxed) {
                     // Key exists, don't insert
+                    // SAFETY: new_ref was created from Owned::into_shared in this function,
+                    // so we still own it. Converting back to Owned and dropping is safe.
                     unsafe {
                         // Drop the node we created
                         drop(new_ref.into_owned());
@@ -418,6 +423,9 @@ where
             }
 
             // Link forward pointers
+            // SAFETY: new_ref points to a node we just allocated. The epoch guard
+            // ensures the memory remains valid. We haven't linked it into the list
+            // yet, so we have exclusive access to the forward pointers.
             let new_node = unsafe { new_ref.deref() };
             for level in 0..height {
                 new_node.forward[level].store(succs[level].unwrap_or(Shared::null()), Ordering::Relaxed);
@@ -425,6 +433,8 @@ where
 
             // Try to link at level 0
             if let Some(pred) = preds[0] {
+                // SAFETY: pred was obtained from find() which loads with Acquire ordering.
+                // The epoch guard ensures validity. We use CAS to safely link the node.
                 let pred_node = unsafe { pred.deref() };
                 let expected = succs[0].unwrap_or(Shared::null());
 
@@ -436,6 +446,7 @@ where
                     for level in 1..height {
                         loop {
                             if let Some(pred) = preds[level] {
+                                // SAFETY: Same invariants as level 0 - epoch-protected pointer.
                                 let pred_node = unsafe { pred.deref() };
                                 let expected = succs[level].unwrap_or(Shared::null());
 
@@ -447,7 +458,7 @@ where
                                 }
                             }
                             // Re-find if CAS fails
-                            let (new_preds, new_succs) = self.find(key, guard);
+                            let (new_preds, _new_succs) = self.find(key, guard);
                             if level < new_preds.len() {
                                 if new_preds[level]
                                     .map(|p| unsafe { p.deref() }.forward[level].load(Ordering::Relaxed, guard) == new_ref)
@@ -469,6 +480,16 @@ where
     }
 
     /// Find predecessors and successors at each level.
+    ///
+    /// This is the core traversal method for the lock-free skip list.
+    /// It uses epoch-based reclamation to safely traverse the structure.
+    ///
+    /// # Safety Invariants
+    ///
+    /// All pointer dereferences are safe because:
+    /// - The epoch guard prevents deallocation of reachable nodes
+    /// - All loads use Acquire ordering for proper synchronization
+    /// - Marked nodes are skipped to handle concurrent deletions
     fn find<'g>(&self, key: u64, guard: &'g Guard) -> (Vec<Option<Shared<'g, SkipListNode<T>>>>, Vec<Option<Shared<'g, SkipListNode<T>>>>) {
         let max_height = self.max_height.load(Ordering::Relaxed);
         let mut preds = vec![None; Self::MAX_HEIGHT];
@@ -480,6 +501,8 @@ where
 
         for level in (0..max_height).rev() {
             loop {
+                // SAFETY: curr is either head (never deallocated) or was obtained
+                // via Acquire load from an Atomic. The guard ensures it remains valid.
                 let curr_node = unsafe { curr.deref() };
                 let next = curr_node.forward[level].load(Ordering::Acquire, guard);
 
@@ -502,6 +525,7 @@ where
             }
 
             preds[level] = Some(curr);
+            // SAFETY: curr was validated as a reachable node in the loop above.
             let curr_node = unsafe { curr.deref() };
             succs[level] = {
                 let next = curr_node.forward[level].load(Ordering::Acquire, guard);
@@ -522,6 +546,7 @@ where
         let (_, succs) = self.find(key, guard);
 
         if let Some(succ) = succs[0] {
+            // SAFETY: succ comes from find() which only returns epoch-protected pointers.
             let node = unsafe { succ.deref() };
             if node.key == key && !node.marked.load(Ordering::Relaxed) {
                 return node.data.clone();
@@ -535,6 +560,7 @@ where
     pub fn min_key(&self) -> Option<u64> {
         let guard = &epoch::pin();
         let head = self.head.load(Ordering::Acquire, guard);
+        // SAFETY: head is the sentinel node, always valid and never deallocated.
         let head_node = unsafe { head.deref() };
 
         let first = head_node.forward[0].load(Ordering::Acquire, guard);
@@ -542,6 +568,7 @@ where
             return None;
         }
 
+        // SAFETY: first is non-null and epoch-protected.
         let first_node = unsafe { first.deref() };
         if first_node.marked.load(Ordering::Relaxed) {
             None
@@ -561,6 +588,8 @@ where
 
         for level in (0..max_height).rev() {
             loop {
+                // SAFETY: curr starts as head (always valid) and is only updated
+                // to next pointers that are epoch-protected.
                 let curr_node = unsafe { curr.deref() };
                 let next = curr_node.forward[level].load(Ordering::Acquire, guard);
 
@@ -568,6 +597,7 @@ where
                     break;
                 }
 
+                // SAFETY: next is non-null and epoch-protected.
                 let next_node = unsafe { next.deref() };
                 if !next_node.marked.load(Ordering::Relaxed) {
                     max_key = Some(next_node.key);
@@ -585,15 +615,17 @@ where
     pub fn top_k(&self, k: usize) -> Vec<(u64, usize)> {
         let guard = &epoch::pin();
         let head = self.head.load(Ordering::Acquire, guard);
+        // SAFETY: head is the always-valid sentinel node.
         let head_node = unsafe { head.deref() };
 
         let mut results = Vec::with_capacity(k);
         let mut curr = head_node.forward[0].load(Ordering::Acquire, guard);
 
         while !curr.is_null() && results.len() < k {
+            // SAFETY: Loop condition ensures curr is non-null, and it's epoch-protected.
             let node = unsafe { curr.deref() };
             if !node.marked.load(Ordering::Relaxed) {
-                if let Some(ref data) = node.data {
+                if let Some(ref _data) = node.data {
                     // Assuming T has a way to get quantity - we'll return key and 0 as placeholder
                     results.push((node.key, 0));
                 }

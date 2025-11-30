@@ -39,7 +39,10 @@ pub mod byzantine_coordinator;
 pub use base::{Agent, AgentId, AgentStatus, AgentConfig};
 pub use portfolio_manager::PortfolioManagerAgent;
 pub use alpha_generator::AlphaGeneratorAgent;
-pub use regime_detection::RegimeDetectionAgent;
+pub use regime_detection::{
+    RegimeDetectionAgent, RegimeDetectionConfig, RegimeProbabilities,
+    HiddenMarkovModel, GaussianEmission, ReturnObservation,
+};
 pub use market_maker::{MarketMakerAgent, MarketMakerConfig, Quote, InventoryState, ToxicityScore};
 pub use execution::ExecutionAgent;
 pub use arbitrage::{ArbitrageAgent, ArbitrageConfig, ArbitrageOpportunity, VenueQuote};

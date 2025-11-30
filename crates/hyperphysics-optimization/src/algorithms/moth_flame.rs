@@ -44,6 +44,7 @@ pub struct MothFlame {
 }
 
 impl MothFlame {
+    /// Create a new Moth-Flame Optimization optimizer
     pub fn new(config: MFOConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         Ok(Self {
@@ -57,11 +58,13 @@ impl MothFlame {
         })
     }
 
+    /// Initialize moth population and flames
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
         self.flames = Vec::new();
     }
 
+    /// Execute one iteration of moth-flame spiral movement
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -140,6 +143,7 @@ impl MothFlame {
         Ok(())
     }
 
+    /// Run the full moth-flame optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
 

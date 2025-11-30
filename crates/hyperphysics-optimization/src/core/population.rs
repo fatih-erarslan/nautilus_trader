@@ -12,8 +12,6 @@ use ndarray::Array1;
 use parking_lot::RwLock;
 use rand::prelude::*;
 use rand_distr::{Distribution, Uniform};
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
@@ -54,7 +52,7 @@ impl Population {
     /// Uses uniform random initialization within bounds.
     pub fn initialize_random(&self, size: usize) {
         let mut rng = rand::thread_rng();
-        let dimension = self.bounds.dimension();
+        let _dimension = self.bounds.dimension();
 
         let individuals: Vec<Individual> = (0..size.min(self.capacity))
             .map(|_| {
@@ -79,7 +77,7 @@ impl Population {
         let n = size.min(self.capacity);
 
         // Generate LHS samples
-        let mut samples: Vec<Vec<f64>> = (0..dimension)
+        let samples: Vec<Vec<f64>> = (0..dimension)
             .map(|_| {
                 let mut indices: Vec<usize> = (0..n).collect();
                 indices.shuffle(&mut rng);

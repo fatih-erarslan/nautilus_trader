@@ -178,7 +178,7 @@ impl DifferentialEvolution {
 
         // Initialize self-adaptive parameters
         if self.config.self_adaptive {
-            let mut rng = rand::thread_rng();
+            let _rng = rand::thread_rng();
             for i in 0..self.f_values.len() {
                 self.f_values[i] = self.config.scaling_factor;
                 self.cr_values[i] = self.config.crossover_rate;
@@ -198,7 +198,7 @@ impl DifferentialEvolution {
         self.population.evaluate_sequential(objective)?;
 
         let pop_size = self.population.len();
-        let dimension = self.population.bounds.dimension();
+        let _dimension = self.population.bounds.dimension();
         let bounds = &self.population.bounds;
 
         let mut rng = rand::thread_rng();

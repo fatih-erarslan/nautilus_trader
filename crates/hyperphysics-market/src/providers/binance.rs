@@ -52,6 +52,7 @@ pub struct BinanceProvider {
     /// - Separate API endpoints (testnet.binance.vision)
     /// - Sandbox trading environment
     /// - Test data feeds without real funds
+    #[allow(dead_code)]
     testnet: bool,
 
     /// Active WebSocket connection

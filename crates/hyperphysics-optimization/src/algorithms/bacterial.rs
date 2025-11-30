@@ -54,6 +54,7 @@ pub struct BacterialForaging {
 }
 
 impl BacterialForaging {
+    /// Create a new Bacterial Foraging Optimization optimizer
     pub fn new(config: BFOConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         let pop_size = opt_config.population_size;
@@ -68,6 +69,7 @@ impl BacterialForaging {
         })
     }
 
+    /// Initialize bacterial population
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
     }
@@ -78,6 +80,7 @@ impl BacterialForaging {
         if norm > 1e-10 { dir / norm } else { Array1::ones(dim) / (dim as f64).sqrt() }
     }
 
+    /// Execute one chemotaxis-reproduction-elimination cycle
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         let dim = self.population.bounds.dimension();
         let bounds = &self.population.bounds;
@@ -162,6 +165,7 @@ impl BacterialForaging {
         Ok(())
     }
 
+    /// Run the full bacterial foraging optimization with all cycles
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         let total_iters = self.config.ned * self.config.nre;

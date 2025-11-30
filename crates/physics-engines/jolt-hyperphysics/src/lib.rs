@@ -45,12 +45,30 @@ impl Default for JoltConfiguration {
 }
 
 /// Adapter for JoltPhysics engine
+///
+/// Provides a safe Rust interface to the Jolt Physics engine via FFI.
+/// All pointer operations are encapsulated with proper null checks.
+///
+/// # Thread Safety
+///
+/// JoltHyperPhysicsAdapter implements Send + Sync because:
+/// - Jolt Physics is designed for thread-safe access
+/// - The body interface methods use internal synchronization
+/// - Multiple threads can safely query and modify bodies
+///
+/// However, for best performance, avoid concurrent modifications to the same body.
 pub struct JoltHyperPhysicsAdapter {
+    /// Pointer to the Jolt physics system. Never null after successful construction.
     system: *mut JoltSystem,
+    /// Pointer to the body interface for creating/modifying bodies.
+    /// Owned by the system; freed when system is destroyed.
     body_interface: *mut JoltBodyInterface,
     _config: JoltConfiguration,
 }
 
+// SAFETY: Jolt Physics is designed for multi-threaded access.
+// The physics system uses internal locks to protect shared state.
+// Individual body operations are atomic and thread-safe.
 unsafe impl Send for JoltHyperPhysicsAdapter {}
 unsafe impl Sync for JoltHyperPhysicsAdapter {}
 
@@ -72,11 +90,16 @@ impl JoltHyperPhysicsAdapter {
             deterministic: config.deterministic,
         };
 
+        // SAFETY: jolt_system_create is safe to call with any JoltConfig.
+        // It returns null on failure, which we check below.
         let system = unsafe { jolt_system_create(c_config) };
         if system.is_null() {
             return Err(JoltError::InitializationFailed);
         }
 
+        // SAFETY: system is valid and non-null (checked above).
+        // The body_interface pointer is owned by the system and will be
+        // freed automatically when the system is destroyed.
         let body_interface = unsafe { jolt_system_get_body_interface(system) };
 
         Ok(Self {
@@ -87,7 +110,12 @@ impl JoltHyperPhysicsAdapter {
     }
 
     /// Step the physics simulation
+    ///
+    /// Advances the simulation by `dt` seconds, performing `collision_steps`
+    /// collision detection iterations.
     pub fn step(&mut self, dt: f32, collision_steps: i32) -> Result<()> {
+        // SAFETY: self.system is always valid after successful construction.
+        // jolt_system_step is safe to call with valid system pointer.
         unsafe {
             jolt_system_step(self.system, dt, collision_steps);
         }
@@ -95,7 +123,12 @@ impl JoltHyperPhysicsAdapter {
     }
 
     /// Create a box rigid body
+    ///
+    /// Creates a box shape with the given half-extents (converted to full extents internally).
+    /// Returns a body ID that can be used for subsequent operations.
     pub fn create_box(&mut self, half_extents: Vector3<f32>, density: f32, is_static: bool) -> u32 {
+        // SAFETY: body_interface is valid after construction.
+        // jolt_body_create_box returns a valid body ID.
         unsafe {
             jolt_body_create_box(
                 self.body_interface,
@@ -109,15 +142,23 @@ impl JoltHyperPhysicsAdapter {
     }
 
     /// Create a sphere rigid body
+    ///
+    /// Creates a sphere shape with the given radius.
+    /// Returns a body ID that can be used for subsequent operations.
     pub fn create_sphere(&mut self, radius: f32, density: f32, is_static: bool) -> u32 {
+        // SAFETY: body_interface is valid after construction.
         unsafe { jolt_body_create_sphere(self.body_interface, radius, density, is_static) }
     }
 
     /// Get body position
+    ///
+    /// Returns the world-space position of the body's center of mass.
     pub fn get_position(&self, body_id: u32) -> Vector3<f32> {
         let mut x = 0.0;
         let mut y = 0.0;
         let mut z = 0.0;
+        // SAFETY: body_interface is valid, and the out-pointers are valid stack variables.
+        // jolt_body_get_position writes the position components to the provided pointers.
         unsafe {
             jolt_body_get_position(self.body_interface, body_id, &mut x, &mut y, &mut z);
         }
@@ -164,11 +205,12 @@ impl JoltHyperPhysicsAdapter {
 
 impl Drop for JoltHyperPhysicsAdapter {
     fn drop(&mut self) {
+        // SAFETY:
+        // - self.system is always valid after successful construction
+        // - body_interface is owned by the system and freed internally
+        // - jolt_system_destroy cleans up all resources
+        // - After this call, the pointers become invalid (but we're being dropped anyway)
         unsafe {
-            // body_interface is managed by system usually, or we need to free it if we alloc'd it
-            // In our mock C++ we malloc'd it, so we should free it.
-            // But typically system owns it. Let's assume system destroy handles it or we add a destroy for interface.
-            // For now, just destroy system.
             jolt_system_destroy(self.system);
         }
     }

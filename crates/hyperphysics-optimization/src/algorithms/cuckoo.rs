@@ -78,6 +78,7 @@ pub struct CuckooSearch {
 }
 
 impl CuckooSearch {
+    /// Create a new Cuckoo Search optimizer
     pub fn new(config: CuckooConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         Ok(Self {
@@ -90,6 +91,7 @@ impl CuckooSearch {
         })
     }
 
+    /// Initialize nest population using Latin Hypercube Sampling
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
     }
@@ -118,6 +120,7 @@ impl CuckooSearch {
         }))
     }
 
+    /// Execute one iteration with Lévy flights and nest abandonment
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -184,6 +187,7 @@ impl CuckooSearch {
         Ok(())
     }
 
+    /// Run the full cuckoo search optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         while self.iteration < self.opt_config.max_iterations && !self.converged {

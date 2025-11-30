@@ -30,9 +30,14 @@ pub mod config;
 pub mod metrics;
 pub mod crypto;
 
-
 #[cfg(feature = "simd")]
 pub mod simd;
+
+#[cfg(any(feature = "wasm", feature = "cuda-wasm"))]
+pub mod wasm_export;
+
+#[cfg(any(feature = "wasm", feature = "cuda-wasm"))]
+pub use wasm_export::HyperPhysicsWasm;
 
 pub use engine::HyperPhysicsEngine;
 pub use config::{EngineConfig, Scale};

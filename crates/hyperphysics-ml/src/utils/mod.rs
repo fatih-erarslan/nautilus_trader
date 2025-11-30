@@ -285,17 +285,22 @@ pub fn init_weights(shape: &[usize], init: WeightInit, device: &Device) -> MlRes
     Tensor::from_slice(&data, shape.to_vec(), device)
 }
 
-// Simple random number generation (for initialization only)
-// In production, would use proper RNG from rand crate
+// Thread-safe random number generation for initialization
+// Uses atomic operations instead of unsafe static mut
+
+use std::sync::atomic::{AtomicU64, Ordering};
+
+/// Global thread-safe RNG seed for weight initialization
+static RNG_SEED: AtomicU64 = AtomicU64::new(12345);
 
 fn rand_uniform(min: f32, max: f32) -> f32 {
     // Linear congruential generator (simple but fast)
-    static mut SEED: u64 = 12345;
-    unsafe {
-        SEED = SEED.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
-        let u = (SEED >> 33) as f32 / (1u64 << 31) as f32;
-        min + u * (max - min)
-    }
+    // Thread-safe using atomic fetch-and-update
+    let seed = RNG_SEED.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |s| {
+        Some(s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407))
+    }).unwrap_or(12345);
+    let u = (seed >> 33) as f32 / (1u64 << 31) as f32;
+    min + u * (max - min)
 }
 
 fn rand_normal(mean: f32, std: f32) -> f32 {
@@ -306,12 +311,9 @@ fn rand_normal(mean: f32, std: f32) -> f32 {
     mean + z * std
 }
 
-/// Set random seed for reproducibility
+/// Set random seed for reproducibility (thread-safe)
 pub fn set_seed(seed: u64) {
-    unsafe {
-        static mut SEED: u64 = 0;
-        SEED = seed;
-    }
+    RNG_SEED.store(seed, Ordering::SeqCst);
 }
 
 #[cfg(test)]

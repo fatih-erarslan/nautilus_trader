@@ -15,6 +15,9 @@ RUST_MIN_STACK = "33554432"
 # sccache configuration
 SCCACHE_CACHE_SIZE = "50G"
 
+# PyO3 ABI3 compatibility for Python 3.14+ support
+PYO3_USE_ABI3_FORWARD_COMPATIBILITY = "1"
+
 [profile.dev]
 opt-level = 0
 debug = true

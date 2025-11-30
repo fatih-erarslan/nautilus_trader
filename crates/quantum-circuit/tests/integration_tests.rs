@@ -3,8 +3,8 @@
 use quantum_circuit::{
     Circuit, CircuitBuilder, VariationalCircuit, EntanglementPattern,
     simulation::{Simulator, BatchSimulator},
-    optimization::{QAOAOptimizer, VQEOptimizer, OptimizerConfig, CostHamiltonian},
-    embeddings::{AmplitudeEmbedding, AngleEmbedding, ParametricEmbedding, NormalizationMethod},
+    optimization::{QAOAOptimizer, VQEOptimizer, OptimizerConfig, CostHamiltonian, Optimizer, VariationalOptimizer},
+    embeddings::{AmplitudeEmbedding, AngleEmbedding, ParametricEmbedding, NormalizationMethod, QuantumEmbedding},
     neural::SimpleHybridNet,
     pennylane_compat::{device, QNodeBuilder, DefaultQubitDevice},
     gates::*,

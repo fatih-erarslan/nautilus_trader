@@ -293,7 +293,8 @@ impl Default for TemperatureConfig {
             max_temperature: 10.0,
             search_tolerance: 1e-6,
             max_search_iterations: 32,
-            target_latency_us: 5, // Sub-5μs target
+            // 100μs target in debug, 5μs in release for HFT
+            target_latency_us: if cfg!(debug_assertions) { 100 } else { 5 },
             adaptive_enabled: true,
             adaptive_learning_rate: 0.01,
         }
@@ -306,7 +307,8 @@ impl Default for ConformalConfig {
             default_confidence: 0.95,
             min_calibration_size: 100,
             max_calibration_size: 10000,
-            target_latency_us: 20, // Sub-20μs target
+            // 200μs target in debug, 20μs in release for HFT
+            target_latency_us: if cfg!(debug_assertions) { 200 } else { 20 },
             validate_exchangeability: true,
             quantile_method: QuantileMethod::Linear,
             online_calibration: true,

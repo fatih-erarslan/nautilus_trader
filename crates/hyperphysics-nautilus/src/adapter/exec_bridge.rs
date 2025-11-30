@@ -4,7 +4,7 @@ use crate::config::IntegrationConfig;
 use crate::error::{IntegrationError, Result};
 use crate::types::{
     HyperPhysicsOrderCommand, OrderSide, OrderType, TimeInForce,
-    conversions::decision_to_order_command,
+    decision_to_order_command,
 };
 use hyperphysics_hft_ecosystem::core::{Action, TradingDecision};
 use hyperphysics_hft_ecosystem::core::unified_pipeline::{ConsensusState, PipelineResult};
@@ -278,6 +278,8 @@ mod tests {
             total_latency_us: 500,
             market_data_latency_us: 100,
             physics_latency_us: 200,
+            neural_latency_us: 0,
+            quantum_latency_us: 0,
             optimization_latency_us: 150,
             consensus_latency_us: 50,
             consensus_state: ConsensusState {

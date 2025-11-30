@@ -151,8 +151,8 @@ impl Individual {
     ///
     /// # Arguments
     /// * `bounds` - Search space bounds for clamping
-    /// * `max_velocity` - Maximum velocity magnitude
-    pub fn apply_velocity(&mut self, bounds: &[(f64, f64)], max_velocity: f64) {
+    /// * `_max_velocity` - Maximum velocity magnitude (reserved for future use)
+    pub fn apply_velocity(&mut self, bounds: &[(f64, f64)], _max_velocity: f64) {
         if let Some(ref velocity) = self.velocity {
             for i in 0..self.dimension() {
                 let new_pos = self.position[i] + velocity[i];

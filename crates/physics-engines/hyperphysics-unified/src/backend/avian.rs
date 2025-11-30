@@ -616,8 +616,8 @@ impl PhysicsBackend for AvianBackend {
                 // Apply linear force
                 body.linear_velocity += force / body.mass;
 
-                // Apply torque from offset
-                let r = point - body.transform.position;
+                // Apply torque from offset (convert Point3 difference to Vector3)
+                let r: Vector3<f32> = (point - body.transform.position).coords;
                 let torque = r.cross(&force);
                 body.angular_velocity += torque / body.mass; // Simplified inertia
             }

@@ -47,7 +47,8 @@ jolt-hyperphysics = { path = "../jolt-hyperphysics", optional = true }
 mujoco-hyperphysics = { path = "../mujoco-hyperphysics", optional = true }
 
 # Python interop for GPU physics (Genesis/Taichi/Warp)
-pyo3 = { version = "0.22", features = ["auto-initialize"], optional = true }
+# Updated for CVE RUSTSEC-2025-0020 fix
+pyo3 = { version = "0.24", features = ["auto-initialize"], optional = true }
 
 # Avian physics (Bevy integration)
 avian3d = { path = "../../vendor/physics/avian/crates/avian3d", optional = true }

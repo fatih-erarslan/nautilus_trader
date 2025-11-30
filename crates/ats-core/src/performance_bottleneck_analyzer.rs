@@ -568,15 +568,26 @@ impl PerformanceBottleneckAnalyzer {
 
     /// Calculate performance trend
     fn calculate_performance_trend(&self, history: &VecDeque<PerformanceMetrics>) -> PerformanceTrend {
-        if history.len() < 10 {
+        // Need at least 20 samples to calculate trend (10 recent + 10 older)
+        if history.len() < 20 {
             return PerformanceTrend::Stable;
         }
 
-        let recent = &history.iter().rev().take(10).collect::<Vec<_>>();
-        let older = &history.iter().rev().skip(10).take(10).collect::<Vec<_>>();
+        let recent: Vec<_> = history.iter().rev().take(10).collect();
+        let older: Vec<_> = history.iter().rev().skip(10).take(10).collect();
+
+        // Safety check for empty collections
+        if recent.is_empty() || older.is_empty() {
+            return PerformanceTrend::Stable;
+        }
 
         let recent_avg = recent.iter().map(|m| m.execution_time.as_nanos()).sum::<u128>() / recent.len() as u128;
         let older_avg = older.iter().map(|m| m.execution_time.as_nanos()).sum::<u128>() / older.len() as u128;
+
+        // Avoid division by zero
+        if older_avg == 0 {
+            return PerformanceTrend::Stable;
+        }
 
         let change_ratio = recent_avg as f64 / older_avg as f64;
 
@@ -717,7 +728,7 @@ mod tests {
             timestamp: SystemTime::now(),
             execution_time: Duration::from_micros(100), // Very slow
             cpu_utilization: 0.3, // Low utilization
-            memory_usage: 500 * 1024 * 1024, // High memory
+            memory_usage: 600 * 1024 * 1024, // High memory (exceeds 500MB threshold)
             cache_misses: 1000, // High cache misses
             simd_utilization: 0.1, // Low SIMD utilization
             throughput: 10.0, // Low throughput

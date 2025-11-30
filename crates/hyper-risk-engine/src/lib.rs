@@ -97,6 +97,7 @@ pub mod fast_path;
 pub mod medium_path;
 pub mod slow_path;
 pub mod simd;
+pub mod market_bridge;
 
 // CWTS - Complex Weighted Trading System integrations
 #[cfg(any(
@@ -141,6 +142,11 @@ pub use crate::evt::{
 pub use crate::position_sizing::{
     KellyCriterion, FractionalKelly, RiskTolerance,
     PPOPositionSizer, PositionSizeResult,
+};
+
+pub use crate::market_bridge::{
+    MarketDataBridge, DataQualityValidator, BridgeError, BridgeResult,
+    RegimeDetectionConfig, batch_detect_regimes,
 };
 
 // CWTS - Complex Weighted Trading System re-exports

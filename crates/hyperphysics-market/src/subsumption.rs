@@ -23,7 +23,6 @@
 //! - Operate independently without central controller
 
 use serde::{Deserialize, Serialize};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Configuration for subsumption trading system
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -438,6 +437,7 @@ impl ExplorationLayer {
     }
 
     /// Update exploration time
+    #[allow(dead_code)]
     fn update(&mut self, time: u64) {
         self.last_exploration_time = time;
     }
@@ -632,6 +632,7 @@ impl Default for SubsumptionConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     fn create_test_config() -> SubsumptionConfig {
         SubsumptionConfig {

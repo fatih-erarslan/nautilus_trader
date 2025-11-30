@@ -656,7 +656,7 @@ def substep():
         let start = self.particles.positions.len();
 
         // Generate particles based on body shape (simplified - creates a cube of particles)
-        let particle_spacing = 0.02; // 2cm spacing
+        let particle_spacing: f32 = 0.02; // 2cm spacing
         let half_extent = 0.1; // 10cm half-extent
 
         let mut count = 0;
@@ -805,7 +805,7 @@ impl PhysicsBackend for TaichiBackend {
             parallel: true,
             gpu: true,
             differentiable: self.config.requires_grad,
-            max_bodies: self.config.max_particles,
+            max_bodies: self.config.max_particles as u32,
         }
     }
 
@@ -830,7 +830,7 @@ impl PhysicsBackend for TaichiBackend {
                     }
                 }
                 com /= body.particle_count as f32;
-                body.transform.position = Point3::from(com);
+                body.transform.position = com;
 
                 // Compute average velocity
                 let mut avg_vel = Vector3::zeros();

@@ -22,8 +22,6 @@ use ndarray::Array1;
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "parallel")]
-use rayon::prelude::*;
 
 /// PSO configuration with formally verified parameter bounds.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -193,7 +191,7 @@ impl ParticleSwarmOptimizer {
     ) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
 
-        let dimension = bounds.dimension();
+        let _dimension = bounds.dimension();
         let ranges = bounds.ranges();
 
         // Calculate velocity bounds

@@ -60,6 +60,7 @@ pub struct SocialSpider {
 }
 
 impl SocialSpider {
+    /// Create a new Social Spider optimizer
     pub fn new(config: SSOConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         let pop_size = opt_config.population_size;
@@ -74,6 +75,7 @@ impl SocialSpider {
         })
     }
 
+    /// Initialize spider population with gender assignment
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
         let mut rng = rand::thread_rng();
@@ -88,6 +90,7 @@ impl SocialSpider {
         }).collect();
     }
 
+    #[allow(dead_code)]
     fn calculate_weight(&self, fitness: f64, worst: f64, best: f64) -> f64 {
         Self::compute_weight(fitness, worst, best)
     }
@@ -108,6 +111,7 @@ impl SocialSpider {
         a.iter().zip(b.iter()).map(|(x, y)| (x - y).powi(2)).sum::<f64>().sqrt()
     }
 
+    /// Execute one iteration of spider social behavior and vibration
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -293,6 +297,7 @@ impl SocialSpider {
         Ok(())
     }
 
+    /// Run the full social spider optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         while self.iteration < self.opt_config.max_iterations && !self.converged {

@@ -364,7 +364,7 @@ impl HyperPhysicsStrategy {
     }
 
     /// Get execution bridge statistics
-    pub async fn get_exec_stats(&self) -> crate::adapter::exec_bridge::ExecBridgeStats {
+    pub async fn get_exec_stats(&self) -> crate::adapter::ExecBridgeStats {
         self.exec_bridge.get_stats().await
     }
 

@@ -453,7 +453,7 @@ impl ComplexSystemsSentinel {
         let autocorr_score = autocorr.abs().min(1.0);
 
         // Weighted average
-        (0.3 * hurst_score + 0.3 * tail_score + 0.2 * kurtosis_score + 0.2 * autocorr_score)
+        0.3 * hurst_score + 0.3 * tail_score + 0.2 * kurtosis_score + 0.2 * autocorr_score
     }
 
     /// Classify SOC regime based on metrics.

@@ -69,6 +69,7 @@ pub struct AlpacaWebSocketClient {
     ws_stream: Option<WsStream>,
     api_key: String,
     secret_key: String,
+    #[allow(dead_code)]
     subscriptions: Vec<String>,
     authenticated: bool,
     ws_url: String,
@@ -181,6 +182,7 @@ impl AlpacaProvider {
     const MAX_RETRIES: u32 = 3;
 
     /// Initial retry delay in milliseconds
+    #[allow(dead_code)]
     const INITIAL_RETRY_DELAY_MS: u64 = 100;
 
     /// Rate limit: 200 requests per minute for free tier
@@ -268,6 +270,7 @@ impl AlpacaProvider {
     }
 
     /// Retry request with exponential backoff
+    #[allow(dead_code)]
     async fn retry_with_backoff<F, Fut, T>(
         &self,
         mut operation: F,
@@ -683,6 +686,7 @@ impl AlpacaWebSocketClient {
 #[derive(Debug, Deserialize)]
 struct AlpacaBarResponse {
     bars: Vec<AlpacaBar>,
+    #[allow(dead_code)]
     symbol: String,
     next_page_token: Option<String>,
 }
@@ -710,7 +714,9 @@ struct AlpacaBar {
 #[derive(Debug, Deserialize)]
 struct AlpacaTradesResponse {
     trades: Vec<AlpacaTradeData>,
+    #[allow(dead_code)]
     symbol: String,
+    #[allow(dead_code)]
     next_page_token: Option<String>,
 }
 

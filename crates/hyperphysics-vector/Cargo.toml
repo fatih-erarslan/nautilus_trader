@@ -1,0 +1,45 @@
+[package]
+name = "hyperphysics-vector"
+version = "0.1.0"
+edition = "2021"
+description = "Vector database integration for HyperPhysics using ruvector-core AgenticDB"
+license = "MIT OR Apache-2.0"
+authors = ["HyperPhysics Team"]
+
+[dependencies]
+# Core vector database from vendor
+ruvector-core = { path = "../vendor/ruvector/crates/ruvector-core", features = ["storage", "simd", "uuid-support", "hnsw"] }
+
+# HyperPhysics core types
+hyperphysics-core = { path = "../hyperphysics-core" }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "2.0.0-rc.3"
+
+# Async
+tokio = { version = "1.48", features = ["sync", "rt"] }
+async-trait = "0.1"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+
+# Math
+ndarray = { version = "0.16", features = ["serde"] }
+nalgebra = "0.33"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Collections
+parking_lot = "0.12"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3.13"
+criterion = { version = "0.5", features = ["html_reports"] }

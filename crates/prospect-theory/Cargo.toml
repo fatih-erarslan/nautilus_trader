@@ -14,7 +14,8 @@ name = "prospect_theory_rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-pyo3 = { version = "0.24.1", features = ["extension-module"], optional = true }
+# Updated for CVE RUSTSEC-2025-0020 fix
+pyo3 = { version = "0.24", features = ["extension-module"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 thiserror = "1.0"
 rayon = { version = "1.7", optional = true }
@@ -56,7 +57,7 @@ name = "performance_validation"
 harness = false
 
 [features]
-default = ["python-bindings"]
+default = []
 python-bindings = ["pyo3"]
 simd = ["wide", "bytemuck", "aligned-vec"]
 avx2 = ["simd"]

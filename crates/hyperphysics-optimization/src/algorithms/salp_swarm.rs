@@ -37,6 +37,7 @@ impl AlgorithmConfig for SSAConfig {
 
 /// Salp Swarm Optimizer.
 pub struct SalpSwarm {
+    #[allow(dead_code)]
     config: SSAConfig,
     opt_config: OptimizationConfig,
     population: Population,
@@ -47,6 +48,7 @@ pub struct SalpSwarm {
 }
 
 impl SalpSwarm {
+    /// Create a new Salp Swarm optimizer
     pub fn new(config: SSAConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         Ok(Self {
@@ -60,11 +62,13 @@ impl SalpSwarm {
         })
     }
 
+    /// Initialize salp population and food source
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
         self.food_source = None;
     }
 
+    /// Execute one iteration of salp chain movement
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -162,6 +166,7 @@ impl SalpSwarm {
         Ok(())
     }
 
+    /// Run the full salp swarm optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
 

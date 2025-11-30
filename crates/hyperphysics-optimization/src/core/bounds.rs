@@ -181,20 +181,27 @@ impl Bounds {
 pub enum Constraint {
     /// Linear constraint: a^T x ≤ b (inequality) or a^T x = b (equality)
     Linear {
+        /// Constraint coefficients vector
         coefficients: Vec<f64>,
+        /// Constraint bound value
         bound: f64,
+        /// Type of constraint (inequality or equality)
         constraint_type: ConstraintType,
     },
     /// Quadratic constraint: x^T Q x + c^T x ≤ b
     Quadratic {
         /// Quadratic matrix (flattened row-major)
         q_matrix: Vec<f64>,
+        /// Linear term coefficients
         linear: Vec<f64>,
+        /// Constraint bound value
         bound: f64,
     },
     /// Custom constraint with evaluation function name
     Custom {
+        /// Name of the custom constraint
         name: String,
+        /// Type of constraint (inequality or equality)
         constraint_type: ConstraintType,
     },
 }

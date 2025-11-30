@@ -28,7 +28,7 @@ use active_inference_agent::{
 };
 
 use crate::core::types::{MarketRegime, Portfolio, RiskDecision, RiskLevel, Symbol, Timestamp};
-use crate::core::error::{Result, RiskError};
+use crate::core::error::Result;
 use super::base::{Agent, AgentId, AgentStatus, AgentConfig, AgentStats};
 
 /// Configuration for the Conscious Risk Agent.
@@ -109,14 +109,34 @@ impl Default for ConsciousRiskConfig {
 pub enum RiskAction {
     /// Maintain current position.
     Hold,
-    /// Reduce exposure by factor.
-    ReduceExposure { factor: f64, reason: String },
-    /// Increase exposure by factor.
-    IncreaseExposure { factor: f64, reason: String },
-    /// Hedge specific risk.
-    Hedge { symbol: Symbol, hedge_ratio: f64 },
-    /// Exit position entirely.
-    Exit { symbol: Symbol, urgency: f64 },
+    /// Reduce exposure by factor and reason.
+    ReduceExposure {
+        /// Reduction factor (0.0 to 1.0).
+        factor: f64,
+        /// Reason for the reduction.
+        reason: String
+    },
+    /// Increase exposure by factor and reason.
+    IncreaseExposure {
+        /// Increase factor (> 0.0).
+        factor: f64,
+        /// Reason for the increase.
+        reason: String
+    },
+    /// Hedge specific risk with hedge ratio.
+    Hedge {
+        /// Symbol to hedge.
+        symbol: Symbol,
+        /// Hedge ratio (position size fraction).
+        hedge_ratio: f64
+    },
+    /// Exit position entirely with urgency level.
+    Exit {
+        /// Symbol to exit.
+        symbol: Symbol,
+        /// Urgency level (0.0 to 1.0).
+        urgency: f64
+    },
 }
 
 /// Conscious experience from a risk processing cycle.
@@ -224,8 +244,8 @@ pub struct ConsciousRiskAgent {
     /// Accumulated free energy (for trend detection).
     accumulated_free_energy: RwLock<Vec<f64>>,
 
-    /// Market state beliefs history.
-    belief_history: RwLock<Vec<na::DVector<f64>>>,
+    /// Market state beliefs history (for future trend analysis).
+    _belief_history: RwLock<Vec<na::DVector<f64>>>,
 }
 
 impl ConsciousRiskAgent {
@@ -240,7 +260,7 @@ impl ConsciousRiskAgent {
             #[cfg(feature = "active-inference")]
             last_experience: RwLock::new(None),
             accumulated_free_energy: RwLock::new(Vec::with_capacity(100)),
-            belief_history: RwLock::new(Vec::with_capacity(100)),
+            _belief_history: RwLock::new(Vec::with_capacity(100)),
         }
     }
 
@@ -405,7 +425,7 @@ impl ConsciousRiskAgent {
             }
         }
         {
-            let mut belief_hist = self.belief_history.write();
+            let mut belief_hist = self._belief_history.write();
             belief_hist.push(experience.belief.clone());
             if belief_hist.len() > 100 {
                 belief_hist.remove(0);
@@ -573,7 +593,7 @@ impl Agent for ConsciousRiskAgent {
         Self::status_from_u8(self.status.load(Ordering::Relaxed))
     }
 
-    fn process(&self, portfolio: &Portfolio, regime: MarketRegime) -> Result<Option<RiskDecision>> {
+    fn process(&self, _portfolio: &Portfolio, regime: MarketRegime) -> Result<Option<RiskDecision>> {
         let start = Instant::now();
         self.status.store(AgentStatus::Processing as u8, Ordering::Relaxed);
 

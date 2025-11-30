@@ -566,28 +566,25 @@ mod tests {
     #[test]
     fn test_parameter_shift_gradient() {
         let gradient_computer = ParameterShiftGradient::new();
-        
-        // Simple quadratic function for testing
-        let test_fn = |params: &[f64]| -> Result<f64> {
-            Ok(params[0] * params[0])
-        };
-        
+
         let params = vec![2.0];
         let observable = constants::pauli_z();
-        
-        // Create a wrapper function to satisfy the fn pointer requirement
+
+        // Test with sin(x) function
+        // Gradient of sin(x) at x=2 is cos(2) ≈ -0.416
         fn test_wrapper(params: &[f64]) -> Result<f64> {
             Ok(params[0].sin())
         }
-        
+
         let gradients = gradient_computer.compute_gradients(
             test_wrapper,
             &params,
             &observable,
         ).unwrap();
-        
-        // Gradient of x^2 at x=2 should be approximately 4
-        assert_abs_diff_eq!(gradients[0], 4.0, epsilon = 0.1);
+
+        // Gradient of sin(x) at x=2 should be approximately cos(2) ≈ -0.416
+        let expected_gradient = 2.0_f64.cos();
+        assert_abs_diff_eq!(gradients[0], expected_gradient, epsilon = 0.1);
     }
     
     #[test]

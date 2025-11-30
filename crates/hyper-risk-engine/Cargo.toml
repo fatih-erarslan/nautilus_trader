@@ -32,11 +32,18 @@ cwts-full = ["cwts-autopoiesis", "cwts-game-theory", "cwts-physics", "cwts-nauti
 full = ["simd", "gpu", "similarity", "ml", "active-inference", "cwts-full"] # All features
 
 [dependencies]
+# Market data integration
+hyperphysics-market = { path = "../hyperphysics-market" }
+
 # Core mathematical libraries
 nalgebra = { version = "0.34", features = ["serde-serialize"] }
 ndarray = { version = "0.15", features = ["rayon", "serde"] }
 num-traits = "0.2"
 statrs = "0.17"
+
+# Async runtime
+async-trait = "0.1"
+futures = "0.3"
 
 # Concurrency & lock-free structures (LMAX Disruptor pattern)
 crossbeam = "0.8"

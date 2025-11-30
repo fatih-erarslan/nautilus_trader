@@ -48,6 +48,7 @@ pub struct ArtificialBeeColony {
 }
 
 impl ArtificialBeeColony {
+    /// Create a new Artificial Bee Colony optimizer
     pub fn new(config: ABCConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         let pop_size = opt_config.population_size;
@@ -62,6 +63,7 @@ impl ArtificialBeeColony {
         })
     }
 
+    /// Initialize bee colony with food sources
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
     }
@@ -70,6 +72,7 @@ impl ArtificialBeeColony {
         if fitness >= 0.0 { 1.0 / (1.0 + fitness) } else { 1.0 + fitness.abs() }
     }
 
+    /// Execute one iteration with employed, onlooker, and scout bee phases
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -169,6 +172,7 @@ impl ArtificialBeeColony {
         Ok(())
     }
 
+    /// Run the full bee colony optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         while self.iteration < self.opt_config.max_iterations && !self.converged {

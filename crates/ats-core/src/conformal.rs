@@ -366,10 +366,27 @@ impl ConformalPredictor {
 
     /// Computes quantile threshold for given confidence level
     fn compute_quantile_threshold(confidence: f64) -> f64 {
-        // Simple approximation for fast computation
-        // In practice, this would use more sophisticated methods
-        let alpha = 1.0 - confidence;
-        -2.0 * (alpha / 2.0).ln().sqrt()
+        // Approximation of the standard normal quantile (inverse CDF)
+        // Using Abramowitz and Stegun approximation for probit function
+        // For confidence level p, we want z such that P(Z <= z) = p
+        let p = confidence;
+        if p <= 0.0 {
+            return f64::NEG_INFINITY;
+        }
+        if p >= 1.0 {
+            return f64::INFINITY;
+        }
+
+        // Coefficients for rational approximation
+        let t = (-2.0 * (1.0 - p).ln()).sqrt();
+        let c0 = 2.515517;
+        let c1 = 0.802853;
+        let c2 = 0.010328;
+        let d1 = 1.432788;
+        let d2 = 0.189269;
+        let d3 = 0.001308;
+
+        t - (c0 + c1 * t + c2 * t * t) / (1.0 + d1 * t + d2 * t * t + d3 * t * t * t)
     }
 
     /// Validates exchangeability assumption

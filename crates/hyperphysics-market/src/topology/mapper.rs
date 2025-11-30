@@ -35,7 +35,6 @@ use crate::error::{MarketError, MarketResult};
 use hyperphysics_geometry::{
     poincare::PoincarePoint,
     tessellation_73::HeptagonalTessellation,
-    Result as GeometryResult,
 };
 use nalgebra as na;
 use std::collections::HashMap;
@@ -383,7 +382,7 @@ impl MarketTopologyMapper {
         // Union-Find data structure
         let mut parent: Vec<usize> = (0..num_points).collect();
         let mut rank = vec![0; num_points];
-        let mut birth_time = vec![0.0; num_points]; // All components born at time 0
+        let birth_time = vec![0.0; num_points]; // All components born at time 0
 
         fn find(parent: &mut [usize], x: usize) -> usize {
             if parent[x] != x {
@@ -400,7 +399,7 @@ impl MarketTopologyMapper {
 
             if root1 != root2 {
                 // Merge components: the younger one dies
-                let (dying_root, surviving_root) = if birth_time[root1] > birth_time[root2] {
+                let (dying_root, _surviving_root) = if birth_time[root1] > birth_time[root2] {
                     (root1, root2)
                 } else {
                     (root2, root1)

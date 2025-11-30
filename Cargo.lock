@@ -179,7 +179,7 @@ checksum = "4f823d037a7ec6ea2197046bafd4ae150e6bc36f9ca347404f46a46823fa84f2"
 dependencies = [
  "approx 0.3.2",
  "num-complex 0.2.4",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -190,6 +190,12 @@ checksum = "377e4c0ba83e4431b10df45c1d4666f178ea9c552cac93e60c3a88bf32785923"
 dependencies = [
  "as-slice",
 ]
+
+[[package]]
+name = "aligned-vec"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4aa90d7ce82d4be67b64039a3d588d38dbcc6736577de4a847025ce5b0c468d1"
 
 [[package]]
 name = "aligned-vec"
@@ -302,7 +308,7 @@ dependencies = [
  "env_logger 0.11.8",
  "lazy_static",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "rayon",
 ]
@@ -389,7 +395,7 @@ version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0e60b75072ecd4168020818c0107f2857bb6c4e64252d8d3983f6263b40a5c3"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -398,7 +404,7 @@ version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f2a05fd1bd10b2527e20a2cd32d8873d115b8b39fe219ee25f42a8aca6ba278"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -407,7 +413,7 @@ version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cab112f0a86d568ea0e627cc1d6be74a1e9cd55214684db5561995f6dad897c6"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -439,7 +445,7 @@ dependencies = [
  "anyhow",
  "argmin-math",
  "instant",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "rand 0.8.5",
  "rand_xoshiro",
@@ -459,7 +465,7 @@ dependencies = [
  "ndarray-linalg",
  "num-complex 0.4.6",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "thiserror 1.0.69",
 ]
@@ -698,33 +704,39 @@ name = "ats-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "approx 0.5.1",
  "async-trait",
  "axum",
  "bincode 1.3.3",
  "bytemuck",
  "chrono",
+ "criterion",
  "ctrlc",
  "flate2",
  "futures",
  "futures-util",
  "hyper 1.8.0",
  "instant",
+ "js-sys",
  "jsonwebtoken",
  "libc",
  "memmap2",
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
+ "proptest",
  "rand 0.8.5",
  "rand_distr 0.4.3",
  "rayon",
  "regex",
  "rmp-serde",
  "serde",
+ "serde-wasm-bindgen",
  "serde_json",
  "sha2",
  "statrs 0.16.1",
+ "tempfile",
  "thiserror 1.0.69",
  "tokio",
  "tokio-tungstenite 0.21.0",
@@ -732,6 +744,8 @@ dependencies = [
  "tower-http",
  "tracing",
  "uuid",
+ "wasm-bindgen",
+ "web-sys",
  "wide",
 ]
 
@@ -823,7 +837,7 @@ dependencies = [
  "chrono",
  "nalgebra 0.32.6",
  "ndarray 0.15.6",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "rand 0.8.5",
  "serde",
@@ -845,7 +859,7 @@ dependencies = [
  "nalgebra 0.32.6",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "petgraph 0.6.5",
  "rand 0.8.5",
@@ -921,7 +935,7 @@ dependencies = [
  "nalgebra 0.32.6",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "rand 0.8.5",
  "rand_distr 0.4.3",
@@ -955,7 +969,7 @@ dependencies = [
  "arrayvec 0.7.6",
  "log",
  "num-rational 0.4.2",
- "num-traits",
+ "num-traits 0.2.19",
  "pastey",
  "rayon",
  "thiserror 2.0.17",
@@ -1004,7 +1018,7 @@ dependencies = [
  "parry2d-f64",
  "serde",
  "slab",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "thread_local",
 ]
@@ -1033,7 +1047,7 @@ dependencies = [
  "parry3d-f64",
  "serde",
  "slab",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "thread_local",
 ]
@@ -1213,7 +1227,7 @@ dependencies = [
  "petgraph 0.8.3",
  "ron",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "thread_local",
  "tracing",
@@ -1348,7 +1362,7 @@ dependencies = [
  "derive_more 2.0.1",
  "downcast-rs 2.0.2",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "wgpu-types 26.0.0",
 ]
@@ -1407,7 +1421,7 @@ dependencies = [
  "bitflags 2.10.0",
  "nonmax",
  "radsort",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "tracing",
 ]
@@ -1469,7 +1483,7 @@ dependencies = [
  "fixedbitset 0.5.7",
  "nonmax",
  "petgraph 0.6.5",
- "smallvec",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -1495,7 +1509,7 @@ dependencies = [
  "nonmax",
  "serde",
  "slotmap",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "variadics_please",
 ]
@@ -1604,7 +1618,7 @@ dependencies = [
  "percent-encoding",
  "serde",
  "serde_json",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "tracing",
 ]
@@ -1634,7 +1648,7 @@ dependencies = [
  "bevy_reflect 0.15.1",
  "bevy_utils 0.15.3",
  "disqualified",
- "smallvec",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -1825,7 +1839,7 @@ dependencies = [
  "itertools 0.13.0",
  "rand 0.8.5",
  "rand_distr 0.4.3",
- "smallvec",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -1843,7 +1857,7 @@ dependencies = [
  "rand 0.9.2",
  "rand_distr 0.5.1",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "variadics_please",
 ]
@@ -1927,7 +1941,7 @@ dependencies = [
  "fixedbitset 0.5.7",
  "nonmax",
  "offset-allocator",
- "smallvec",
+ "smallvec 1.15.1",
  "static_assertions",
  "thiserror 2.0.17",
  "tracing",
@@ -2004,7 +2018,7 @@ dependencies = [
  "erased-serde",
  "glam 0.29.3",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
  "smol_str",
 ]
 
@@ -2028,7 +2042,7 @@ dependencies = [
  "inventory",
  "petgraph 0.8.3",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
  "smol_str",
  "thiserror 2.0.17",
  "uuid",
@@ -2103,7 +2117,7 @@ dependencies = [
  "nonmax",
  "offset-allocator",
  "send_wrapper",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "tracing",
  "variadics_please",
@@ -2296,7 +2310,7 @@ dependencies = [
  "bevy_utils 0.17.3",
  "cosmic-text",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
  "sys-locale",
  "thiserror 2.0.17",
  "tracing",
@@ -2399,7 +2413,7 @@ dependencies = [
  "bevy_window",
  "derive_more 2.0.1",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
  "taffy",
  "thiserror 2.0.17",
  "tracing",
@@ -2979,7 +2993,7 @@ dependencies = [
  "half",
  "hashbrown 0.14.5",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "portable-atomic-util",
  "rand 0.8.5",
  "rmp-serde",
@@ -3004,7 +3018,7 @@ dependencies = [
  "derive-new 0.7.0",
  "half",
  "hashbrown 0.15.5",
- "num-traits",
+ "num-traits 0.2.19",
  "portable-atomic-util",
  "rand 0.8.5",
  "serde",
@@ -3141,7 +3155,7 @@ dependencies = [
  "half",
  "hashbrown 0.14.5",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
  "spin 0.9.8",
@@ -3164,7 +3178,7 @@ dependencies = [
  "half",
  "hashbrown 0.15.5",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
  "spin 0.9.8",
@@ -3182,9 +3196,9 @@ dependencies = [
  "burn-tensor 0.14.0",
  "derive-new 0.6.0",
  "libm",
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "ndarray 0.16.1",
- "num-traits",
+ "num-traits 0.2.19",
  "portable-atomic-util",
  "rand 0.8.5",
  "spin 0.9.8",
@@ -3202,9 +3216,9 @@ dependencies = [
  "burn-tensor 0.16.1",
  "derive-new 0.7.0",
  "libm",
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "ndarray 0.16.1",
- "num-traits",
+ "num-traits 0.2.19",
  "portable-atomic-util",
  "rand 0.8.5",
  "spin 0.9.8",
@@ -3250,7 +3264,7 @@ dependencies = [
  "derive-new 0.6.0",
  "half",
  "hashbrown 0.14.5",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "rand_distr 0.4.3",
  "serde",
@@ -3270,7 +3284,7 @@ dependencies = [
  "derive-new 0.7.0",
  "half",
  "hashbrown 0.15.5",
- "num-traits",
+ "num-traits 0.2.19",
  "portable-atomic-util",
  "rand 0.8.5",
  "rand_distr 0.4.3",
@@ -3481,7 +3495,7 @@ dependencies = [
  "gemm 0.17.1",
  "half",
  "memmap2",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "rand 0.8.5",
  "rand_distr 0.4.3",
@@ -3506,7 +3520,7 @@ dependencies = [
  "half",
  "memmap2",
  "metal 0.27.0",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "rand 0.9.2",
  "rand_distr 0.5.1",
@@ -3549,7 +3563,7 @@ checksum = "be1160c3b63f47d40d91110a3e1e1e566ae38edddbbf492a60b40ffc3bc1ff38"
 dependencies = [
  "candle-core 0.8.4",
  "half",
- "num-traits",
+ "num-traits 0.2.19",
  "rayon",
  "safetensors 0.4.5",
  "serde",
@@ -3584,7 +3598,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ff11ddd2af3b5e80dd0297fee6e56ac038d9bdc549573cdb51bd6d2efe7f05e"
 dependencies = [
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
 ]
@@ -3681,7 +3695,7 @@ checksum = "145052bdd345b87320e369255277e3fb5152762ad123a901ef5c262dd38fe8d2"
 dependencies = [
  "iana-time-zone",
  "js-sys",
- "num-traits",
+ "num-traits 0.2.19",
  "serde",
  "wasm-bindgen",
  "windows-link 0.2.1",
@@ -3854,6 +3868,25 @@ dependencies = [
  "serde",
  "termcolor",
  "unicode-width",
+]
+
+[[package]]
+name = "coin_cbc"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d602045cd2e7ad02608a71492af94357f493a6f3c934ce854c03bf10fddc5780"
+dependencies = [
+ "coin_cbc_sys",
+ "lazy_static",
+]
+
+[[package]]
+name = "coin_cbc_sys"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "085619f8bdc38e24e25c6336ecc3f2e6c0543d67566dff6daef0e32f7ac20f76"
+dependencies = [
+ "pkg-config",
 ]
 
 [[package]]
@@ -4206,7 +4239,7 @@ dependencies = [
  "futures",
  "is-terminal",
  "itertools 0.10.5",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "oorandom",
  "plotters",
@@ -4235,6 +4268,12 @@ name = "critical-section"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "790eea4361631c5e7d22598ecd5723ff611904e3344ce8720784c93e3d83d40b"
+
+[[package]]
+name = "crossbeam"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24ce9782d4d5c53674646a6a4c1863a21a8fc0cb649b3c94dfc16e45071dea19"
 
 [[package]]
 name = "crossbeam"
@@ -4450,7 +4489,7 @@ dependencies = [
  "derive-new 0.6.0",
  "half",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "serde",
 ]
 
@@ -4468,7 +4507,7 @@ dependencies = [
  "derive_more 1.0.0",
  "half",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "serde",
  "serde_json",
@@ -4610,7 +4649,7 @@ checksum = "0912890b52cc6f9636e0070320ff93dec27af15d57453789081b9a8bdb49786d"
 dependencies = [
  "cubecl-core 0.4.0",
  "cubecl-runtime 0.4.0",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -5223,7 +5262,7 @@ dependencies = [
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "parking_lot",
  "particle-swarm",
  "rand 0.8.5",
@@ -5441,7 +5480,7 @@ version = "0.22.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ad9cdb4b747e485a12abb0e6566612956c7a1bafa3bdb8d682c5b6d403589e48"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -5492,7 +5531,7 @@ dependencies = [
  "lebe",
  "miniz_oxide",
  "rayon-core",
- "smallvec",
+ "smallvec 1.15.1",
  "zune-inflate",
 ]
 
@@ -5562,7 +5601,7 @@ dependencies = [
  "itertools 0.12.1",
  "ndarray 0.15.6",
  "num-bigint 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "prost",
  "prost-build",
  "rand 0.8.5",
@@ -5585,7 +5624,7 @@ dependencies = [
  "ndarray 0.15.6",
  "num-bigint 0.4.6",
  "num-bigint-dig",
- "num-traits",
+ "num-traits 0.2.19",
  "prost",
  "prost-build",
  "rand 0.8.5",
@@ -5612,7 +5651,7 @@ checksum = "4ebba91076931f5eef912ea10bc25d2a81aa75438d2d03d04bcc31fa404b3562"
 dependencies = [
  "itertools 0.12.1",
  "num-bigint-dig",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
 ]
 
@@ -5775,6 +5814,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ab85b9b05e3978cc9a9cf8fea7f01b494e1a09ed3037e16ba39edc7a29eb61a"
 
 [[package]]
+name = "fuchsia-cprng"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
+
+[[package]]
 name = "funty"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5908,14 +5953,21 @@ dependencies = [
  "async-trait",
  "bincode 1.3.3",
  "chrono",
+ "criterion",
  "futures",
+ "good_lp",
  "log",
+ "mcts",
+ "minilp",
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "parking_lot",
  "petgraph 0.6.5",
+ "proptest",
+ "pyo3",
+ "quickcheck",
  "rand 0.8.5",
  "rand_distr 0.4.3",
  "rayon",
@@ -5924,6 +5976,7 @@ dependencies = [
  "statrs 0.16.1",
  "thiserror 1.0.69",
  "tokio",
+ "tokio-test",
  "tracing",
 ]
 
@@ -5941,7 +5994,7 @@ dependencies = [
  "gemm-f32 0.17.1",
  "gemm-f64 0.17.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 10.7.0",
  "seq-macro",
@@ -5961,7 +6014,7 @@ dependencies = [
  "gemm-f32 0.18.2",
  "gemm-f64 0.18.2",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 11.6.0",
  "seq-macro",
@@ -5976,7 +6029,7 @@ dependencies = [
  "dyn-stack 0.10.0",
  "gemm-common 0.17.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 10.7.0",
  "seq-macro",
@@ -5991,7 +6044,7 @@ dependencies = [
  "dyn-stack 0.13.2",
  "gemm-common 0.18.2",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 11.6.0",
  "seq-macro",
@@ -6006,7 +6059,7 @@ dependencies = [
  "dyn-stack 0.10.0",
  "gemm-common 0.17.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 10.7.0",
  "seq-macro",
@@ -6021,7 +6074,7 @@ dependencies = [
  "dyn-stack 0.13.2",
  "gemm-common 0.18.2",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 11.6.0",
  "seq-macro",
@@ -6037,7 +6090,7 @@ dependencies = [
  "dyn-stack 0.10.0",
  "half",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "paste 1.0.15",
  "pulp 0.18.22",
@@ -6058,7 +6111,7 @@ dependencies = [
  "half",
  "libm",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "paste 1.0.15",
  "pulp 0.21.5",
@@ -6079,7 +6132,7 @@ dependencies = [
  "gemm-f32 0.17.1",
  "half",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 10.7.0",
  "rayon",
@@ -6097,7 +6150,7 @@ dependencies = [
  "gemm-f32 0.18.2",
  "half",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 11.6.0",
  "rayon",
@@ -6113,7 +6166,7 @@ dependencies = [
  "dyn-stack 0.10.0",
  "gemm-common 0.17.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 10.7.0",
  "seq-macro",
@@ -6128,7 +6181,7 @@ dependencies = [
  "dyn-stack 0.13.2",
  "gemm-common 0.18.2",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 11.6.0",
  "seq-macro",
@@ -6143,7 +6196,7 @@ dependencies = [
  "dyn-stack 0.10.0",
  "gemm-common 0.17.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 10.7.0",
  "seq-macro",
@@ -6158,7 +6211,7 @@ dependencies = [
  "dyn-stack 0.13.2",
  "gemm-common 0.18.2",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "raw-cpuid 11.6.0",
  "seq-macro",
@@ -6537,6 +6590,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "good_lp"
+version = "1.14.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "776aa1ba88ac058e78408c17f4dbff826a51ae08ed6642f71ca0edd7fe9383f3"
+dependencies = [
+ "coin_cbc",
+ "fnv",
+]
+
+[[package]]
 name = "governor"
 version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6550,7 +6613,7 @@ dependencies = [
  "parking_lot",
  "portable-atomic",
  "rand 0.8.5",
- "smallvec",
+ "smallvec 1.15.1",
  "spinning_top",
 ]
 
@@ -6741,7 +6804,7 @@ dependencies = [
  "bytemuck",
  "cfg-if 1.0.4",
  "crunchy",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.9.2",
  "rand_distr 0.5.1",
  "serde",
@@ -6932,7 +6995,7 @@ dependencies = [
  "lazy_static",
  "log",
  "mmap-rs",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "parking_lot",
  "rand 0.9.2",
@@ -7080,7 +7143,7 @@ dependencies = [
  "itoa",
  "pin-project-lite",
  "pin-utils",
- "smallvec",
+ "smallvec 1.15.1",
  "tokio",
  "want",
 ]
@@ -7092,22 +7155,25 @@ dependencies = [
  "active-inference-agent",
  "anyhow",
  "approx 0.5.1",
+ "async-trait",
  "autopoiesis",
  "bincode 1.3.3",
  "bytemuck",
  "chrono",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "dashmap",
+ "futures",
  "game-theory-engine",
  "hyperphysics-lsh",
+ "hyperphysics-market",
  "hyperphysics-ml",
  "hyperphysics-nautilus",
  "hyperphysics-neural-trader",
  "hyperphysics-similarity",
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
- "num-traits",
+ "num-traits 0.2.19",
  "parking_lot",
  "proptest",
  "rand 0.8.5",
@@ -7117,6 +7183,7 @@ dependencies = [
  "rayon",
  "serde",
  "serde_json",
+ "sha2",
  "statrs 0.17.1",
  "thiserror 1.0.69",
  "tokio",
@@ -7323,7 +7390,7 @@ dependencies = [
  "criterion",
  "nalgebra 0.34.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "proptest",
  "serde",
  "thiserror 1.0.69",
@@ -7369,7 +7436,7 @@ dependencies = [
  "burn-wgpu 0.14.0",
  "bytemuck",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "dashmap",
  "nalgebra 0.33.2",
  "ndarray 0.15.6",
@@ -7399,7 +7466,7 @@ dependencies = [
  "bincode 1.3.3",
  "chrono",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "cuckoo-search",
  "dashmap",
  "dynamic-swarm-selector",
@@ -7421,7 +7488,7 @@ dependencies = [
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "parking_lot",
  "proptest",
@@ -7452,9 +7519,9 @@ dependencies = [
  "approx 0.5.1",
  "bincode 1.3.3",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "memmap2",
- "num-traits",
+ "num-traits 0.2.19",
  "parking_lot",
  "proptest",
  "rand 0.8.5",
@@ -7474,7 +7541,7 @@ dependencies = [
  "fhe",
  "fhe-traits",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
  "thiserror 1.0.69",
@@ -7489,7 +7556,7 @@ dependencies = [
  "bincode 1.3.3",
  "bitvec",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "memmap2",
  "parking_lot",
  "proptest",
@@ -7511,6 +7578,7 @@ dependencies = [
  "async-trait",
  "base64 0.21.7",
  "chrono",
+ "crossbeam-epoch",
  "futures",
  "futures-util",
  "governor",
@@ -7552,7 +7620,7 @@ dependencies = [
  "candle-core 0.8.4",
  "candle-nn",
  "criterion",
- "num-traits",
+ "num-traits 0.2.19",
  "proptest",
  "rand 0.8.5",
  "rand_distr 0.4.3",
@@ -7593,6 +7661,7 @@ dependencies = [
  "anyhow",
  "approx 0.5.1",
  "async-trait",
+ "bincode 1.3.3",
  "chrono",
  "criterion",
  "csv",
@@ -7678,7 +7747,7 @@ dependencies = [
  "dashmap",
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
- "num-traits",
+ "num-traits 0.2.19",
  "parking_lot",
  "proptest",
  "quickcheck",
@@ -7711,7 +7780,7 @@ dependencies = [
  "rand_distr 0.4.3",
  "rayon",
  "serde",
- "sprs",
+ "sprs 0.11.1",
  "thiserror 1.0.69",
 ]
 
@@ -7745,7 +7814,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "dashmap",
  "hnsw_rs",
  "nalgebra 0.33.2",
@@ -7757,7 +7826,7 @@ dependencies = [
  "serde",
  "serde_json",
  "simdeez",
- "smallvec",
+ "smallvec 1.15.1",
  "statrs 0.18.0",
  "thiserror 2.0.17",
  "tokio",
@@ -7799,7 +7868,7 @@ name = "hyperphysics-similarity"
 version = "0.1.0"
 dependencies = [
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "hyperphysics-hnsw",
  "hyperphysics-lsh",
  "parking_lot",
@@ -7852,7 +7921,7 @@ dependencies = [
  "bincode 1.3.3",
  "bumpalo",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "cxx",
  "cxx-build",
  "jolt-hyperphysics",
@@ -7868,7 +7937,7 @@ dependencies = [
  "serde",
  "simba 0.9.1",
  "slotmap",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "tracing",
  "typed-arena",
@@ -7890,7 +7959,7 @@ dependencies = [
  "hyperphysics-thermo",
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
- "num-traits",
+ "num-traits 0.2.19",
  "proptest",
  "quickcheck",
  "rand 0.8.5",
@@ -8005,7 +8074,7 @@ dependencies = [
  "icu_normalizer_data",
  "icu_properties",
  "icu_provider",
- "smallvec",
+ "smallvec 1.15.1",
  "zerovec",
 ]
 
@@ -8063,7 +8132,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de"
 dependencies = [
  "idna_adapter",
- "smallvec",
+ "smallvec 1.15.1",
  "utf8_iter",
 ]
 
@@ -8090,7 +8159,7 @@ dependencies = [
  "gif",
  "image-webp",
  "moxcms",
- "num-traits",
+ "num-traits 0.2.19",
  "png",
  "qoi",
  "ravif",
@@ -8394,7 +8463,7 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0f0a0e9f770b65bac9aad00f97a67ab5c5319effed07f6da385da3c2115e47ba"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
  "thiserror 1.0.69",
 ]
 
@@ -8451,7 +8520,7 @@ dependencies = [
  "cauchy",
  "katexit",
  "lapack-sys",
- "num-traits",
+ "num-traits 0.2.19",
  "thiserror 1.0.69",
 ]
 
@@ -8554,9 +8623,9 @@ checksum = "56f9097edc7c89d03d526efbacf6d90914e3a8fa53bd56c2d1489e3a90819370"
 dependencies = [
  "approx 0.4.0",
  "ndarray 0.15.6",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
- "sprs",
+ "sprs 0.11.1",
  "thiserror 1.0.69",
 ]
 
@@ -8573,7 +8642,7 @@ dependencies = [
  "ndarray-rand",
  "ndarray-stats",
  "noisy_float",
- "num-traits",
+ "num-traits 0.2.19",
  "rand_xoshiro",
  "space",
  "thiserror 1.0.69",
@@ -8588,8 +8657,8 @@ dependencies = [
  "linfa",
  "linfa-nn",
  "ndarray 0.15.6",
- "num-traits",
- "sprs",
+ "num-traits 0.2.19",
+ "sprs 0.11.1",
 ]
 
 [[package]]
@@ -8599,7 +8668,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56e7562b41c8876d3367897067013bb2884cc78e6893f092ecd26b305176ac82"
 dependencies = [
  "ndarray 0.15.6",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "thiserror 1.0.69",
 ]
@@ -8615,7 +8684,7 @@ dependencies = [
  "ndarray 0.15.6",
  "ndarray-stats",
  "noisy_float",
- "num-traits",
+ "num-traits 0.2.19",
  "order-stat",
  "thiserror 1.0.69",
 ]
@@ -8631,10 +8700,10 @@ dependencies = [
  "linfa-linalg",
  "ndarray 0.15.6",
  "ndarray-rand",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "rand_xoshiro",
- "sprs",
+ "sprs 0.11.1",
  "thiserror 1.0.69",
 ]
 
@@ -8672,12 +8741,49 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "11d3d7f243d5c5a8b9bb5d6dd2b1602c0cb0b9db1621bafc7ed66e35ff9fe092"
 
 [[package]]
+name = "lmsr-rs"
+version = "0.1.0"
+dependencies = [
+ "aligned-vec 0.5.0",
+ "approx 0.5.1",
+ "bytemuck",
+ "cpu-time",
+ "criterion",
+ "crossbeam 0.8.4",
+ "lockfree",
+ "memmap2",
+ "num-traits 0.2.19",
+ "num_cpus",
+ "once_cell",
+ "parking_lot",
+ "proptest",
+ "pyo3",
+ "rand 0.8.5",
+ "rand_distr 0.4.3",
+ "rayon",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "tokio",
+ "wide",
+]
+
+[[package]]
 name = "lock_api"
 version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "224399e74b87b5f3557511d98dff8b14089b3dadafcab6bb93eab67d3aace965"
 dependencies = [
  "scopeguard",
+]
+
+[[package]]
+name = "lockfree"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74ee94b5ad113c7cb98c5a040f783d0952ee4fe100993881d1673c2cb002dd23"
+dependencies = [
+ "owned-alloc",
 ]
 
 [[package]]
@@ -8747,6 +8853,15 @@ checksum = "0e7465ac9959cc2b1404e8e2367b43684a6d13790fe23056cc8c6c5a6b7bcb94"
 
 [[package]]
 name = "matrixmultiply"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "916806ba0031cd542105d916a97c8572e1fa6dd79c9c51e7eb43a09ec2dd84c1"
+dependencies = [
+ "rawpointer",
+]
+
+[[package]]
+name = "matrixmultiply"
 version = "0.3.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a06de3016e9fae57a36fd14dba131fccf49f74b40b7fbdb472f96e361ec71a08"
@@ -8766,6 +8881,23 @@ checksum = "8ea1f30cedd69f0a2954655f7188c6a834246d2bcf1e315e2ac40c4b24dc9519"
 dependencies = [
  "cfg-if 1.0.4",
  "rayon",
+]
+
+[[package]]
+name = "maybe-uninit"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
+
+[[package]]
+name = "mcts"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf4a0e0480ed34518915a2354e82aa3550019f39e24db9c237c91cb9268d2778"
+dependencies = [
+ "crossbeam 0.3.2",
+ "rand 0.4.6",
+ "smallvec 0.6.14",
 ]
 
 [[package]]
@@ -8912,6 +9044,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "minilp"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82a7750a9e5076c660b7bec5e6457b4dbff402b9863c8d112891434e18fd5385"
+dependencies = [
+ "log",
+ "sprs 0.7.1",
+]
+
+[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9034,7 +9176,7 @@ version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fbdd3d7436f8b5e892b8b7ea114271ff0fa00bc5acae845d53b07d498616ef6"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
  "pxfm",
 ]
 
@@ -9089,7 +9231,7 @@ dependencies = [
  "hexf-parse",
  "indexmap 2.12.0",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "rustc-hash 1.1.0",
  "spirv",
  "termcolor",
@@ -9110,7 +9252,7 @@ dependencies = [
  "hexf-parse",
  "indexmap 2.12.0",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "petgraph 0.6.5",
  "rustc-hash 1.1.0",
  "spirv",
@@ -9177,7 +9319,7 @@ dependencies = [
  "hexf-parse",
  "indexmap 2.12.0",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "rustc-hash 1.1.0",
  "spirv",
@@ -9204,7 +9346,7 @@ dependencies = [
  "indexmap 2.12.0",
  "libm",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "once_cell",
  "pp-rs",
  "rustc-hash 1.1.0",
@@ -9237,11 +9379,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d506eb7e08d6329505faa8a3a00a5dcc6de9f76e0c77e4b75763ae3c770831ff"
 dependencies = [
  "approx 0.5.1",
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "nalgebra-macros 0.1.0",
  "num-complex 0.4.6",
  "num-rational 0.4.2",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "rand_distr 0.4.3",
  "simba 0.6.0",
@@ -9255,11 +9397,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b5c17de023a86f59ed79891b2e5d5a94c705dbe904a5b5c9c952ea6221b03e4"
 dependencies = [
  "approx 0.5.1",
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "nalgebra-macros 0.2.2",
  "num-complex 0.4.6",
  "num-rational 0.4.2",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "rand_distr 0.4.3",
  "simba 0.8.1",
@@ -9273,11 +9415,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26aecdf64b707efd1310e3544d709c5c0ac61c13756046aaaba41be5c4f66a3b"
 dependencies = [
  "approx 0.5.1",
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "nalgebra-macros 0.2.2",
  "num-complex 0.4.6",
  "num-rational 0.4.2",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "rand_distr 0.4.3",
  "serde",
@@ -9308,11 +9450,11 @@ dependencies = [
  "glam 0.28.0",
  "glam 0.29.3",
  "glam 0.30.9",
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "nalgebra-macros 0.3.0",
  "num-complex 0.4.6",
  "num-rational 0.4.2",
- "num-traits",
+ "num-traits 0.2.19",
  "rayon",
  "serde",
  "simba 0.9.1",
@@ -9431,6 +9573,19 @@ dependencies = [
 
 [[package]]
 name = "ndarray"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac06db03ec2f46ee0ecdca1a1c34a99c0d188a0d83439b84bf0cb4b386e4ab09"
+dependencies = [
+ "matrixmultiply 0.2.4",
+ "num-complex 0.2.4",
+ "num-integer",
+ "num-traits 0.2.19",
+ "rawpointer",
+]
+
+[[package]]
+name = "ndarray"
 version = "0.15.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "adb12d4e967ec485a5f71c6311fe28158e9d6f4bc4a447b474184d0f91a8fa32"
@@ -9438,10 +9593,10 @@ dependencies = [
  "approx 0.4.0",
  "cblas-sys",
  "libc",
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "num-complex 0.4.6",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "rawpointer",
  "rayon",
  "serde",
@@ -9453,10 +9608,10 @@ version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "882ed72dce9365842bf196bdeedf5055305f11fc8c03dee7bb0194a6cad34841"
 dependencies = [
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "num-complex 0.4.6",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "portable-atomic",
  "portable-atomic-util",
  "rawpointer",
@@ -9475,7 +9630,7 @@ dependencies = [
  "lax",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "thiserror 1.0.69",
 ]
@@ -9502,7 +9657,7 @@ dependencies = [
  "ndarray 0.15.6",
  "noisy_float",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
 ]
 
@@ -9615,7 +9770,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "978fe6e6ebc0bf53de533cd456ca2d9de13de13856eda1518a285d7705a213af"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9684,7 +9839,7 @@ dependencies = [
  "num-integer",
  "num-iter",
  "num-rational 0.3.2",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9698,7 +9853,7 @@ dependencies = [
  "num-integer",
  "num-iter",
  "num-rational 0.4.2",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9709,7 +9864,7 @@ checksum = "5f6f7833f2cbf2360a6cfd58cd41a53aa7a90bd4c202f5b1c7dd2ed73c57b2c3"
 dependencies = [
  "autocfg",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "serde",
 ]
 
@@ -9720,7 +9875,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9"
 dependencies = [
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9733,10 +9888,10 @@ dependencies = [
  "libm",
  "num-integer",
  "num-iter",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -9746,7 +9901,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6b19411a9719e753aff12e5187b74d60d3dc449ec3f4dc21e3989c3f554bc95"
 dependencies = [
  "autocfg",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9755,7 +9910,7 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "747d632c0c558b87dbabbe6a82f3b4ae03720d0646ac5b7b4dae89394be5f2c5"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
  "serde",
 ]
 
@@ -9766,7 +9921,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
 dependencies = [
  "bytemuck",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
 ]
@@ -9794,7 +9949,7 @@ version = "0.1.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9805,7 +9960,7 @@ checksum = "1429034a0490724d0075ebb2bc9e875d6503c3cf69e235a8941aa757d83ef5bf"
 dependencies = [
  "autocfg",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9817,7 +9972,7 @@ dependencies = [
  "autocfg",
  "num-bigint 0.3.3",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "serde",
 ]
 
@@ -9829,7 +9984,16 @@ checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
 dependencies = [
  "num-bigint 0.4.6",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
+]
+
+[[package]]
+name = "num-traits"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92e5113e9fd4cc14ded8e499429f396a20f98c772a47cc8622a736e1ec843c31"
+dependencies = [
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -9885,17 +10049,18 @@ dependencies = [
 
 [[package]]
 name = "numpy"
-version = "0.22.1"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edb929bc0da91a4d85ed6c0a84deaa53d411abfb387fc271124f91bf6b89f14e"
+checksum = "a7cfbf3f0feededcaa4d289fe3079b03659e85c5b5a177f4ba6fb01ab4fb3e39"
 dependencies = [
  "libc",
  "ndarray 0.16.1",
  "num-complex 0.4.6",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "pyo3",
- "rustc-hash 1.1.0",
+ "pyo3-build-config",
+ "rustc-hash 2.1.1",
 ]
 
 [[package]]
@@ -10273,7 +10438,7 @@ version = "4.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7bb71e1b3fa6ca1c61f383464aaf2bb0e2f8e772a1f01d486832464de363b951"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
 ]
@@ -10284,8 +10449,14 @@ version = "5.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f4779c6901a562440c3786d08192c6fbda7c1c2060edd10006b05ee35d10f2d"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
+
+[[package]]
+name = "owned-alloc"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30fceb411f9a12ff9222c5f824026be368ff15dc2f13468d850c7d3f502205d6"
 
 [[package]]
 name = "owned_ttf_parser"
@@ -10321,7 +10492,7 @@ dependencies = [
  "cfg-if 1.0.4",
  "libc",
  "redox_syscall 0.5.18",
- "smallvec",
+ "smallvec 1.15.1",
  "windows-link 0.2.1",
 ]
 
@@ -10343,14 +10514,14 @@ dependencies = [
  "log",
  "nalgebra 0.34.1",
  "num-derive",
- "num-traits",
+ "num-traits 0.2.19",
  "ordered-float 5.1.0",
  "rayon",
  "serde",
  "serde_arrays",
  "simba 0.9.1",
  "slab",
- "smallvec",
+ "smallvec 1.15.1",
  "spade",
  "thiserror 2.0.17",
 ]
@@ -10373,14 +10544,14 @@ dependencies = [
  "log",
  "nalgebra 0.34.1",
  "num-derive",
- "num-traits",
+ "num-traits 0.2.19",
  "ordered-float 5.1.0",
  "rayon",
  "serde",
  "serde_arrays",
  "simba 0.9.1",
  "slab",
- "smallvec",
+ "smallvec 1.15.1",
  "spade",
  "thiserror 2.0.17",
 ]
@@ -10404,7 +10575,7 @@ dependencies = [
  "log",
  "nalgebra 0.34.1",
  "num-derive",
- "num-traits",
+ "num-traits 0.2.19",
  "ordered-float 5.1.0",
  "rayon",
  "rstar",
@@ -10412,7 +10583,7 @@ dependencies = [
  "serde_arrays",
  "simba 0.9.1",
  "slab",
- "smallvec",
+ "smallvec 1.15.1",
  "spade",
  "static_assertions",
  "thiserror 2.0.17",
@@ -10436,7 +10607,7 @@ dependencies = [
  "log",
  "nalgebra 0.34.1",
  "num-derive",
- "num-traits",
+ "num-traits 0.2.19",
  "ordered-float 5.1.0",
  "rayon",
  "rstar",
@@ -10444,7 +10615,7 @@ dependencies = [
  "serde_arrays",
  "simba 0.9.1",
  "slab",
- "smallvec",
+ "smallvec 1.15.1",
  "spade",
  "thiserror 2.0.17",
 ]
@@ -10634,7 +10805,7 @@ version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5aeb6f403d7a4911efb1e33402027fc44f29b5bf6def3effcc22d7bb75f2b747"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
  "plotters-backend",
  "plotters-svg",
  "wasm-bindgen",
@@ -10968,7 +11139,7 @@ dependencies = [
  "bit-set 0.8.0",
  "bit-vec 0.8.0",
  "bitflags 2.10.0",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.9.2",
  "rand_chacha 0.9.0",
  "rand_xorshift",
@@ -10976,6 +11147,31 @@ dependencies = [
  "rusty-fork",
  "tempfile",
  "unarray",
+]
+
+[[package]]
+name = "prospect-theory-rs"
+version = "0.1.0"
+dependencies = [
+ "aligned-vec 0.5.0",
+ "approx 0.5.1",
+ "bytemuck",
+ "cpu-time",
+ "criterion",
+ "crossbeam 0.8.4",
+ "lockfree",
+ "memmap2",
+ "num-traits 0.2.19",
+ "num_cpus",
+ "once_cell",
+ "proptest",
+ "pyo3",
+ "rand 0.8.5",
+ "rayon",
+ "serde",
+ "statrs 0.16.1",
+ "thiserror 1.0.69",
+ "wide",
 ]
 
 [[package]]
@@ -11103,14 +11299,14 @@ version = "0.1.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3cbdf373972bf78df4d3b518d07003938e2c7d1fb5891e55f9cb6df57009d84"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
 name = "pyo3"
-version = "0.22.6"
+version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f402062616ab18202ae8319da13fa4279883a2b8a9d9f83f20dbade813ce1884"
+checksum = "e5203598f366b11a02b13aa20cab591229ff0a89fd121a308a5df751d5fc9219"
 dependencies = [
  "cfg-if 1.0.4",
  "indoc",
@@ -11126,9 +11322,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-build-config"
-version = "0.22.6"
+version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b14b5775b5ff446dd1056212d778012cbe8a0fbffd368029fd9e25b514479c38"
+checksum = "99636d423fa2ca130fa5acde3059308006d46f98caac629418e53f7ebb1e9999"
 dependencies = [
  "once_cell",
  "target-lexicon",
@@ -11136,9 +11332,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-ffi"
-version = "0.22.6"
+version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ab5bcf04a2cdcbb50c7d6105de943f543f9ed92af55818fd17b660390fc8636"
+checksum = "78f9cf92ba9c409279bc3305b5409d90db2d2c22392d443a87df3a1adad59e33"
 dependencies = [
  "libc",
  "pyo3-build-config",
@@ -11146,9 +11342,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros"
-version = "0.22.6"
+version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fd24d897903a9e6d80b968368a34e1525aeb719d568dba8b3d4bfa5dc67d453"
+checksum = "0b999cb1a6ce21f9a6b147dcf1be9ffedf02e0043aec74dc390f3007047cecd9"
 dependencies = [
  "proc-macro2",
  "pyo3-macros-backend",
@@ -11158,9 +11354,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros-backend"
-version = "0.22.6"
+version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36c011a03ba1e50152b4b394b479826cad97e7a21eb52df179cd91ac411cbfbe"
+checksum = "822ece1c7e1012745607d5cf0bcb2874769f0f7cb34c4cde03b9358eb9ef911a"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -11176,6 +11372,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f6d64c71eb498fe9eae14ce4ec935c555749aef511cca85b5568910d6e48001"
 dependencies = [
  "bytemuck",
+]
+
+[[package]]
+name = "quantum-circuit"
+version = "0.1.0"
+dependencies = [
+ "approx 0.5.1",
+ "criterion",
+ "itertools 0.12.1",
+ "nalgebra 0.34.1",
+ "ndarray 0.15.6",
+ "num-complex 0.4.6",
+ "proptest",
+ "rand 0.8.5",
+ "rand_distr 0.4.3",
+ "rayon",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "tokio",
 ]
 
 [[package]]
@@ -11281,6 +11497,19 @@ dependencies = [
 
 [[package]]
 name = "rand"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "552840b97013b1a26992c11eac34bdd778e464601a4c2054b5f0bff7c6761293"
+dependencies = [
+ "fuchsia-cprng",
+ "libc",
+ "rand_core 0.3.1",
+ "rdrand",
+ "winapi",
+]
+
+[[package]]
+name = "rand"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a6b1679d49b24bbfe0c803429aa1874472f50d9b363131f0e89fc356b544d03"
@@ -11346,6 +11575,21 @@ dependencies = [
 
 [[package]]
 name = "rand_core"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a6fdeb83b075e8266dcc8762c22776f6877a63111121f5f8c7411e5be7eed4b"
+dependencies = [
+ "rand_core 0.4.2",
+]
+
+[[package]]
+name = "rand_core"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c33a3c44ca05fa6f1807d8e6743f3824e8509beca625669633be0acbdf509dc"
+
+[[package]]
+name = "rand_core"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90bde5296fc891b0cef12a6d03ddccc162ce7b2aff54160af9338f8d40df6d19"
@@ -11378,7 +11622,7 @@ version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32cb0b9bc82b0a0876c2dd994a7e7a2683d3e7390ca40e6886785ef0c7e3ee31"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
 ]
 
@@ -11388,7 +11632,7 @@ version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a8615d50dcf34fa31f7ab52692afec947c4dd0ab803cc87cb3b0b4570ff7463"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.9.2",
 ]
 
@@ -11466,7 +11710,7 @@ dependencies = [
  "log",
  "nalgebra 0.34.1",
  "num-derive",
- "num-traits",
+ "num-traits 0.2.19",
  "oorandom",
  "ordered-float 5.1.0",
  "parry2d",
@@ -11496,7 +11740,7 @@ dependencies = [
  "log",
  "nalgebra 0.34.1",
  "num-derive",
- "num-traits",
+ "num-traits 0.2.19",
  "oorandom",
  "ordered-float 5.1.0",
  "parry3d",
@@ -11540,7 +11784,7 @@ version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43b6dd56e85d9483277cde964fd1bdb0428de4fec5ebba7540995639a21cb32b"
 dependencies = [
- "aligned-vec",
+ "aligned-vec 0.6.4",
  "arbitrary",
  "arg_enum_proc_macro",
  "arrayvec 0.7.6",
@@ -11558,7 +11802,7 @@ dependencies = [
  "new_debug_unreachable",
  "noop_proc_macro",
  "num-derive",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "profiling",
  "rand 0.9.2",
@@ -11632,6 +11876,15 @@ checksum = "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91"
 dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
+]
+
+[[package]]
+name = "rdrand"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "678054eb77286b51581ba43620cc911abf02758c91f93f479767aed0f90458b2"
+dependencies = [
+ "rand_core 0.3.1",
 ]
 
 [[package]]
@@ -11925,7 +12178,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "228ed7c16fa39782c3b3468e974aec2795e9089153cd08ee2e9aefb3613334c4"
 dependencies = [
  "byteorder",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
 ]
 
@@ -11972,8 +12225,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "421400d13ccfd26dfa5858199c30a5d76f9c54e0dba7575273025b43c5175dbb"
 dependencies = [
  "heapless",
- "num-traits",
- "smallvec",
+ "num-traits 0.2.19",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -11987,7 +12240,7 @@ dependencies = [
  "fallible-streaming-iterator",
  "hashlink",
  "libsqlite3-sys",
- "smallvec",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -11999,7 +12252,7 @@ dependencies = [
  "arrayvec 0.7.6",
  "borsh",
  "bytes",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "rkyv 0.7.45",
  "serde",
@@ -12124,7 +12377,7 @@ dependencies = [
  "bitflags 2.10.0",
  "bytemuck",
  "libm",
- "smallvec",
+ "smallvec 1.15.1",
  "ttf-parser 0.21.1",
  "unicode-bidi-mirroring",
  "unicode-ccc",
@@ -12150,7 +12403,7 @@ dependencies = [
  "js-sys",
  "lazy_static",
  "log",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "pollster 0.3.0",
  "pretty_assertions",
@@ -12177,7 +12430,7 @@ dependencies = [
  "bincode 2.0.1",
  "chrono",
  "criterion",
- "crossbeam",
+ "crossbeam 0.8.4",
  "dashmap",
  "hnsw_rs",
  "memmap2",
@@ -12388,6 +12641,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde-wasm-bindgen"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8302e169f0eddcc139c70f139d19d6467353af16f9fce27e8c30158036a1e16b"
+dependencies = [
+ "js-sys",
+ "serde",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "serde_arrays"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12587,7 +12851,7 @@ checksum = "f0b7840f121a46d63066ee7a99fc81dcabbc6105e437cae43528cea199b5a05f"
 dependencies = [
  "approx 0.5.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "wide",
 ]
@@ -12600,7 +12864,7 @@ checksum = "061507c94fc6ab4ba1c9a0305018408e312e17c041eb63bef8aa726fa33aceae"
 dependencies = [
  "approx 0.5.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "wide",
 ]
@@ -12614,7 +12878,7 @@ dependencies = [
  "approx 0.5.1",
  "libm",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "paste 1.0.15",
  "wide",
 ]
@@ -12663,7 +12927,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "297f631f50729c8c99b84667867963997ec0b50f32b2a7dbcab828ef0541e8bb"
 dependencies = [
  "num-bigint 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "thiserror 2.0.17",
  "time",
 ]
@@ -12714,6 +12978,15 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
+version = "0.6.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97fcaeba89edba30f044a10c6a3cc39df9c3f17d7cd829dd1446cab35f890e0"
+dependencies = [
+ "maybe-uninit",
+]
+
+[[package]]
+name = "smallvec"
 version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
@@ -12730,7 +13003,7 @@ dependencies = [
  "approx 0.5.1",
  "cfg-if 1.0.4",
  "num 0.4.3",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
  "serde",
  "typetag",
@@ -12841,10 +13114,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb313e1c8afee5b5647e00ee0fe6855e3d529eb863a0fdae1d60006c4d1e9990"
 dependencies = [
  "hashbrown 0.15.5",
- "num-traits",
+ "num-traits 0.2.19",
  "robust",
  "serde",
- "smallvec",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -12896,6 +13169,17 @@ dependencies = [
 
 [[package]]
 name = "sprs"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec63571489873d4506683915840eeb1bb16b3198ee4894cc6f2fe3013d505e56"
+dependencies = [
+ "ndarray 0.13.1",
+ "num-complex 0.2.4",
+ "num-traits 0.1.43",
+]
+
+[[package]]
+name = "sprs"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88bab60b0a18fb9b3e0c26e92796b3c3a278bf5fa4880f5ad5cc3bdfb843d0b1"
@@ -12903,10 +13187,10 @@ dependencies = [
  "alga",
  "ndarray 0.15.6",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "rayon",
- "smallvec",
+ "smallvec 1.15.1",
 ]
 
 [[package]]
@@ -12949,7 +13233,7 @@ dependencies = [
  "approx 0.5.1",
  "lazy_static",
  "nalgebra 0.29.0",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
 ]
 
@@ -12961,7 +13245,7 @@ checksum = "f697a07e4606a0a25c044de247e583a330dbb1731d11bc7350b81f48ad567255"
 dependencies = [
  "approx 0.5.1",
  "nalgebra 0.32.6",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
 ]
 
@@ -12973,7 +13257,7 @@ checksum = "2a3fe7c28c6512e766b0874335db33c94ad7b8f9054228ae1c2abd47ce7d335e"
 dependencies = [
  "approx 0.5.1",
  "nalgebra 0.33.2",
- "num-traits",
+ "num-traits 0.2.19",
  "rand 0.8.5",
 ]
 
@@ -13252,9 +13536,9 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "target-lexicon"
-version = "0.12.16"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
+checksum = "df7f62577c25e07834649fc3b39fafdc597c0a3527dc1c60129201ccfcbaa50c"
 
 [[package]]
 name = "tch"
@@ -13845,7 +14129,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sharded-slab",
- "smallvec",
+ "smallvec 1.15.1",
  "thread_local",
  "tracing",
  "tracing-core",
@@ -14009,7 +14293,7 @@ dependencies = [
  "libloading 0.8.9",
  "memmap2",
  "num 0.4.3",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "rayon",
  "safetensors 0.4.5",
@@ -14290,8 +14574,8 @@ version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "666b7727c8875d6ab5db9533418d7c764233ac9c0cff1d469aec8fa127597be2"
 dependencies = [
- "aligned-vec",
- "num-traits",
+ "aligned-vec 0.6.4",
+ "num-traits 0.2.19",
  "wasm-bindgen",
 ]
 
@@ -14480,7 +14764,7 @@ dependencies = [
  "downcast-rs 1.2.1",
  "rustix 1.1.2",
  "scoped-tls",
- "smallvec",
+ "smallvec 1.15.1",
  "wayland-sys",
 ]
 
@@ -14648,7 +14932,7 @@ dependencies = [
  "parking_lot",
  "profiling",
  "raw-window-handle",
- "smallvec",
+ "smallvec 1.15.1",
  "static_assertions",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -14674,7 +14958,7 @@ dependencies = [
  "parking_lot",
  "profiling",
  "raw-window-handle",
- "smallvec",
+ "smallvec 1.15.1",
  "static_assertions",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -14699,7 +14983,7 @@ dependencies = [
  "parking_lot",
  "profiling",
  "raw-window-handle",
- "smallvec",
+ "smallvec 1.15.1",
  "static_assertions",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -14724,7 +15008,7 @@ dependencies = [
  "parking_lot",
  "profiling",
  "raw-window-handle",
- "smallvec",
+ "smallvec 1.15.1",
  "static_assertions",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -14752,7 +15036,7 @@ dependencies = [
  "portable-atomic",
  "profiling",
  "raw-window-handle",
- "smallvec",
+ "smallvec 1.15.1",
  "static_assertions",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -14779,7 +15063,7 @@ dependencies = [
  "portable-atomic",
  "profiling",
  "raw-window-handle",
- "smallvec",
+ "smallvec 1.15.1",
  "static_assertions",
  "wgpu-core 26.0.1",
  "wgpu-hal 26.0.6",
@@ -14805,7 +15089,7 @@ dependencies = [
  "profiling",
  "raw-window-handle",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "web-sys",
  "wgpu-hal 0.19.5",
@@ -14833,7 +15117,7 @@ dependencies = [
  "profiling",
  "raw-window-handle",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "web-sys",
  "wgpu-hal 0.21.1",
@@ -14859,7 +15143,7 @@ dependencies = [
  "profiling",
  "raw-window-handle",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "wgpu-hal 22.0.0",
  "wgpu-types 22.0.0",
@@ -14884,7 +15168,7 @@ dependencies = [
  "profiling",
  "raw-window-handle",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "wgpu-hal 23.0.1",
  "wgpu-types 23.0.0",
@@ -14912,7 +15196,7 @@ dependencies = [
  "profiling",
  "raw-window-handle",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "wgpu-core-deps-apple 25.0.0",
  "wgpu-core-deps-emscripten",
@@ -14943,7 +15227,7 @@ dependencies = [
  "profiling",
  "raw-window-handle",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "wgpu-core-deps-apple 26.0.0",
  "wgpu-core-deps-windows-linux-android 26.0.0",
@@ -15033,7 +15317,7 @@ dependencies = [
  "raw-window-handle",
  "renderdoc-sys",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "wasm-bindgen",
  "web-sys",
@@ -15078,7 +15362,7 @@ dependencies = [
  "raw-window-handle",
  "renderdoc-sys",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "wasm-bindgen",
  "web-sys",
@@ -15123,7 +15407,7 @@ dependencies = [
  "raw-window-handle",
  "renderdoc-sys",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "wasm-bindgen",
  "web-sys",
@@ -15167,7 +15451,7 @@ dependencies = [
  "raw-window-handle",
  "renderdoc-sys",
  "rustc-hash 1.1.0",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 1.0.69",
  "wasm-bindgen",
  "web-sys",
@@ -15214,7 +15498,7 @@ dependencies = [
  "range-alloc",
  "raw-window-handle",
  "renderdoc-sys",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "wasm-bindgen",
  "web-sys",
@@ -15257,7 +15541,7 @@ dependencies = [
  "range-alloc",
  "raw-window-handle",
  "renderdoc-sys",
- "smallvec",
+ "smallvec 1.15.1",
  "thiserror 2.0.17",
  "wgpu-types 26.0.0",
  "windows 0.58.0",

@@ -52,6 +52,7 @@ pub struct AntColonyOptimizer {
 }
 
 impl AntColonyOptimizer {
+    /// Create a new Ant Colony Optimizer for continuous domains
     pub fn new(config: ACOConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         let archive_size = config.archive_size;
@@ -67,6 +68,7 @@ impl AntColonyOptimizer {
         })
     }
 
+    /// Initialize archive with diverse solutions
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.config.archive_size);
     }
@@ -84,6 +86,7 @@ impl AntColonyOptimizer {
         for w in &mut self.weights { *w /= sum; }
     }
 
+    /// Execute one iteration of ant colony sampling and archive update
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -126,7 +129,7 @@ impl AntColonyOptimizer {
             for j in 0..dim {
                 // Calculate standard deviation
                 let sigma: f64 = self.archive.iter().enumerate()
-                    .map(|(e, sol)| self.config.xi * (sol.position[j] - selected.position[j]).abs() / (self.archive.len() - 1) as f64)
+                    .map(|(_e, sol)| self.config.xi * (sol.position[j] - selected.position[j]).abs() / (self.archive.len() - 1) as f64)
                     .sum();
                 let sigma = sigma.max(1e-10);
 
@@ -153,6 +156,7 @@ impl AntColonyOptimizer {
         Ok(())
     }
 
+    /// Run the full ant colony optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         #[cfg(feature = "parallel")]

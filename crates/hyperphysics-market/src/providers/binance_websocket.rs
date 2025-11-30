@@ -301,6 +301,7 @@ pub struct BinanceWebSocketClient {
     ws_url: String,
 
     /// Whether using testnet
+    #[allow(dead_code)]
     testnet: bool,
 
     /// Circuit breaker for connection failures

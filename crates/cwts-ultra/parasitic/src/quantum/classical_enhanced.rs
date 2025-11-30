@@ -662,22 +662,35 @@ fn calculate_interference(a: &[f64], b: &[f64]) -> f64 {
 
 fn sample_gaussian() -> f64 {
     // Box-Muller transform for Gaussian sampling
-    static mut HAVE_SPARE: bool = false;
-    static mut SPARE: f64 = 0.0;
-    
-    unsafe {
-        if HAVE_SPARE {
-            HAVE_SPARE = false;
-            return SPARE;
+    // Thread-safe implementation using thread-local storage
+    use std::cell::RefCell;
+
+    thread_local! {
+        static GAUSSIAN_STATE: RefCell<GaussianState> = RefCell::new(GaussianState {
+            have_spare: false,
+            spare: 0.0,
+        });
+    }
+
+    struct GaussianState {
+        have_spare: bool,
+        spare: f64,
+    }
+
+    GAUSSIAN_STATE.with(|state| {
+        let mut state = state.borrow_mut();
+        if state.have_spare {
+            state.have_spare = false;
+            return state.spare;
         }
-        
-        HAVE_SPARE = true;
+
+        state.have_spare = true;
         let u = fastrand::f64();
         let v = fastrand::f64();
         let mag = 0.1 * (-2.0 * u.ln()).sqrt();
-        SPARE = mag * (2.0 * std::f64::consts::PI * v).cos();
+        state.spare = mag * (2.0 * std::f64::consts::PI * v).cos();
         mag * (2.0 * std::f64::consts::PI * v).sin()
-    }
+    })
 }
 
 fn geometric_cooling_schedule(initial_temp: f64, final_temp: f64, steps: usize) -> Vec<f64> {

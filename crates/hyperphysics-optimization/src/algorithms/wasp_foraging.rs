@@ -101,6 +101,7 @@ struct FoodSource {
     position: Array1<f64>,
     fitness: f64,
     trials: u32,
+    #[allow(dead_code)]
     visitors: u32,
 }
 

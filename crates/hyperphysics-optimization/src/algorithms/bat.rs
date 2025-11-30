@@ -58,6 +58,7 @@ pub struct BatOptimizer {
 }
 
 impl BatOptimizer {
+    /// Create a new Bat Algorithm optimizer
     pub fn new(config: BatConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         let pop_size = opt_config.population_size;
@@ -76,10 +77,12 @@ impl BatOptimizer {
         })
     }
 
+    /// Initialize population and bat parameters
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
     }
 
+    /// Execute one iteration of the bat algorithm with frequency tuning
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -146,6 +149,7 @@ impl BatOptimizer {
         Ok(())
     }
 
+    /// Run the full bat optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         while self.iteration < self.opt_config.max_iterations && !self.converged {

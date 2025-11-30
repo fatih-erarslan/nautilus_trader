@@ -374,21 +374,21 @@ impl PhysicsBackend for RapierBackend {
                     .build()
             }
             ConstraintType::Distance { anchor_a, anchor_b, distance } => {
-                let mut joint = GenericJointBuilder::new(JointAxesMask::X)
+                let mut joint = GenericJointBuilder::new(JointAxesMask::LIN_X)
                     .local_anchor1(*anchor_a)
                     .local_anchor2(*anchor_b)
                     .build();
-                joint.set_limits(JointAxis::X, [*distance, *distance]);
+                joint.set_limits(JointAxis::LinX, [*distance, *distance]);
                 joint
             }
             ConstraintType::Spring { anchor_a, anchor_b, rest_length, stiffness, damping } => {
-                let mut joint = GenericJointBuilder::new(JointAxesMask::X)
+                let mut joint = GenericJointBuilder::new(JointAxesMask::LIN_X)
                     .local_anchor1(*anchor_a)
                     .local_anchor2(*anchor_b)
                     .build();
-                joint.set_limits(JointAxis::X, [*rest_length * 0.5, *rest_length * 2.0]);
+                joint.set_limits(JointAxis::LinX, [*rest_length * 0.5, *rest_length * 2.0]);
                 joint.set_motor(
-                    JointAxis::X,
+                    JointAxis::LinX,
                     *rest_length,
                     0.0,
                     *stiffness,

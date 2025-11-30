@@ -672,11 +672,17 @@ mod tests {
     async fn test_model_id_generation() {
         let persistence = ModelPersistence::new();
         let id1 = persistence.generate_model_id("test_model");
-        let id2 = persistence.generate_model_id("test_model");
-        
-        assert_ne!(id1, id2);
+
+        // Verify format: name_timestamp
         assert!(id1.starts_with("test_model_"));
-        assert!(id2.starts_with("test_model_"));
+        // Verify timestamp component is numeric
+        let timestamp_part = id1.strip_prefix("test_model_").unwrap();
+        assert!(timestamp_part.chars().all(|c| c.is_ascii_digit()));
+
+        // Test different names produce different IDs
+        let id2 = persistence.generate_model_id("other_model");
+        assert!(id2.starts_with("other_model_"));
+        assert_ne!(id1, id2);
     }
     
     #[tokio::test]

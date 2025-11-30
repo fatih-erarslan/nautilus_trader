@@ -9,8 +9,9 @@ name = "warp_hyperphysics"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-pyo3 = { version = "0.22", features = ["extension-module", "auto-initialize"] }
-numpy = "0.22"
+# Updated for CVE RUSTSEC-2025-0020 fix
+pyo3 = { version = "0.24", features = ["extension-module", "auto-initialize"] }
+numpy = "0.24"
 anyhow = "1.0"
 thiserror = "1.0"
 serde = { version = "1.0", features = ["derive"] }

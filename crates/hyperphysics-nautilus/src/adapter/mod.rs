@@ -7,4 +7,4 @@ mod data_adapter;
 mod exec_bridge;
 
 pub use data_adapter::NautilusDataAdapter;
-pub use exec_bridge::NautilusExecBridge;
+pub use exec_bridge::{NautilusExecBridge, ExecBridgeStats};

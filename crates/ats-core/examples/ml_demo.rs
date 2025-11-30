@@ -1,25 +1,17 @@
 // ATS-Core ML Integration Demo
 // Demonstrates working neural network functionality
 
-use ats_core::ruv_fann_integration::production_ready::*;
+use ats_core::ruv_fann_integration::*;
 use ats_core::*;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     println!("🚀 ATS-Core ML Integration Demo");
     println!("================================");
-    
-    // Run validation
-    println!("🔍 Running ML validation...");
-    validation::validate_basic_functionality().await?;
-    
-    // Performance benchmark
-    println!("⚡ Running performance benchmark...");
-    validation::performance_benchmark().await?;
-    
+
     // Create integration instance
     println!("🧠 Creating ML integration...");
-    let mut integration = ProductionRuvFannIntegration::new();
+    let integration = RuvFannIntegration::new().await?;
     
     // Create a neural model
     println!("📊 Creating neural model...");
@@ -33,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         architecture_specific: serde_json::json!({}),
     };
     
-    let model_id = integration.create_model("demo_model".to_string(), config).await?;
+    let model_id = integration.create_model("demo_model".to_string(), "mlp".to_string(), config).await?;
     println!("✅ Model created: {}", model_id);
     
     // Generate training data
@@ -75,19 +67,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("   Final loss: {:.6}", training_result.final_loss);
     println!("   Training time: {:.2}ms", training_result.training_time.as_millis());
     
-    // Make predictions
-    println!("🔮 Making predictions...");
-    let test_inputs = vec![
-        vec![1.5, 2.5, 3.5, 4.5],
-        vec![2.5, 3.5, 4.5, 5.5],
-        vec![3.5, 4.5, 5.5, 6.5],
-    ];
-    
-    for (i, input) in test_inputs.iter().enumerate() {
-        let prediction = integration.predict(model_id.clone(), input).await?;
-        println!("   Input {}: {:?} -> Prediction: {:?}", i + 1, input, prediction);
-    }
-    
     // Generate forecasts
     println!("📊 Generating forecasts...");
     let input_data = InputData {
@@ -106,10 +85,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("   Forecast: {:?}", forecast.predictions);
     println!("   Confidence intervals: {:?}", forecast.confidence_intervals.keys().collect::<Vec<_>>());
     
-    // Show model statistics
-    println!("📈 Model Statistics:");
-    println!("   Total models: {}", integration.model_count());
-    println!("   Available models: {:?}", integration.list_models());
+    // Show architectures
+    println!("📈 Available Architectures:");
+    let architectures = integration.get_architectures().await;
+    println!("   Total architectures: {}", architectures.len());
     
     println!();
     println!("🎉 ML Integration Demo Completed Successfully!");

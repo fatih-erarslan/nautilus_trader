@@ -557,17 +557,26 @@ impl ExecutionAgent {
 
     /// Generate timing jitter for steganographic hiding.
     ///
-    /// Uses xorshift for fast pseudo-random generation.
-    /// Returns value in range [-max_jitter, +max_jitter].
+    /// Uses xorshift for fast pseudo-random generation (thread-safe).
+    /// Returns value in range [0, 2*max_jitter).
     fn generate_timing_jitter(&self, max_jitter: u64) -> u64 {
-        // Simple xorshift PRNG (fast, not cryptographic)
-        static mut SEED: u64 = 123456789;
-        unsafe {
-            SEED ^= SEED << 13;
-            SEED ^= SEED >> 7;
-            SEED ^= SEED << 17;
-            (SEED % (2 * max_jitter)) as u64
+        use std::sync::atomic::{AtomicU64, Ordering};
+
+        // Thread-safe xorshift PRNG (fast, not cryptographic)
+        static JITTER_SEED: AtomicU64 = AtomicU64::new(123456789);
+
+        let seed = JITTER_SEED.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |s| {
+            let mut x = s;
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            Some(x)
+        }).unwrap_or(123456789);
+
+        if max_jitter == 0 {
+            return 0;
         }
+        (seed % (2 * max_jitter))
     }
 
     /// Generate size jitter for steganographic hiding.

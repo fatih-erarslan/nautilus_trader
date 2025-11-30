@@ -47,6 +47,7 @@ pub struct WhaleOptimizer {
 }
 
 impl WhaleOptimizer {
+    /// Create a new Whale Optimization Algorithm optimizer
     pub fn new(config: WOAConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         Ok(Self {
@@ -59,10 +60,12 @@ impl WhaleOptimizer {
         })
     }
 
+    /// Initialize population using Latin Hypercube Sampling
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
     }
 
+    /// Execute one iteration of the whale optimization algorithm
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -127,6 +130,7 @@ impl WhaleOptimizer {
         Ok(())
     }
 
+    /// Run the full optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         while self.iteration < self.opt_config.max_iterations && !self.converged {

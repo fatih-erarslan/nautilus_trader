@@ -51,6 +51,7 @@ pub struct FireflyOptimizer {
 }
 
 impl FireflyOptimizer {
+    /// Create a new Firefly Algorithm optimizer
     pub fn new(config: FireflyConfig, opt_config: OptimizationConfig, bounds: Bounds) -> Result<Self, OptimizationError> {
         config.validate().map_err(|e| OptimizationError::Configuration(e))?;
         let alpha = config.alpha;
@@ -65,10 +66,12 @@ impl FireflyOptimizer {
         })
     }
 
+    /// Initialize firefly population using Latin Hypercube Sampling
     pub fn initialize(&mut self) {
         self.population.initialize_lhs(self.opt_config.population_size);
     }
 
+    /// Execute one iteration of firefly movement and attraction
     pub fn step<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<(), OptimizationError> {
         #[cfg(feature = "parallel")]
         self.population.evaluate_parallel(objective)?;
@@ -93,7 +96,7 @@ impl FireflyOptimizer {
                 if fj < fi {
                     // Calculate Euclidean distance
                     let r_sq: f64 = (0..dim).map(|k| (pop_snapshot[i].position[k] - pop_snapshot[j].position[k]).powi(2)).sum();
-                    let r = r_sq.sqrt();
+                    let _r = r_sq.sqrt();
 
                     // Attractiveness decreases with distance
                     let beta = self.config.beta0 * (-self.config.gamma * r_sq).exp();
@@ -127,6 +130,7 @@ impl FireflyOptimizer {
         Ok(())
     }
 
+    /// Run the full firefly optimization until convergence or max iterations
     pub fn optimize<F: ObjectiveFunction + Sync>(&mut self, objective: &F) -> Result<Individual, OptimizationError> {
         self.initialize();
         while self.iteration < self.opt_config.max_iterations && !self.converged {

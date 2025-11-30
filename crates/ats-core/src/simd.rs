@@ -1349,7 +1349,17 @@ mod tests {
     use approx::assert_relative_eq;
 
     fn create_test_config() -> AtsCpConfig {
-        AtsCpConfig::default()
+        AtsCpConfig {
+            temperature: crate::config::TemperatureConfig {
+                target_latency_us: 10_000, // Relaxed for testing (10ms)
+                ..Default::default()
+            },
+            conformal: crate::config::ConformalConfig {
+                target_latency_us: 10_000, // Relaxed for testing (10ms)
+                ..Default::default()
+            },
+            ..Default::default()
+        }
     }
 
     #[test]

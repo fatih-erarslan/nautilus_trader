@@ -15,7 +15,12 @@ pub enum OptimizationError {
 
     /// Dimension mismatch.
     #[error("Dimension mismatch: expected {expected}, got {got}")]
-    DimensionMismatch { expected: usize, got: usize },
+    DimensionMismatch {
+        /// Expected dimension
+        expected: usize,
+        /// Actual dimension received
+        got: usize
+    },
 
     /// Invalid bounds.
     #[error("Invalid bounds: {0}")]

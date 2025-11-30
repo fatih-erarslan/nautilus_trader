@@ -278,7 +278,7 @@ impl HNSWIndex {
                 if layers[lc].connections[neighbor_id].len() > neighbor_m_max {
                     // Prune to M_max best connections
                     let neighbor_vec = &nodes[neighbor_id].vector;
-                    let mut neighbor_candidates: Vec<SearchResult> = layers[lc].connections[neighbor_id]
+                    let neighbor_candidates: Vec<SearchResult> = layers[lc].connections[neighbor_id]
                         .iter()
                         .map(|&id| SearchResult {
                             id,
@@ -387,6 +387,7 @@ impl HNSWIndex {
     ///
     /// L2 squared distance between vectors.
     #[inline(always)]
+    #[allow(dead_code)]
     fn distance_simd(a: &[f32], b: &[f32]) -> f32 {
         // simsimd returns f64, convert to f32
         SpatialSimilarity::l2sq(a, b)
@@ -604,7 +605,7 @@ impl HNSWIndex {
             }
         }
 
-        for (level, layer) in layers.iter().enumerate() {
+        for (_level, layer) in layers.iter().enumerate() {
             for connections in &layer.connections {
                 total_connections += connections.len();
             }

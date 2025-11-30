@@ -121,9 +121,15 @@ pub enum SelectionStrategy {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CrossoverOperator {
     /// Simulated Binary Crossover (SBX)
-    SBX { eta: f64 },
+    SBX {
+        /// Distribution index for SBX
+        eta: f64
+    },
     /// Blend Crossover (BLX-α)
-    BLX { alpha: f64 },
+    BLX {
+        /// Blend factor alpha
+        alpha: f64
+    },
     /// Arithmetic crossover
     Arithmetic,
     /// Uniform crossover
@@ -134,7 +140,10 @@ pub enum CrossoverOperator {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MutationOperator {
     /// Polynomial mutation
-    Polynomial { eta: f64 },
+    Polynomial {
+        /// Distribution index for polynomial mutation
+        eta: f64
+    },
     /// Gaussian mutation
     Gaussian,
     /// Uniform mutation

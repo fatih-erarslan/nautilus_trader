@@ -61,6 +61,7 @@
 
 pub mod adapter;
 pub mod config;
+pub mod conformal;
 pub mod ensemble;
 pub mod error;
 pub mod forecast;
@@ -69,6 +70,10 @@ pub mod forecast;
 pub mod prelude {
     pub use crate::adapter::{MarketFeed, NeuralDataAdapter};
     pub use crate::config::NeuralBridgeConfig;
+    pub use crate::conformal::{
+        ConformalConfig, ConformalMethod, HyperConformalPredictor,
+        PredictionInterval, CQRPredictor, NonconformityScore,
+    };
     pub use crate::ensemble::EnsemblePredictor;
     pub use crate::error::{NeuralBridgeError, Result};
     pub use crate::forecast::{ForecastResult, NeuralForecastEngine};
@@ -77,6 +82,10 @@ pub mod prelude {
 // Re-exports for convenience
 pub use adapter::{MarketFeed, NeuralDataAdapter};
 pub use config::NeuralBridgeConfig;
+pub use conformal::{
+    ConformalConfig, ConformalMethod, HyperConformalPredictor,
+    PredictionInterval, CQRPredictor, NonconformityScore,
+};
 pub use ensemble::EnsemblePredictor;
 pub use error::{NeuralBridgeError, Result};
 pub use forecast::{ForecastResult, NeuralForecastEngine};

@@ -21,7 +21,7 @@
 
 use std::collections::VecDeque;
 use nalgebra::DVector;
-use rand::{Rng, SeedableRng};
+use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rand_distr::{Distribution, Normal};
 use crate::error::{OptimizationError, OptimizationResult};

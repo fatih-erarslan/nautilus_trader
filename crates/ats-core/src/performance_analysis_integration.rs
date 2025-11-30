@@ -561,14 +561,16 @@ mod tests {
         let config = AtsCpConfig::high_performance();
         let monitoring_config = MonitoringConfig::default();
         let mut monitored_predictor = MonitoredOptimizedConformalPredictor::new(&config, monitoring_config).unwrap();
-        
+
         let logits = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-        let calibration_scores: Vec<f64> = (0..100).map(|i| i as f64 * 0.01).collect();
-        let alpha = 0.1;
-        
-        let result = monitored_predictor.predict_monitored(&logits, &calibration_scores, alpha);
-        
-        assert!(result.is_ok());
+        // Need > min_calibration_size (default 100) samples
+        let calibration_scores: Vec<f64> = (0..150).map(|i| i as f64 * 0.01).collect();
+        // Use supported confidence level (0.90, 0.95, 0.99, or 0.999)
+        let confidence = 0.90;
+
+        let result = monitored_predictor.predict_monitored(&logits, &calibration_scores, confidence);
+
+        assert!(result.is_ok(), "predict_monitored failed: {:?}", result.err());
         let monitoring_result = result.unwrap();
         
         // Verify monitoring result structure

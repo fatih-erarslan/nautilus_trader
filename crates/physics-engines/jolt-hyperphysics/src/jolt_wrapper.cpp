@@ -281,15 +281,13 @@ JoltBodyID jolt_body_create_sphere(JoltBodyInterface* iface, float radius, float
 
 void jolt_body_set_position(JoltBodyInterface* iface, JoltBodyID body_id, float x, float y, float z) {
     if (!iface || !iface->body_interface) return;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     iface->body_interface->SetPosition(id, RVec3(x, y, z), EActivation::Activate);
 }
 
 void jolt_body_get_position(JoltBodyInterface* iface, JoltBodyID body_id, float* x, float* y, float* z) {
     if (!iface || !iface->body_interface || !x || !y || !z) return;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     RVec3 pos = iface->body_interface->GetCenterOfMassPosition(id);
     *x = (float)pos.GetX();
     *y = (float)pos.GetY();
@@ -298,15 +296,13 @@ void jolt_body_get_position(JoltBodyInterface* iface, JoltBodyID body_id, float*
 
 void jolt_body_set_velocity(JoltBodyInterface* iface, JoltBodyID body_id, float vx, float vy, float vz) {
     if (!iface || !iface->body_interface) return;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     iface->body_interface->SetLinearVelocity(id, Vec3(vx, vy, vz));
 }
 
 void jolt_body_get_velocity(JoltBodyInterface* iface, JoltBodyID body_id, float* vx, float* vy, float* vz) {
     if (!iface || !iface->body_interface || !vx || !vy || !vz) return;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     Vec3 vel = iface->body_interface->GetLinearVelocity(id);
     *vx = vel.GetX();
     *vy = vel.GetY();
@@ -315,29 +311,25 @@ void jolt_body_get_velocity(JoltBodyInterface* iface, JoltBodyID body_id, float*
 
 void jolt_body_add_force(JoltBodyInterface* iface, JoltBodyID body_id, float fx, float fy, float fz) {
     if (!iface || !iface->body_interface) return;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     iface->body_interface->AddForce(id, Vec3(fx, fy, fz));
 }
 
 bool jolt_body_is_active(JoltBodyInterface* iface, JoltBodyID body_id) {
     if (!iface || !iface->body_interface) return false;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     return iface->body_interface->IsActive(id);
 }
 
 void jolt_body_activate(JoltBodyInterface* iface, JoltBodyID body_id) {
     if (!iface || !iface->body_interface) return;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     iface->body_interface->ActivateBody(id);
 }
 
 void jolt_body_deactivate(JoltBodyInterface* iface, JoltBodyID body_id) {
     if (!iface || !iface->body_interface) return;
-    BodyID id;
-    id.SetIndexAndSequenceNumber(body_id);
+    BodyID id(body_id);
     iface->body_interface->DeactivateBody(id);
 }
 

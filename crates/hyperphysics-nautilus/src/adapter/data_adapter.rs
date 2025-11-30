@@ -104,12 +104,12 @@ impl NautilusDataAdapter {
         state.last_trade_price = trade.price;
 
         // Update volume
-        let trade_size = crate::types::conversions::fixed_u64_to_f64(
+        let trade_size = crate::types::fixed_u64_to_f64(
             trade.size,
             trade.size_precision,
         );
         state.snapshot.volume += trade_size;
-        state.snapshot.timestamp = crate::types::conversions::nanos_to_seconds(trade.ts_event);
+        state.snapshot.timestamp = crate::types::nanos_to_seconds(trade.ts_event);
 
         trace!(
             instrument_id = trade.instrument_id,
