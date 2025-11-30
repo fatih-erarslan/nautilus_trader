@@ -241,3 +241,12 @@ crossbeam = "0.8"
 
 # Iteration utilities
 itertools = "0.12"
+
+# Storage and persistence (for ruvector)
+memmap2 = "0.9"
+redb = "2.2"
+rkyv = { version = "0.8", features = ["bytecheck"] }
+once_cell = "1.19"
+uuid = { version = "1.10", features = ["v4", "serde"] }
+mockall = "0.13"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

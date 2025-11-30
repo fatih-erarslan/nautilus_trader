@@ -189,6 +189,7 @@ impl BacktestEngine {
         self.venues.insert(venue, exchange.clone());
 
         let account_id = AccountId::from(format!("{venue}-001").as_str());
+
         let exec_client = BacktestExecutionClient::new(
             self.config.trader_id(),
             account_id,
@@ -198,10 +199,15 @@ impl BacktestEngine {
             routing,
             frozen_account,
         );
-        let exec_client = Rc::new(exec_client);
 
-        exchange.borrow_mut().register_client(exec_client.clone());
-        self.kernel.exec_engine.register_client(exec_client)?;
+        exchange
+            .borrow_mut()
+            .register_client(Rc::new(exec_client.clone()));
+
+        self.kernel
+            .exec_engine
+            .borrow_mut()
+            .register_client(Box::new(exec_client))?;
 
         log::info!("Adding exchange {venue} to engine");
 
@@ -238,8 +244,7 @@ impl BacktestEngine {
                 && exchange.borrow().base_currency.is_some()
             {
                 anyhow::bail!(
-                    "Cannot add a `CurrencyPair` instrument {} for a venue with a single-currency CASH account",
-                    instrument_id
+                    "Cannot add a `CurrencyPair` instrument {instrument_id} for a venue with a single-currency CASH account"
                 )
             }
             exchange
@@ -563,10 +568,9 @@ mod tests {
         let mut engine = get_backtest_engine(None);
         engine.add_instrument(instrument).unwrap();
 
-        // Check the venue and exec client has been added
+        // Check the venue has been added
         assert_eq!(engine.venues.len(), 1);
         assert!(engine.venues.contains_key(&venue));
-        assert!(engine.kernel.exec_engine.get_client(&client_id).is_some());
 
         // Check the instrument has been added
         assert!(

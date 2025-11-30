@@ -15,8 +15,9 @@
 
 #![allow(clippy::too_many_arguments)] // Test functions with many fixtures
 
-use std::{cell::RefCell, collections::HashMap, rc::Rc, str::FromStr};
+use std::{cell::RefCell, rc::Rc, str::FromStr};
 
+use ahash::AHashMap;
 use nautilus_common::{
     cache::Cache,
     clock::{Clock, TestClock},
@@ -149,7 +150,7 @@ fn test_deny_order_exceeding_max_notional(
     let process_handler = register_process_handler();
 
     // Prepare small max_notional setting (1 USD)
-    let mut max_notional_map = HashMap::new();
+    let mut max_notional_map = AHashMap::new();
     max_notional_map.insert(instrument_audusd.id(), Decimal::from_i64(1).unwrap());
 
     let mut cache = Cache::default();
@@ -166,7 +167,7 @@ fn test_deny_order_exceeding_max_notional(
         bypass: false,
         max_order_submit: RateLimit::new(10, 1000),
         max_order_modify: RateLimit::new(5, 1000),
-        max_notional_per_order: HashMap::new(),
+        max_notional_per_order: AHashMap::new(),
     };
 
     let mut risk_engine = get_risk_engine(
@@ -242,8 +243,8 @@ fn max_order_modify() -> RateLimit {
 }
 
 #[fixture]
-fn max_notional_per_order() -> HashMap<InstrumentId, Decimal> {
-    HashMap::new()
+fn max_notional_per_order() -> AHashMap<InstrumentId, Decimal> {
+    AHashMap::new()
 }
 
 // Market buy order with corresponding fill
@@ -296,7 +297,7 @@ fn get_stub_submit_order(
 fn config_fixture(
     max_order_submit: RateLimit,
     max_order_modify: RateLimit,
-    max_notional_per_order: HashMap<InstrumentId, Decimal>,
+    max_notional_per_order: AHashMap<InstrumentId, Decimal>,
 ) -> RiskEngineConfig {
     RiskEngineConfig {
         debug: true,
@@ -412,7 +413,7 @@ fn get_risk_engine(
         bypass,
         max_order_submit: RateLimit::new(10, 1000),
         max_order_modify: RateLimit::new(5, 1000),
-        max_notional_per_order: HashMap::new(),
+        max_notional_per_order: AHashMap::new(),
     });
     let clock = clock.unwrap_or(Rc::new(RefCell::new(TestClock::new())));
     let portfolio = Portfolio::new(cache.clone(), clock.clone(), None);
@@ -569,7 +570,7 @@ fn test_max_order_modify_rate_when_no_risk_config_returns_5_per_second() {
 fn test_max_notionals_per_order_when_no_risk_config_returns_empty_hashmap() {
     let risk_engine = get_risk_engine(None, None, None, false);
 
-    assert_eq!(risk_engine.max_notional_per_order, HashMap::new());
+    assert_eq!(risk_engine.max_notional_per_order, AHashMap::new());
 }
 
 #[rstest]
@@ -579,7 +580,7 @@ fn test_set_max_notional_per_order_changes_setting(instrument_audusd: Instrument
     risk_engine
         .set_max_notional_per_order(instrument_audusd.id(), Decimal::from_i64(100000).unwrap());
 
-    let mut expected = HashMap::new();
+    let mut expected = AHashMap::new();
     expected.insert(instrument_audusd.id(), Decimal::from_i64(100000).unwrap());
     assert_eq!(risk_engine.max_notional_per_order, expected);
 }
@@ -2498,6 +2499,7 @@ fn test_submit_order_when_trading_halted_then_denies_order(
     instrument_eth_usdt: InstrumentAny,
     venue_order_id: VenueOrderId,
     process_order_event_handler: ShareableMessageHandler,
+    cash_account_state_million_usd: AccountState,
     mut simple_cache: Cache,
 ) {
     msgbus::register(
@@ -2507,6 +2509,11 @@ fn test_submit_order_when_trading_halted_then_denies_order(
 
     simple_cache
         .add_instrument(instrument_eth_usdt.clone())
+        .unwrap();
+
+    // Add account so risk checks can proceed to trading state check
+    simple_cache
+        .add_account(AccountAny::Cash(cash_account(cash_account_state_million_usd)))
         .unwrap();
 
     let mut risk_engine =
@@ -3359,7 +3366,11 @@ fn test_submit_order_when_market_order_and_over_free_balance_then_denies_with_be
     risk_engine.execute(TradingCommand::SubmitOrder(submit_order));
     let saved_process_messages =
         get_process_order_event_handler_messages(process_order_event_handler);
-    assert_eq!(saved_process_messages.len(), 0); // Currently, it executes because check_orders_risk returns true for margin_account
+    // With proper margin account risk checks implemented, the order should now be denied
+    // because it exceeds free balance (100000 AUD/USD notional vs available margin)
+    assert_eq!(saved_process_messages.len(), 1);
+    let first_message = saved_process_messages.first().unwrap();
+    assert_eq!(first_message.event_type(), OrderEventType::Denied);
 }
 
 #[rstest]

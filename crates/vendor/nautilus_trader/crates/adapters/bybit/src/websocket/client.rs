@@ -29,8 +29,8 @@ use std::{
 use ahash::AHashMap;
 use arc_swap::ArcSwap;
 use dashmap::DashMap;
-use nautilus_common::runtime::get_runtime;
-use nautilus_core::{UUID4, consts::NAUTILUS_USER_AGENT};
+use nautilus_common::live::runtime::get_runtime;
+use nautilus_core::{UUID4, consts::NAUTILUS_USER_AGENT, env::get_or_env_var_opt};
 use nautilus_model::{
     enums::{OrderSide, OrderType, TimeInForce},
     identifiers::{AccountId, ClientOrderId, InstrumentId, StrategyId, TraderId, VenueOrderId},
@@ -46,7 +46,6 @@ use nautilus_network::{
     },
 };
 use serde_json::Value;
-use tokio::sync::RwLock;
 use tokio_util::sync::CancellationToken;
 use ustr::Ustr;
 
@@ -82,7 +81,33 @@ const WEBSOCKET_AUTH_WINDOW_MS: i64 = 5_000;
 const BATCH_PROCESSING_LIMIT: usize = 20;
 
 /// Type alias for the funding rate cache.
-type FundingCache = Arc<RwLock<AHashMap<Ustr, (Option<String>, Option<String>)>>>;
+type FundingCache = Arc<tokio::sync::RwLock<AHashMap<Ustr, (Option<String>, Option<String>)>>>;
+
+/// Resolves credentials from provided values or environment variables.
+///
+/// Priority for environment variables based on environment:
+/// - Demo: `BYBIT_DEMO_API_KEY`, `BYBIT_DEMO_API_SECRET`
+/// - Testnet: `BYBIT_TESTNET_API_KEY`, `BYBIT_TESTNET_API_SECRET`
+/// - Mainnet: `BYBIT_API_KEY`, `BYBIT_API_SECRET`
+fn resolve_credential(
+    environment: BybitEnvironment,
+    api_key: Option<String>,
+    api_secret: Option<String>,
+) -> Option<Credential> {
+    let (api_key_env, api_secret_env) = match environment {
+        BybitEnvironment::Demo => ("BYBIT_DEMO_API_KEY", "BYBIT_DEMO_API_SECRET"),
+        BybitEnvironment::Testnet => ("BYBIT_TESTNET_API_KEY", "BYBIT_TESTNET_API_SECRET"),
+        BybitEnvironment::Mainnet => ("BYBIT_API_KEY", "BYBIT_API_SECRET"),
+    };
+
+    let key = get_or_env_var_opt(api_key, api_key_env);
+    let secret = get_or_env_var_opt(api_secret, api_secret_env);
+
+    match (key, secret) {
+        (Some(k), Some(s)) => Some(Credential::new(k, s)),
+        _ => None,
+    }
+}
 
 /// Public/market data WebSocket client for Bybit.
 #[cfg_attr(feature = "python", pyo3::pyclass)]
@@ -192,20 +217,29 @@ impl BybitWebSocketClient {
             is_authenticated: Arc::new(AtomicBool::new(false)),
             instruments_cache: Arc::new(DashMap::new()),
             account_id: None,
-            funding_cache: Arc::new(RwLock::new(AHashMap::new())),
+            funding_cache: Arc::new(tokio::sync::RwLock::new(AHashMap::new())),
             cancellation_token: CancellationToken::new(),
             mm_level: Arc::new(AtomicU8::new(0)),
         }
     }
 
     /// Creates a new Bybit private WebSocket client.
+    ///
+    /// If `api_key` or `api_secret` are not provided, they will be loaded from
+    /// environment variables based on the environment:
+    /// - Demo: `BYBIT_DEMO_API_KEY`, `BYBIT_DEMO_API_SECRET`
+    /// - Testnet: `BYBIT_TESTNET_API_KEY`, `BYBIT_TESTNET_API_SECRET`
+    /// - Mainnet: `BYBIT_API_KEY`, `BYBIT_API_SECRET`
     #[must_use]
     pub fn new_private(
         environment: BybitEnvironment,
-        credential: Credential,
+        api_key: Option<String>,
+        api_secret: Option<String>,
         url: Option<String>,
         heartbeat: Option<u64>,
     ) -> Self {
+        let credential = resolve_credential(environment, api_key, api_secret);
+
         // We don't have a handler yet; this placeholder keeps cache_instrument() working.
         // connect() swaps in the real channel and replays any queued instruments so the
         // handler sees them once it starts.
@@ -218,7 +252,7 @@ impl BybitWebSocketClient {
             url: url.unwrap_or_else(|| bybit_ws_private_url(environment).to_string()),
             environment,
             product_type: None,
-            credential: Some(credential),
+            credential,
             requires_auth: true,
             auth_tracker: AuthTracker::new(),
             heartbeat: heartbeat.or(Some(DEFAULT_HEARTBEAT_SECS)),
@@ -231,20 +265,29 @@ impl BybitWebSocketClient {
             is_authenticated: Arc::new(AtomicBool::new(false)),
             instruments_cache: Arc::new(DashMap::new()),
             account_id: None,
-            funding_cache: Arc::new(RwLock::new(AHashMap::new())),
+            funding_cache: Arc::new(tokio::sync::RwLock::new(AHashMap::new())),
             cancellation_token: CancellationToken::new(),
             mm_level: Arc::new(AtomicU8::new(0)),
         }
     }
 
     /// Creates a new Bybit trade WebSocket client for order operations.
+    ///
+    /// If `api_key` or `api_secret` are not provided, they will be loaded from
+    /// environment variables based on the environment:
+    /// - Demo: `BYBIT_DEMO_API_KEY`, `BYBIT_DEMO_API_SECRET`
+    /// - Testnet: `BYBIT_TESTNET_API_KEY`, `BYBIT_TESTNET_API_SECRET`
+    /// - Mainnet: `BYBIT_API_KEY`, `BYBIT_API_SECRET`
     #[must_use]
     pub fn new_trade(
         environment: BybitEnvironment,
-        credential: Credential,
+        api_key: Option<String>,
+        api_secret: Option<String>,
         url: Option<String>,
         heartbeat: Option<u64>,
     ) -> Self {
+        let credential = resolve_credential(environment, api_key, api_secret);
+
         // We don't have a handler yet; this placeholder keeps cache_instrument() working.
         // connect() swaps in the real channel and replays any queued instruments so the
         // handler sees them once it starts.
@@ -257,7 +300,7 @@ impl BybitWebSocketClient {
             url: url.unwrap_or_else(|| bybit_ws_trade_url(environment).to_string()),
             environment,
             product_type: None,
-            credential: Some(credential),
+            credential,
             requires_auth: true,
             auth_tracker: AuthTracker::new(),
             heartbeat: heartbeat.or(Some(DEFAULT_HEARTBEAT_SECS)),
@@ -270,7 +313,7 @@ impl BybitWebSocketClient {
             is_authenticated: Arc::new(AtomicBool::new(false)),
             instruments_cache: Arc::new(DashMap::new()),
             account_id: None,
-            funding_cache: Arc::new(RwLock::new(AHashMap::new())),
+            funding_cache: Arc::new(tokio::sync::RwLock::new(AHashMap::new())),
             cancellation_token: CancellationToken::new(),
             mm_level: Arc::new(AtomicU8::new(0)),
         }
@@ -486,7 +529,7 @@ impl BybitWebSocketClient {
                             let mut topics = Vec::new();
                             for entry in confirmed.iter() {
                                 let (channel, symbols) = entry.pair();
-                                for symbol in symbols.iter() {
+                                for symbol in symbols {
                                     if symbol.is_empty() {
                                         topics.push(channel.to_string());
                                     } else {
@@ -1256,8 +1299,7 @@ impl BybitWebSocketClient {
                     .map(|inst| inst.id())
                     .ok_or_else(|| {
                         BybitWsError::ClientError(format!(
-                            "Instrument {} not found in cache",
-                            cache_key
+                            "Instrument {cache_key} not found in cache"
                         ))
                     })?;
                 batch_order_data.push((
@@ -2341,7 +2383,8 @@ mod tests {
 
         let client = BybitWebSocketClient::new_trade(
             BybitEnvironment::Testnet,
-            Credential::new("test-key", "test-secret"),
+            Some("test-key".to_string()),
+            Some("test-secret".to_string()),
             None,
             Some(20),
         );
@@ -2393,7 +2436,8 @@ mod tests {
 
         let client = BybitWebSocketClient::new_trade(
             BybitEnvironment::Testnet,
-            Credential::new("test-key", "test-secret"),
+            Some("test-key".to_string()),
+            Some("test-secret".to_string()),
             None,
             Some(20),
         );

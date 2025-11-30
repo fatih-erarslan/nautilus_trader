@@ -46,7 +46,6 @@ use nautilus_network::{
 use reqwest::{Method, header::USER_AGENT};
 use rust_decimal::Decimal;
 use serde_json::Value;
-use tokio::time::sleep;
 use ustr::Ustr;
 
 use crate::{
@@ -215,6 +214,7 @@ impl HyperliquidRawHttpClient {
     }
 
     /// Configure rate limiting parameters (chainable).
+    #[must_use]
     pub fn with_rate_limits(mut self) -> Self {
         self.rest_limiter = Arc::new(WeightedLimiter::per_minute(1200));
         self.rate_limit_backoff_base = Duration::from_millis(125);
@@ -253,7 +253,7 @@ impl HyperliquidRawHttpClient {
         Ok(SignerId("hyperliquid:default".into()))
     }
 
-    /// Parse Retry-After from response headers (simplified)
+    /// Parse Retry-After from response headers
     fn parse_retry_after_simple(&self, headers: &HashMap<String, String>) -> Option<u64> {
         let retry_after = headers.get("retry-after")?;
         retry_after.parse::<u64>().ok().map(|s| s * 1000) // convert seconds to ms
@@ -397,7 +397,7 @@ impl HyperliquidRawHttpClient {
                     );
                 tracing::warn!(endpoint=?request, attempt, wait_ms=?delay.as_millis(), "429 Too Many Requests; backing off");
                 attempt += 1;
-                sleep(delay).await;
+                tokio::time::sleep(delay).await;
                 // tiny re-acquire to avoid stampede exactly on minute boundary
                 self.rest_limiter.acquire(1).await;
                 continue;
@@ -414,7 +414,7 @@ impl HyperliquidRawHttpClient {
                 );
                 tracing::warn!(endpoint=?request, attempt, status=?response.status.as_u16(), wait_ms=?delay.as_millis(), "transient error; retrying");
                 attempt += 1;
-                sleep(delay).await;
+                tokio::time::sleep(delay).await;
                 continue;
             }
 
@@ -1009,11 +1009,13 @@ impl HyperliquidHttpClient {
     }
 
     /// Get perpetuals metadata (internal helper).
+    #[allow(dead_code)]
     pub(crate) async fn load_perp_meta(&self) -> Result<PerpMeta> {
         self.inner.load_perp_meta().await
     }
 
     /// Get spot metadata (internal helper).
+    #[allow(dead_code)]
     pub(crate) async fn get_spot_meta(&self) -> Result<SpotMeta> {
         self.inner.get_spot_meta().await
     }
@@ -1506,8 +1508,7 @@ impl HyperliquidHttpClient {
                         | TimeInForce::AtTheOpen
                         | TimeInForce::AtTheClose => {
                             return Err(Error::bad_request(format!(
-                                "Time in force {:?} not supported",
-                                time_in_force
+                                "Time in force {time_in_force:?} not supported"
                             )));
                         }
                     }
@@ -1555,8 +1556,7 @@ impl HyperliquidHttpClient {
             }
             _ => {
                 return Err(Error::bad_request(format!(
-                    "Order type {:?} not supported",
-                    order_type
+                    "Order type {order_type:?} not supported"
                 )));
             }
         };
