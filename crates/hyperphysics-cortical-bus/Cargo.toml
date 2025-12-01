@@ -1,0 +1,115 @@
+[package]
+name = "hyperphysics-cortical-bus"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+license = "MIT OR Apache-2.0"
+description = "Ultra-low-latency software cortical bus integrating pBit dynamics, GPU compute, and similarity search"
+repository = "https://github.com/hyperphysics/cortical-bus"
+keywords = ["neuromorphic", "trading", "simd", "lock-free", "hft"]
+categories = ["algorithms", "concurrency", "hardware-support"]
+rust-version = "1.75"
+
+[features]
+default = ["pbit", "similarity"]
+pbit = ["dep:hyperphysics-pbit"]
+similarity = ["dep:hyperphysics-similarity", "dep:hyperphysics-hnsw", "dep:hyperphysics-lsh"]
+gpu = ["dep:hyperphysics-gpu-unified"]
+full = ["pbit", "similarity", "gpu"]
+nightly = []    # Enable nightly-only optimizations
+
+[dependencies]
+# ============================================================================
+# HyperPhysics Ecosystem Integration
+# ============================================================================
+
+# pBit dynamics - Metropolis, Gillespie, SIMD-optimized
+hyperphysics-pbit = { path = "../hyperphysics-pbit", optional = true }
+
+# Similarity search - HNSW + LSH hybrid
+hyperphysics-similarity = { path = "../hyperphysics-similarity", optional = true }
+hyperphysics-hnsw = { path = "../hyperphysics-hnsw", optional = true }
+hyperphysics-lsh = { path = "../hyperphysics-lsh", optional = true }
+
+# Unified GPU orchestration
+hyperphysics-gpu-unified = { path = "../hyperphysics-gpu-unified", optional = true }
+
+# ============================================================================
+# Core Dependencies
+# ============================================================================
+
+# Lock-free primitives
+crossbeam = "0.8"
+parking_lot = "0.12"
+
+# Collections
+smallvec = { version = "1.13", features = ["const_generics"] }
+
+# Zero-copy serialization
+bytemuck = { version = "1.14", features = ["derive", "min_const_generics"] }
+
+# Logging and tracing
+tracing = "0.1"
+
+# Error handling
+thiserror = "1.0"
+
+# Atomic primitives
+portable-atomic = { version = "1.6", features = ["float"] }
+
+# Random number generation (for pBit dynamics)
+rand = "0.8"
+fastrand = "2.0"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+rand = "0.8"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1.35", features = ["rt-multi-thread", "macros"] }
+
+[build-dependencies]
+# For SIMD feature detection at build time
+cc = "1.0"
+
+[[bench]]
+name = "spike_inject"
+harness = false
+
+[[bench]]
+name = "lsh_query"
+harness = false
+
+[[bench]]
+name = "metropolis"
+harness = false
+
+[[bench]]
+name = "ringbuf"
+harness = false
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+panic = "abort"
+strip = true
+
+[profile.bench]
+lto = "thin"
+opt-level = 3
+
+# Ultra-optimized profile for production trading
+[profile.production]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+panic = "abort"
+debug = false
+strip = true
+overflow-checks = false
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

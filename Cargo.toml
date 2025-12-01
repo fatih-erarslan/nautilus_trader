@@ -58,6 +58,10 @@ members = [
     "crates/ats-core",
     # Quantum circuit simulation
     "crates/quantum-circuit",
+    # Native AgentDB integration
+    "crates/hyperphysics-agentdb",
+    # Ultra-low-latency cortical bus with HAL
+    "crates/hyperphysics-cortical-bus",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
@@ -233,8 +237,8 @@ ruvector-core = { path = "crates/vendor/ruvector/crates/ruvector-core", default-
 hnsw_rs = "0.3"
 simsimd = "5.9"
 
-# Serialization (binary)
-bincode = "1.3"
+# Serialization (binary) - v2.0 for ruvector compatibility
+bincode = { version = "2.0.0-rc.3", features = ["serde"] }
 
 # Concurrent data structures
 crossbeam = "0.8"

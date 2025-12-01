@@ -17,6 +17,7 @@ serde.workspace = true
 thiserror.workspace = true
 sprs = "0.11"
 rayon.workspace = true
+fastrand = "2.0"
 proptest = { workspace = true, optional = true }
 
 [dev-dependencies]
@@ -27,6 +28,10 @@ proptest.workspace = true
 
 [[bench]]
 name = "simd_exp"
+harness = false
+
+[[bench]]
+name = "scalable"
 harness = false
 
 [features]

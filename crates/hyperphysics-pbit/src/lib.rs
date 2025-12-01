@@ -27,6 +27,7 @@ pub mod metropolis;
 pub mod coupling;
 pub mod sparse_matrix;
 pub mod simd;
+pub mod scalable;
 
 pub use pbit::PBit;
 pub use lattice::PBitLattice;

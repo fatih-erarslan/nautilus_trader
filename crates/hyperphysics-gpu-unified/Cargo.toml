@@ -44,6 +44,7 @@ once_cell = "1.19"
 criterion = { version = "0.5", features = ["html_reports"] }
 proptest = "1.4"
 tempfile = "3.10"
+rand = "0.8"
 
 [features]
 default = ["async"]
