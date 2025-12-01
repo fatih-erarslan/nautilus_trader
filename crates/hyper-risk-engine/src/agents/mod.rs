@@ -24,6 +24,7 @@ pub mod base;
 pub mod portfolio_manager;
 pub mod alpha_generator;
 pub mod regime_detection;
+pub mod pbit_hmm;
 pub mod market_maker;
 pub mod execution;
 pub mod arbitrage;
@@ -43,6 +44,7 @@ pub use regime_detection::{
     RegimeDetectionAgent, RegimeDetectionConfig, RegimeProbabilities,
     HiddenMarkovModel, GaussianEmission, ReturnObservation,
 };
+pub use pbit_hmm::{PBitHmmSampler, PBitRegimeDetector, HmmSamplerStats};
 pub use market_maker::{MarketMakerAgent, MarketMakerConfig, Quote, InventoryState, ToxicityScore};
 pub use execution::ExecutionAgent;
 pub use arbitrage::{ArbitrageAgent, ArbitrageConfig, ArbitrageOpportunity, VenueQuote};

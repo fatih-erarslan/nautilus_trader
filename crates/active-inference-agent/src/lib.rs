@@ -29,6 +29,7 @@ use thiserror::Error;
 use tracing::debug;
 
 pub mod gpu_accelerated;
+pub mod gpu_markov;
 pub mod hyperphysics_integration;
 pub mod markov_kernel;
 pub mod pbit_substrate;
@@ -37,6 +38,7 @@ pub mod temporal;
 pub mod thermodynamics;
 
 pub use gpu_accelerated::*;
+pub use gpu_markov::{GpuMarkovSampler, BatchMarkovSampler, SamplerStats};
 pub use hyperphysics_integration::*;
 pub use markov_kernel::*;
 pub use pbit_substrate::*;
