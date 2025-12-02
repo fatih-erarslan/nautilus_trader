@@ -50,3 +50,9 @@ hyperphysics-dilithium = { path = "../hyperphysics-dilithium", optional = true }
 approx = "0.5"
 rand_chacha = "0.3"
 criterion = { workspace = true }
+nalgebra = { workspace = true }
+
+# Benchmarks
+[[bench]]
+name = "markov_kernel"
+harness = false

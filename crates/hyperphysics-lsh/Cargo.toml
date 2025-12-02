@@ -67,11 +67,11 @@ pbit = []
 # FPGA interface stubs
 fpga = []
 
-# Benchmarks - TODO: uncomment when benchmark files are created
-# [[bench]]
-# name = "hash_latency"
-# harness = false
-#
-# [[bench]]
-# name = "streaming_insert"
-# harness = false
+# Benchmarks
+[[bench]]
+name = "hash_computation"
+harness = false
+
+[[bench]]
+name = "streaming_insert"
+harness = false

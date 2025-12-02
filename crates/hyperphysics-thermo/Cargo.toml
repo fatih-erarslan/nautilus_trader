@@ -16,3 +16,16 @@ rand.workspace = true
 [dev-dependencies]
 criterion.workspace = true
 rand_chacha.workspace = true
+
+# Benchmarks
+[[bench]]
+name = "hamiltonian"
+harness = false
+
+[[bench]]
+name = "entropy"
+harness = false
+
+[[bench]]
+name = "landauer"
+harness = false

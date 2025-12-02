@@ -69,11 +69,11 @@ gpu = []
 rocm = ["gpu"]
 cuda = ["gpu"]
 
-# Benchmarks - TODO: uncomment when benchmark files are created
-# [[bench]]
-# name = "query_latency"
-# harness = false
-#
-# [[bench]]
-# name = "hyperbolic_distance"
-# harness = false
+# Benchmarks
+[[bench]]
+name = "query_latency"
+harness = false
+
+[[bench]]
+name = "distance_metrics"
+harness = false
