@@ -317,10 +317,11 @@ async fn cmd_run(
     }
 
     println!(
-        "\n{} Running {} targets (parallelism: {}, timeout: {}s)\n",
+        "\n{} Running {} targets (parallelism: {}, {}timeout: {}s)\n",
         ROCKET,
         style(targets.len()).bold(),
         parallelism,
+        CLOCK,
         timeout
     );
 
