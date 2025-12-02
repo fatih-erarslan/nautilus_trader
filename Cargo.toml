@@ -62,6 +62,8 @@ members = [
     "crates/hyperphysics-agentdb",
     # Ultra-low-latency cortical bus with HAL
     "crates/hyperphysics-cortical-bus",
+    # Benchmark orchestrator for unified test/benchmark execution
+    "crates/hyperphysics-bench-orchestrator",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
