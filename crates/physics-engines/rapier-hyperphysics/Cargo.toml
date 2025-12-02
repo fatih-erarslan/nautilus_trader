@@ -48,11 +48,6 @@ default = ["simd"]
 simd = []
 deterministic = []
 
-[profile.release]
-opt-level = 3
-lto = "fat"
-codegen-units = 1
-
 [[bench]]
 name = "rapier_benchmark"
 harness = false

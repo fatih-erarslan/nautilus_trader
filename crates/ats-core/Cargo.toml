@@ -132,7 +132,7 @@ required-features = ["benchmarking"]
 name = "scores_benchmark"
 harness = false
 
-[[bin]]
+[[bench]]
 name = "performance_comparison_report"
-path = "benches/performance_comparison_report.rs"
+harness = false
 required-features = ["benchmarking"]

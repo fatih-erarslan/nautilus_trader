@@ -66,14 +66,3 @@ neon = ["simd"]
 parallel = ["rayon", "num_cpus", "crossbeam"]
 memory-pool = ["aligned-vec", "lockfree"]
 high-performance = ["simd", "parallel", "memory-pool", "cpu-time", "memmap2", "once_cell"]
-
-[profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
-panic = "abort"
-
-[profile.bench]
-opt-level = 3
-lto = true
-codegen-units = 1
