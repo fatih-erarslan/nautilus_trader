@@ -14,6 +14,12 @@ hyperphysics-thermo = { path = "../hyperphysics-thermo" }
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
 hyperphysics-dilithium = { path = "../hyperphysics-dilithium" }
 
+# Lorentz model integration (optional)
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+
+# Strategy routing integration (optional)
+hyperphysics-strategy-router = { path = "../hyperphysics-strategy-router", optional = true }
+
 serde.workspace = true
 serde_json = "1.0"
 serde_bytes = "0.11"
@@ -42,3 +48,9 @@ proptest = "1.4"
 [features]
 default = []
 simd = []
+# Lorentz/Hyperboloid model with f64 SIMD Minkowski operations
+lorentz = ["hyperphysics-lorentz", "hyperphysics-geometry/lorentz"]
+# pBit-aware MoE strategy routing
+strategy-router = ["hyperphysics-strategy-router"]
+# Full hyperbolic features
+hyperbolic-full = ["lorentz", "strategy-router"]

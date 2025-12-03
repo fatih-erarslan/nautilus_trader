@@ -64,6 +64,10 @@ members = [
     "crates/hyperphysics-cortical-bus",
     # Benchmark orchestrator for unified test/benchmark execution
     "crates/hyperphysics-bench-orchestrator",
+    # Lorentz/Hyperboloid model with SIMD Minkowski operations
+    "crates/hyperphysics-lorentz",
+    # pBit-aware Mixture of Experts strategy router
+    "crates/hyperphysics-strategy-router",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [

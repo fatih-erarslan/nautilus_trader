@@ -7,9 +7,16 @@ license.workspace = true
 
 description = "Syntergic field theory implementation with non-local correlations"
 
+[features]
+default = []
+# Lorentz model for Green's function propagators in hyperbolic space
+lorentz = ["hyperphysics-lorentz", "hyperphysics-geometry/lorentz"]
+
 [dependencies]
 hyperphysics-geometry = { path = "../hyperphysics-geometry" }
 hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+# Lorentz/Hyperboloid model for hyperbolic Green's functions
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
 nalgebra.workspace = true
 ndarray.workspace = true
 rayon.workspace = true

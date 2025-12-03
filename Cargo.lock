@@ -92,11 +92,13 @@ dependencies = [
  "hyperphysics-geometry",
  "hyperphysics-gpu-unified",
  "hyperphysics-homomorphic",
+ "hyperphysics-lorentz",
  "hyperphysics-neural",
  "hyperphysics-optimization",
  "hyperphysics-pbit",
  "hyperphysics-reasoning-backends",
  "hyperphysics-reasoning-router",
+ "hyperphysics-strategy-router",
  "hyperphysics-syntergic",
  "hyperphysics-thermo",
  "hyperphysics-verify",
@@ -3870,7 +3872,7 @@ checksum = "fe6d2e5af09e8c8ad56c969f2157a3d4238cebc7c55f0a517728c38f7b200f81"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
@@ -3881,7 +3883,7 @@ checksum = "af491d569909a7e4dee0ad7db7f5341fef5c614d5b8ec8cf765732aba3cff681"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
@@ -7327,7 +7329,9 @@ name = "hyperphysics-agentdb"
 version = "0.2.0"
 dependencies = [
  "chrono",
+ "hyperphysics-lorentz",
  "hyperphysics-pbit",
+ "hyperphysics-strategy-router",
  "parking_lot",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
@@ -7398,7 +7402,9 @@ dependencies = [
  "hyperphysics-consciousness",
  "hyperphysics-dilithium",
  "hyperphysics-geometry",
+ "hyperphysics-lorentz",
  "hyperphysics-pbit",
+ "hyperphysics-strategy-router",
  "hyperphysics-thermo",
  "pollster 0.3.0",
  "proptest",
@@ -7492,6 +7498,7 @@ name = "hyperphysics-geometry"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "hyperphysics-lorentz",
  "nalgebra 0.34.1",
  "num-complex 0.4.6",
  "num-traits 0.2.19",
@@ -7580,12 +7587,14 @@ dependencies = [
  "hyperphysics-consciousness",
  "hyperphysics-core",
  "hyperphysics-geometry",
+ "hyperphysics-lorentz",
  "hyperphysics-market",
  "hyperphysics-ml",
  "hyperphysics-neural-trader",
  "hyperphysics-optimization",
  "hyperphysics-pbit",
  "hyperphysics-risk",
+ "hyperphysics-strategy-router",
  "hyperphysics-thermo",
  "jolt-hyperphysics",
  "js-sys",
@@ -7653,6 +7662,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperphysics-lorentz"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "nalgebra 0.34.1",
+ "num-traits 0.2.19",
+ "proptest",
+ "serde",
+ "simsimd 6.5.5",
+ "thiserror 1.0.69",
+ "wide",
+]
+
+[[package]]
 name = "hyperphysics-lsh"
 version = "0.1.0"
 dependencies = [
@@ -7683,6 +7706,7 @@ dependencies = [
  "async-trait",
  "base64 0.21.7",
  "chrono",
+ "criterion",
  "crossbeam-epoch",
  "futures",
  "futures-util",
@@ -7985,12 +8009,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperphysics-strategy-router"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "hyperphysics-lorentz",
+ "hyperphysics-pbit",
+ "nalgebra 0.34.1",
+ "num-traits 0.2.19",
+ "proptest",
+ "rand 0.8.5",
+ "rayon",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "hyperphysics-syntergic"
 version = "0.1.0"
 dependencies = [
  "approx 0.5.1",
  "criterion",
  "hyperphysics-geometry",
+ "hyperphysics-lorentz",
  "hyperphysics-pbit",
  "nalgebra 0.34.1",
  "ndarray 0.15.6",
@@ -13159,6 +13200,15 @@ name = "simsimd"
 version = "5.9.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9638f2829f4887c62a01958903b58fa1b740a64d5dc2bbc4a75a33827ee1bd53"
+dependencies = [
+ "cc",
+]
+
+[[package]]
+name = "simsimd"
+version = "6.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "35185e4ac5ccaa9b8550d0dbdfaca87a6cabd68d5fe2db81ad270692f827bdb1"
 dependencies = [
  "cc",
 ]

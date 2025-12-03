@@ -8,10 +8,16 @@ categories = ["science", "simulation", "algorithms"]
 
 [features]
 default = []
-full = ["gpu", "verification", "crypto"]
+full = ["gpu", "verification", "crypto", "action-routing"]
 gpu = ["hyperphysics-gpu-unified"]
 verification = ["hyperphysics-verify"]
 crypto = ["hyperphysics-homomorphic", "hyperphysics-dilithium"]
+# pBit-aware MoE action routing for intelligent action selection
+action-routing = ["hyperphysics-strategy-router"]
+# Lorentz model for hyperbolic belief state representations
+lorentz = ["hyperphysics-lorentz", "hyperphysics-geometry/lorentz"]
+# Full hyperbolic action system
+hyperbolic-action = ["action-routing", "lorentz"]
 
 [dependencies]
 nalgebra = { workspace = true }
@@ -29,6 +35,12 @@ hyperphysics-pbit = { path = "../hyperphysics-pbit" }
 hyperphysics-thermo = { path = "../hyperphysics-thermo" }
 hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
 hyperphysics-syntergic = { path = "../hyperphysics-syntergic" }
+
+# Lorentz/Hyperboloid model for hyperbolic belief representations (optional)
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+
+# pBit-aware MoE strategy router for action selection (optional)
+hyperphysics-strategy-router = { path = "../hyperphysics-strategy-router", optional = true }
 
 # Optimization and reasoning
 hyperphysics-optimization = { path = "../hyperphysics-optimization" }

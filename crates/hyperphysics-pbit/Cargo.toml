@@ -20,6 +20,9 @@ rayon.workspace = true
 fastrand = "2.0"
 proptest = { workspace = true, optional = true }
 
+# Note: strategy-router depends on pbit, not the other way around.
+# Use hyperphysics-strategy-router directly for regime inference instead.
+
 [dev-dependencies]
 criterion.workspace = true
 rand_chacha.workspace = true

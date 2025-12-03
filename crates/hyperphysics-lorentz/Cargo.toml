@@ -1,29 +1,28 @@
 [package]
-name = "hyperphysics-geometry"
+name = "hyperphysics-lorentz"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
-description = "Hyperbolic geometry engine (H³ manifold with K=-1 curvature)"
+description = "Lorentz/Hyperboloid model for hyperbolic space with f64 SIMD Minkowski operations"
 repository = "https://github.com/hyperphysics/hyperphysics"
 
-[features]
-default = []
-# Lorentz/Hyperboloid model with SIMD Minkowski operations
-lorentz = ["hyperphysics-lorentz"]
-
 [dependencies]
+# Note: No dependency on hyperphysics-geometry to avoid circular dependency.
+# hyperphysics-geometry can optionally depend on this crate via the "lorentz" feature.
 nalgebra.workspace = true
-num-complex = "0.4"
 num-traits.workspace = true
 serde.workspace = true
 thiserror.workspace = true
-
-# Optional Lorentz model integration
-hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+simsimd = "6.5"
+wide = "0.7"
 
 [dev-dependencies]
 criterion.workspace = true
 proptest.workspace = true
+
+[[bench]]
+name = "lorentz_benchmark"
+harness = false

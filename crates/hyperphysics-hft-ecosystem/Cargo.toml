@@ -24,6 +24,12 @@ hyperphysics-market = { path = "../hyperphysics-market", optional = true }
 hyperphysics-risk = { path = "../hyperphysics-risk", optional = true }
 active-inference-agent = { path = "../active-inference-agent" }
 
+# Lorentz/Hyperboloid model for hyperbolic similarity (optional)
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+
+# pBit-aware MoE strategy router for unified strategy selection
+hyperphysics-strategy-router = { path = "../hyperphysics-strategy-router", optional = true }
+
 # REAL optimization algorithms (NOT stubs)
 hyperphysics-optimization = { path = "../hyperphysics-optimization", optional = true }
 
@@ -149,6 +155,15 @@ wasm-bindings = ["wasm-bindgen", "js-sys", "web-sys"]
 # Formal verification
 verification = []
 
+# Lorentz model for hyperbolic similarity metrics
+lorentz = ["hyperphysics-lorentz", "hyperphysics-geometry/lorentz"]
+
+# pBit-aware MoE strategy routing for unified strategy selection
+strategy-routing = ["hyperphysics-strategy-router"]
+
+# Full hyperbolic strategy system (Lorentz + MoE routing)
+hyperbolic-strategy = ["lorentz", "strategy-routing"]
+
 # Full feature set (for testing)
 full = [
     "hft-core",
@@ -157,7 +172,8 @@ full = [
     "quantum-forecasting",
     "physics-all",
     "simd",
-    "verification"
+    "verification",
+    "hyperbolic-strategy"
 ]
 
 [[bench]]

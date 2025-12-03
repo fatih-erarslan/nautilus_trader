@@ -1,0 +1,72 @@
+[package]
+name = "hyperphysics-agentdb"
+version = "0.2.0"
+edition = "2021"
+description = "Native AgentDB integration for HyperPhysics - Trading Memory, Causal Learning, GNN-Enhanced Search, Attention Mechanisms, and pBit Regime Detection"
+license = "MIT"
+authors = ["HyperPhysics Team"]
+
+[features]
+default = ["gnn", "attention", "routing"]
+# GNN-enhanced search with EWC forgetting mitigation
+gnn = ["dep:ruvector-gnn"]
+# Attention mechanisms: hyperbolic, MoE, graph, sparse
+attention = ["dep:ruvector-attention"]
+# Tiny Dancer neural routing
+routing = ["dep:ruvector-tiny-dancer-core"]
+# pBit regime detection integration
+pbit = ["dep:hyperphysics-pbit", "dep:rand", "dep:rand_chacha"]
+# Lorentz hyperbolic attention (SIMD f64 Minkowski)
+lorentz-attention = ["dep:hyperphysics-lorentz"]
+# pBit-aware MoE strategy routing
+strategy-routing = ["dep:hyperphysics-strategy-router"]
+# Full feature set
+full = ["gnn", "attention", "routing", "pbit", "lorentz-attention", "strategy-routing"]
+
+[dependencies]
+# Core AgenticDB from ruvector
+ruvector-core = { path = "../vendor/ruvector/crates/ruvector-core", default-features = false, features = ["storage"] }
+
+# GNN layers, EWC, replay buffers, differentiable search
+ruvector-gnn = { path = "../vendor/ruvector/crates/ruvector-gnn", default-features = false, optional = true }
+
+# Attention mechanisms: hyperbolic, MoE, graph, sparse
+ruvector-attention = { path = "../vendor/ruvector/crates/ruvector-attention", default-features = false, optional = true }
+
+# Tiny Dancer: FastGRNN routing, uncertainty, circuit breakers
+ruvector-tiny-dancer-core = { path = "../vendor/ruvector/crates/ruvector-tiny-dancer-core", default-features = false, optional = true }
+
+# HyperPhysics pBit dynamics for regime detection
+hyperphysics-pbit = { path = "../hyperphysics-pbit", optional = true }
+
+# Lorentz/Hyperboloid model for hyperbolic attention (SIMD f64 Minkowski)
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+
+# pBit-aware MoE strategy router for unified routing
+hyperphysics-strategy-router = { path = "../hyperphysics-strategy-router", optional = true }
+
+# Random number generation for pBit sampling
+rand = { version = "0.8", optional = true }
+rand_chacha = { version = "0.3", optional = true }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1.0", features = ["v4"] }
+
+# Concurrent data structures
+parking_lot = "0.12"
+
+[dev-dependencies]
+tempfile = "3.13"

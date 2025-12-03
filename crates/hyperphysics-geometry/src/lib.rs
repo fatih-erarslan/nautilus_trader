@@ -24,6 +24,10 @@ pub mod tessellation_73;
 pub mod crypto_substrate;
 pub mod curvature;
 
+/// Lorentz/Hyperboloid model bridge (requires `lorentz` feature)
+#[cfg(feature = "lorentz")]
+pub mod lorentz_bridge;
+
 pub use poincare::PoincarePoint;
 pub use geodesic::Geodesic;
 pub use distance::HyperbolicDistance;
@@ -72,3 +76,11 @@ pub mod moebius;
 pub mod fuchsian;
 pub use moebius::{MoebiusTransform, TransformType};
 pub use fuchsian::FuchsianGroup as FuchsianGroupAlgebraic;
+
+// Re-export Lorentz bridge types when feature is enabled
+#[cfg(feature = "lorentz")]
+pub use lorentz_bridge::{ToLorentz, ToPoincare, simd_hyperbolic_distance, batch_to_lorentz, batch_to_poincare, pairwise_distances_simd, lorentz_model};
+
+// Re-export core Lorentz types when feature is enabled
+#[cfg(feature = "lorentz")]
+pub use hyperphysics_lorentz::{LorentzPoint, LorentzModel, SimdMinkowski};
