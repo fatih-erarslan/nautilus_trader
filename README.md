@@ -1,202 +1,172 @@
 # HyperPhysics
 
-**Enterprise-grade physics-inspired quantitative trading system combining hyperbolic geometry, consciousness metrics, adaptive temperature scaling, and ultra-low-latency risk management.**
+**A scientific computing platform at the intersection of computational neuroscience, hyperbolic geometry, thermodynamic computing, and quantitative finance.**
+
+HyperPhysics unifies biophysically-accurate neural simulation (OpenWorm/Sibernetic), physics-inspired optimization (pBit/Ising machines), and enterprise-grade trading infrastructure into a coherent Rust workspace.
+
+---
+
+## Core Philosophy
+
+HyperPhysics is built on three foundational principles from complex systems science:
+
+1. **Autopoiesis** — Self-organizing systems that maintain their own boundaries
+2. **Self-Organized Criticality** — Systems naturally evolving toward critical states
+3. **Embodied Cognition** — Intelligence emerging from physical substrate interaction
+
+These principles manifest across all components: from C. elegans neural dynamics to market regime detection to thermodynamic optimization.
 
 ---
 
 ## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                              HYPERPHYSICS ECOSYSTEM                                  │
-├──────────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                      │
-│  ┌─────────────────────────────────────────────────────────────────────────────┐    │
-│  │                        MARKET DATA LAYER                                     │    │
-│  │  ┌─────────────┐ ┌──────────────┐ ┌─────────────┐ ┌──────────────────────┐  │    │
-│  │  │   Alpaca    │ │   Binance    │ │   Bybit     │ │  Coinbase/Kraken/OKX │  │    │
-│  │  │  (Equities) │ │ (WebSocket)  │ │  (Futures)  │ │     (Multi-CEX)      │  │    │
-│  │  └──────┬──────┘ └──────┬───────┘ └──────┬──────┘ └──────────┬───────────┘  │    │
-│  │         └────────────────┴────────────────┴───────────────────┘              │    │
-│  │                                   │                                          │    │
-│  │                    ┌──────────────▼──────────────┐                          │    │
-│  │                    │   Lock-Free Order Book      │                          │    │
-│  │                    │   (<50μs message passing)   │                          │    │
-│  │                    └──────────────┬──────────────┘                          │    │
-│  └───────────────────────────────────┼──────────────────────────────────────────┘    │
-│                                      │                                               │
-│  ┌───────────────────────────────────▼──────────────────────────────────────────┐   │
-│  │                        HYPER-RISK-ENGINE (3-Tier Latency)                    │   │
-│  │  ┌─────────────────────────────────────────────────────────────────────────┐ │   │
-│  │  │  FAST PATH (<100μs)           │  MEDIUM PATH (100μs-1ms)                │ │   │
-│  │  │  ─────────────────────        │  ────────────────────────               │ │   │
-│  │  │  • Global Kill Switch         │  • Regime Detection (HMM)               │ │   │
-│  │  │  • Position Limits            │  • VaR/CVaR Calculation                 │ │   │
-│  │  │  • Circuit Breakers           │  • Kelly Position Sizing                │ │   │
-│  │  │  • Pre-trade Risk             │  • DCC Correlation Updates              │ │   │
-│  │  │  • SPOT/DSPOT Anomaly         │  • Alpha Generation                     │ │   │
-│  │  ├─────────────────────────────────────────────────────────────────────────┤ │   │
-│  │  │  SLOW PATH (>1ms)             │  EVOLUTION LAYER (seconds-hours)        │ │   │
-│  │  │  ─────────────────────        │  ────────────────────────────           │ │   │
-│  │  │  • Monte Carlo VaR            │  • Parameter Optimization               │ │   │
-│  │  │  • FRTB ES Calculation        │  • Neural Pattern Learning              │ │   │
-│  │  │  • Portfolio Optimization     │  • Regime Model Retraining              │ │   │
-│  │  └─────────────────────────────────────────────────────────────────────────┘ │   │
-│  └──────────────────────────────────┬───────────────────────────────────────────┘   │
-│                                     │                                                │
-│  ┌──────────────────────────────────▼────────────────────────────────────────────┐  │
-│  │                        HYPERPHYSICS CORE ENGINE                                │  │
-│  │  ┌──────────────────┐ ┌──────────────────┐ ┌────────────────────────────────┐ │  │
-│  │  │ Hyperbolic H³    │ │ pBit Dynamics    │ │ Thermodynamics                 │ │  │
-│  │  │ Geometry (K=-1)  │ │ (Gillespie/MCMC) │ │ (Landauer Principle)           │ │  │
-│  │  └──────────────────┘ └──────────────────┘ └────────────────────────────────┘ │  │
-│  │  ┌──────────────────┐ ┌──────────────────┐ ┌────────────────────────────────┐ │  │
-│  │  │ Consciousness    │ │ ATS Conformal    │ │ Game Theory Engine             │ │  │
-│  │  │ Φ (IIT) + CI     │ │ Prediction       │ │ (LMSR + Prospect Theory)       │ │  │
-│  │  └──────────────────┘ └──────────────────┘ └────────────────────────────────┘ │  │
-│  └──────────────────────────────────┬────────────────────────────────────────────┘  │
-│                                     │                                                │
-│  ┌──────────────────────────────────▼────────────────────────────────────────────┐  │
-│  │                       NAUTILUS TRADER BRIDGE                                   │  │
-│  │  ┌──────────────────┐ ┌──────────────────┐ ┌────────────────────────────────┐ │  │
-│  │  │ NautilusAdapter  │ │ TypeConversions  │ │ ExecBridge                     │ │  │
-│  │  │ (Data → Feed)    │ │ (NT ↔ HP)        │ │ (Signal → Order)               │ │  │
-│  │  └──────────────────┘ └──────────────────┘ └────────────────────────────────┘ │  │
-│  │                                                                                │  │
-│  │  → Redis Cache (Fixed todo!() panics)                                         │  │
-│  │  → Risk Engine Integration (Orders routed through validation)                 │  │
-│  │  → Multi-venue + Margin Account Support                                       │  │
-│  └───────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                      │
-│  ┌───────────────────────────────────────────────────────────────────────────────┐  │
-│  │                       PHYSICS ENGINES (Unified Backend)                       │  │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐             │  │
-│  │  │   Rapier    │ │ JoltPhysics │ │   MuJoCo    │ │   Avian     │             │  │
-│  │  │   (2D/3D)   │ │   (C++)     │ │  (DeepMind) │ │   (Bevy)    │             │  │
-│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘             │  │
-│  │  ┌─────────────┐ ┌─────────────┐                                             │  │
-│  │  │    Warp     │ │   Taichi    │  All via hyperphysics-unified               │  │
-│  │  │  (NVIDIA)   │ │   (GPU JIT) │  abstraction layer                          │  │
-│  │  └─────────────┘ └─────────────┘                                             │  │
-│  └───────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                      │
-└──────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                           HYPERPHYSICS ECOSYSTEM                                  │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
+│  │                    COMPUTATIONAL NEUROSCIENCE LAYER                          │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────────────┐ │ │
+│  │  │ hyperphysics-   │  │ hyperphysics-   │  │ hyperphysics-stdp            │ │ │
+│  │  │ connectome      │  │ sph             │  │ (Spike-Timing Plasticity)    │ │ │
+│  │  │ (302 neurons)   │  │ (PCISPH fluid)  │  │                              │ │ │
+│  │  └────────┬────────┘  └────────┬────────┘  └──────────────┬───────────────┘ │ │
+│  │           └────────────────────┼──────────────────────────┘                  │ │
+│  │                                ▼                                              │ │
+│  │              ┌─────────────────────────────────────┐                         │ │
+│  │              │     hyperphysics-embodiment         │                         │ │
+│  │              │  (Neural-Body Coupling / Muscles)   │                         │ │
+│  │              └─────────────────┬───────────────────┘                         │ │
+│  │                                ▼                                              │ │
+│  │              ┌─────────────────────────────────────┐                         │ │
+│  │              │     sibernetic-hyperphysics         │                         │ │
+│  │              │  (Integrated C. elegans Simulator)  │                         │ │
+│  │              └─────────────────────────────────────┘                         │ │
+│  └─────────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
+│  │                    PHYSICS & GEOMETRY LAYER                                  │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────────────┐ │ │
+│  │  │ hyperphysics-   │  │ hyperphysics-   │  │ hyperphysics-thermo          │ │ │
+│  │  │ geometry (H³)   │  │ lorentz         │  │ (Landauer/Hamiltonian)       │ │ │
+│  │  │ K=-1 manifold   │  │ (Hyperboloid)   │  │                              │ │ │
+│  │  └─────────────────┘  └─────────────────┘  └──────────────────────────────┘ │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────────────┐ │ │
+│  │  │ hyperphysics-   │  │ ising-optimizer │  │ quantum-circuit              │ │ │
+│  │  │ pbit (p-bits)   │  │ (NP-hard solver)│  │ (Quantum simulation)         │ │ │
+│  │  └─────────────────┘  └─────────────────┘  └──────────────────────────────┘ │ │
+│  └─────────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
+│  │                    COGNITIVE ARCHITECTURE LAYER                              │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────────────┐ │ │
+│  │  │ active-         │  │ hyperphysics-   │  │ hyperphysics-consciousness   │ │ │
+│  │  │ inference-agent │  │ cortical-bus    │  │ (Φ IIT / CI metrics)         │ │ │
+│  │  │ (Free Energy)   │  │ (Neural routing)│  │                              │ │ │
+│  │  └─────────────────┘  └─────────────────┘  └──────────────────────────────┘ │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────────────┐ │ │
+│  │  │ hyperphysics-   │  │ hyperphysics-   │  │ game-theory-engine           │ │ │
+│  │  │ reasoning-      │  │ strategy-router │  │ (Nash/LMSR/Prospect)         │ │ │
+│  │  │ router          │  │ (pBit MoE)      │  │                              │ │ │
+│  │  └─────────────────┘  └─────────────────┘  └──────────────────────────────┘ │ │
+│  └─────────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
+│  │                    TRADING & RISK INFRASTRUCTURE                             │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────────────┐ │ │
+│  │  │ hyper-risk-     │  │ ats-core        │  │ hyperphysics-nautilus        │ │ │
+│  │  │ engine          │  │ (Conformal      │  │ (Nautilus Trader bridge)     │ │ │
+│  │  │ (<100μs path)   │  │  Prediction)    │  │                              │ │ │
+│  │  └─────────────────┘  └─────────────────┘  └──────────────────────────────┘ │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────────────────┐ │ │
+│  │  │ hyperphysics-   │  │ tengri          │  │ cwts-ultra                   │ │ │
+│  │  │ market          │  │ (Crypto strats) │  │ (HFT infrastructure)         │ │ │
+│  │  └─────────────────┘  └─────────────────┘  └──────────────────────────────┘ │ │
+│  └─────────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
+│  │                    PHYSICS SIMULATION BACKENDS                               │ │
+│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────────────┐ │ │
+│  │  │ Rapier │ │  Jolt  │ │ MuJoCo │ │  Warp  │ │ Taichi │ │hyperphysics-   │ │ │
+│  │  │ (2D/3D)│ │ (C++)  │ │(DeepM.)│ │(NVIDIA)│ │(GPU)   │ │unified         │ │ │
+│  │  └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────────────┘ │ │
+│  └─────────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                   │
+└──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Data Flow Pipeline
+## Featured Components
 
-```
-┌────────────────┐     ┌─────────────────┐     ┌──────────────────────┐
-│  Exchange WS   │────▶│  Lock-Free      │────▶│  HNSW Similarity     │
-│  (QuoteTick)   │     │  Order Book     │     │  Search (150x opt)   │
-└────────────────┘     └─────────────────┘     └──────────┬───────────┘
-                                                          │
-                       ┌──────────────────────────────────▼────────────────────────────┐
-                       │                    SIGNAL GENERATION                          │
-                       │  ┌─────────────────┐  ┌─────────────────┐  ┌───────────────┐ │
-                       │  │ Subsumption     │  │ Enactive        │  │ Arbitrage     │ │
-                       │  │ Architecture    │  │ Market Percept  │  │ Detection     │ │
-                       │  │ (Brooks Robot)  │  │ (Coupling)      │  │ (Cross-venue) │ │
-                       │  └────────┬────────┘  └────────┬────────┘  └───────┬───────┘ │
-                       │           └──────────────┬─────┴──────────────────┘          │
-                       └──────────────────────────┼────────────────────────────────────┘
-                                                  ▼
-┌───────────────────────────────────────────────────────────────────────────────────────┐
-│                              RISK VALIDATION PIPELINE                                 │
-│                                                                                       │
-│   ┌─────────────┐     ┌─────────────────┐     ┌────────────────────┐                 │
-│   │ Fast Path   │────▶│ ATS Conformal   │────▶│ Position Sizing    │                 │
-│   │ Sentinels   │     │ Prediction      │     │ (Kelly/PPO)        │                 │
-│   │ (<100μs)    │     │ (CQR/Coverage)  │     │                    │                 │
-│   └─────────────┘     └─────────────────┘     └─────────┬──────────┘                 │
-│                                                          │                            │
-│                       ┌──────────────────────────────────▼─────────────────────────┐ │
-│                       │                    REGIME DETECTION                        │ │
-│                       │  HMM + MS-GARCH → Bull/Bear/Bubble/Crash Classification   │ │
-│                       │  Byzantine Consensus (PBFT/Raft) for Signal Agreement     │ │
-│                       └──────────────────────────────────┬─────────────────────────┘ │
-└──────────────────────────────────────────────────────────┼────────────────────────────┘
-                                                           ▼
-                       ┌──────────────────────────────────────────────────────────────┐
-                       │                    ORDER EXECUTION                           │
-                       │  NautilusTrader ExecEngine → Venue Adapters → Exchange      │
-                       └──────────────────────────────────────────────────────────────┘
-```
+### Computational Neuroscience (OpenWorm/Sibernetic Port)
 
----
+The `sibernetic-hyperphysics` stack provides a complete C. elegans simulation ported from OpenWorm:
 
-## Crate Structure (53 Crates)
-
-### Core Physics & Mathematics
-| Crate | Description | Lines |
-|-------|-------------|-------|
-| `hyperphysics-core` | Main engine orchestration, SIMD optimizations | ~15K |
-| `hyperphysics-geometry` | Hyperbolic H³ manifold (K=-1), {3,7,2} tessellation | ~3K |
-| `hyperphysics-pbit` | Probabilistic bit dynamics (Gillespie SSA + Metropolis) | ~5K |
-| `hyperphysics-thermo` | Thermodynamics (Landauer principle: E_min = k_B T ln 2) | ~2K |
-| `hyperphysics-consciousness` | Φ (IIT) and CI metrics for regime detection | ~4K |
-
-### Risk & Trading
-| Crate | Description | Lines |
-|-------|-------------|-------|
-| `hyper-risk-engine` | 3-tier latency risk (<100μs fast path) | ~25K |
-| `hyperphysics-market` | Multi-venue data providers, lock-free order book | ~20K |
-| `hyperphysics-nautilus` | Nautilus Trader integration bridge | ~8K |
-| `hyperphysics-risk` | Portfolio risk metrics and topology | ~5K |
-| `hyperphysics-finance` | Financial calculations and models | ~4K |
-
-### Machine Learning & Prediction
-| Crate | Description | Lines |
-|-------|-------------|-------|
-| `ats-core` | Adaptive Temperature Scaling, CQR, conformal prediction | ~40K |
-| `hyperphysics-neural` | Central neural intelligence layer | ~8K |
-| `hyperphysics-ml` | ML model integrations | ~5K |
-| `quantum-circuit` | Quantum circuit simulation (PennyLane compatible) | ~6K |
-
-### Optimization & Search
-| Crate | Description | Lines |
-|-------|-------------|-------|
-| `hyperphysics-optimization` | 14 bio-inspired algorithms (PSO, ACO, GA, etc.) | ~15K |
-| `hyperphysics-hnsw` | Hierarchical Navigable Small World graphs | ~5K |
-| `hyperphysics-lsh` | Locality-Sensitive Hashing | ~3K |
-| `hyperphysics-similarity` | Similarity search orchestration | ~4K |
-
-### Game Theory & Behavioral Economics
-| Crate | Description | Lines |
-|-------|-------------|-------|
-| `game-theory-engine` | Nash equilibrium, mechanism design | ~8K |
-| `lmsr` | Logarithmic Market Scoring Rule (Hanson) | ~4K |
-| `prospect-theory` | Kahneman-Tversky probability weighting | ~3K |
-
-### Physics Engines (Vendor)
 | Crate | Description |
 |-------|-------------|
-| `rapier-hyperphysics` | Rapier 2D/3D physics binding |
-| `jolt-hyperphysics` | JoltPhysics C++ binding |
-| `warp-hyperphysics` | NVIDIA Warp binding |
-| `hyperphysics-unified` | Unified physics backend abstraction |
+| **hyperphysics-connectome** | Complete 302-neuron connectome with 6 model levels (A→D1), graded synapses, ion channels (k_slow, k_fast, ca_boyle) based on c302 |
+| **hyperphysics-sph** | PCISPH (Predictive-Corrective Incompressible SPH) fluid dynamics for soft body simulation |
+| **hyperphysics-embodiment** | Neural-muscle coupling linking connectome outputs to 96 body wall muscles |
+| **hyperphysics-stdp** | Spike-Timing Dependent Plasticity for online learning |
+| **hyperphysics-nas** | Neural architecture search for connectome optimization |
 
-### Vendor Integrations
-| Vendor | Description |
-|--------|-------------|
-| `nautilus_trader` | Production trading framework (synced with upstream) |
-| `ruvector` | High-performance vector database |
-| `ruv-fann` | Fast Artificial Neural Network library |
-| `physics/` | JoltPhysics, MuJoCo, Taichi, Rapier, Warp, Avian |
+**c302 Model Levels:**
+- **Level A**: Leaky Integrate-and-Fire (fast behavioral studies)
+- **Level B**: Izhikevich neurons with gap junctions
+- **Level C**: Conductance-based with spike-triggered synapses
+- **Level C1**: Conductance-based with graded synaptic transmission
+- **Level D**: Full Hodgkin-Huxley with ion channel dynamics
+- **Level D1**: Full biophysical with calcium-based GradedSynapse2
+
+### Hyperbolic Geometry & Thermodynamic Computing
+
+| Crate | Description |
+|-------|-------------|
+| **hyperphysics-geometry** | H³ hyperbolic manifold (K=-1), {3,7,2} tessellation, Poincaré disk model |
+| **hyperphysics-lorentz** | Lorentz/Hyperboloid model with f64 SIMD Minkowski operations |
+| **hyperphysics-pbit** | Probabilistic bit dynamics (Gillespie SSA, Metropolis-Hastings, Hopfield networks) |
+| **hyperphysics-thermo** | Thermodynamics engine (Landauer principle: E_min = k_B T ln 2) |
+| **ising-optimizer** | Ising machine for NP-hard combinatorial optimization |
+| **quantum-circuit** | Quantum circuit simulation (PennyLane compatible) |
+| **quantum-lstm** | Quantum-enhanced LSTM with biological quantum effects |
+
+### Cognitive Architecture
+
+| Crate | Description |
+|-------|-------------|
+| **active-inference-agent** | Free Energy Principle agents (Friston), predictive processing |
+| **hyperphysics-consciousness** | Integrated Information Theory (Φ) and Complexity Index (CI) |
+| **hyperphysics-cortical-bus** | Neural signal routing and similarity-based retrieval |
+| **hyperphysics-reasoning-router** | Multi-backend reasoning orchestration |
+| **hyperphysics-strategy-router** | pBit-aware Mixture-of-Experts action selection |
+| **game-theory-engine** | Nash equilibrium, mechanism design, auction theory |
+| **lmsr** | Logarithmic Market Scoring Rule (Hanson prediction markets) |
+| **prospect-theory** | Kahneman-Tversky probability weighting |
+
+### Trading Infrastructure
+
+| Crate | Description |
+|-------|-------------|
+| **hyper-risk-engine** | 3-tier latency risk management (<100μs fast path) |
+| **ats-core** | Adaptive Temperature Scaling, Conformal Quantile Regression |
+| **hyperphysics-nautilus** | Nautilus Trader integration bridge |
+| **hyperphysics-market** | Multi-venue data providers, lock-free order book |
+| **tengri** | Cryptocurrency trading strategies |
+| **cwts-ultra** | High-frequency trading infrastructure |
 
 ---
 
-## Performance Targets
+## Performance Characteristics
 
-| Component | Target | Implementation |
-|-----------|--------|----------------|
+| Component | Target Latency | Implementation |
+|-----------|---------------|----------------|
 | Data Ingestion | <5μs | Lock-free ring buffer |
 | Feature Computation | <10μs | SIMD vectorized (AVX2/NEON) |
+| Risk Pre-trade Check | <20μs | Inline quantile functions |
+| Anomaly Detection | <15μs | SPOT/DSPOT streaming |
 | Model Inference | <30μs | Pre-fitted parameters |
-| Risk Calculation | <20μs | Inline quantile functions |
-| Anomaly Check | <15μs | SPOT/DSPOT streaming |
 | Decision Logic | <10μs | Lookup tables |
 | **Total Fast Path** | **<90μs** | |
 
@@ -204,78 +174,90 @@
 
 ## Scientific Foundation
 
+### Neuroscience
+- **Hodgkin-Huxley Model**: Full ion channel dynamics (Boyle & Cohen, 2008)
+- **Graded Synapses**: Voltage-dependent analog transmission for C. elegans
+- **STDP**: Bi-exponential spike-timing dependent plasticity (Bi & Poo, 1998)
+- **c302**: OpenWorm connectome data model (Gleeson et al.)
+
 ### Physics
 - **Hyperbolic Geometry**: H³ space with constant curvature K=-1
-- **Thermodynamics**: Landauer principle (E_min = k_B T ln 2), Second Law compliance
-- **Statistical Mechanics**: Gillespie SSA for stochastic simulation, Metropolis-Hastings MCMC
+- **Lorentz Model**: Hyperboloid representation with Minkowski inner product
+- **Thermodynamics**: Landauer principle, Second Law compliance
+- **SPH**: Predictive-Corrective Incompressible Smoothed Particle Hydrodynamics
 
 ### Machine Learning
-- **Conformal Prediction**: Guaranteed coverage with adaptive calibration (Romano et al., 2019)
-- **Quantile Regression**: CQR for asymmetric prediction intervals
-- **Deep Hedging**: Neural approach to derivatives (Buehler et al., 2019)
-
-### Risk Management
-- **Extreme Value Theory**: GARCH + EVT for tail risk (McNeil & Frey, 2000)
-- **Streaming Anomaly Detection**: SPOT/DSPOT (Siffer et al., 2017)
-- **Position Sizing**: Kelly criterion + PPO reinforcement learning (Schulman et al., 2017)
-
-### Consciousness Metrics
+- **Conformal Prediction**: Guaranteed coverage (Romano et al., 2019)
+- **Active Inference**: Free Energy Principle (Friston, 2010)
 - **Integrated Information Theory**: Φ metric (Tononi et al.)
-- **Resonance Complexity**: CI metric for neural dynamics
-- **Regime Detection**: Bull/Bear/Bubble/Crash via consciousness metrics
+
+### Finance
+- **Extreme Value Theory**: GARCH + EVT for tail risk (McNeil & Frey, 2000)
+- **Kelly Criterion**: Optimal position sizing
+- **LMSR**: Logarithmic market scoring rule (Hanson, 2003)
 
 ---
 
 ## Quick Start
 
 ```bash
-# Clone and enter
-cd /path/to/HyperPhysics
-
 # Build workspace
 cargo build --workspace --release
 
 # Run tests
 cargo test --workspace
 
-# Run with SIMD optimizations (default)
-cargo run --release --features simd
+# Run connectome example
+cargo run -p hyperphysics-connectome --example celegans_simulation
+
+# Build with SIMD optimizations
+cargo build --release --features simd
 ```
 
-### Nautilus Trader Integration
+### C. elegans Simulation
 
 ```rust
-use hyperphysics_nautilus::prelude::*;
+use hyperphysics_connectome::{Connectome, SpikingNetwork, ModelLevel};
 
-// Create integration bridge
-let config = IntegrationConfig::default();
-let bridge = NautilusBridge::new(config)?;
+// Load full 302-neuron connectome
+let connectome = Connectome::celegans();
 
-// Convert Nautilus quote to HyperPhysics feed
-let feed = bridge.quote_to_feed(&quote_tick)?;
+// Create network with graded synapses (Level C1)
+let mut network = SpikingNetwork::from_connectome(&connectome, ModelLevel::C1);
 
-// Execute physics-based pipeline
-let decision = bridge.execute_pipeline(&feed).await?;
+// Simulate with 0.05ms timestep
+for _ in 0..10000 {
+    network.step(0.05);
+}
 
-// Convert back to Nautilus order
-let order = bridge.decision_to_order(&decision)?;
+// Get muscle activation for body control
+let muscle_signals = network.get_muscle_output();
 ```
 
-### Risk Engine Usage
+### Hyperbolic pBit Dynamics
+
+```rust
+use hyperphysics_pbit::{HopfieldNetwork, PBitConfig};
+
+// Create Hopfield network on hyperbolic lattice
+let config = PBitConfig::default();
+let mut network = HopfieldNetwork::new(64, config);
+
+// Store patterns and recall
+network.store_pattern(&pattern);
+let recalled = network.recall(&noisy_pattern, 100);
+```
+
+### Risk Engine Integration
 
 ```rust
 use hyper_risk_engine::{HyperRiskEngine, EngineConfig};
-use hyper_risk_engine::sentinels::{GlobalKillSwitch, DrawdownSentinel};
 
-// Initialize engine with sub-100μs target
+// Initialize with sub-100μs target
 let config = EngineConfig::production();
 let mut engine = HyperRiskEngine::new(config)?;
 
-// Register sentinels
-engine.register_sentinel(GlobalKillSwitch::new());
-engine.register_sentinel(DrawdownSentinel::new(0.15)); // 15% max drawdown
-
-// Fast-path pre-trade check (<100μs)
+// Fast-path pre-trade check
 let decision = engine.pre_trade_check(&order)?;
 ```
 
@@ -285,35 +267,13 @@ let decision = engine.pre_trade_check(&order)?;
 
 ### CPU Architectures
 - **x86_64**: AVX2 (256-bit), AVX-512 (512-bit)
-- **aarch64**: NEON (128-bit), Apple Silicon M1/M2/M3
-- **ARM**: Cortex-A series with NEON
+- **aarch64**: NEON (128-bit), Apple Silicon M1/M2/M3/M4
 - **wasm32**: SIMD128 (128-bit)
 
 ### Operating Systems
 - macOS (primary development, Apple Silicon optimized)
-- Linux (tested)
-- Windows (via WSL)
-
----
-
-## Vendor Synchronization
-
-### Nautilus Trader
-Synced with [nautechsystems/nautilus_trader](https://github.com/nautechsystems/nautilus_trader) develop branch.
-
-**HyperPhysics Custom Fixes** (3 commits ahead):
-1. Fix Redis cache database adapter `todo!()` panics
-2. Fix order emulator to route released orders through risk engine
-3. Fix critical risk engine bypasses for multi-venue and margin accounts
-
-### Physics Engines
-All synchronized with upstream repositories:
-- JoltPhysics (jrouwe/JoltPhysics)
-- MuJoCo (google-deepmind/mujoco)
-- Avian (Jondolf/avian)
-- Rapier (dimforge/rapier)
-- Warp (NVIDIA/warp)
-- Taichi (taichi-dev/taichi)
+- Linux (tested on Ubuntu 22.04+)
+- Windows (via WSL2)
 
 ---
 
@@ -321,22 +281,32 @@ All synchronized with upstream repositories:
 
 | Metric | Count |
 |--------|-------|
-| Rust Source Files | 8,232 |
-| Total Lines of Code | 3.3M+ |
-| Workspace Crates | 53 |
-| Vendor Integrations | 7 |
+| Workspace Crates | 64+ |
+| Total Rust Lines | ~1.05M |
 | Physics Backends | 6 |
-| Market Providers | 7 |
+| Neuron Models | 3 (LIF, Izhikevich, HH) |
+| Model Levels | 6 (A, B, C, C1, D, D1) |
+| Ion Channels | 4 (k_slow, k_fast, ca_boyle, leak) |
 | Bio-inspired Algorithms | 14 |
+| Market Providers | 7 |
 
 ---
 
-## Documentation
+## References
 
-- [ROADMAP.md](ROADMAP.md) - Development roadmap
-- [CHECKLIST.md](CHECKLIST.md) - Execution checklist
-- [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - Known issues and workarounds
-- [docs/](docs/) - Technical documentation
+### Neuroscience
+- Boyle, J.H. & Cohen, N. (2008). C. elegans body wall muscles are simple actuators. *PLOS Computational Biology*
+- Gleeson, P. et al. (2018). c302: A multiscale framework for modelling the nervous system of C. elegans. *Phil Trans R Soc B*
+- Bi, G. & Poo, M. (1998). Synaptic modifications in cultured hippocampal neurons. *J Neurosci*
+
+### Physics & Computing
+- Camsari, K.Y. et al. (2017). Stochastic p-bits for invertible logic. *Phys Rev X*
+- Landauer, R. (1961). Irreversibility and heat generation in the computing process. *IBM J Res Dev*
+
+### Machine Learning & Finance
+- Friston, K. (2010). The free-energy principle: a unified brain theory? *Nat Rev Neurosci*
+- Tononi, G. (2008). Consciousness as integrated information. *Biol Bull*
+- Romano, Y. et al. (2019). Conformalized quantile regression. *NeurIPS*
 
 ---
 
@@ -346,4 +316,4 @@ MIT OR Apache-2.0
 
 ---
 
-*A scientific computing system combining hyperbolic geometry, consciousness metrics, adaptive temperature scaling, and ultra-low-latency risk management for quantitative trading.*
+*HyperPhysics: Where computational neuroscience meets quantitative finance through the lens of physics-inspired computing.*
