@@ -1,0 +1,78 @@
+[package]
+name = "hyperphysics-autopoiesis"
+description = "Autopoietic systems bridge integrating Maturana-Varela autopoiesis, Prigogine dissipative structures, and Grinberg syntergy with HyperPhysics ecosystem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+full = ["consciousness", "neural-trader", "market-integration"]
+consciousness = []
+neural-trader = []
+market-integration = []
+
+[dependencies]
+# HyperPhysics ecosystem dependencies
+hyperphysics-core = { path = "../hyperphysics-core", default-features = false }
+hyperphysics-thermo = { path = "../hyperphysics-thermo" }
+hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-syntergic = { path = "../hyperphysics-syntergic" }
+hyperphysics-geometry = { path = "../hyperphysics-geometry" }
+hyperphysics-pbit = { path = "../hyperphysics-pbit" }
+hyperphysics-market = { path = "../hyperphysics-market" }
+hyperphysics-risk = { path = "../hyperphysics-risk" }
+hyperphysics-neural-trader = { path = "../hyperphysics-neural-trader", optional = true }
+
+# Mathematical foundations
+nalgebra.workspace = true
+ndarray.workspace = true
+num-traits.workspace = true
+num-complex.workspace = true
+statrs.workspace = true
+
+# Graphs and networks
+petgraph = "0.6"
+
+# Async runtime
+async-trait = "0.1"
+tokio = { version = "1.0", features = ["full"] }
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Error handling
+thiserror.workspace = true
+anyhow.workspace = true
+
+# Logging
+tracing.workspace = true
+
+# Time
+chrono.workspace = true
+
+# Random
+rand.workspace = true
+rand_distr.workspace = true
+
+# Concurrency
+dashmap.workspace = true
+crossbeam.workspace = true
+
+# UUIDs
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+[dev-dependencies]
+approx.workspace = true
+criterion.workspace = true
+proptest.workspace = true
+tokio-test = "0.4"
+pretty_assertions = "1.4"
+test-case = "3.3"
+
+[[bench]]
+name = "autopoietic_benchmarks"
+harness = false

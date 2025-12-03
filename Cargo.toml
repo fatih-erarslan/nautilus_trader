@@ -76,6 +76,8 @@ members = [
     "crates/hyperphysics-nas",
     "crates/hyperphysics-sentinel",
     "crates/sibernetic-hyperphysics",
+    # Autopoiesis-HyperPhysics integration bridge
+    "crates/hyperphysics-autopoiesis",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
