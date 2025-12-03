@@ -68,6 +68,14 @@ members = [
     "crates/hyperphysics-lorentz",
     # pBit-aware Mixture of Experts strategy router
     "crates/hyperphysics-strategy-router",
+    # Sibernetic: C. elegans simulation (OpenWorm port)
+    "crates/hyperphysics-sph",
+    "crates/hyperphysics-connectome",
+    "crates/hyperphysics-embodiment",
+    "crates/hyperphysics-stdp",
+    "crates/hyperphysics-nas",
+    "crates/hyperphysics-sentinel",
+    "crates/sibernetic-hyperphysics",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
@@ -260,3 +268,19 @@ once_cell = "1.19"
 uuid = { version = "1.10", features = ["v4", "serde"] }
 mockall = "0.13"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Sibernetic SPH dependencies
+glam = "0.29"
+smallvec = "1.13"
+hashbrown = "0.15"
+wide = "0.7"
+wgpu = "0.20"
+bytemuck = { version = "1.14", features = ["derive"] }
+
+# Sibernetic crate paths
+hyperphysics-sph = { path = "crates/hyperphysics-sph", default-features = false }
+hyperphysics-connectome = { path = "crates/hyperphysics-connectome", default-features = false }
+hyperphysics-embodiment = { path = "crates/hyperphysics-embodiment", default-features = false }
+hyperphysics-stdp = { path = "crates/hyperphysics-stdp", default-features = false }
+hyperphysics-nas = { path = "crates/hyperphysics-nas", default-features = false }
+hyperphysics-sentinel = { path = "crates/hyperphysics-sentinel", default-features = false }

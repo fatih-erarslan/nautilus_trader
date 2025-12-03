@@ -130,8 +130,11 @@ fn bench_coupling_strength_calc(c: &mut Criterion) {
 fn bench_energy_per_pbit(c: &mut Criterion) {
     let mut group = c.benchmark_group("hamiltonian_energy_per_pbit");
 
+    // Hyperbolic tessellation requires (p-2)(q-2) > 4
+    // {3,7}: (1)(5) = 5 > 4 ✓
+    // {4,5}: (2)(3) = 6 > 4 ✓
     let configs = [
-        ("small", 3, 5, 2),
+        ("small", 3, 7, 1),   // Smallest hyperbolic lattice
         ("medium", 3, 7, 2),
         ("large", 3, 7, 3),
     ];

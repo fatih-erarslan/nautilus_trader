@@ -232,9 +232,10 @@ pub mod utils {
 // Re-export commonly used items
 pub use circuit::{Circuit, CircuitBuilder, VariationalCircuit, EntanglementPattern};
 pub use gates::{Gate, QuantumGate, ParametricGate};
-pub use simulation::{Simulator, StateEvolution};
+pub use simulation::{Simulator, StateEvolution, BatchSimulator};
 pub use optimization::{Optimizer, VariationalOptimizer, OptimizationResult, VQEOptimizer, AdamOptimizer, QAOAOptimizer, OptimizerConfig};
 pub use pennylane_compat::{device, qnode, QNode, DefaultQubitDevice, QNodeBuilder};
+pub use embeddings::{QuantumEmbedding, AmplitudeEmbedding, AngleEmbedding, ParametricEmbedding, NormalizationMethod};
 
 #[cfg(test)]
 mod tests {

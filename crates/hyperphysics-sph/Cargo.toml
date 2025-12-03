@@ -1,0 +1,43 @@
+[package]
+name = "hyperphysics-sph"
+description = "Smoothed Particle Hydrodynamics engine for soft body simulation, ported from OpenWorm Sibernetic"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[features]
+default = ["simd", "serde"]
+simd = ["wide"]
+serde = []
+gpu-wgpu = ["wgpu", "bytemuck"]
+gpu-opencl = ["opencl3"]
+
+[dependencies]
+thiserror.workspace = true
+tracing.workspace = true
+serde.workspace = true
+bincode.workspace = true
+nalgebra.workspace = true
+glam.workspace = true
+rayon.workspace = true
+num-traits.workspace = true
+hashbrown.workspace = true
+smallvec.workspace = true
+
+# Optional SIMD
+wide = { workspace = true, optional = true }
+
+# Optional GPU backends
+wgpu = { workspace = true, optional = true }
+bytemuck = { workspace = true, optional = true }
+opencl3 = { version = "0.12", optional = true }
+
+[dev-dependencies]
+criterion.workspace = true
+approx.workspace = true
+
+[[bench]]
+name = "sph_bench"
+harness = false

@@ -113,7 +113,7 @@ fn bench_concurrent_access(c: &mut Criterion) {
             num_threads,
             |b, &threads| {
                 b.iter(|| {
-                    let handles: Vec<_> = (0..*threads).map(|_| {
+                    let handles: Vec<_> = (0..threads).map(|_| {
                         let market = Arc::clone(&market);
                         thread::spawn(move || {
                             for _ in 0..100 {
@@ -134,7 +134,7 @@ fn bench_concurrent_access(c: &mut Criterion) {
             num_threads,
             |b, &threads| {
                 b.iter(|| {
-                    let handles: Vec<_> = (0..*threads).map(|i| {
+                    let handles: Vec<_> = (0..threads).map(|i| {
                         let market = Arc::clone(&market);
                         thread::spawn(move || {
                             for j in 0..10 {

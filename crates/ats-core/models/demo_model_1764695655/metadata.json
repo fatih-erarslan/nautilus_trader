@@ -1,0 +1,14 @@
+{
+  "id": "demo_model_1764695655",
+  "name": "demo_model",
+  "created_at": 1764695655,
+  "updated_at": 1764695655,
+  "version": 1,
+  "size_bytes": 418,
+  "compressed": true,
+  "encrypted": false,
+  "architecture": "unknown",
+  "hyperparameters": {},
+  "training_history": [],
+  "tags": []
+}

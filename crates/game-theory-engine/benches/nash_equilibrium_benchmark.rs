@@ -1,347 +1,329 @@
-// Nash Equilibrium Benchmark for Game Theory Engine
-// Copyright (c) 2025 TENGRI Trading Swarm
+//! Nash Equilibrium Benchmark for Game Theory Engine
+//!
+//! Benchmarks for Nash equilibrium solving algorithms based on:
+//! - Nash, J. (1951). "Non-Cooperative Games". Annals of Mathematics. 54 (2): 286–295
+//! - Lemke, C.E. & Howson, J.T. (1964). "Equilibrium Points of Bimatrix Games". SIAM Journal
 
-use criterion::{criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId, Throughput};
 use game_theory_engine::{
-    NashEquilibrium, GameTheory, StrategyProfile, PayoffMatrix, Player,
-    PureStrategy, MixedStrategy, EvolutionaryStableStrategy, Replicator,
-    IteratedElimination, BestResponse, CoreSolution, ShapleyValue,
-    CoalitionalGame, CooperativeGame, NonCooperativeGame, GameSolver
+    NashSolver, GameState, GameType, PayoffMatrix, MarketRegime, MarketContext,
+    RegulatoryEnvironment, TransparencyLevel, EvolutionaryAnalyzer, Population,
 };
+use std::collections::HashMap;
 
-fn create_players(count: usize) -> Vec<Player> {
-    (0..count).map(|i| Player {
-        id: i,
-        strategy_space: vec![0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
-        payoff_function: Box::new(move |strategies: &[f64]| {
-            strategies.iter().sum::<f64>() * (1.0 + i as f64 * 0.1)
-        }),
-        rationality_level: 0.8 + (i as f64 * 0.02),
-        risk_preference: 0.1 + (i as f64 * 0.05),
-    }).collect()
+/// Create a 2-player symmetric payoff matrix of given size
+fn create_symmetric_payoff_matrix(size: usize) -> PayoffMatrix {
+    let mut payoffs = HashMap::new();
+    for i in 0..size {
+        for j in 0..size {
+            // Symmetric game: diagonal has high payoffs, off-diagonal varies
+            let p1_payoff = if i == j { 3.0 } else { 1.0 + (i + j) as f64 * 0.1 };
+            let p2_payoff = if i == j { 3.0 } else { 1.0 + (i + j) as f64 * 0.1 };
+            payoffs.insert(format!("P1_payoff_{}_{}", i, j), p1_payoff);
+            payoffs.insert(format!("P2_payoff_{}_{}", i, j), p2_payoff);
+        }
+    }
+
+    let mut strategies = HashMap::new();
+    let strats: Vec<String> = (0..size).map(|i| format!("S{}", i)).collect();
+    strategies.insert("P1".to_string(), strats.clone());
+    strategies.insert("P2".to_string(), strats);
+
+    PayoffMatrix {
+        players: vec!["P1".to_string(), "P2".to_string()],
+        strategies,
+        payoffs,
+        dimension: vec![size, size],
+    }
 }
 
-fn create_payoff_matrix(size: usize) -> PayoffMatrix {
-    PayoffMatrix::new(
-        (0..size).map(|i| {
-            (0..size).map(|j| {
-                if i == j { 3.0 } else { 1.0 + (i + j) as f64 * 0.1 }
-            }).collect()
-        }).collect()
-    )
+/// Create a zero-sum game payoff matrix
+fn create_zero_sum_matrix(size: usize) -> PayoffMatrix {
+    let mut payoffs = HashMap::new();
+    for i in 0..size {
+        for j in 0..size {
+            // Zero-sum: P1 wins what P2 loses
+            let p1_payoff = if i == j { 0.0 }
+                else if (i + 1) % size == j { -1.0 }
+                else { 1.0 };
+            payoffs.insert(format!("P1_payoff_{}_{}", i, j), p1_payoff);
+            payoffs.insert(format!("P2_payoff_{}_{}", i, j), -p1_payoff);
+        }
+    }
+
+    let mut strategies = HashMap::new();
+    let strats: Vec<String> = (0..size).map(|i| format!("S{}", i)).collect();
+    strategies.insert("P1".to_string(), strats.clone());
+    strategies.insert("P2".to_string(), strats);
+
+    PayoffMatrix {
+        players: vec!["P1".to_string(), "P2".to_string()],
+        strategies,
+        payoffs,
+        dimension: vec![size, size],
+    }
 }
 
-fn benchmark_nash_equilibrium_computation(c: &mut Criterion) {
-    let mut group = c.benchmark_group("nash_equilibrium_computation");
-    
-    for player_count in [2, 3, 4, 5, 8].iter() {
-        let players = create_players(*player_count);
-        let payoff_matrix = create_payoff_matrix(*player_count);
-        let nash_solver = NashEquilibrium::new();
-        
-        group.bench_with_input(BenchmarkId::new("compute_pure_nash", player_count), player_count, |b, _| {
-            b.iter(|| {
-                nash_solver.compute_pure_nash_equilibrium(&players, &payoff_matrix)
-            })
-        });
-        
-        group.bench_with_input(BenchmarkId::new("compute_mixed_nash", player_count), player_count, |b, _| {
-            b.iter(|| {
-                nash_solver.compute_mixed_nash_equilibrium(&players, &payoff_matrix)
-            })
+/// Create a game state with the given payoff matrix
+fn create_game_state(game_type: GameType, payoff_matrix: PayoffMatrix) -> GameState {
+    GameState {
+        game_type,
+        players: vec![],
+        market_context: MarketContext {
+            regime: MarketRegime::LowVolatility,
+            volatility: 0.1,
+            liquidity: 1_000_000.0,
+            volume: 500_000.0,
+            spread: 0.01,
+            market_impact: 0.001,
+            information_asymmetry: 0.1,
+            regulatory_environment: RegulatoryEnvironment {
+                short_selling_allowed: true,
+                position_limits: None,
+                circuit_breakers: true,
+                market_making_obligations: false,
+                transparency_requirements: TransparencyLevel::Full,
+            },
+        },
+        information_sets: HashMap::new(),
+        action_history: vec![],
+        current_round: 0,
+        payoff_matrix: Some(payoff_matrix),
+        nash_equilibria: vec![],
+        nash_equilibrium_found: false,
+        dominant_strategies: HashMap::new(),
+        cooperation_level: 0.5,
+        competition_intensity: 0.7,
+    }
+}
+
+fn benchmark_nash_solver_creation(c: &mut Criterion) {
+    let mut group = c.benchmark_group("nash_solver_creation");
+
+    let configs = [
+        (1e-6, 100),
+        (1e-9, 1000),
+        (1e-12, 10000),
+    ];
+
+    for (tolerance, max_iter) in configs {
+        group.bench_with_input(
+            BenchmarkId::new("new", format!("tol{:.0e}_iter{}", tolerance, max_iter)),
+            &(tolerance, max_iter),
+            |b, &(tol, max)| {
+                b.iter(|| black_box(NashSolver::new(black_box(tol), black_box(max))))
+            },
+        );
+    }
+
+    group.finish();
+}
+
+fn benchmark_pure_nash_equilibrium(c: &mut Criterion) {
+    let mut group = c.benchmark_group("pure_nash_equilibrium");
+
+    let solver = NashSolver::new(1e-9, 1000);
+
+    for size in [2, 3, 4, 5] {
+        let game_state = create_game_state(
+            GameType::PrisonersDilemma,
+            create_symmetric_payoff_matrix(size),
+        );
+
+        group.throughput(Throughput::Elements(size as u64 * size as u64));
+        group.bench_with_input(
+            BenchmarkId::new("symmetric", size),
+            &size,
+            |b, _| {
+                b.iter(|| solver.find_pure_nash(black_box(&game_state)))
+            },
+        );
+    }
+
+    // Zero-sum games (usually no pure equilibrium)
+    for size in [2, 3, 4] {
+        let game_state = create_game_state(
+            GameType::MatchingPennies,
+            create_zero_sum_matrix(size),
+        );
+
+        group.bench_with_input(
+            BenchmarkId::new("zero_sum", size),
+            &size,
+            |b, _| {
+                b.iter(|| solver.find_pure_nash(black_box(&game_state)))
+            },
+        );
+    }
+
+    group.finish();
+}
+
+fn benchmark_mixed_nash_equilibrium(c: &mut Criterion) {
+    let mut group = c.benchmark_group("mixed_nash_equilibrium");
+
+    let solver = NashSolver::new(1e-9, 1000);
+
+    // 2x2 games - classical case
+    let game_2x2 = create_game_state(GameType::MatchingPennies, create_zero_sum_matrix(2));
+    group.bench_function("2x2_zero_sum", |b| {
+        b.iter(|| solver.find_mixed_nash(black_box(&game_2x2)))
+    });
+
+    // 2x2 symmetric coordination game
+    let game_coord = create_game_state(GameType::StagHunt, create_symmetric_payoff_matrix(2));
+    group.bench_function("2x2_coordination", |b| {
+        b.iter(|| solver.find_mixed_nash(black_box(&game_coord)))
+    });
+
+    // Larger games (3x3, 4x4) - support enumeration scales combinatorially
+    for size in [3, 4] {
+        let game_state = create_game_state(
+            GameType::RockPaperScissors,
+            create_zero_sum_matrix(size),
+        );
+
+        group.bench_with_input(
+            BenchmarkId::new("nxn_zero_sum", size),
+            &size,
+            |b, _| {
+                b.iter(|| solver.find_mixed_nash(black_box(&game_state)))
+            },
+        );
+    }
+
+    group.finish();
+}
+
+fn benchmark_full_nash_solve(c: &mut Criterion) {
+    let mut group = c.benchmark_group("full_nash_solve");
+
+    let solver = NashSolver::new(1e-9, 1000);
+
+    // Standard game types
+    let games = [
+        ("prisoners_dilemma_2x2", GameType::PrisonersDilemma, create_symmetric_payoff_matrix(2)),
+        ("matching_pennies_2x2", GameType::MatchingPennies, create_zero_sum_matrix(2)),
+        ("coordination_3x3", GameType::StagHunt, create_symmetric_payoff_matrix(3)),
+        ("rps_3x3", GameType::RockPaperScissors, create_zero_sum_matrix(3)),
+    ];
+
+    for (name, game_type, payoff_matrix) in games {
+        let game_state = create_game_state(game_type, payoff_matrix);
+
+        group.bench_function(name, |b| {
+            b.iter(|| solver.solve(black_box(&game_state)))
         });
     }
+
     group.finish();
 }
 
-fn benchmark_strategy_profiles(c: &mut Criterion) {
-    let mut group = c.benchmark_group("strategy_profiles");
-    
-    let players = create_players(4);
-    let payoff_matrix = create_payoff_matrix(4);
-    let profile_analyzer = StrategyProfile::new();
-    
-    group.bench_function("pure_strategy_profile", |b| {
-        b.iter(|| {
-            profile_analyzer.analyze_pure_strategy_profile(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("mixed_strategy_profile", |b| {
-        b.iter(|| {
-            profile_analyzer.analyze_mixed_strategy_profile(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("symmetric_strategy_profile", |b| {
-        b.iter(|| {
-            profile_analyzer.analyze_symmetric_strategy_profile(&players, &payoff_matrix)
-        })
-    });
-    
+fn benchmark_solver_tolerance_impact(c: &mut Criterion) {
+    let mut group = c.benchmark_group("tolerance_impact");
+
+    let game_state = create_game_state(GameType::MatchingPennies, create_zero_sum_matrix(2));
+
+    for tolerance in [1e-3, 1e-6, 1e-9, 1e-12] {
+        let solver = NashSolver::new(tolerance, 1000);
+
+        group.bench_with_input(
+            BenchmarkId::new("solve", format!("{:.0e}", tolerance)),
+            &tolerance,
+            |b, _| {
+                b.iter(|| solver.solve(black_box(&game_state)))
+            },
+        );
+    }
+
     group.finish();
 }
 
-fn benchmark_evolutionary_stable_strategies(c: &mut Criterion) {
-    let mut group = c.benchmark_group("evolutionary_stable_strategies");
-    
-    let players = create_players(6);
-    let payoff_matrix = create_payoff_matrix(6);
-    let ess_analyzer = EvolutionaryStableStrategy::new();
-    
+fn benchmark_evolutionary_analyzer(c: &mut Criterion) {
+    let mut group = c.benchmark_group("evolutionary_analyzer");
+
+    let configs = [
+        (100, 0.01, 1.0),
+        (500, 0.01, 1.0),
+        (1000, 0.01, 1.0),
+    ];
+
+    for (pop_size, mutation_rate, selection_pressure) in configs {
+        group.bench_with_input(
+            BenchmarkId::new("create", pop_size),
+            &(pop_size, mutation_rate, selection_pressure),
+            |b, &(ps, mr, sp)| {
+                b.iter(|| black_box(EvolutionaryAnalyzer::new(black_box(ps), black_box(mr), black_box(sp))))
+            },
+        );
+    }
+
+    // Find ESS
+    let analyzer = EvolutionaryAnalyzer::new(100, 0.01, 1.0);
+    let game_state = create_game_state(GameType::HawkDove, create_symmetric_payoff_matrix(2));
+
     group.bench_function("find_ess", |b| {
-        b.iter(|| {
-            ess_analyzer.find_evolutionary_stable_strategies(&players, &payoff_matrix)
-        })
+        b.iter(|| analyzer.find_ess(black_box(&game_state)))
     });
-    
-    group.bench_function("stability_analysis", |b| {
-        b.iter(|| {
-            ess_analyzer.analyze_strategy_stability(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("invasion_analysis", |b| {
-        b.iter(|| {
-            ess_analyzer.analyze_invasion_resistance(&players, &payoff_matrix)
-        })
-    });
-    
-    group.finish();
-}
 
-fn benchmark_replicator_dynamics(c: &mut Criterion) {
-    let mut group = c.benchmark_group("replicator_dynamics");
-    
-    let players = create_players(5);
-    let payoff_matrix = create_payoff_matrix(5);
-    let replicator = Replicator::new();
-    
-    group.bench_function("simulate_dynamics", |b| {
-        b.iter(|| {
-            replicator.simulate_replicator_dynamics(&players, &payoff_matrix, 1000)
-        })
-    });
-    
-    group.bench_function("find_fixed_points", |b| {
-        b.iter(|| {
-            replicator.find_fixed_points(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("stability_analysis", |b| {
-        b.iter(|| {
-            replicator.analyze_dynamic_stability(&players, &payoff_matrix)
-        })
-    });
-    
-    group.finish();
-}
+    // Simulate evolution
+    let initial_population = Population {
+        strategies: [("Hawk".to_string(), 0.5), ("Dove".to_string(), 0.5)]
+            .into_iter()
+            .collect(),
+        fitness: [("Hawk".to_string(), 1.0), ("Dove".to_string(), 1.0)]
+            .into_iter()
+            .collect(),
+    };
 
-fn benchmark_iterated_elimination(c: &mut Criterion) {
-    let mut group = c.benchmark_group("iterated_elimination");
-    
-    let players = create_players(4);
-    let payoff_matrix = create_payoff_matrix(4);
-    let eliminator = IteratedElimination::new();
-    
-    group.bench_function("eliminate_dominated_strategies", |b| {
-        b.iter(|| {
-            eliminator.eliminate_dominated_strategies(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("eliminate_weakly_dominated", |b| {
-        b.iter(|| {
-            eliminator.eliminate_weakly_dominated_strategies(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("iterative_elimination", |b| {
-        b.iter(|| {
-            eliminator.iterative_elimination_process(&players, &payoff_matrix)
-        })
-    });
-    
-    group.finish();
-}
-
-fn benchmark_best_response_analysis(c: &mut Criterion) {
-    let mut group = c.benchmark_group("best_response_analysis");
-    
-    let players = create_players(4);
-    let payoff_matrix = create_payoff_matrix(4);
-    let best_response = BestResponse::new();
-    
-    group.bench_function("compute_best_response", |b| {
-        b.iter(|| {
-            best_response.compute_best_response(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("best_response_dynamics", |b| {
-        b.iter(|| {
-            best_response.simulate_best_response_dynamics(&players, &payoff_matrix, 500)
-        })
-    });
-    
-    group.bench_function("rationalizability_analysis", |b| {
-        b.iter(|| {
-            best_response.analyze_rationalizability(&players, &payoff_matrix)
-        })
-    });
-    
-    group.finish();
-}
-
-fn benchmark_cooperative_games(c: &mut Criterion) {
-    let mut group = c.benchmark_group("cooperative_games");
-    
-    let players = create_players(5);
-    let cooperative_game = CooperativeGame::new();
-    
-    group.bench_function("compute_core", |b| {
-        b.iter(|| {
-            cooperative_game.compute_core(&players)
-        })
-    });
-    
-    group.bench_function("compute_shapley_value", |b| {
-        b.iter(|| {
-            cooperative_game.compute_shapley_value(&players)
-        })
-    });
-    
-    group.bench_function("compute_nucleolus", |b| {
-        b.iter(|| {
-            cooperative_game.compute_nucleolus(&players)
-        })
-    });
-    
-    group.finish();
-}
-
-fn benchmark_coalitional_games(c: &mut Criterion) {
-    let mut group = c.benchmark_group("coalitional_games");
-    
-    let players = create_players(6);
-    let coalitional_game = CoalitionalGame::new();
-    
-    group.bench_function("analyze_coalitions", |b| {
-        b.iter(|| {
-            coalitional_game.analyze_coalition_formation(&players)
-        })
-    });
-    
-    group.bench_function("stability_analysis", |b| {
-        b.iter(|| {
-            coalitional_game.analyze_coalition_stability(&players)
-        })
-    });
-    
-    group.bench_function("bargaining_analysis", |b| {
-        b.iter(|| {
-            coalitional_game.analyze_bargaining_power(&players)
-        })
-    });
-    
-    group.finish();
-}
-
-fn benchmark_game_solver_algorithms(c: &mut Criterion) {
-    let mut group = c.benchmark_group("game_solver_algorithms");
-    
-    let players = create_players(4);
-    let payoff_matrix = create_payoff_matrix(4);
-    let solver = GameSolver::new();
-    
-    group.bench_function("lemke_howson_algorithm", |b| {
-        b.iter(|| {
-            solver.lemke_howson_algorithm(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("support_enumeration", |b| {
-        b.iter(|| {
-            solver.support_enumeration_algorithm(&players, &payoff_matrix)
-        })
-    });
-    
-    group.bench_function("fictitious_play", |b| {
-        b.iter(|| {
-            solver.fictitious_play_algorithm(&players, &payoff_matrix, 1000)
-        })
-    });
-    
-    group.finish();
-}
-
-fn benchmark_mechanism_design_games(c: &mut Criterion) {
-    let mut group = c.benchmark_group("mechanism_design_games");
-    
-    let players = create_players(5);
-    let game_theory = GameTheory::new();
-    
-    group.bench_function("auction_mechanism", |b| {
-        b.iter(|| {
-            game_theory.analyze_auction_mechanism(&players)
-        })
-    });
-    
-    group.bench_function("voting_mechanism", |b| {
-        b.iter(|| {
-            game_theory.analyze_voting_mechanism(&players)
-        })
-    });
-    
-    group.bench_function("contract_mechanism", |b| {
-        b.iter(|| {
-            game_theory.analyze_contract_mechanism(&players)
-        })
-    });
-    
-    group.finish();
-}
-
-fn benchmark_real_time_game_analysis(c: &mut Criterion) {
-    let mut group = c.benchmark_group("real_time_game_analysis");
-    
-    let nash_solver = NashEquilibrium::new();
-    
-    for batch_size in [2, 4, 8, 16].iter() {
-        let players = create_players(*batch_size);
-        let payoff_matrix = create_payoff_matrix(*batch_size);
-        
-        group.bench_with_input(BenchmarkId::new("streaming_analysis", batch_size), batch_size, |b, _| {
-            b.iter(|| {
-                nash_solver.streaming_game_analysis(&players, &payoff_matrix)
-            })
-        });
+    for generations in [10, 100, 500] {
+        group.bench_with_input(
+            BenchmarkId::new("simulate_evolution", generations),
+            &generations,
+            |b, &gen| {
+                b.iter(|| analyzer.simulate_evolution(black_box(&initial_population), black_box(gen)))
+            },
+        );
     }
-    
-    group.bench_function("low_latency_equilibrium", |b| {
-        b.iter(|| {
-            let players = create_players(2);
-            let payoff_matrix = create_payoff_matrix(2);
-            nash_solver.low_latency_equilibrium_computation(&players, &payoff_matrix)
-        })
-    });
-    
+
+    group.finish();
+}
+
+fn benchmark_payoff_matrix_creation(c: &mut Criterion) {
+    let mut group = c.benchmark_group("payoff_matrix_creation");
+
+    for size in [2, 3, 4, 5, 8, 10] {
+        group.throughput(Throughput::Elements((size * size) as u64));
+
+        group.bench_with_input(
+            BenchmarkId::new("symmetric", size),
+            &size,
+            |b, &s| {
+                b.iter(|| black_box(create_symmetric_payoff_matrix(black_box(s))))
+            },
+        );
+
+        group.bench_with_input(
+            BenchmarkId::new("zero_sum", size),
+            &size,
+            |b, &s| {
+                b.iter(|| black_box(create_zero_sum_matrix(black_box(s))))
+            },
+        );
+    }
+
     group.finish();
 }
 
 criterion_group!(
     benches,
-    benchmark_nash_equilibrium_computation,
-    benchmark_strategy_profiles,
-    benchmark_evolutionary_stable_strategies,
-    benchmark_replicator_dynamics,
-    benchmark_iterated_elimination,
-    benchmark_best_response_analysis,
-    benchmark_cooperative_games,
-    benchmark_coalitional_games,
-    benchmark_game_solver_algorithms,
-    benchmark_mechanism_design_games,
-    benchmark_real_time_game_analysis
+    benchmark_nash_solver_creation,
+    benchmark_pure_nash_equilibrium,
+    benchmark_mixed_nash_equilibrium,
+    benchmark_full_nash_solve,
+    benchmark_solver_tolerance_impact,
+    benchmark_evolutionary_analyzer,
+    benchmark_payoff_matrix_creation,
 );
+
 criterion_main!(benches);

@@ -3,9 +3,9 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use quantum_circuit::{
     Circuit, CircuitBuilder, VariationalCircuit, EntanglementPattern,
-    simulation::{Simulator, BatchSimulator},
-    optimization::{QAOAOptimizer, OptimizerConfig},
-    embeddings::{AmplitudeEmbedding, AngleEmbedding, ParametricEmbedding, NormalizationMethod},
+    Simulator, BatchSimulator,
+    QAOAOptimizer, OptimizerConfig, Optimizer,
+    AmplitudeEmbedding, AngleEmbedding, ParametricEmbedding, NormalizationMethod, QuantumEmbedding,
     gates::*,
     constants,
 };
@@ -226,18 +226,24 @@ fn bench_optimization_algorithms(c: &mut Criterion) {
 
 fn bench_gradient_computation(c: &mut Criterion) {
     let mut group = c.benchmark_group("gradient_computation");
-    
+
     for n_params in [1, 3, 5, 10].iter() {
         let mut circuit = Circuit::new(2);
-        
+
         // Add parameterized gates
         for i in 0..*n_params {
             let qubit = i % 2;
             circuit.add_gate(Box::new(RY::new(qubit, PI / 4.0))).unwrap();
         }
-        
-        let observable = constants::pauli_z();
-        
+
+        // Create a 4x4 observable for the 2-qubit system (tensor product of Z with I)
+        // Z ⊗ I = diag(1, 1, -1, -1)
+        let mut observable = ndarray::Array2::zeros((4, 4));
+        observable[[0, 0]] = quantum_circuit::Complex::new(1.0, 0.0);
+        observable[[1, 1]] = quantum_circuit::Complex::new(1.0, 0.0);
+        observable[[2, 2]] = quantum_circuit::Complex::new(-1.0, 0.0);
+        observable[[3, 3]] = quantum_circuit::Complex::new(-1.0, 0.0);
+
         group.bench_with_input(
             BenchmarkId::new("parameter_shift_gradients", n_params),
             n_params,
@@ -248,18 +254,26 @@ fn bench_gradient_computation(c: &mut Criterion) {
             },
         );
     }
-    
+
     group.finish();
 }
 
 fn bench_quantum_utils(c: &mut Criterion) {
     let mut group = c.benchmark_group("quantum_utils");
-    
+
     // Benchmark state operations
     let state1 = quantum_circuit::utils::random_state(3);
     let state2 = quantum_circuit::utils::random_state(3);
-    let operator = constants::pauli_z();
-    
+
+    // Create an 8x8 diagonal operator for 3-qubit system (Z ⊗ I ⊗ I)
+    let mut operator = ndarray::Array2::zeros((8, 8));
+    for i in 0..4 {
+        operator[[i, i]] = quantum_circuit::Complex::new(1.0, 0.0);
+    }
+    for i in 4..8 {
+        operator[[i, i]] = quantum_circuit::Complex::new(-1.0, 0.0);
+    }
+
     group.bench_function("fidelity_computation", |b| {
         b.iter(|| {
             black_box(quantum_circuit::utils::fidelity(
@@ -268,7 +282,7 @@ fn bench_quantum_utils(c: &mut Criterion) {
             ).unwrap());
         });
     });
-    
+
     group.bench_function("expectation_value", |b| {
         b.iter(|| {
             black_box(quantum_circuit::utils::expectation_value(

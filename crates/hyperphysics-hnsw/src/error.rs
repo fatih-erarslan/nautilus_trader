@@ -241,8 +241,14 @@ impl From<io::Error> for HnswError {
     }
 }
 
-impl From<bincode::Error> for HnswError {
-    fn from(err: bincode::Error) -> Self {
+impl From<bincode::error::EncodeError> for HnswError {
+    fn from(err: bincode::error::EncodeError) -> Self {
+        Self::SerializationError(err.to_string())
+    }
+}
+
+impl From<bincode::error::DecodeError> for HnswError {
+    fn from(err: bincode::error::DecodeError) -> Self {
         Self::SerializationError(err.to_string())
     }
 }

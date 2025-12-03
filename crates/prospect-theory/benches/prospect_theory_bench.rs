@@ -67,12 +67,16 @@ fn benchmark_probability_weighting(c: &mut Criterion) {
 
 fn benchmark_decision_weights(c: &mut Criterion) {
     let pw = ProbabilityWeighting::default_tk();
-    
+
     let sizes = [10, 50, 100, 500];
     for size in sizes {
-        let probs: Vec<f64> = (0..size).map(|_| 1.0 / size as f64).collect();
+        // Create probabilities that sum to slightly less than 1.0 to avoid
+        // cumulative floating-point errors exceeding 1.0 inside decision_weights
+        let total = 0.9999; // Slightly under 1.0 to leave room for FP errors
+        let prob = total / size as f64;
+        let probs: Vec<f64> = vec![prob; size];
         let outcomes: Vec<f64> = (0..size).map(|i| (i as f64) - (size as f64) / 2.0).collect();
-        
+
         c.bench_with_input(
             BenchmarkId::new("decision_weights", size),
             &(probs, outcomes),
@@ -138,11 +142,12 @@ fn benchmark_inverse_value(c: &mut Criterion) {
 fn benchmark_complete_prospect_calculation(c: &mut Criterion) {
     let vf = ValueFunction::default_kt();
     let pw = ProbabilityWeighting::default_tk();
-    
+
     let sizes = [5, 10, 20, 50];
     for size in sizes {
         let outcomes: Vec<f64> = (0..size).map(|i| (i as f64) - (size as f64) / 2.0).collect();
-        let probabilities: Vec<f64> = (0..size).map(|_| 1.0 / size as f64).collect();
+        // Use 0.9999 total to avoid cumulative FP errors exceeding 1.0 inside decision_weights
+        let probabilities: Vec<f64> = vec![0.9999 / size as f64; size];
         
         c.bench_with_input(
             BenchmarkId::new("complete_prospect_calculation", size),

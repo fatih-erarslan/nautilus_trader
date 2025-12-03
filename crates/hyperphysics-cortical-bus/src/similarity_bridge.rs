@@ -119,7 +119,7 @@ impl SimilarityBridge {
 
     /// Search for k nearest neighbors.
     ///
-    /// Automatically routes to HNSW for hot queries, LSH for cold queries.
+    /// Automatically routes using the hybrid strategy (LSH filter + HNSW refinement).
     /// Target latency: <1µs for hot path.
     pub fn search(&mut self, query: &[f32], k: usize) -> Result<Vec<SearchResult>> {
         self.stats.total_queries += 1;
@@ -131,10 +131,10 @@ impl SimilarityBridge {
                 Ok(results)
             }
             Ok(_) | Err(_) => {
-                // Fall back to LSH
+                // Fall back to hybrid mode (LSH + HNSW)
                 self.stats.lsh_fallbacks += 1;
                 self.index
-                    .search_cold(query, k)
+                    .search(query, k, SearchMode::Hybrid)
                     .map_err(CorticalError::from)
             }
         }
@@ -154,11 +154,12 @@ impl SimilarityBridge {
                 self.stats.hnsw_hits += 1;
                 self.index.search_hot(query, k).map_err(CorticalError::from)
             }
-            SearchMode::Cold => {
+            SearchMode::Hybrid => {
                 self.stats.lsh_fallbacks += 1;
-                self.index.search_cold(query, k).map_err(CorticalError::from)
+                self.index.search(query, k, SearchMode::Hybrid).map_err(CorticalError::from)
             }
             SearchMode::Auto => self.search(query, k),
+            _ => self.index.search(query, k, mode).map_err(CorticalError::from),
         }
     }
 
@@ -166,10 +167,11 @@ impl SimilarityBridge {
     ///
     /// Patterns are initially stored in LSH, then promoted to HNSW
     /// based on access frequency.
-    pub fn ingest(&mut self, id: u64, embedding: &[f32]) -> Result<()> {
+    pub fn ingest(&mut self, _id: u64, embedding: &[f32]) -> Result<()> {
         self.stats.patterns_ingested += 1;
+        // stream_ingest takes only the vector (id is auto-assigned)
         self.index
-            .stream_ingest(id, embedding)
+            .stream_ingest(embedding.to_vec())
             .map_err(CorticalError::from)
     }
 
@@ -218,14 +220,15 @@ impl SimilarityBridge {
         self.search(&embedding, k)
     }
 
-    /// Get number of patterns in index.
+    /// Get number of patterns ingested.
     pub fn len(&self) -> usize {
-        self.index.len()
+        // Use our tracked count since HybridIndex doesn't expose len()
+        self.stats.patterns_ingested as usize
     }
 
-    /// Check if index is empty.
+    /// Check if index has any patterns.
     pub fn is_empty(&self) -> bool {
-        self.index.is_empty()
+        self.stats.patterns_ingested == 0
     }
 
     /// Get statistics.

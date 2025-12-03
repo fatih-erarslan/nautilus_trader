@@ -7,15 +7,16 @@
 #[cfg(feature = "benchmarking")]
 pub mod temperature_benchmarks {
     //! Temperature scaling performance benchmarks
-    
+
+    use crate::config::AtsCpConfig;
     use crate::temperature::TemperatureScaler;
     use std::time::Instant;
-    
+
     /// Benchmark temperature scaling performance
     pub fn benchmark_temperature_scaling() -> u64 {
         let start = Instant::now();
-        // Placeholder benchmark implementation
-        let _scaler = TemperatureScaler::new(1.0);
+        let config = AtsCpConfig::default();
+        let _scaler = TemperatureScaler::new(&config);
         start.elapsed().as_micros() as u64
     }
 }

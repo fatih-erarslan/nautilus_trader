@@ -97,6 +97,7 @@ tokio-test = "0.4"
 mockall = "0.11"
 tempfile = "3.0"
 test-log = "0.2"
+criterion = { version = "0.5", features = ["html_reports"] }
 
 [features]
 default = ["production-validation", "real-time-monitoring"]
@@ -117,7 +118,6 @@ path = "src/main.rs"
 name = "tengri_market_readiness_sentinel"
 path = "src/lib.rs"
 
-# [[bench]]
-# name = "market_readiness_benchmark"
-# harness = false
-# path = "benches/market_readiness_benchmark.rs"
+[[bench]]
+name = "market_readiness_benchmark"
+harness = false

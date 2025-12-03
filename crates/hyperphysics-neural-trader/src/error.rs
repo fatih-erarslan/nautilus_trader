@@ -29,6 +29,10 @@ pub enum NeuralBridgeError {
     #[error("Configuration error: {0}")]
     Configuration(String),
 
+    /// Invalid input error
+    #[error("Invalid input: {0}")]
+    InvalidInput(String),
+
     /// Feature extraction error
     #[error("Feature extraction error: {0}")]
     FeatureExtraction(String),

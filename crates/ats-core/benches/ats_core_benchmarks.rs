@@ -188,67 +188,67 @@ fn bench_simd_operations(c: &mut Criterion) {
     
     // Test different array sizes
     for size in [64, 128, 256, 512, 1024, 2048, 4096, 8192].iter() {
-        let a: Vec<f64> = (0..*size).map(|i| i as f64 * 0.01).collect();
-        let b: Vec<f64> = (0..*size).map(|i| (i as f64 + 1.0) * 0.01).collect();
+        let a_vec: Vec<f64> = (0..*size).map(|i| i as f64 * 0.01).collect();
+        let b_vec: Vec<f64> = (0..*size).map(|i| (i as f64 + 1.0) * 0.01).collect();
         let scalar = 2.5;
-        
+
         group.throughput(Throughput::Elements(*size as u64));
-        
+
         // Vector addition benchmark
         group.bench_with_input(
             BenchmarkId::new("vector_add", size),
             size,
-            |b, _| {
-                b.iter(|| {
-                    simd_ops.vector_add(black_box(&a), black_box(&b)).unwrap()
+            |bench, _| {
+                bench.iter(|| {
+                    simd_ops.vector_add(black_box(&a_vec), black_box(&b_vec)).unwrap()
                 })
             },
         );
-        
+
         // Vector multiplication benchmark
         group.bench_with_input(
             BenchmarkId::new("vector_multiply", size),
             size,
-            |b, _| {
-                b.iter(|| {
-                    simd_ops.vector_multiply(black_box(&a), black_box(&b)).unwrap()
+            |bench, _| {
+                bench.iter(|| {
+                    simd_ops.vector_multiply(black_box(&a_vec), black_box(&b_vec)).unwrap()
                 })
             },
         );
-        
+
         // Scalar multiplication benchmark
         group.bench_with_input(
             BenchmarkId::new("scalar_multiply", size),
             size,
-            |b, _| {
-                b.iter(|| {
-                    simd_ops.scalar_multiply(black_box(&a), black_box(scalar)).unwrap()
+            |bench, _| {
+                bench.iter(|| {
+                    simd_ops.scalar_multiply(black_box(&a_vec), black_box(scalar)).unwrap()
                 })
             },
         );
-        
+
         // Dot product benchmark
         group.bench_with_input(
             BenchmarkId::new("dot_product", size),
             size,
-            |b, _| {
-                b.iter(|| {
-                    simd_ops.dot_product(black_box(&a), black_box(&b)).unwrap()
+            |bench, _| {
+                bench.iter(|| {
+                    simd_ops.dot_product(black_box(&a_vec), black_box(&b_vec)).unwrap()
                 })
             },
         );
-        
+
         // Vector exponential benchmark
         group.bench_with_input(
             BenchmarkId::new("vector_exp", size),
             size,
-            |b, _| {
-                b.iter(|| {
-                    simd_ops.vector_exp(black_box(&a)).unwrap()
+            |bench, _| {
+                bench.iter(|| {
+                    simd_ops.vector_exp(black_box(&a_vec)).unwrap()
                 })
             },
         );
-        
+
         // Fused multiply-add benchmark
         let c_vec: Vec<f64> = (0..*size).map(|i| (i as f64) * 0.005).collect();
         group.bench_with_input(
@@ -256,7 +256,7 @@ fn bench_simd_operations(c: &mut Criterion) {
             size,
             |bench, _| {
                 bench.iter(|| {
-                    simd_ops.fused_multiply_add(black_box(&a), black_box(&b), black_box(&c_vec)).unwrap()
+                    simd_ops.fused_multiply_add(black_box(&a_vec), black_box(&b_vec), black_box(&c_vec)).unwrap()
                 })
             },
         );
@@ -265,105 +265,108 @@ fn bench_simd_operations(c: &mut Criterion) {
     group.finish();
 }
 
-/// End-to-end ATS-CP engine benchmarks
-fn bench_ats_cp_engine(c: &mut Criterion) {
+/// End-to-end ATS-CP pipeline benchmarks using individual components
+fn bench_ats_cp_pipeline(c: &mut Criterion) {
     let config = create_benchmark_config();
-    let engine = AtsCpEngine::new(config).unwrap();
-    
-    let mut group = c.benchmark_group("ats_cp_engine");
+    let mut scaler = TemperatureScaler::new(&config).unwrap();
+    let mut predictor = ConformalPredictor::new(&config).unwrap();
+    let mut simd_ops = SimdOperations::new(&config).unwrap();
+
+    let mut group = c.benchmark_group("ats_cp_pipeline");
     group.measurement_time(Duration::from_secs(30));
     group.sample_size(500);
-    
+
     // Generate test data
     let predictions: Vec<f64> = (0..128).map(|i| i as f64 * 0.01).collect();
     let calibration_data: Vec<f64> = (0..500).map(|i| i as f64 * 0.002).collect();
     let temperature = 1.5;
-    
+
     // End-to-end temperature scaling + conformal prediction
     group.bench_function("full_pipeline", |b| {
         b.iter(|| {
             // Temperature scaling
-            let scaled = engine.temperature_scale(black_box(&predictions), black_box(temperature)).unwrap();
-            
+            let scaled = scaler.scale(black_box(&predictions), black_box(temperature)).unwrap();
+
             // Conformal prediction
-            let _intervals = engine.conformal_predict(black_box(&scaled), black_box(&calibration_data)).unwrap();
+            let _intervals = predictor.predict(black_box(&scaled), black_box(&calibration_data)).unwrap();
         })
     });
-    
+
     // Individual operations
     group.bench_function("temperature_scale_only", |b| {
         b.iter(|| {
-            engine.temperature_scale(black_box(&predictions), black_box(temperature)).unwrap()
+            scaler.scale(black_box(&predictions), black_box(temperature)).unwrap()
         })
     });
-    
+
     group.bench_function("conformal_predict_only", |b| {
         b.iter(|| {
-            engine.conformal_predict(black_box(&predictions), black_box(&calibration_data)).unwrap()
+            predictor.predict(black_box(&predictions), black_box(&calibration_data)).unwrap()
         })
     });
-    
+
     // SIMD operations
     let a: Vec<f64> = (0..256).map(|i| i as f64 * 0.01).collect();
-    let b: Vec<f64> = (0..256).map(|i| (i as f64 + 1.0) * 0.01).collect();
-    
+    let b_vec: Vec<f64> = (0..256).map(|i| (i as f64 + 1.0) * 0.01).collect();
+
     group.bench_function("simd_vector_add", |b| {
         b.iter(|| {
-            engine.simd_vector_add(black_box(&a), black_box(&b)).unwrap()
+            simd_ops.vector_add(black_box(&a), black_box(&b_vec)).unwrap()
         })
     });
-    
+
     group.finish();
 }
 
 /// Latency validation benchmarks (must meet sub-100μs targets)
 fn bench_latency_validation(c: &mut Criterion) {
     let config = create_benchmark_config();
-    let engine = AtsCpEngine::new(config).unwrap();
-    
+    let mut scaler = TemperatureScaler::new(&config).unwrap();
+    let mut predictor = ConformalPredictor::new(&config).unwrap();
+
     let mut group = c.benchmark_group("latency_validation");
     group.measurement_time(Duration::from_secs(60));
     group.sample_size(10000); // Large sample for accurate latency measurement
-    
+
     // Critical path: temperature scaling (target: <5μs)
     let small_predictions: Vec<f64> = (0..32).map(|i| i as f64 * 0.01).collect();
     let temperature = 1.5;
-    
+
     group.bench_function("temperature_scale_5us_target", |b| {
         b.iter_custom(|iters| {
             let start = std::time::Instant::now();
             for _ in 0..iters {
-                let _ = engine.temperature_scale(black_box(&small_predictions), black_box(temperature)).unwrap();
+                let _ = scaler.scale(black_box(&small_predictions), black_box(temperature)).unwrap();
             }
             start.elapsed()
         })
     });
-    
+
     // Conformal prediction (target: <20μs)
     let small_calibration: Vec<f64> = (0..100).map(|i| i as f64 * 0.01).collect();
-    
+
     group.bench_function("conformal_predict_20us_target", |b| {
         b.iter_custom(|iters| {
             let start = std::time::Instant::now();
             for _ in 0..iters {
-                let _ = engine.conformal_predict(black_box(&small_predictions), black_box(&small_calibration)).unwrap();
+                let _ = predictor.predict(black_box(&small_predictions), black_box(&small_calibration)).unwrap();
             }
             start.elapsed()
         })
     });
-    
+
     // Full pipeline (target: <100μs)
     group.bench_function("full_pipeline_100us_target", |b| {
         b.iter_custom(|iters| {
             let start = std::time::Instant::now();
             for _ in 0..iters {
-                let scaled = engine.temperature_scale(black_box(&small_predictions), black_box(temperature)).unwrap();
-                let _ = engine.conformal_predict(black_box(&scaled), black_box(&small_calibration)).unwrap();
+                let scaled = scaler.scale(black_box(&small_predictions), black_box(temperature)).unwrap();
+                let _ = predictor.predict(black_box(&scaled), black_box(&small_calibration)).unwrap();
             }
             start.elapsed()
         })
     });
-    
+
     group.finish();
 }
 
@@ -371,29 +374,29 @@ fn bench_latency_validation(c: &mut Criterion) {
 fn bench_memory_bandwidth(c: &mut Criterion) {
     let config = create_benchmark_config();
     let mut simd_ops = SimdOperations::new(&config).unwrap();
-    
+
     let mut group = c.benchmark_group("memory_bandwidth");
     group.measurement_time(Duration::from_secs(30));
-    
+
     // Test memory bandwidth with large arrays
     for size in [1024, 4096, 16384, 65536, 262144].iter() {
-        let a: Vec<f64> = (0..*size).map(|i| i as f64).collect();
-        let b: Vec<f64> = (0..*size).map(|i| (i as f64) + 1.0).collect();
-        
+        let a_vec: Vec<f64> = (0..*size).map(|i| i as f64).collect();
+        let b_vec: Vec<f64> = (0..*size).map(|i| (i as f64) + 1.0).collect();
+
         let bytes_per_op = size * 3 * std::mem::size_of::<f64>(); // Read a, read b, write result
         group.throughput(Throughput::Bytes(bytes_per_op as u64));
-        
+
         group.bench_with_input(
             BenchmarkId::new("memory_bandwidth", size),
             size,
-            |b, _| {
-                b.iter(|| {
-                    simd_ops.vector_add(black_box(&a), black_box(&b)).unwrap()
+            |bench, _| {
+                bench.iter(|| {
+                    simd_ops.vector_add(black_box(&a_vec), black_box(&b_vec)).unwrap()
                 })
             },
         );
     }
-    
+
     group.finish();
 }
 
@@ -446,7 +449,7 @@ criterion_group!(
     bench_temperature_scaling,
     bench_conformal_prediction,
     bench_simd_operations,
-    bench_ats_cp_engine,
+    bench_ats_cp_pipeline,
     bench_latency_validation,
     bench_memory_bandwidth,
     bench_cache_efficiency

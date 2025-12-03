@@ -460,9 +460,9 @@ impl PhysicsBackend for WarpBackend {
     fn create_body(&mut self, desc: &BodyDesc) -> Result<Self::BodyHandle, BackendError> {
         let state = WarpAgentState {
             position: [
-                desc.position.x,
-                desc.position.y,
-                desc.position.z,
+                desc.transform.position.x,
+                desc.transform.position.y,
+                desc.transform.position.z,
             ],
             velocity: [0.0, 0.0, 0.0],
             capital: 100_000.0,
@@ -486,13 +486,12 @@ impl PhysicsBackend for WarpBackend {
         self.body_handles.get(&handle).and_then(|&idx| {
             self.agents.get(idx).map(|agent| {
                 Transform {
-                    translation: Vector3::new(
+                    position: Vector3::new(
                         agent.position[0],
                         agent.position[1],
                         agent.position[2],
                     ),
                     rotation: UnitQuaternion::identity(),
-                    scale: Vector3::new(1.0, 1.0, 1.0),
                 }
             })
         })
@@ -502,9 +501,9 @@ impl PhysicsBackend for WarpBackend {
         if let Some(&idx) = self.body_handles.get(&handle) {
             if let Some(agent) = self.agents.get_mut(idx) {
                 agent.position = [
-                    transform.translation.x,
-                    transform.translation.y,
-                    transform.translation.z,
+                    transform.position.x,
+                    transform.position.y,
+                    transform.position.z,
                 ];
             }
         }

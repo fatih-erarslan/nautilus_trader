@@ -324,16 +324,18 @@ impl CorticalBus {
     ///
     /// Goes through LSH for streaming ingestion.
     #[cfg(feature = "similarity")]
-    pub fn store_pattern(&self, id: u64, embedding: &[f32]) -> Result<()> {
+    pub fn store_pattern(&self, _id: u64, embedding: &[f32]) -> Result<()> {
+        // stream_ingest takes only the vector (id is auto-assigned)
         self.pattern_memory
-            .stream_ingest(id, embedding)
+            .stream_ingest(embedding.to_vec())
             .map_err(CorticalError::from)
     }
 
     /// Get number of patterns stored.
     #[cfg(feature = "similarity")]
     pub fn pattern_count(&self) -> usize {
-        self.pattern_memory.len()
+        // Use stats from RouterStats since HybridIndex doesn't expose len()
+        self.pattern_memory.stats().streaming_inserts.load(std::sync::atomic::Ordering::Relaxed) as usize
     }
 
     // ========================================================================

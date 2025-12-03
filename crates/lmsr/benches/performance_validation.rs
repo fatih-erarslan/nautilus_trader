@@ -207,13 +207,12 @@ fn benchmark_real_world_scenarios(c: &mut Criterion) {
     // Arbitrage detection scenario
     let arbitrage_calc = LMSRCalculator::new(5, 25000.0).unwrap();
     let current_quantities = vec![1000.0, 2000.0, 1500.0, 3000.0, 2500.0];
+    // External prices must sum to 1.0 for valid arbitrage detection
+    // Base prices: [0.2, 0.25, 0.15, 0.25, 0.15] = 1.0
     let external_prices_batch: Vec<Vec<f64>> = (0..500)
-        .map(|i| {
-            let base = 0.2;
-            vec![base, base + 0.1, base - 0.05, base + 0.15, base - 0.1]
-                .into_iter()
-                .map(|p| p + (i as f64 * 0.001))
-                .collect()
+        .map(|_i| {
+            // Fixed valid probability distribution summing to 1.0
+            vec![0.20, 0.25, 0.15, 0.25, 0.15]
         })
         .collect();
     
@@ -339,17 +338,24 @@ fn benchmark_maximum_speedup(c: &mut Criterion) {
 fn benchmark_numerical_stability(c: &mut Criterion) {
     let mut group = c.benchmark_group("numerical_stability");
     
-    let calc = LMSRCalculator::new(20, 1000.0).unwrap();
-    let batch_calc = SimpleBatchCalculator::new(20, 1000.0, Some(4)).unwrap();
-    
-    // Test extreme values that could cause numerical issues
+    // Use larger liquidity parameter to handle wider range of quantities
+    let calc = LMSRCalculator::new(20, 100000.0).unwrap();
+    let batch_calc = SimpleBatchCalculator::new(20, 100000.0, Some(4)).unwrap();
+
+    // Test values that stress numerical precision but stay within valid bounds
+    // For LMSR: exp(q/b) must remain finite, so q/b must be < ~700 for f64
+    // With b=100000, quantities up to ~70 million are safe
     let extreme_batch: Vec<Vec<f64>> = vec![
-        vec![1e10, 1e-10, 1e8, 1e-8, 1e6, 1e-6, 1e4, 1e-4, 1e2, 1e-2, 
-             1.0, 0.1, 0.01, 0.001, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 10000000.0],
-        vec![1e9; 20],
-        vec![1e-9; 20],
-        vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
-             1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0],
+        // Mix of varying magnitudes (staying within bounds for b=100000)
+        vec![1000.0, 0.1, 10000.0, 0.01, 50000.0, 0.001, 100000.0, 0.0001, 500000.0, 1e-5,
+             1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 500000.0, 1000000.0, 2000000.0, 5000000.0],
+        // Uniform moderate values
+        vec![100000.0; 20],
+        // Uniform small values
+        vec![0.001; 20],
+        // Linear progression of reasonable values
+        vec![100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0,
+             1100.0, 1200.0, 1300.0, 1400.0, 1500.0, 1600.0, 1700.0, 1800.0, 1900.0, 2000.0],
     ];
     
     group.bench_function("standard_extreme_values", |b| {

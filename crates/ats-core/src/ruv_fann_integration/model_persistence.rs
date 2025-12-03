@@ -663,7 +663,14 @@ mod tests {
     
     #[tokio::test]
     async fn test_model_persistence_creation() {
-        let persistence = ModelPersistence::new();
+        // Use temp directory to avoid picking up leftover models from previous runs
+        let temp_dir = tempdir().unwrap();
+        let config = PersistenceConfig {
+            storage_path: temp_dir.path().to_path_buf(),
+            compression_enabled: true,
+            encryption_enabled: false,
+        };
+        let persistence = ModelPersistence::with_config(config);
         let stats = persistence.get_storage_stats().await.unwrap();
         assert_eq!(stats.total_models, 0);
     }

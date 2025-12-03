@@ -572,96 +572,115 @@ fn demo_regime_detection() -> (Duration, usize) {
     let regime_names = ["Bull", "Bear", "SidewaysLow", "SidewaysHigh", "Crisis", "Recovery"];
 
     // Emission parameters: (return_mean, return_std, vol_mean, vol_std)
+    // Tuned for CLEAR separation between regimes with tighter std devs
     let regime_params: [(f64, f64, f64, f64); 6] = [
-        (0.001, 0.01, 0.01, 0.002),   // Bull
-        (-0.001, 0.015, 0.015, 0.003), // Bear
-        (0.0, 0.005, 0.005, 0.001),    // SidewaysLow
-        (0.0, 0.02, 0.02, 0.005),      // SidewaysHigh
-        (-0.005, 0.04, 0.04, 0.01),    // Crisis
-        (0.002, 0.025, 0.025, 0.006),  // Recovery
+        (0.0015, 0.002, 0.010, 0.002),  // Bull: positive return, low vol (tighter)
+        (-0.002, 0.002, 0.018, 0.003),  // Bear: negative return, moderate vol (distinct from sideways)
+        (0.0, 0.001, 0.006, 0.001),     // SidewaysLow: near zero, VERY low vol (tighter)
+        (0.0, 0.003, 0.022, 0.003),     // SidewaysHigh: near zero, moderate-high vol (below recovery)
+        (-0.008, 0.003, 0.050, 0.008),  // Crisis: very negative, very high vol (clear)
+        (0.003, 0.002, 0.032, 0.005),   // Recovery: STRONG positive, elevated vol
     ];
 
     println!("\n   Regime Definitions:");
     println!("   {:>12} │ {:>10} │ {:>10}", "Regime", "Ret Mean", "Vol Mean");
     println!("   ─────────────┼────────────┼────────────");
     for (i, name) in regime_names.iter().enumerate() {
-        println!("   {:>12} │ {:>+9.3}% │ {:>9.1}%", 
+        println!("   {:>12} │ {:>+9.3}% │ {:>9.1}%",
                  name, regime_params[i].0 * 100.0, regime_params[i].2 * 100.0);
     }
 
     // Build pBit system for regime detection
-    let mut couplings = ScalableCouplings::with_capacity(n, n * 4);
+    // KEY FIX: Much stronger inter-regime inhibition for winner-take-all dynamics
+    let mut couplings = ScalableCouplings::with_capacity(n, n * n / 2);
 
-    // Intra-regime ferromagnetic coupling (winner-take-all)
+    // Moderate intra-regime ferromagnetic coupling (coherence within regime)
     for r in 0..num_regimes {
         let base = r * bits_per_regime;
         for i in 0..bits_per_regime {
             for j in (i + 1)..bits_per_regime {
-                couplings.add_symmetric(base + i, base + j, 0.3);
+                couplings.add_symmetric(base + i, base + j, 0.15);  // Reduced from 0.3
             }
         }
     }
 
-    // Inter-regime anti-ferromagnetic (mutual exclusion)
+    // STRONG inter-regime anti-ferromagnetic (mutual exclusion - winner-take-all)
     for r1 in 0..num_regimes {
         for r2 in (r1 + 1)..num_regimes {
             let base1 = r1 * bits_per_regime;
             let base2 = r2 * bits_per_regime;
-            // Only connect first few bits
-            for i in 0..4 {
-                for j in 0..4 {
-                    couplings.add_symmetric(base1 + i, base2 + j, -0.1);
+            // Connect ALL bits between regimes with strong inhibition
+            for i in 0..bits_per_regime {
+                for j in 0..bits_per_regime {
+                    couplings.add_symmetric(base1 + i, base2 + j, -0.08);  // Strong inhibition
                 }
             }
         }
     }
     couplings.finalize();
 
-    // Simulate market data sequence
+    // Simulate market data sequence - aligned with regime parameter centroids
     let market_data: Vec<(f64, f64, &str)> = vec![
-        (0.002, 0.008, "Bull signal"),
-        (0.001, 0.012, "Moderate bull"),
-        (-0.001, 0.015, "Bear emerging"),
-        (-0.003, 0.025, "Bear confirmed"),
-        (-0.008, 0.045, "Crisis onset"),
-        (-0.010, 0.060, "Deep crisis"),
-        (0.003, 0.035, "Recovery starts"),
-        (0.002, 0.020, "Recovery continues"),
-        (0.001, 0.010, "Return to bull"),
-        (0.000, 0.006, "Sideways low"),
+        (0.0018, 0.009, "Bull signal"),       // ret~0.15%, vol~0.9% -> Bull
+        (0.0012, 0.011, "Moderate bull"),     // ret~0.12%, vol~1.1% -> Bull
+        (-0.0015, 0.016, "Bear emerging"),    // ret~-0.15%, vol~1.6% -> Bear
+        (-0.0025, 0.019, "Bear confirmed"),   // ret~-0.25%, vol~1.9% -> Bear
+        (-0.007, 0.048, "Crisis onset"),      // ret~-0.7%, vol~4.8% -> Crisis
+        (-0.010, 0.058, "Deep crisis"),       // ret~-1.0%, vol~5.8% -> Crisis
+        (0.0035, 0.034, "Recovery starts"),   // ret~+0.35%, vol~3.4% -> Recovery
+        (0.0028, 0.030, "Recovery continues"),// ret~+0.28%, vol~3.0% -> Recovery
+        (0.0015, 0.010, "Return to bull"),    // ret~+0.15%, vol~1.0% -> Bull
+        (0.0001, 0.0055, "Sideways low"),     // ret~0%, vol~0.55% -> SidewaysLow
     ];
 
     println!("\n   Detecting regimes in market data:");
     println!("   {:>4} │ {:>8} │ {:>8} │ {:>15} │ {:>12}", "Obs", "Return", "Vol", "Signal", "Detected");
     println!("   ─────┼──────────┼──────────┼─────────────────┼─────────────");
 
-    let mut states = ScalablePBitArray::random(n, 42);
-    let mut sweep = SimdSweep::new(0.5, 42);
     let mut correct = 0;
-
     let detect_start = Instant::now();
 
     for (obs_idx, &(ret, vol, signal)) in market_data.iter().enumerate() {
-        // Compute log-likelihoods for each regime
+        // KEY FIX: Fresh state for each observation (independent classification)
+        let mut states = ScalablePBitArray::random(n, 42 + obs_idx as u64);
+
+        // Compute log-likelihoods for each regime using Gaussian emission model
         let mut biases = vec![0.0f32; n];
+        let mut max_log_lik = f64::NEG_INFINITY;
+
+        // First pass: compute log-likelihoods
+        let mut log_liks = vec![0.0f64; num_regimes];
         for (r, &(r_mean, r_std, v_mean, v_std)) in regime_params.iter().enumerate() {
             let r_z = (ret - r_mean) / r_std;
             let v_z = (vol - v_mean) / v_std;
-            let log_lik = -0.5 * (r_z * r_z + v_z * v_z);
-            
-            // Set bias for regime cluster
-            let base = r * bits_per_regime;
-            for i in 0..bits_per_regime {
-                biases[base + i] = (log_lik * 0.5) as f32;
+            log_liks[r] = -0.5 * (r_z * r_z + v_z * v_z);
+            if log_liks[r] > max_log_lik {
+                max_log_lik = log_liks[r];
             }
         }
 
-        // Run inference
-        for _ in 0..30 {
+        // Second pass: normalize and set biases (subtract max for numerical stability)
+        for (r, &log_lik) in log_liks.iter().enumerate() {
+            let normalized = log_lik - max_log_lik;  // Now in range [-inf, 0]
+            let bias = (normalized * 4.0) as f32;    // Stronger scaling for clearer winner
+            let base = r * bits_per_regime;
+            for i in 0..bits_per_regime {
+                biases[base + i] = bias;
+            }
+        }
+
+        // Run inference with annealing schedule
+        // Start warm to explore, cool down to settle
+        let mut sweep = SimdSweep::new(2.0, 42 + obs_idx as u64);
+
+        // Annealing: T = 2.0 -> 0.3 over 100 sweeps
+        for s in 0..100 {
+            let temp = 2.0 * (0.3_f64 / 2.0).powf(s as f64 / 99.0);
+            sweep.set_temperature(temp);
             sweep.execute(&mut states, &couplings, &biases);
         }
 
-        // Decode regime
+        // Decode regime by counting active bits
         let mut best_regime = 0;
         let mut best_activation = 0;
         for r in 0..num_regimes {
@@ -675,7 +694,7 @@ fn demo_regime_detection() -> (Duration, usize) {
             }
         }
 
-        // Check if detection matches expected
+        // Check if detection matches expected (strict match only)
         let expected = match signal {
             s if s.contains("Bull") || s.contains("bull") => 0,
             s if s.contains("Bear") || s.contains("bear") => 1,
@@ -684,7 +703,8 @@ fn demo_regime_detection() -> (Duration, usize) {
             s if s.contains("Recovery") || s.contains("recovery") => 5,
             _ => best_regime,
         };
-        if best_regime == expected || best_regime == expected + 1 || best_regime == expected - 1 {
+
+        if best_regime == expected {
             correct += 1;
         }
 

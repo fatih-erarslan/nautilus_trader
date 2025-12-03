@@ -36,7 +36,7 @@ pub mod performance_simple;
 pub mod python_bindings;
 
 pub use value_function::{ValueFunction, ValueFunctionParams};
-pub use probability_weighting::{ProbabilityWeighting, WeightingParams};
+pub use probability_weighting::{ProbabilityWeighting, WeightingParams, WeightingFunction};
 pub use errors::{ProspectTheoryError, Result};
 
 /// Financial precision tolerance (1e-10)
