@@ -8209,6 +8209,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyperphysics-tengri-bridge"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "approx 0.5.1",
+ "async-trait",
+ "chrono",
+ "criterion",
+ "hyperphysics-autopoiesis",
+ "hyperphysics-consciousness",
+ "hyperphysics-pbit",
+ "hyperphysics-risk",
+ "hyperphysics-syntergic",
+ "hyperphysics-thermo",
+ "nalgebra 0.33.2",
+ "ndarray 0.16.1",
+ "num-complex 0.4.6",
+ "quantum-circuit",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "rayon",
+ "serde",
+ "serde_json",
+ "statrs 0.17.1",
+ "thiserror 2.0.17",
+ "tokio",
+ "tokio-test",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "hyperphysics-thermo"
 version = "0.1.0"
 dependencies = [

@@ -78,6 +78,8 @@ members = [
     "crates/sibernetic-hyperphysics",
     # Autopoiesis-HyperPhysics integration bridge
     "crates/hyperphysics-autopoiesis",
+    # Tengri-HyperPhysics trading integration bridge
+    "crates/hyperphysics-tengri-bridge",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
