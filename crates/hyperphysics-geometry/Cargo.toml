@@ -13,6 +13,8 @@ repository = "https://github.com/hyperphysics/hyperphysics"
 default = []
 # Lorentz/Hyperboloid model with SIMD Minkowski operations
 lorentz = ["hyperphysics-lorentz"]
+# GPU compute acceleration via wgpu
+gpu = ["wgpu", "pollster"]
 
 [dependencies]
 nalgebra.workspace = true
@@ -20,9 +22,14 @@ num-complex = "0.4"
 num-traits.workspace = true
 serde.workspace = true
 thiserror.workspace = true
+bytemuck = { version = "1.14", features = ["derive"] }
 
 # Optional Lorentz model integration
 hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+
+# Optional GPU compute dependencies
+wgpu = { version = "0.19", optional = true }
+pollster = { version = "0.3", optional = true }
 
 [dev-dependencies]
 criterion.workspace = true

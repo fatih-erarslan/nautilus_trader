@@ -36,7 +36,7 @@ use serde::{Deserialize, Serialize};
 /// updates and belief propagation.
 ///
 /// Layout: [t, x, y, _padding]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[repr(C, align(16))]
 pub struct LorentzVec {
     /// Packed components: [t, x, y, pad]

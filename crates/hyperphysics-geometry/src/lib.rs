@@ -26,6 +26,21 @@ pub mod curvature;
 pub mod adversarial_lattice;
 pub mod sentry_integration;
 
+// Hyperbolic Spiking Neural Network modules
+pub mod hyperbolic_snn;
+pub mod markov_kernels;
+pub mod chunk_processor;
+pub mod enactive_layer;
+pub mod snn_gnn_simd;
+pub mod snn_gpu;
+
+// Phase 2 & 3: Language Acquisition and Evolution
+pub mod stdp_learning;
+pub mod topology_evolution;
+
+// Graph Attention with Hyperbolic Modulation
+pub mod graph_attention;
+
 /// Lorentz/Hyperboloid model bridge (requires `lorentz` feature)
 #[cfg(feature = "lorentz")]
 pub mod lorentz_bridge;
@@ -44,6 +59,68 @@ pub use adversarial_lattice::{
 pub use sentry_integration::{
     LorentzVec, LorentzBatch, BeliefUpdateMode, DualModeBeliefUpdater,
     ThermodynamicLearner, ThermodynamicStats, HyperbolicLattice,
+};
+
+// Re-export Hyperbolic SNN types
+pub use hyperbolic_snn::{
+    LorentzVec as LorentzVec4D, SpikingNeuron, Synapse, SpikeEvent as SNNSpikeEvent,
+    HyperbolicSTDP, SOCMonitor, SOCStats, SNNConfig, HyperbolicSNN, SimulationResult, NetworkStats,
+};
+
+// Re-export Markov kernel types
+pub use markov_kernels::{
+    HyperbolicHeatKernel, TransitionOperator, ChapmanKolmogorov,
+    HyperbolicRandomWalk, HittingTime, SpectralAnalysis,
+};
+
+// Re-export Chunk processor types
+pub use chunk_processor::{
+    SpikeEvent, SpikePacket, TemporalChunk, ChunkProcessor, ChunkProcessorConfig,
+    NowOrNeverBottleneck, CompressedUnit, ProcessorStats,
+};
+
+// Re-export Enactive layer types
+pub use enactive_layer::{
+    Observation, Action, ActionType, BeliefState, Policy, PolicyType,
+    EnactiveLayer, EnactiveConfig, EnactiveStats, EnactiveSensorimotorAgent,
+    Modality, SensorimotorCoupling,
+};
+
+// Re-export SNN-GNN SIMD types
+pub use snn_gnn_simd::{
+    SpikingGraphNode, SpikeEvent as GraphSpikeEvent, SimdMembraneBatch,
+    SimdDistanceCalculator, EventDrivenGraphProcessor, ProcessorConfig as GraphProcessorConfig,
+    ProcessorStats as GraphProcessorStats, SpikeCode, EnergyMetrics, AvalancheInfo, NetworkState,
+    SOCAnalyzer, SOCStats as GnnSOCStats,
+};
+
+// Re-export STDP Learning types (Phase 2)
+pub use stdp_learning::{
+    STDPConfig, STDPLearner, STDPStats, EligibilityTrace,
+    LearningRateSchedule, LearningRateScheduler,
+    HomeostaticPlasticity, NormalizationType, WeightNormalizer,
+    ChunkAwareSTDP,
+};
+
+// Re-export Topology Evolution types (Phase 3)
+pub use topology_evolution::{
+    TopologyConfig, TopologyEvolver, TopologyStats, TopologyUpdate,
+    ConnectionState, NeuronTopologyState,
+    PruningStrategy, CreationStrategy,
+    TessellationRefinement,
+};
+
+// Re-export Graph Attention types
+pub use graph_attention::{
+    AttentionConfig, HyperbolicAttentionHead, MultiHeadGraphAttention,
+    AttentionStats, SpikeAwareGraphAttention,
+    HyperbolicMessagePassing, MessageAggregation,
+};
+
+// Re-export GPU types
+pub use snn_gpu::{
+    GpuContext, GpuConfig, GpuBackend, GpuNeuronState, GpuPosition, GpuSynapse,
+    GpuSimParams, GpuError, HybridProcessor, ProcessingMode, HybridMetrics,
 };
 
 use thiserror::Error;
