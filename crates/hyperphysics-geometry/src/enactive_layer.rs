@@ -471,14 +471,25 @@ impl EnactiveLayer {
     fn generate_candidates(&self) -> Vec<Action> {
         let mut candidates = Vec::with_capacity(self.config.num_action_candidates);
 
-        // Current velocity direction (reserved for future trajectory planning)
-        let _velocity = self.belief.velocity();
+        // Current velocity for momentum-based trajectory continuation
+        let velocity = self.belief.velocity();
+        let speed = (velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z).sqrt();
+
+        // Compute velocity direction for momentum bias
+        let (vel_dx, vel_dy) = if speed > 1e-6 {
+            (velocity.x / speed, velocity.y / speed)
+        } else {
+            (0.0, 0.0)
+        };
 
         for i in 0..self.config.num_action_candidates {
             let angle = 2.0 * PI * i as f64 / self.config.num_action_candidates as f64;
 
             // Generate target in direction around current position
-            let radius = 0.5;  // Step size in hyperbolic space
+            // Momentum bias: actions aligned with velocity get larger step
+            let momentum_alignment = vel_dx * angle.cos() + vel_dy * angle.sin();
+            let momentum_factor = 1.0 + 0.5 * momentum_alignment.max(0.0) * speed.min(1.0);
+            let radius = 0.5 * momentum_factor;  // Step size with momentum
             let dx = radius * angle.cos();
             let dy = radius * angle.sin();
 
@@ -555,17 +566,47 @@ impl EnactiveLayer {
     }
 
     /// Execute action and update belief
-    pub fn execute_action(&mut self, _action: &Action, outcome: &Observation) {
-        // Compute prediction error for action outcome (reserved for learning)
-        let _pred_error = self.belief.prediction_error(outcome);
+    pub fn execute_action(&mut self, action: &Action, outcome: &Observation) {
+        // Compute prediction error for action outcome
+        let pred_error = self.belief.prediction_error(outcome);
+
+        // Adaptive learning rate: higher error → faster adaptation
+        let surprise = (pred_error / (self.stats.avg_prediction_error + 1e-6)).min(3.0);
+        let adaptive_rate = self.config.learning_rate * (1.0 + 0.5 * surprise);
+
+        // Update policy based on action outcome quality
+        // Good predictions (low error) reinforce current policy
+        let action_quality = (-pred_error).exp();
+        self.policy.temperature = (self.policy.temperature * 0.99
+            + 0.01 * (1.0 / action_quality.max(0.1))).clamp(0.1, 10.0);
+
+        // Track action-outcome correlation for policy refinement
+        let expected_distance = self.belief.position_mean.hyperbolic_distance(&action.target);
+        let actual_distance = outcome.position.hyperbolic_distance(&action.target);
+        let outcome_accuracy = 1.0 - (actual_distance - expected_distance).abs()
+            / (expected_distance + 0.1);
 
         // Information gain from action
         let info_gain = self.belief.position_uncertainty -
             1.0 / outcome.precision.max(0.01);
         self.stats.cumulative_info_gain += info_gain.max(0.0);
 
-        // Update belief with outcome
-        self.process_observation(outcome.clone());
+        // Update exploration based on prediction quality
+        // High error → increase exploration to learn environment
+        self.policy.exploration = (self.policy.exploration * 0.95
+            + 0.05 * pred_error.min(1.0)).clamp(0.01, 0.5);
+
+        // Update belief with outcome using adaptive learning rate
+        self.belief.update(outcome, adaptive_rate);
+
+        // Track outcome accuracy for stats
+        self.stats.avg_prediction_error =
+            0.95 * self.stats.avg_prediction_error + 0.05 * pred_error;
+
+        // Store action-outcome pair for future learning
+        if outcome_accuracy > 0.8 {
+            self.stats.total_actions += 1; // Count successful predictions
+        }
     }
 
     /// Get current belief state

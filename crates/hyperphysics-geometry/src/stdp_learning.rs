@@ -648,7 +648,6 @@ pub struct WeightNormalizer {
     /// Normalization type
     norm_type: NormalizationType,
     /// Apply normalization per neuron or globally
-    #[allow(dead_code)]
     per_neuron: bool,
 }
 
@@ -656,6 +655,11 @@ impl WeightNormalizer {
     /// Create new weight normalizer
     pub fn new(norm_type: NormalizationType, per_neuron: bool) -> Self {
         Self { norm_type, per_neuron }
+    }
+
+    /// Check if normalizer operates per-neuron or globally
+    pub fn is_per_neuron(&self) -> bool {
+        self.per_neuron
     }
 
     /// Normalize a set of weights
@@ -708,6 +712,30 @@ impl WeightNormalizer {
             }
         }
     }
+
+    /// Normalize weight matrix (for global normalization mode)
+    /// Each row is a neuron's outgoing weights
+    pub fn normalize_matrix(&self, weights: &mut [Vec<f64>]) {
+        if self.per_neuron {
+            // Normalize each neuron's weights independently
+            for row in weights.iter_mut() {
+                self.normalize(row);
+            }
+        } else {
+            // Global normalization across all weights
+            let mut all_weights: Vec<f64> = weights.iter().flatten().copied().collect();
+            self.normalize(&mut all_weights);
+
+            // Write back normalized values
+            let mut idx = 0;
+            for row in weights.iter_mut() {
+                for w in row.iter_mut() {
+                    *w = all_weights[idx];
+                    idx += 1;
+                }
+            }
+        }
+    }
 }
 
 // ============================================================================
@@ -723,13 +751,11 @@ pub struct ChunkAwareSTDP {
     scheduler: LearningRateScheduler,
     /// Homeostatic controller
     homeostasis: HomeostaticPlasticity,
-    /// Weight normalizer (for future batch normalization)
-    #[allow(dead_code)]
+    /// Weight normalizer for synaptic homeostasis
     normalizer: WeightNormalizer,
     /// Current chunk level (affects learning rate)
     current_level: usize,
-    /// Level-dependent learning rate multipliers
-    #[allow(dead_code)]
+    /// Level-dependent learning rate multipliers (higher levels learn slower)
     level_multipliers: Vec<f64>,
 }
 
@@ -759,7 +785,7 @@ impl ChunkAwareSTDP {
     }
 
     /// Get level-adjusted learning rate
-    #[allow(dead_code)]
+    /// Higher levels (more abstract chunks) learn slower for stability
     fn get_adjusted_rate(&self) -> f64 {
         let base = self.scheduler.get_rate();
         let multiplier = self.level_multipliers
@@ -769,7 +795,7 @@ impl ChunkAwareSTDP {
         base * multiplier
     }
 
-    /// Process spike event
+    /// Process spike event with level-adjusted learning
     pub fn on_spike(
         &mut self,
         neuron_id: u32,
@@ -778,6 +804,10 @@ impl ChunkAwareSTDP {
         connections: &[(u32, f64, f64)],
     ) {
         self.homeostasis.record_spike(neuron_id);
+
+        // Apply level-adjusted learning rate to STDP
+        let adjusted_rate = self.get_adjusted_rate();
+        self.stdp.config.learning_rate = adjusted_rate;
 
         if is_pre {
             self.stdp.on_pre_spike(neuron_id, time, connections);
@@ -796,7 +826,7 @@ impl ChunkAwareSTDP {
         self.scheduler.step(time, Some(chunk_quality));
     }
 
-    /// Get and apply weight updates
+    /// Get and apply weight updates with normalization
     pub fn flush_updates(&mut self, current_time: f64) -> Vec<((u32, u32), f64)> {
         // Get homeostatic scaling factors
         let scaling = self.homeostasis.update(current_time);
@@ -811,7 +841,27 @@ impl ChunkAwareSTDP {
             }
         }
 
-        updates
+        // Collect weight deltas for normalization by post-neuron
+        use std::collections::HashMap;
+        let mut post_deltas: HashMap<u32, Vec<(u32, f64)>> = HashMap::new();
+        for &((pre_id, post_id), delta_w) in &updates {
+            post_deltas.entry(post_id).or_default().push((pre_id, delta_w));
+        }
+
+        // Apply weight normalization per post-neuron (maintain synaptic homeostasis)
+        let mut normalized_updates = Vec::with_capacity(updates.len());
+        for (post_id, deltas) in post_deltas {
+            // Normalize the weight changes to prevent runaway dynamics
+            let mut delta_values: Vec<f64> = deltas.iter().map(|(_, d)| *d).collect();
+            self.normalizer.normalize(&mut delta_values);
+
+            // Rebuild updates with normalized values
+            for ((pre_id, _), normalized_delta) in deltas.iter().zip(delta_values.iter()) {
+                normalized_updates.push(((*pre_id, post_id), *normalized_delta));
+            }
+        }
+
+        normalized_updates
     }
 
     /// Get statistics

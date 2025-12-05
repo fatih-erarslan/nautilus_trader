@@ -523,7 +523,7 @@ impl SpikeAwareGraphAttention {
     }
 
     /// Compute attention-weighted features for a node
-    pub fn compute_attention(&mut self, node_id: u32, _current_time: f64) -> Option<Vec<f32>> {
+    pub fn compute_attention(&mut self, node_id: u32, current_time: f64) -> Option<Vec<f32>> {
         let features = self.node_features.get(&node_id)?.clone();
         let position = *self.node_positions.get(&node_id)?;
         let neighbors = self.adjacency.get(&node_id)?;
@@ -534,9 +534,18 @@ impl SpikeAwareGraphAttention {
                 let feat = self.node_features.get(&nid)?;
                 let pos = self.node_positions.get(&nid)?;
 
-                // Compute spike timing difference
+                // Compute spike timing difference relative to current time
+                // Recent spikes get higher attention weight (temporal relevance)
                 let spike_dt = match (self.spike_times.get(&node_id), self.spike_times.get(&nid)) {
-                    (Some(&t1), Some(&t2)) => Some(t1 - t2),
+                    (Some(&t1), Some(&t2)) => {
+                        // Causal spike timing: positive if neighbor spiked before node
+                        let dt = t1 - t2;
+                        // Apply temporal decay based on how long ago spikes occurred
+                        let node_recency = (-(current_time - t1).abs() / 50.0).exp();
+                        let neighbor_recency = (-(current_time - t2).abs() / 50.0).exp();
+                        // Weight by recency: recent spike pairs are more relevant
+                        Some(dt * (node_recency * neighbor_recency).sqrt())
+                    },
                     _ => None,
                 };
 
