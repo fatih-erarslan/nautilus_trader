@@ -55,6 +55,10 @@ mod zeroize_wrappers;
 mod zeroize_polyvec;
 mod zeroize_polynomial;
 
+// Security infrastructure modules
+pub mod hsm;
+pub mod batch;
+pub mod audit;
 
 #[cfg(feature = "hybrid-mode")]
 pub mod hybrid;
@@ -68,6 +72,11 @@ pub use crypto_pbit::{CryptographicPBit, HyperbolicPoint, SignedPBitState};
 pub use crypto_lattice::{CryptoLattice, SignedLatticeState};
 pub use secure_channel::{SecureGPUChannel, SecureMessage, KyberKeypair, KyberCiphertext};
 pub use zk_proofs::{PhiProof, ConsciousnessQualityProof, EmergenceProof};
+
+// Security infrastructure re-exports
+pub use hsm::{HsmProvider, KeyHandle, KeyType, KeyAttributes, SoftwareHsm};
+pub use batch::{BatchVerifier, BatchVerifyRequest, BatchVerifyResult};
+pub use audit::{AuditLogger, AuditEvent, AuditEventType, AuditSeverity};
 
 /// Dilithium-specific error types
 #[derive(Debug, thiserror::Error)]

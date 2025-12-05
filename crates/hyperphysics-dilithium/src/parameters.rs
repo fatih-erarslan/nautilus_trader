@@ -3,7 +3,7 @@
 use serde::{Serialize, Deserialize};
 
 /// ML-DSA security level
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[derive(zeroize::Zeroize)]
 pub enum SecurityLevel {
     /// ML-DSA-44: 128-bit quantum security

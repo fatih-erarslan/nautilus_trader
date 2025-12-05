@@ -7549,6 +7549,7 @@ dependencies = [
  "hyperphysics-geometry",
  "log",
  "merlin",
+ "num_cpus",
  "pqcrypto-dilithium",
  "pqcrypto-kyber",
  "pqcrypto-traits",
@@ -7566,6 +7567,7 @@ dependencies = [
  "tiny-keccak",
  "tokio",
  "tracing",
+ "uuid",
  "zeroize",
 ]
 

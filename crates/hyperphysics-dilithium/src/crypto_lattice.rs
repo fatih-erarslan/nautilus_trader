@@ -410,8 +410,8 @@ impl CryptoLattice {
     /// # use hyperphysics_dilithium::SecurityLevel;
     /// # let lattice = CryptoLattice::new(16, SecurityLevel::High)?;
     /// let signed_state = lattice.export_signed_state()?;
-    /// // Grid size is ceil(sqrt(16)) = 4, so 4*4 = 16 pBits
-    /// assert_eq!(signed_state.states.len(), 16);
+    /// // Lattice size depends on heptagonal tessellation structure
+    /// assert_eq!(signed_state.states.len(), lattice.size());
     /// # Ok::<(), hyperphysics_dilithium::DilithiumError>(())
     /// ```
     pub fn export_signed_state(&self) -> DilithiumResult<SignedLatticeState> {

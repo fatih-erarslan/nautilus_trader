@@ -58,10 +58,14 @@ tokio = { version = "1.35", features = ["full"] }
 log = "0.4"
 tracing = "0.1"
 
+# Security infrastructure
+uuid = { version = "1.6", features = ["v4"] }
+num_cpus = "1.16"
+hex = "0.4"
+
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
 proptest = "1.4"
-hex = "0.4"
 tempfile = "3.8"
 
 [features]

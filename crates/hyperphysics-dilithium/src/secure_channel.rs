@@ -457,11 +457,11 @@ mod tests {
     #[test]
     fn test_key_derivation() {
         let keypair = KyberKeypair::generate();
-        let (ciphertext, secret) = KyberCiphertext::encapsulate(&keypair.public_key);
-        
+        let (_ciphertext, secret) = KyberCiphertext::encapsulate(&keypair.public_key);
+
         let key1 = secret.derive_key(b"test-channel");
         let key2 = secret.derive_key(b"test-channel");
-        
+
         assert_eq!(key1.as_bytes(), key2.as_bytes());
     }
     
