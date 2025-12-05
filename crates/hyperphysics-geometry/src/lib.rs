@@ -41,6 +41,9 @@ pub mod topology_evolution;
 // Graph Attention with Hyperbolic Modulation
 pub mod graph_attention;
 
+// Integrated Cognitive System - connects all modules
+pub mod integrated_system;
+
 /// Lorentz/Hyperboloid model bridge (requires `lorentz` feature)
 #[cfg(feature = "lorentz")]
 pub mod lorentz_bridge;
@@ -121,6 +124,13 @@ pub use graph_attention::{
 pub use snn_gpu::{
     GpuContext, GpuConfig, GpuBackend, GpuNeuronState, GpuPosition, GpuSynapse,
     GpuSimParams, GpuError, HybridProcessor, ProcessingMode, HybridMetrics,
+};
+
+// Re-export Integrated System types
+pub use integrated_system::{
+    SOCCoordinator, SOCModulation, HyperbolicEnvironment,
+    ActiveInferenceLayer, IntegratedCognitiveSystem,
+    IntegratedSystemConfig, IntegratedStats,
 };
 
 use thiserror::Error;

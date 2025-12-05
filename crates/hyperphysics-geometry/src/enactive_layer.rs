@@ -58,14 +58,30 @@ pub enum Modality {
 pub struct Observation {
     /// Time of observation
     pub time: f64,
-    /// Modality
+    /// Modality (optional for simple observations)
     pub modality: Modality,
     /// Position in hyperbolic space (where observation is localized)
     pub position: LorentzVec,
-    /// Observation value (feature vector)
+    /// Observation value (feature vector) - legacy field
     pub value: Vec<f64>,
+    /// Extracted features (numeric vector)
+    pub features: Vec<f64>,
     /// Precision (confidence in observation)
     pub precision: Precision,
+}
+
+impl Observation {
+    /// Create a simple observation with position and features
+    pub fn simple(time: f64, position: LorentzVec, features: Vec<f64>, precision: f64) -> Self {
+        Self {
+            time,
+            modality: Modality::Proprioceptive,
+            position,
+            value: features.clone(),
+            features,
+            precision,
+        }
+    }
 }
 
 /// Motor action to environment
@@ -218,7 +234,7 @@ pub struct Policy {
 }
 
 /// Types of policies
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum PolicyType {
     /// Free energy minimizing (active inference)
     FreeEnergy,
@@ -335,8 +351,10 @@ pub trait SensorimotorCoupling {
     fn free_energy(&self) -> f64;
 }
 
+use serde::{Deserialize, Serialize};
+
 /// Configuration for enactive layer
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnactiveConfig {
     /// Hidden state dimensionality
     pub hidden_dim: usize,
@@ -644,6 +662,26 @@ impl EnactiveLayer {
         self.free_energy = 0.0;
         self.stats = EnactiveStats::default();
     }
+
+    /// Get exploration factor
+    pub fn get_exploration(&self) -> f64 {
+        self.policy.exploration
+    }
+
+    /// Set exploration factor
+    pub fn set_exploration(&mut self, exploration: f64) {
+        self.policy.exploration = exploration;
+    }
+
+    /// Get policy temperature
+    pub fn get_temperature(&self) -> f64 {
+        self.policy.temperature
+    }
+
+    /// Set policy temperature
+    pub fn set_temperature(&mut self, temperature: f64) {
+        self.policy.temperature = temperature;
+    }
 }
 
 impl SensorimotorCoupling for EnactiveLayer {
@@ -703,7 +741,8 @@ impl ChunkObservationMapper {
             time: chunk.end_time,
             modality: self.default_modality,
             position: chunk.representation.centroid,
-            value,
+            value: value.clone(),
+            features: value,
             precision: chunk.quality * self.precision_scale,
         }
     }
@@ -770,6 +809,7 @@ mod tests {
             modality: Modality::Visual,
             position: LorentzVec::new(t, x, y, 0.0),
             value: vec![x, y],
+            features: vec![x, y],
             precision: 1.0,
         }
     }

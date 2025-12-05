@@ -868,6 +868,22 @@ impl ChunkAwareSTDP {
     pub fn stats(&self) -> &STDPStats {
         self.stdp.stats()
     }
+
+    /// Get current learning rate
+    pub fn get_learning_rate(&self) -> f64 {
+        self.stdp.config.learning_rate
+    }
+
+    /// Set learning rate factor (multiplied with base rate)
+    pub fn set_learning_rate_factor(&mut self, factor: f64) {
+        let base_rate = self.scheduler.get_rate();
+        self.stdp.config.learning_rate = base_rate * factor;
+    }
+
+    /// Scale learning rate by factor
+    pub fn scale_learning_rate(&mut self, factor: f64) {
+        self.stdp.config.learning_rate *= factor;
+    }
 }
 
 // ============================================================================

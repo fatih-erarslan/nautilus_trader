@@ -737,6 +737,19 @@ impl TopologyEvolver {
     pub fn get_plasticity(&self) -> f64 {
         self.plasticity_factor()
     }
+
+    /// Scale plasticity by modulating critical period parameters
+    pub fn modulate_plasticity(&mut self, factor: f64) {
+        // Scale prune_threshold and creation_threshold
+        // Higher factor = more plasticity
+        self.config.prune_threshold /= factor.max(0.1);
+        self.config.creation_threshold /= factor.max(0.1);
+    }
+
+    /// Get config reference (read-only)
+    pub fn config(&self) -> &TopologyConfig {
+        &self.config
+    }
 }
 
 /// Result of topology evolution step

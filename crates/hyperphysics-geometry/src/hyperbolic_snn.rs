@@ -619,6 +619,18 @@ impl SOCMonitor {
             } else {
                 self.avalanche_sizes.iter().sum::<usize>() as f64 / self.avalanche_sizes.len() as f64
             },
+            largest_avalanche: self.avalanche_sizes.iter().copied().max().unwrap_or(0),
+            total_initiating_spikes: self.spike_counts.iter().sum::<usize>() as u64,
+            total_triggered_spikes: self.triggered_counts.iter().sum::<usize>() as u64,
+        }
+    }
+
+    /// Get current avalanche size (if avalanche is ongoing)
+    pub fn current_avalanche_size(&self) -> Option<usize> {
+        if self.current_avalanche > 0 {
+            Some(self.current_avalanche)
+        } else {
+            None
         }
     }
 }
@@ -632,6 +644,28 @@ pub struct SOCStats {
     pub is_critical: bool,
     pub total_avalanches: usize,
     pub avg_avalanche_size: f64,
+    /// Largest avalanche size observed
+    pub largest_avalanche: usize,
+    /// Total initiating spikes (for branching ratio)
+    pub total_initiating_spikes: u64,
+    /// Total triggered spikes (for branching ratio)
+    pub total_triggered_spikes: u64,
+}
+
+impl Default for SOCStats {
+    fn default() -> Self {
+        Self {
+            sigma_measured: 1.0,
+            sigma_target: 1.0,
+            power_law_tau: 1.5,
+            is_critical: false,
+            total_avalanches: 0,
+            avg_avalanche_size: 0.0,
+            largest_avalanche: 0,
+            total_initiating_spikes: 0,
+            total_triggered_spikes: 0,
+        }
+    }
 }
 
 /// Configuration for HyperbolicSNN
@@ -967,6 +1001,48 @@ impl HyperbolicSNN {
         }
         self.spike_queue.clear();
         self.time = 0.0;
+    }
+
+    /// Run one timestep with external input current
+    /// Input is applied to boundary neurons proportionally
+    pub fn step_with_input(&mut self, external_input: &[f64]) -> Vec<usize> {
+        // Apply external input to boundary neurons
+        let boundary = self.boundary_neurons();
+        for (i, &neuron_id) in boundary.iter().enumerate() {
+            let input_val = external_input.get(i).copied()
+                .or_else(|| external_input.get(i % external_input.len().max(1)).copied())
+                .unwrap_or(0.0);
+            self.inject_current(neuron_id, input_val);
+        }
+
+        // Run normal step
+        self.step()
+    }
+
+    /// Add a new synapse to the network
+    pub fn add_synapse(&mut self, pre_id: usize, post_id: usize, weight: f64, distance: f32) {
+        let synapse = Synapse::new(pre_id, post_id, weight, distance, self.config.propagation_speed);
+        let syn_idx = self.synapses.len();
+        self.synapses.push(synapse);
+        self.adjacency.entry(pre_id).or_default().push(syn_idx);
+    }
+
+    /// Remove a synapse from the network
+    pub fn remove_synapse(&mut self, pre_id: usize, post_id: usize) {
+        // Find and remove the synapse
+        if let Some(idx) = self.synapses.iter().position(|s| s.pre_id == pre_id && s.post_id == post_id) {
+            self.synapses.remove(idx);
+            // Rebuild adjacency (simple approach)
+            self.rebuild_adjacency();
+        }
+    }
+
+    /// Rebuild adjacency map from synapses
+    fn rebuild_adjacency(&mut self) {
+        self.adjacency.clear();
+        for (idx, synapse) in self.synapses.iter().enumerate() {
+            self.adjacency.entry(synapse.pre_id).or_default().push(idx);
+        }
     }
 }
 

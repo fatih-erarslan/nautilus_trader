@@ -191,29 +191,34 @@ pub struct ChunkRepresentation {
     /// Position centroid on hyperboloid
     pub centroid: LorentzVec,
     /// Temporal signature (eigenvalues of spike correlation matrix)
-    pub temporal_signature: [f64; 4],
+    pub temporal_signature: Vec<f64>,
     /// Spatial signature (principal directions)
     pub spatial_signature: [LorentzVec; 3],
     /// Activity level (normalized spike count)
     pub activity: f64,
     /// Complexity measure (approximate entropy)
     pub complexity: f64,
+    /// Confidence in chunk representation (0-1)
+    pub confidence: f64,
 }
 
 impl Default for ChunkRepresentation {
     fn default() -> Self {
         Self {
             centroid: LorentzVec::origin(),
-            temporal_signature: [0.0; 4],
+            temporal_signature: vec![0.0; 4],
             spatial_signature: [LorentzVec::origin(); 3],
             activity: 0.0,
             complexity: 0.0,
+            confidence: 0.0,
         }
     }
 }
 
+use serde::{Deserialize, Serialize};
+
 /// Chunk-and-Pass processor configuration
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChunkProcessorConfig {
     /// Number of hierarchical levels
     pub num_levels: usize,
@@ -279,7 +284,7 @@ pub struct PredictionState {
 }
 
 /// Processing statistics
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ProcessorStats {
     /// Total spikes processed
     pub total_spikes: usize,
@@ -291,6 +296,8 @@ pub struct ProcessorStats {
     pub information_rate: f64,
     /// Compression ratio
     pub compression_ratio: f64,
+    /// Total chunks formed across all levels
+    pub chunks_formed: usize,
 }
 
 impl ChunkProcessor {
@@ -445,19 +452,35 @@ impl ChunkProcessor {
         // Complexity via approximate entropy
         let complexity = self.compute_complexity(&packet.spikes);
 
+        // Compute confidence from spike count and activity
+        let confidence = self.compute_confidence(packet);
+
         ChunkRepresentation {
             centroid: packet.centroid,
             temporal_signature,
             spatial_signature,
             activity,
             complexity,
+            confidence,
         }
     }
 
+    /// Compute confidence in chunk representation
+    fn compute_confidence(&self, packet: &SpikePacket) -> f64 {
+        if packet.spike_count < self.config.min_spikes_per_chunk {
+            return 0.0;
+        }
+        // Confidence based on spike count and duration
+        let count_factor = (packet.spike_count as f64 / 10.0).min(1.0);
+        let duration = packet.duration().max(1e-6);
+        let rate_factor = ((packet.spike_count as f64 / duration) / 100.0).min(1.0);
+        (count_factor * 0.6 + rate_factor * 0.4).clamp(0.0, 1.0)
+    }
+
     /// Compute temporal signature from spike times
-    fn compute_temporal_signature(&self, spikes: &[SpikeEvent]) -> [f64; 4] {
+    fn compute_temporal_signature(&self, spikes: &[SpikeEvent]) -> Vec<f64> {
         if spikes.len() < 2 {
-            return [0.0; 4];
+            return vec![0.0; 4];
         }
 
         let times: Vec<f64> = spikes.iter().map(|s| s.time).collect();
@@ -465,7 +488,7 @@ impl ChunkProcessor {
         let mean = times.iter().sum::<f64>() / n as f64;
 
         // Compute first 4 moments
-        let mut moments = [0.0f64; 4];
+        let mut moments = vec![0.0f64; 4];
         for &t in &times {
             let d = t - mean;
             moments[0] += d;
