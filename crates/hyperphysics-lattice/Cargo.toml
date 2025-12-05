@@ -1,0 +1,51 @@
+[package]
+name = "hyperphysics-lattice"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+description = "Exotic hyperbolic lattice topologies ({7,3} heptagonal, {5,4} pentagonal, Lorentz hyperboloid) with SOC dynamics and consciousness emergence"
+repository = "https://github.com/hyperphysics/hyperphysics"
+
+[features]
+default = []
+# Enable full hyperbolic geometry integration
+geometry = ["hyperphysics-geometry"]
+# Enable Lorentz hyperboloid model (10x faster than Poincaré)
+lorentz = ["hyperphysics-lorentz"]
+# GPU acceleration for lattice operations
+gpu = ["wgpu", "pollster"]
+# Game-theoretic coordination for multi-agent lattices
+game-theory = []
+# Consciousness metrics (IIT Phi, coherence, entanglement)
+consciousness = ["hyperphysics-consciousness"]
+# Post-quantum cryptography for lattice security
+dilithium = ["hyperphysics-dilithium"]
+# SIMD vectorization for manifold operations
+simd = []
+
+[dependencies]
+nalgebra.workspace = true
+num-complex = "0.4"
+num-traits.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+bytemuck = { version = "1.14", features = ["derive"] }
+rand = "0.8"
+rayon = "1.10"
+
+# Hyperbolic geometry foundation
+hyperphysics-geometry = { path = "../hyperphysics-geometry", optional = true }
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+hyperphysics-consciousness = { path = "../hyperphysics-consciousness", optional = true }
+hyperphysics-dilithium = { path = "../hyperphysics-dilithium", optional = true }
+
+# GPU acceleration
+wgpu = { version = "0.19", optional = true }
+pollster = { version = "0.3", optional = true }
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true

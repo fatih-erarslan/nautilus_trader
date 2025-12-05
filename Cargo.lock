@@ -7613,14 +7613,17 @@ dependencies = [
 name = "hyperphysics-geometry"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "criterion",
  "hyperphysics-lorentz",
  "nalgebra 0.34.1",
  "num-complex 0.4.6",
  "num-traits 0.2.19",
+ "pollster 0.3.0",
  "proptest",
  "serde",
  "thiserror 1.0.69",
+ "wgpu 0.19.4",
 ]
 
 [[package]]
@@ -7775,6 +7778,28 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "hyperphysics-lattice"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "criterion",
+ "hyperphysics-consciousness",
+ "hyperphysics-dilithium",
+ "hyperphysics-geometry",
+ "hyperphysics-lorentz",
+ "nalgebra 0.34.1",
+ "num-complex 0.4.6",
+ "num-traits 0.2.19",
+ "pollster 0.3.0",
+ "proptest",
+ "rand 0.8.5",
+ "rayon",
+ "serde",
+ "thiserror 1.0.69",
+ "wgpu 0.19.4",
 ]
 
 [[package]]

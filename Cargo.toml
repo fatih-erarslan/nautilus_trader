@@ -82,6 +82,8 @@ members = [
     "crates/hyperphysics-tengri-bridge",
     # Post-quantum secure MCP authentication layer
     "crates/hyperphysics-mcp-auth",
+    # Exotic hyperbolic lattice topologies with SOC dynamics
+    "crates/hyperphysics-lattice",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
