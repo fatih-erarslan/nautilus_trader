@@ -24,6 +24,7 @@ pub mod tessellation_73;
 pub mod crypto_substrate;
 pub mod curvature;
 pub mod adversarial_lattice;
+pub mod sentry_integration;
 
 /// Lorentz/Hyperboloid model bridge (requires `lorentz` feature)
 #[cfg(feature = "lorentz")]
@@ -39,6 +40,10 @@ pub use curvature::CurvatureTensor;
 pub use adversarial_lattice::{
     SchlafliSymbol, DefenseTopology, HyperboloidPoint, SentryNode,
     AdversarialLattice, DetectionResult, LatticeStats, DetectionEvent,
+};
+pub use sentry_integration::{
+    LorentzVec, LorentzBatch, BeliefUpdateMode, DualModeBeliefUpdater,
+    ThermodynamicLearner, ThermodynamicStats, HyperbolicLattice,
 };
 
 use thiserror::Error;
