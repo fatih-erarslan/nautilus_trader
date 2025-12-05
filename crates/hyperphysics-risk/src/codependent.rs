@@ -194,8 +194,9 @@ impl CodependentRiskModel {
         let mut new_adjacency = DMatrix::zeros(n, n);
 
         // Build reverse mapping from NodeIndex to position
+        // Note: asset_id is stored in id_to_node for lookup but position is used for matrix indexing
         let mut node_to_pos: HashMap<NodeIndex, usize> = HashMap::new();
-        for (pos, (&asset_id, &node_idx)) in self.id_to_node.iter().enumerate() {
+        for (pos, (_asset_id, &node_idx)) in self.id_to_node.iter().enumerate() {
             node_to_pos.insert(node_idx, pos);
         }
 

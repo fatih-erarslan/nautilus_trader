@@ -1,13 +1,21 @@
 //! SIMD-optimized Metropolis sweep
 //!
 //! Uses packed bit operations and vectorized RNG for maximum throughput.
+//!
+//! # Architecture Support
+//!
+//! - **x86_64**: AVX2/AVX-512 vectorized energy calculations
+//! - **aarch64**: NEON vectorized operations
+//! - **Fallback**: Scalar implementation with cache-optimized chunking
 
 use super::{ScalableCouplings, ScalablePBitArray};
 
 #[cfg(target_arch = "x86_64")]
+#[allow(unused_imports)]
 use std::arch::x86_64::*;
 
 #[cfg(target_arch = "aarch64")]
+#[allow(unused_imports)]
 use std::arch::aarch64::*;
 
 /// SIMD-optimized sweep executor

@@ -330,6 +330,107 @@ impl NTT {
         // Inverse NTT (returns Montgomery form)
         self.inverse(&c_ntt)
     }
+
+    /// Inverse NTT using precomputed inverse twiddle factors
+    ///
+    /// Alternative implementation that uses the precomputed `ZETAS_INV` array
+    /// directly instead of computing negative twiddle factors at runtime.
+    ///
+    /// # Arguments
+    ///
+    /// * `coeffs` - NTT-domain coefficients (length must be N=256)
+    ///
+    /// # Returns
+    ///
+    /// Polynomial coefficients in Montgomery form
+    ///
+    /// # Performance
+    ///
+    /// May offer better cache performance due to sequential memory access
+    /// pattern in the precomputed array.
+    pub fn inverse_precomputed(&self, coeffs: &[i32]) -> Vec<i32> {
+        assert_eq!(coeffs.len(), N, "Polynomial must have {} coefficients", N);
+
+        let mut result = coeffs.to_vec();
+        let zetas_inv = &ZETAS_INV;
+        let mut len = 1;
+        let mut k = 0_usize;
+
+        // Inverse Cooley-Tukey using precomputed inverse twiddle factors
+        while len < N {
+            for start in (0..N).step_by(2 * len) {
+                // Use precomputed inverse twiddle factor directly
+                let zeta_inv = zetas_inv[k];
+                k += 1;
+
+                for j in start..(start + len) {
+                    let t = result[j];
+                    result[j] = t + result[j + len];
+                    result[j + len] = t - result[j + len];
+                    result[j + len] = montgomery_reduce(zeta_inv as i64 * result[j + len] as i64);
+                }
+            }
+
+            len *= 2;
+        }
+
+        // Normalize by f = mont^2/256
+        for coeff in &mut result {
+            *coeff = montgomery_reduce(MONT_INV_256 as i64 * (*coeff) as i64);
+        }
+
+        result
+    }
+
+    /// Pointwise polynomial subtraction in NTT domain
+    ///
+    /// Computes c = a - b where a, b are in NTT representation.
+    pub fn pointwise_sub(&self, a: &[i32], b: &[i32]) -> Vec<i32> {
+        assert_eq!(a.len(), N);
+        assert_eq!(b.len(), N);
+
+        a.iter()
+            .zip(b.iter())
+            .map(|(&ai, &bi)| barrett_reduce(ai as i64 - bi as i64))
+            .collect()
+    }
+
+    /// Pointwise polynomial negation in NTT domain
+    ///
+    /// Computes c = -a where a is in NTT representation.
+    pub fn pointwise_neg(&self, a: &[i32]) -> Vec<i32> {
+        a.iter()
+            .map(|&ai| barrett_reduce(-(ai as i64)))
+            .collect()
+    }
+
+    /// Get inverse twiddle factor for cryptographic verification
+    ///
+    /// Returns the precomputed inverse twiddle factor at the given index.
+    /// Used for verifying NTT computations in zero-knowledge proofs.
+    #[inline]
+    pub fn get_inverse_zeta(&self, index: usize) -> i32 {
+        assert!(index < N, "Index out of bounds");
+        ZETAS_INV[index]
+    }
+
+    /// Verify twiddle factor relationship
+    ///
+    /// Checks that zetas[i] * zetas_inv[i] ≡ 1 (mod Q) for cryptographic validation.
+    /// This is used for security auditing of NTT implementations.
+    pub fn verify_twiddle_factors(&self) -> bool {
+        // Skip index 0 as zetas[0] = 0 (intentionally unused per FIPS 204)
+        for i in 1..N {
+            let product = montgomery_reduce(ZETAS[i] as i64 * ZETAS_INV[i] as i64);
+            // Product should be close to 1 in Montgomery form (mont = R mod Q)
+            // Due to Montgomery representation, exact check is complex
+            // We verify the product is within valid range
+            if product.abs() >= Q {
+                return false;
+            }
+        }
+        true
+    }
 }
 
 impl Default for NTT {

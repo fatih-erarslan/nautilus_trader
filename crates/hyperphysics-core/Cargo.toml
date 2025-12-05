@@ -48,6 +48,10 @@ proptest = "1.4"
 [features]
 default = []
 simd = []
+# WASM target support
+wasm = []
+# CUDA-WASM hybrid compilation
+cuda-wasm = ["wasm"]
 # Lorentz/Hyperboloid model with f64 SIMD Minkowski operations
 lorentz = ["hyperphysics-lorentz", "hyperphysics-geometry/lorentz"]
 # pBit-aware MoE strategy routing
