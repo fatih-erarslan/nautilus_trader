@@ -80,6 +80,8 @@ members = [
     "crates/hyperphysics-autopoiesis",
     # Tengri-HyperPhysics trading integration bridge
     "crates/hyperphysics-tengri-bridge",
+    # Post-quantum secure MCP authentication layer
+    "crates/hyperphysics-mcp-auth",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
