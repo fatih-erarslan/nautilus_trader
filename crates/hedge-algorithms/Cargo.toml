@@ -1,0 +1,72 @@
+[package]
+name = "hedge-algorithms"
+version = "0.1.0"
+edition = "2021"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Advanced hedge algorithms with quantum enhancement and expert weighting systems"
+license = "MIT OR Apache-2.0"
+keywords = ["hedge", "algorithms", "quantum", "expert-systems", "trading"]
+categories = ["algorithms", "mathematics", "finance", "science"]
+
+# Empty workspace table to exclude from parent workspace
+[workspace]
+
+[dependencies]
+# Quantum computing core
+quantum-core = { path = "../quantum-core" }
+
+# Core workspace dependencies (updated to use workspace versions)
+nalgebra = { version = "0.33", features = ["serde-serialize"] }
+ndarray = { version = "0.16", features = ["rayon"] }
+rand = "0.8"
+rand_distr = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+rayon = "1.10"
+chrono = { version = "0.4", features = ["serde"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Math and scientific computing (updated to use workspace versions)
+num-traits = "0.2"
+num-complex = "0.4"
+statrs = "0.16"
+faer = "0.19"
+
+# Optimization and SIMD (temporarily disabled due to compatibility issues)
+# wide = "0.7"
+# packed_simd = "0.3"
+
+# Quantum computing (updated to use workspace versions)
+candle-core = { version = "0.9", default-features = false, optional = true }
+candle-nn = { version = "0.9", default-features = false, optional = true }
+
+# Python bindings (updated to use workspace versions)
+pyo3 = { version = "0.20", features = ["extension-module", "auto-initialize"], optional = true }
+numpy = { version = "0.20", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+approx = "0.5"
+
+[features]
+default = ["python", "quantum"]
+python = ["pyo3", "numpy"]
+quantum = []
+simd = []
+gpu = []
+
+[lib]
+name = "hedge_algorithms"
+crate-type = ["cdylib", "rlib"]
+
+[[bench]]
+name = "hedge_algorithms_bench"
+harness = false
+
+[[bench]]
+name = "quantum_hedge_bench"
+harness = false
