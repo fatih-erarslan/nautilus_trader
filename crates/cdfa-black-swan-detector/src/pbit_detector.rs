@@ -53,24 +53,24 @@ impl PBitBlackSwanDetector {
     }
 
     /// Add observation and detect black swan
-    pub fn observe(&mut self, value: f64) -> BlackSwanResult {
+    pub fn observe(&mut self, value: f64) -> PBitBlackSwanResult {
         self.history.push_back(value);
         if self.history.len() > self.window_size {
             self.history.pop_front();
         }
 
         if self.history.len() < self.min_samples {
-            return BlackSwanResult::insufficient_data();
+            return PBitBlackSwanResult::insufficient_data();
         }
 
         self.detect()
     }
 
     /// Detect black swan in current window
-    pub fn detect(&self) -> BlackSwanResult {
+    pub fn detect(&self) -> PBitBlackSwanResult {
         let n = self.history.len();
         if n < self.min_samples {
-            return BlackSwanResult::insufficient_data();
+            return PBitBlackSwanResult::insufficient_data();
         }
 
         let data: Vec<f64> = self.history.iter().copied().collect();
@@ -114,7 +114,7 @@ impl PBitBlackSwanDetector {
         // Cascade risk from pBit correlation
         let cascade_risk = self.pbit_cascade_risk(&data);
 
-        BlackSwanResult {
+        PBitBlackSwanResult {
             is_black_swan: black_swan_score > 1.0,
             score: black_swan_score,
             tail_probability: tail_prob,
@@ -241,7 +241,7 @@ impl PBitBlackSwanDetector {
     }
 
     /// Batch detection on time series
-    pub fn detect_batch(&mut self, data: &[f64]) -> Vec<BlackSwanResult> {
+    pub fn detect_batch(&mut self, data: &[f64]) -> Vec<PBitBlackSwanResult> {
         data.iter().map(|&x| self.observe(x)).collect()
     }
 
@@ -272,9 +272,9 @@ impl PBitBlackSwanDetector {
     }
 }
 
-/// Black swan detection result
+/// pBit black swan detection result
 #[derive(Debug, Clone)]
-pub struct BlackSwanResult {
+pub struct PBitBlackSwanResult {
     /// Is this a black swan event?
     pub is_black_swan: bool,
     /// Black swan score (higher = more extreme)
@@ -291,7 +291,7 @@ pub struct BlackSwanResult {
     pub direction: TailDirection,
 }
 
-impl BlackSwanResult {
+impl PBitBlackSwanResult {
     fn insufficient_data() -> Self {
         Self {
             is_black_swan: false,

@@ -17,7 +17,7 @@ pub mod validation {
     use super::*;
     
     /// Validate that data has minimum required size
-    pub fn validate_min_size(data: &[f64], min_size: usize, context: &str) -> BlackSwanResult<()> {
+    pub fn validate_min_size(data: &[f64], min_size: usize, context: &str) -> BSResult<()> {
         if data.len() < min_size {
             return Err(BlackSwanError::InsufficientData {
                 required: min_size,
@@ -28,7 +28,7 @@ pub mod validation {
     }
     
     /// Validate that all values are finite (not NaN or infinite)
-    pub fn validate_all_finite(data: &[f64], context: &str) -> BlackSwanResult<()> {
+    pub fn validate_all_finite(data: &[f64], context: &str) -> BSResult<()> {
         for (i, &value) in data.iter().enumerate() {
             if !value.is_finite() {
                 return Err(BlackSwanError::InvalidInput(
@@ -40,7 +40,7 @@ pub mod validation {
     }
     
     /// Validate that all values are positive
-    pub fn validate_all_positive(data: &[f64], context: &str) -> BlackSwanResult<()> {
+    pub fn validate_all_positive(data: &[f64], context: &str) -> BSResult<()> {
         for (i, &value) in data.iter().enumerate() {
             if value <= 0.0 {
                 return Err(BlackSwanError::InvalidInput(
@@ -52,7 +52,7 @@ pub mod validation {
     }
     
     /// Validate that data is within expected range
-    pub fn validate_range(data: &[f64], min: f64, max: f64, context: &str) -> BlackSwanResult<()> {
+    pub fn validate_range(data: &[f64], min: f64, max: f64, context: &str) -> BSResult<()> {
         for (i, &value) in data.iter().enumerate() {
             if value < min || value > max {
                 return Err(BlackSwanError::InvalidInput(
@@ -65,7 +65,7 @@ pub mod validation {
     }
     
     /// Validate probability values (0 <= p <= 1)
-    pub fn validate_probabilities(data: &[f64], context: &str) -> BlackSwanResult<()> {
+    pub fn validate_probabilities(data: &[f64], context: &str) -> BSResult<()> {
         validate_range(data, 0.0, 1.0, context)
     }
     
@@ -74,7 +74,7 @@ pub mod validation {
         data1: &[T], 
         data2: &[U], 
         context: &str
-    ) -> BlackSwanResult<()> {
+    ) -> BSResult<()> {
         if data1.len() != data2.len() {
             return Err(BlackSwanError::InvalidInput(
                 format!("{}: Array length mismatch: {} vs {}", 

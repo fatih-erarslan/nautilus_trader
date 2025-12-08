@@ -30,7 +30,7 @@ impl HillEstimator {
     }
     
     /// Estimate tail index using Hill estimator
-    pub fn estimate(&self, data: &[f64]) -> BlackSwanResult<TailRiskMetrics> {
+    pub fn estimate(&self, data: &[f64]) -> BSResult<TailRiskMetrics> {
         validation::validate_min_size(data, 50, "Hill estimator data")?;
         validation::validate_all_finite(data, "Hill estimator data")?;
         
@@ -72,7 +72,7 @@ impl HillEstimator {
     }
     
     /// Calculate Hill estimate for given k
-    fn calculate_hill_estimate(&self, sorted_data: &[f64], k: usize) -> BlackSwanResult<f64> {
+    fn calculate_hill_estimate(&self, sorted_data: &[f64], k: usize) -> BSResult<f64> {
         if k == 0 || k >= sorted_data.len() {
             return Err(BlackSwanError::InvalidInput("Invalid k value".to_string()));
         }
@@ -97,7 +97,7 @@ impl HillEstimator {
     }
     
     /// Goodness-of-fit test for Hill estimator
-    fn goodness_of_fit_test(&self, sorted_data: &[f64], k: usize, hill_estimate: f64) -> BlackSwanResult<f64> {
+    fn goodness_of_fit_test(&self, sorted_data: &[f64], k: usize, hill_estimate: f64) -> BSResult<f64> {
         if k < 10 || k >= sorted_data.len() {
             return Ok(0.0);
         }
@@ -122,7 +122,7 @@ impl HillEstimator {
     }
     
     /// Kolmogorov-Smirnov test statistic
-    fn kolmogorov_smirnov_statistic(&self, theoretical: &[f64], empirical: &[f64]) -> BlackSwanResult<f64> {
+    fn kolmogorov_smirnov_statistic(&self, theoretical: &[f64], empirical: &[f64]) -> BSResult<f64> {
         if theoretical.len() != empirical.len() {
             return Err(BlackSwanError::InvalidInput("Mismatched array lengths".to_string()));
         }
@@ -168,7 +168,7 @@ impl HillEstimator {
     }
     
     /// Calculate Value at Risk (VaR)
-    fn calculate_var(&self, sorted_data: &[f64], k: usize, hill_estimate: f64) -> BlackSwanResult<f64> {
+    fn calculate_var(&self, sorted_data: &[f64], k: usize, hill_estimate: f64) -> BSResult<f64> {
         if k == 0 || k >= sorted_data.len() {
             return Err(BlackSwanError::InvalidInput("Invalid k value for VaR calculation".to_string()));
         }
@@ -184,7 +184,7 @@ impl HillEstimator {
     }
     
     /// Calculate Expected Shortfall (Conditional VaR)
-    fn calculate_expected_shortfall(&self, sorted_data: &[f64], k: usize) -> BlackSwanResult<f64> {
+    fn calculate_expected_shortfall(&self, sorted_data: &[f64], k: usize) -> BSResult<f64> {
         if k == 0 || k >= sorted_data.len() {
             return Err(BlackSwanError::InvalidInput("Invalid k value for ES calculation".to_string()));
         }
@@ -194,7 +194,7 @@ impl HillEstimator {
     }
     
     /// Calculate tail probability
-    fn calculate_tail_probability(&self, sorted_data: &[f64], k: usize) -> BlackSwanResult<f64> {
+    fn calculate_tail_probability(&self, sorted_data: &[f64], k: usize) -> BSResult<f64> {
         if k == 0 || k >= sorted_data.len() {
             return Err(BlackSwanError::InvalidInput("Invalid k value for tail probability".to_string()));
         }
@@ -203,7 +203,7 @@ impl HillEstimator {
     }
     
     /// Bootstrap confidence intervals
-    pub fn bootstrap_confidence_intervals(&self, data: &[f64], k: usize) -> BlackSwanResult<(f64, f64)> {
+    pub fn bootstrap_confidence_intervals(&self, data: &[f64], k: usize) -> BSResult<(f64, f64)> {
         validation::validate_min_size(data, 50, "Bootstrap data")?;
         
         let mut bootstrap_estimates = Vec::new();
@@ -250,7 +250,7 @@ impl GEVFitter {
     }
     
     /// Fit GEV distribution to block maxima
-    pub fn fit(&self, block_maxima: &[f64]) -> BlackSwanResult<GEVParameters> {
+    pub fn fit(&self, block_maxima: &[f64]) -> BSResult<GEVParameters> {
         validation::validate_min_size(block_maxima, 10, "GEV block maxima")?;
         validation::validate_all_finite(block_maxima, "GEV block maxima")?;
         
@@ -309,7 +309,7 @@ impl GEVFitter {
         location: f64,
         scale: f64,
         shape: f64,
-    ) -> BlackSwanResult<(f64, Vec<f64>, Vec<Vec<f64>>)> {
+    ) -> BSResult<(f64, Vec<f64>, Vec<Vec<f64>>)> {
         let n = data.len() as f64;
         let mut log_likelihood = 0.0;
         let mut gradient = vec![0.0; 3]; // [d/d_location, d/d_scale, d/d_shape]
@@ -360,7 +360,7 @@ impl GEVFitter {
     }
     
     /// Invert 3x3 matrix
-    fn invert_3x3_matrix(&self, matrix: &[Vec<f64>]) -> BlackSwanResult<Vec<Vec<f64>>> {
+    fn invert_3x3_matrix(&self, matrix: &[Vec<f64>]) -> BSResult<Vec<Vec<f64>>> {
         // Simplified 3x3 matrix inversion
         // In practice, use a proper linear algebra library
         let det = matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1])
@@ -426,7 +426,7 @@ impl POTModel {
     }
     
     /// Fit POT model to exceedances
-    pub fn fit(&mut self, data: &[f64]) -> BlackSwanResult<()> {
+    pub fn fit(&mut self, data: &[f64]) -> BSResult<()> {
         let exceedances: Vec<f64> = data.iter()
             .filter(|&&x| x > self.threshold)
             .map(|&x| x - self.threshold)
@@ -500,7 +500,7 @@ impl EVTAnalyzer {
     }
     
     /// Comprehensive EVT analysis
-    pub fn analyze(&mut self, data: &[f64]) -> BlackSwanResult<EVTAnalysis> {
+    pub fn analyze(&mut self, data: &[f64]) -> BSResult<EVTAnalysis> {
         // Hill estimator analysis
         let tail_metrics = self.hill_estimator.estimate(data)?;
         

@@ -538,7 +538,7 @@ impl BenchmarkSuite {
         self.test_cases.push(case);
     }
     
-    pub fn run_benchmarks(&mut self) -> BlackSwanResult<Vec<BenchmarkResult>> {
+    pub fn run_benchmarks(&mut self) -> BSResult<Vec<BenchmarkResult>> {
         let mut results = Vec::new();
         
         for test_case in &self.test_cases {
@@ -549,7 +549,7 @@ impl BenchmarkSuite {
         Ok(results)
     }
     
-    fn run_single_benchmark(&mut self, test_case: &BenchmarkCase) -> BlackSwanResult<BenchmarkResult> {
+    fn run_single_benchmark(&mut self, test_case: &BenchmarkCase) -> BSResult<BenchmarkResult> {
         self.metrics_collector.reset();
         
         let start_time = Instant::now();

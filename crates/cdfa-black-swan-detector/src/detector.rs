@@ -67,7 +67,7 @@ pub struct BlackSwanDetector {
 
 impl BlackSwanDetector {
     /// Create a new Black Swan detector
-    pub fn new(config: BlackSwanConfig) -> BlackSwanResult<Self> {
+    pub fn new(config: BlackSwanConfig) -> BSResult<Self> {
         config.validate()?;
         
         // Initialize IQAD configuration
@@ -120,7 +120,7 @@ impl BlackSwanDetector {
     }
     
     /// Initialize the detector
-    pub fn initialize(&mut self) -> BlackSwanResult<()> {
+    pub fn initialize(&mut self) -> BSResult<()> {
         if self.is_initialized {
             return Ok(());
         }
@@ -149,7 +149,7 @@ impl BlackSwanDetector {
     }
     
     /// Detect Black Swan events in real-time
-    pub fn detect_real_time(&self, prices: &[f64], volumes: &[f64]) -> BlackSwanResult<BlackSwanResult> {
+    pub fn detect_real_time(&self, prices: &[f64], volumes: &[f64]) -> BSResult<BlackSwanResult> {
         if !self.is_initialized {
             return Err(BlackSwanError::Generic("Detector not initialized".to_string()));
         }
@@ -215,7 +215,7 @@ impl BlackSwanDetector {
         &self,
         prices: &[f64],
         volumes: &[f64],
-    ) -> BlackSwanResult<(
+    ) -> BSResult<(
         EVTAnalysis,
         Vec<f64>,
         VolatilityClusteringResult,
@@ -245,20 +245,20 @@ impl BlackSwanDetector {
     }
     
     /// Run EVT analysis
-    fn run_evt_analysis(&self, return_data: &[f64]) -> BlackSwanResult<EVTAnalysis> {
+    fn run_evt_analysis(&self, return_data: &[f64]) -> BSResult<EVTAnalysis> {
         let mut evt_analyzer = self.evt_analyzer.lock().unwrap();
         evt_analyzer.analyze(return_data)
     }
     
     /// Run IQAD analysis
-    fn run_iqad_analysis(&self, return_data: &[f64]) -> BlackSwanResult<Vec<f64>> {
+    fn run_iqad_analysis(&self, return_data: &[f64]) -> BSResult<Vec<f64>> {
         let iqad_detector = self.iqad_detector.lock().unwrap();
         iqad_detector.detect_anomalies(return_data)
             .map_err(|e| BlackSwanError::Integration(format!("IQAD analysis failed: {}", e)))
     }
     
     /// Run volatility clustering analysis
-    fn run_volatility_analysis(&self, return_data: &[f64]) -> BlackSwanResult<VolatilityClusteringResult> {
+    fn run_volatility_analysis(&self, return_data: &[f64]) -> BSResult<VolatilityClusteringResult> {
         let mut volatility_models = self.volatility_models.lock().unwrap();
         
         // Get or create GARCH model
@@ -272,7 +272,7 @@ impl BlackSwanDetector {
     }
     
     /// Run liquidity analysis
-    fn run_liquidity_analysis(&self, prices: &[f64], volumes: &[f64]) -> BlackSwanResult<LiquidityAnalysisResult> {
+    fn run_liquidity_analysis(&self, prices: &[f64], volumes: &[f64]) -> BSResult<LiquidityAnalysisResult> {
         let mut liquidity_monitors = self.liquidity_monitors.lock().unwrap();
         
         // Get or create liquidity monitor
@@ -283,7 +283,7 @@ impl BlackSwanDetector {
     }
     
     /// Run correlation analysis
-    fn run_correlation_analysis(&self, return_data: &[f64]) -> BlackSwanResult<CorrelationAnalysisResult> {
+    fn run_correlation_analysis(&self, return_data: &[f64]) -> BSResult<CorrelationAnalysisResult> {
         let mut correlation_trackers = self.correlation_trackers.lock().unwrap();
         
         // Get or create correlation tracker
@@ -301,7 +301,7 @@ impl BlackSwanDetector {
         volatility_result: VolatilityClusteringResult,
         liquidity_result: LiquidityAnalysisResult,
         correlation_result: CorrelationAnalysisResult,
-    ) -> BlackSwanResult<BlackSwanResult> {
+    ) -> BSResult<BlackSwanResult> {
         let weights = &self.config.risk_model.component_weights;
         
         // Calculate component probabilities
@@ -366,7 +366,7 @@ impl BlackSwanDetector {
     }
     
     /// Calculate log returns from prices
-    fn calculate_returns(&self, prices: &[f64]) -> BlackSwanResult<Vec<f64>> {
+    fn calculate_returns(&self, prices: &[f64]) -> BSResult<Vec<f64>> {
         if prices.len() < 2 {
             return Err(BlackSwanError::InsufficientData {
                 required: 2,
@@ -404,7 +404,7 @@ impl BlackSwanDetector {
     }
     
     /// Determine market direction from analysis
-    fn determine_direction(&self, evt_result: &EVTAnalysis, iqad_result: &[f64]) -> BlackSwanResult<i8> {
+    fn determine_direction(&self, evt_result: &EVTAnalysis, iqad_result: &[f64]) -> BSResult<i8> {
         // Simple heuristic: negative skew in EVT suggests downward pressure
         let evt_direction = if evt_result.tail_metrics.hill_estimator < 2.0 { -1 } else { 1 };
         
@@ -416,7 +416,7 @@ impl BlackSwanDetector {
     }
     
     /// Calculate severity based on probability and tail characteristics
-    fn calculate_severity(&self, probability: f64, evt_result: &EVTAnalysis) -> BlackSwanResult<f64> {
+    fn calculate_severity(&self, probability: f64, evt_result: &EVTAnalysis) -> BSResult<f64> {
         // Base severity from probability
         let base_severity = probability;
         
@@ -432,7 +432,7 @@ impl BlackSwanDetector {
     }
     
     /// Calculate confidence in the detection
-    fn calculate_confidence(&self, evt_result: &EVTAnalysis, iqad_result: &[f64]) -> BlackSwanResult<f64> {
+    fn calculate_confidence(&self, evt_result: &EVTAnalysis, iqad_result: &[f64]) -> BSResult<f64> {
         // Base confidence from statistical significance
         let base_confidence = 1.0 - evt_result.tail_metrics.p_value;
         
@@ -447,7 +447,7 @@ impl BlackSwanDetector {
     }
     
     /// Detect jump discontinuities in the anomaly signal
-    fn detect_jump_discontinuities(&self, iqad_result: &[f64]) -> BlackSwanResult<f64> {
+    fn detect_jump_discontinuities(&self, iqad_result: &[f64]) -> BSResult<f64> {
         if iqad_result.len() < 2 {
             return Ok(0.0);
         }
@@ -465,7 +465,7 @@ impl BlackSwanDetector {
     }
     
     /// Check and send alerts based on detection results
-    fn check_and_send_alerts(&self, result: &BlackSwanResult) -> BlackSwanResult<()> {
+    fn check_and_send_alerts(&self, result: &BlackSwanResult) -> BSResult<()> {
         let alert_system = self.alert_system.lock().unwrap();
         alert_system.check_and_send(result)
     }
@@ -477,7 +477,7 @@ impl BlackSwanDetector {
     }
     
     /// Reset the detector state
-    pub fn reset(&mut self) -> BlackSwanResult<()> {
+    pub fn reset(&mut self) -> BSResult<()> {
         // Reset all components
         {
             let mut market_data = self.market_data_window.lock().unwrap();
@@ -543,7 +543,7 @@ impl GARCHModel {
         }
     }
     
-    pub fn analyze_clustering(&mut self, returns: &[f64], config: &VolatilityConfig) -> BlackSwanResult<VolatilityClusteringResult> {
+    pub fn analyze_clustering(&mut self, returns: &[f64], config: &VolatilityConfig) -> BSResult<VolatilityClusteringResult> {
         // Simplified GARCH analysis
         let mut volatility_clustering = 0.0;
         let window_size = config.clustering_window;
@@ -575,7 +575,7 @@ impl LiquidityMonitor {
         }
     }
     
-    pub fn analyze(&mut self, prices: &[f64], volumes: &[f64]) -> BlackSwanResult<LiquidityAnalysisResult> {
+    pub fn analyze(&mut self, prices: &[f64], volumes: &[f64]) -> BSResult<LiquidityAnalysisResult> {
         // Simplified liquidity analysis
         let avg_volume = volumes.iter().sum::<f64>() / volumes.len() as f64;
         let volume_volatility = volumes.iter()
@@ -606,7 +606,7 @@ impl CorrelationTracker {
         }
     }
     
-    pub fn analyze(&mut self, returns: &[f64]) -> BlackSwanResult<CorrelationAnalysisResult> {
+    pub fn analyze(&mut self, returns: &[f64]) -> BSResult<CorrelationAnalysisResult> {
         // Simplified correlation analysis
         let breakdown_probability = if returns.len() > self.config.correlation_window {
             let recent_returns = &returns[returns.len() - self.config.correlation_window..];
@@ -637,12 +637,12 @@ impl QuantumStateManager {
         }
     }
     
-    pub fn initialize(&mut self) -> BlackSwanResult<()> {
+    pub fn initialize(&mut self) -> BSResult<()> {
         self.is_initialized = true;
         Ok(())
     }
     
-    pub fn compute_superposition_weights(&self, probabilities: &[f64]) -> BlackSwanResult<Vec<f64>> {
+    pub fn compute_superposition_weights(&self, probabilities: &[f64]) -> BSResult<Vec<f64>> {
         if !self.is_initialized {
             return Err(BlackSwanError::Generic("Quantum state not initialized".to_string()));
         }
@@ -730,7 +730,7 @@ impl AlertSystem {
         }
     }
     
-    pub fn check_and_send(&self, result: &BlackSwanResult) -> BlackSwanResult<()> {
+    pub fn check_and_send(&self, result: &BlackSwanResult) -> BSResult<()> {
         if result.probability < self.config.probability_threshold {
             return Ok(());
         }
@@ -758,7 +758,7 @@ impl AlertSystem {
         self.config.severity_levels.len() - 1
     }
     
-    fn send_alert(&self, result: &BlackSwanResult, severity_level: usize) -> BlackSwanResult<()> {
+    fn send_alert(&self, result: &BlackSwanResult, severity_level: usize) -> BSResult<()> {
         // Placeholder for actual alert implementation
         log::warn!("Black Swan Alert: Probability={:.3}, Severity={}", result.probability, severity_level);
         Ok(())

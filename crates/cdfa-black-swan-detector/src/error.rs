@@ -85,10 +85,21 @@ pub enum BlackSwanError {
     /// External library error
     #[error("External library error: {0}")]
     External(String),
+    
+    /// Integration error
+    #[error("Integration error: {0}")]
+    Integration(String),
+    
+    /// Generic error
+    #[error("Generic error: {0}")]
+    Generic(String),
 }
 
 /// Result type for Black Swan operations
-pub type BlackSwanResult<T> = Result<T, BlackSwanError>;
+pub type BSResult<T> = Result<T, BlackSwanError>;
+
+/// Backward compatibility alias (prefer BSResult to avoid confusion with types::BlackSwanResult)
+pub type BlackSwanOpResult<T> = BSResult<T>;
 
 /// Error context for detailed error reporting
 #[derive(Debug, Clone)]
@@ -190,7 +201,7 @@ pub mod validation {
         min: T,
         max: T,
         name: &str,
-    ) -> BlackSwanResult<()> {
+    ) -> BSResult<()> {
         if value < min || value > max {
             return Err(BlackSwanError::InvalidInput(
                 format!("{} must be between {:?} and {:?}, got {:?}", name, min, max, value)
@@ -204,7 +215,7 @@ pub mod validation {
         collection: &[T],
         min_size: usize,
         name: &str,
-    ) -> BlackSwanResult<()> {
+    ) -> BSResult<()> {
         if collection.len() < min_size {
             return Err(BlackSwanError::InsufficientData {
                 required: min_size,
@@ -215,7 +226,7 @@ pub mod validation {
     }
     
     /// Validate that a value is finite
-    pub fn validate_finite(value: f64, name: &str) -> BlackSwanResult<()> {
+    pub fn validate_finite(value: f64, name: &str) -> BSResult<()> {
         if !value.is_finite() {
             return Err(BlackSwanError::InvalidInput(
                 format!("{} must be finite, got {}", name, value)
@@ -225,7 +236,7 @@ pub mod validation {
     }
     
     /// Validate that a value is positive
-    pub fn validate_positive(value: f64, name: &str) -> BlackSwanResult<()> {
+    pub fn validate_positive(value: f64, name: &str) -> BSResult<()> {
         if value <= 0.0 {
             return Err(BlackSwanError::InvalidInput(
                 format!("{} must be positive, got {}", name, value)
@@ -235,12 +246,12 @@ pub mod validation {
     }
     
     /// Validate that a probability is in [0, 1]
-    pub fn validate_probability(value: f64, name: &str) -> BlackSwanResult<()> {
+    pub fn validate_probability(value: f64, name: &str) -> BSResult<()> {
         validate_range(value, 0.0, 1.0, name)
     }
     
     /// Validate that all values in a slice are finite
-    pub fn validate_all_finite(values: &[f64], name: &str) -> BlackSwanResult<()> {
+    pub fn validate_all_finite(values: &[f64], name: &str) -> BSResult<()> {
         for (i, &value) in values.iter().enumerate() {
             if !value.is_finite() {
                 return Err(BlackSwanError::InvalidInput(
@@ -273,7 +284,7 @@ pub mod performance {
             }
         }
         
-        pub fn check_performance(&self) -> BlackSwanResult<()> {
+        pub fn check_performance(&self) -> BSResult<()> {
             let elapsed_ns = self.start_time.elapsed().as_nanos() as u64;
             if elapsed_ns > self.target_ns {
                 return Err(BlackSwanError::Performance(
@@ -323,7 +334,7 @@ pub mod memory {
             }
         }
         
-        pub fn check_memory(&self) -> BlackSwanResult<()> {
+        pub fn check_memory(&self) -> BSResult<()> {
             let current_usage = get_memory_usage();
             let delta = current_usage.saturating_sub(self.initial_usage);
             
@@ -347,18 +358,18 @@ pub mod memory {
 
 /// Result extensions for chaining operations
 pub trait ResultExt<T> {
-    fn with_operation(self, operation: &str) -> BlackSwanResult<T>;
-    fn with_info<K: Into<String>, V: Into<String>>(self, key: K, value: V) -> BlackSwanResult<T>;
+    fn with_operation(self, operation: &str) -> BSResult<T>;
+    fn with_info<K: Into<String>, V: Into<String>>(self, key: K, value: V) -> BSResult<T>;
 }
 
-impl<T> ResultExt<T> for BlackSwanResult<T> {
-    fn with_operation(self, operation: &str) -> BlackSwanResult<T> {
+impl<T> ResultExt<T> for BSResult<T> {
+    fn with_operation(self, operation: &str) -> BSResult<T> {
         self.map_err(|e| {
             BlackSwanError::External(format!("Failed in {}: {}", operation, e))
         })
     }
     
-    fn with_info<K: Into<String>, V: Into<String>>(self, key: K, value: V) -> BlackSwanResult<T> {
+    fn with_info<K: Into<String>, V: Into<String>>(self, key: K, value: V) -> BSResult<T> {
         self.map_err(|e| {
             BlackSwanError::External(format!("{} ({}={})", e, key.into(), value.into()))
         })
@@ -445,10 +456,10 @@ mod tests {
     
     #[test]
     fn test_result_extensions() {
-        let result: BlackSwanResult<i32> = Ok(42);
+        let result: BSResult<i32> = Ok(42);
         assert!(result.with_operation("test").is_ok());
         
-        let error_result: BlackSwanResult<i32> = Err(BlackSwanError::Configuration("test".to_string()));
+        let error_result: BSResult<i32> = Err(BlackSwanError::Configuration("test".to_string()));
         assert!(error_result.with_operation("test").is_err());
         assert!(error_result.with_info("key", "value").is_err());
     }
