@@ -25,6 +25,7 @@ pub mod entropy;
 pub mod regimes;
 pub mod types;
 pub mod simd;
+pub mod pbit_soc;
 
 #[cfg(feature = "gpu")]
 pub mod gpu;
