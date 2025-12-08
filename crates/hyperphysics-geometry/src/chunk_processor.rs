@@ -29,6 +29,7 @@
 use std::collections::VecDeque;
 
 use crate::hyperbolic_snn::LorentzVec;
+use crate::free_energy::{Precision, PrecisionWeightedError, HierarchicalErrorAggregator};
 
 /// Temporal resolution constants (in seconds)
 pub const SPIKE_RESOLUTION: f64 = 0.001;      // 1ms - spike timing
@@ -200,6 +201,25 @@ pub struct ChunkRepresentation {
     pub complexity: f64,
     /// Confidence in chunk representation (0-1)
     pub confidence: f64,
+    /// Precision (inverse variance) of the representation
+    pub precision: Precision,
+    /// Prediction error from higher level
+    pub prediction_error: Option<ChunkPredictionError>,
+}
+
+/// Prediction error for a chunk (predictive coding)
+#[derive(Debug, Clone)]
+pub struct ChunkPredictionError {
+    /// Spatial prediction error (hyperbolic distance from predicted centroid)
+    pub spatial_error: f64,
+    /// Temporal prediction error (timing deviation)
+    pub temporal_error: f64,
+    /// Activity prediction error
+    pub activity_error: f64,
+    /// Combined precision-weighted error
+    pub weighted_error: f64,
+    /// Precision of the prediction
+    pub precision: Precision,
 }
 
 impl Default for ChunkRepresentation {
@@ -211,7 +231,44 @@ impl Default for ChunkRepresentation {
             activity: 0.0,
             complexity: 0.0,
             confidence: 0.0,
+            precision: 1.0,
+            prediction_error: None,
         }
+    }
+}
+
+impl ChunkPredictionError {
+    /// Create new prediction error
+    pub fn new(
+        spatial_error: f64,
+        temporal_error: f64,
+        activity_error: f64,
+        precision: Precision,
+    ) -> Self {
+        // Combined error: weighted sum with spatial dominating
+        let weighted_error = precision * (
+            0.5 * spatial_error.powi(2) +
+            0.3 * temporal_error.powi(2) +
+            0.2 * activity_error.powi(2)
+        ).sqrt();
+
+        Self {
+            spatial_error,
+            temporal_error,
+            activity_error,
+            weighted_error,
+            precision,
+        }
+    }
+
+    /// Convert to PrecisionWeightedError for hierarchical aggregation
+    pub fn to_precision_weighted(&self, level: usize, source_id: usize) -> PrecisionWeightedError {
+        PrecisionWeightedError::new(
+            self.weighted_error,
+            self.precision,
+            level,
+            source_id,
+        )
     }
 }
 
@@ -268,6 +325,10 @@ pub struct ChunkProcessor {
     prediction_state: PredictionState,
     /// Statistics
     stats: ProcessorStats,
+    /// Hierarchical prediction error aggregator
+    error_aggregator: HierarchicalErrorAggregator,
+    /// Predictions for each level (what we expect next)
+    level_predictions: Vec<Option<ChunkPrediction>>,
 }
 
 /// State for predictive chunking
@@ -281,6 +342,37 @@ pub struct PredictionState {
     duration_history: VecDeque<f64>,
     /// Bayesian prior for chunk duration (mean, variance)
     duration_prior: (f64, f64),
+    /// Total prediction error accumulated
+    total_prediction_error: f64,
+    /// Number of predictions made
+    prediction_count: usize,
+}
+
+/// Prediction for upcoming chunk at a level
+#[derive(Debug, Clone)]
+pub struct ChunkPrediction {
+    /// Predicted centroid position
+    pub centroid: LorentzVec,
+    /// Predicted activity level
+    pub activity: f64,
+    /// Predicted start time
+    pub start_time: f64,
+    /// Predicted duration
+    pub duration: f64,
+    /// Precision of the prediction (higher = more confident)
+    pub precision: Precision,
+}
+
+impl Default for ChunkPrediction {
+    fn default() -> Self {
+        Self {
+            centroid: LorentzVec::origin(),
+            activity: 0.5,
+            start_time: 0.0,
+            duration: CHUNK_RESOLUTION,
+            precision: 1.0,
+        }
+    }
 }
 
 /// Processing statistics
@@ -317,6 +409,8 @@ impl ChunkProcessor {
                 avg_quality_per_level: vec![0.0; num_levels],
                 ..Default::default()
             },
+            error_aggregator: HierarchicalErrorAggregator::new(num_levels),
+            level_predictions: (0..num_levels).map(|_| None).collect(),
         }
     }
 
@@ -455,6 +549,9 @@ impl ChunkProcessor {
         // Compute confidence from spike count and activity
         let confidence = self.compute_confidence(packet);
 
+        // Compute precision as inverse variance of spike positions
+        let precision = self.compute_precision(packet);
+
         ChunkRepresentation {
             centroid: packet.centroid,
             temporal_signature,
@@ -462,6 +559,33 @@ impl ChunkProcessor {
             activity,
             complexity,
             confidence,
+            precision,
+            prediction_error: None, // Set later during prediction comparison
+        }
+    }
+
+    /// Compute precision (inverse variance) from spike distribution
+    fn compute_precision(&self, packet: &SpikePacket) -> Precision {
+        if packet.spikes.len() < 2 {
+            return 1.0; // Default precision for insufficient data
+        }
+
+        // Compute variance of distances from centroid
+        let centroid = packet.centroid;
+        let mut total_sq_dist = 0.0;
+
+        for spike in &packet.spikes {
+            let dist = centroid.hyperbolic_distance(&spike.position);
+            total_sq_dist += dist * dist;
+        }
+
+        let variance = total_sq_dist / packet.spikes.len() as f64;
+
+        // Precision = 1 / variance, with floor to avoid infinities
+        if variance < 1e-10 {
+            100.0 // Maximum precision for tightly clustered spikes
+        } else {
+            (1.0 / variance).min(100.0).max(0.01)
         }
     }
 
@@ -745,6 +869,243 @@ impl ChunkProcessor {
             avg_quality_per_level: vec![0.0; self.config.num_levels],
             ..Default::default()
         };
+        self.error_aggregator.clear();
+        for pred in &mut self.level_predictions {
+            *pred = None;
+        }
+    }
+
+    // ========================================================================
+    // Precision-Weighted Prediction Error Methods
+    // ========================================================================
+
+    /// Compute prediction error for a newly formed chunk
+    ///
+    /// Compares the actual chunk to the prediction at that level,
+    /// producing precision-weighted error signals for hierarchical propagation.
+    pub fn compute_prediction_error(
+        &mut self,
+        level: usize,
+        chunk: &TemporalChunk,
+    ) -> Option<ChunkPredictionError> {
+        // Get prediction for this level
+        let prediction = self.level_predictions[level].as_ref()?;
+
+        // Spatial error: hyperbolic distance from predicted centroid
+        let spatial_error = prediction.centroid.hyperbolic_distance(&chunk.representation.centroid);
+
+        // Temporal error: deviation from predicted timing
+        let actual_start = chunk.start_time;
+        let temporal_error = (actual_start - prediction.start_time).abs() / prediction.duration.max(1e-6);
+
+        // Activity error: deviation from predicted activity
+        let activity_error = (chunk.representation.activity - prediction.activity).abs();
+
+        // Combine into prediction error
+        let error = ChunkPredictionError::new(
+            spatial_error,
+            temporal_error,
+            activity_error,
+            prediction.precision,
+        );
+
+        // Add to error aggregator
+        let pw_error = error.to_precision_weighted(level, self.stats.chunks_per_level[level]);
+        self.error_aggregator.add_error(pw_error);
+
+        // Update prediction state statistics
+        self.prediction_state.total_prediction_error += error.weighted_error;
+        self.prediction_state.prediction_count += 1;
+
+        Some(error)
+    }
+
+    /// Generate prediction for next chunk at a level
+    ///
+    /// Uses completed chunks to predict the next chunk's properties.
+    /// Precision of prediction increases with more consistent history.
+    pub fn generate_prediction(&mut self, level: usize) {
+        let chunks = &self.completed_chunks[level];
+
+        if chunks.is_empty() {
+            // Default prediction: origin with low precision
+            self.level_predictions[level] = Some(ChunkPrediction::default());
+            return;
+        }
+
+        // Use recent chunks to predict next
+        let recent: Vec<&TemporalChunk> = chunks.iter().rev().take(10).collect();
+
+        // Predict centroid: exponentially weighted average
+        let mut pred_x = 0.0_f64;
+        let mut pred_y = 0.0_f64;
+        let mut pred_z = 0.0_f64;
+        let mut total_weight = 0.0_f64;
+        let decay: f64 = 0.8;
+
+        for (i, chunk) in recent.iter().enumerate() {
+            let w = decay.powi(i as i32);
+            pred_x += w * chunk.representation.centroid.x;
+            pred_y += w * chunk.representation.centroid.y;
+            pred_z += w * chunk.representation.centroid.z;
+            total_weight += w;
+        }
+
+        let pred_centroid = if total_weight > 1e-10 {
+            let x = pred_x / total_weight;
+            let y = pred_y / total_weight;
+            let z = pred_z / total_weight;
+            let t = (1.0_f64 + x*x + y*y + z*z).sqrt();
+            LorentzVec::new(t, x, y, z)
+        } else {
+            LorentzVec::origin()
+        };
+
+        // Predict activity: weighted average
+        let pred_activity: f64 = recent.iter()
+            .enumerate()
+            .map(|(i, c)| decay.powi(i as i32) * c.representation.activity)
+            .sum::<f64>() / total_weight.max(1e-10);
+
+        // Predict timing
+        let last_chunk = chunks.last().unwrap();
+        let pred_start = last_chunk.end_time;
+        let pred_duration = self.config.level_windows[level];
+
+        // Compute precision from consistency of recent chunks
+        let precision = self.compute_prediction_precision(&recent);
+
+        self.level_predictions[level] = Some(ChunkPrediction {
+            centroid: pred_centroid,
+            activity: pred_activity,
+            start_time: pred_start,
+            duration: pred_duration,
+            precision,
+        });
+    }
+
+    /// Compute prediction precision from chunk history
+    fn compute_prediction_precision(&self, chunks: &[&TemporalChunk]) -> Precision {
+        if chunks.len() < 2 {
+            return 1.0;
+        }
+
+        // Compute variance of centroids
+        let n = chunks.len() as f64;
+        let mut mean_x = 0.0;
+        let mut mean_y = 0.0;
+        let mut mean_z = 0.0;
+
+        for chunk in chunks {
+            mean_x += chunk.representation.centroid.x;
+            mean_y += chunk.representation.centroid.y;
+            mean_z += chunk.representation.centroid.z;
+        }
+        mean_x /= n;
+        mean_y /= n;
+        mean_z /= n;
+
+        let mut variance = 0.0;
+        for chunk in chunks {
+            let dx = chunk.representation.centroid.x - mean_x;
+            let dy = chunk.representation.centroid.y - mean_y;
+            let dz = chunk.representation.centroid.z - mean_z;
+            variance += dx*dx + dy*dy + dz*dz;
+        }
+        variance /= n;
+
+        // Precision = 1/variance, bounded
+        if variance < 1e-10 {
+            10.0
+        } else {
+            (1.0 / variance).min(10.0).max(0.1)
+        }
+    }
+
+    /// Propagate prediction errors through hierarchy
+    ///
+    /// Bottom-up: aggregate errors from lower levels
+    /// Top-down: adjust predictions based on higher-level context
+    pub fn propagate_errors(&mut self) {
+        self.error_aggregator.propagate();
+    }
+
+    /// Get total prediction error at a level
+    pub fn total_error_at_level(&self, level: usize) -> f64 {
+        self.error_aggregator.total_error_at_level(level)
+    }
+
+    /// Get average precision at a level
+    pub fn average_precision_at_level(&self, level: usize) -> Precision {
+        self.error_aggregator.average_precision_at_level(level)
+    }
+
+    /// Get mean prediction error across all levels
+    pub fn mean_prediction_error(&self) -> f64 {
+        if self.prediction_state.prediction_count == 0 {
+            return 0.0;
+        }
+        self.prediction_state.total_prediction_error / self.prediction_state.prediction_count as f64
+    }
+
+    /// Get prediction for a level
+    pub fn get_prediction(&self, level: usize) -> Option<&ChunkPrediction> {
+        self.level_predictions.get(level).and_then(|p| p.as_ref())
+    }
+
+    /// Get the hierarchical error aggregator
+    pub fn error_aggregator(&self) -> &HierarchicalErrorAggregator {
+        &self.error_aggregator
+    }
+
+    // ========================================================================
+    // Phase 5: Language Creation Integration Methods
+    // ========================================================================
+
+    /// Scale all temporal windows by a factor
+    ///
+    /// Used by acquisition-processing constraint bridge to adjust processing
+    /// windows based on learned construction properties.
+    pub fn scale_windows(&mut self, factor: f64) {
+        for window in self.config.level_windows.iter_mut() {
+            *window *= factor.clamp(0.1, 10.0); // Bounded scaling
+        }
+    }
+
+    /// Drain all completed chunks from all levels
+    ///
+    /// Returns all completed chunks and clears the internal buffers.
+    /// Used for processing-to-acquisition constraint flow.
+    pub fn drain_completed_chunks(&mut self) -> Vec<TemporalChunk> {
+        let mut all_chunks = Vec::new();
+        for level_chunks in &mut self.completed_chunks {
+            all_chunks.extend(level_chunks.drain(..));
+        }
+        all_chunks
+    }
+
+    /// Advance time without processing new spikes
+    ///
+    /// Triggers level processing based on time passage.
+    /// Used when stepping the tri-directional system without new input.
+    pub fn advance_time(&mut self, dt: f64) {
+        self.current_time += dt;
+        self.process_all_levels();
+    }
+
+    /// Get current simulation time
+    pub fn current_time(&self) -> f64 {
+        self.current_time
+    }
+
+    /// Get reference to configuration
+    pub fn config(&self) -> &ChunkProcessorConfig {
+        &self.config
+    }
+
+    /// Get mutable reference to configuration
+    pub fn config_mut(&mut self) -> &mut ChunkProcessorConfig {
+        &mut self.config
     }
 }
 

@@ -739,6 +739,395 @@ impl WeightNormalizer {
 }
 
 // ============================================================================
+// Shapley Value Credit Assignment
+// ============================================================================
+
+/// Shapley value calculator for synapse credit assignment
+///
+/// Uses cooperative game theory to fairly distribute reward/credit
+/// among synapses based on their marginal contributions.
+///
+/// ## Mathematical Foundation
+///
+/// Shapley value for synapse i:
+/// φᵢ = Σₛ⊆N\{i} |S|!(n-|S|-1)!/n! × [v(S∪{i}) - v(S)]
+///
+/// Where v(S) is the value of coalition S (subset of synapses).
+///
+/// ## Approximation
+///
+/// We use Monte Carlo sampling with random permutations to approximate
+/// Shapley values in O(k×n) where k is the number of samples.
+///
+/// ## References
+/// - Shapley (1953) "A value for n-person games"
+/// - Ghorbani & Zou (2019) "Data Shapley" AISTATS
+/// - Rozemberczki et al. (2022) "Shapley-based feature attribution"
+#[derive(Debug, Clone)]
+pub struct ShapleyCreditor {
+    /// Number of Monte Carlo samples for approximation
+    num_samples: usize,
+    /// Shapley values per synapse (pre_id, post_id) -> value
+    shapley_values: HashMap<(u32, u32), f64>,
+    /// Running count of samples per synapse
+    sample_counts: HashMap<(u32, u32), usize>,
+    /// Performance cache for coalition evaluations
+    coalition_cache: HashMap<u64, f64>,
+    /// Decay factor for temporal credit (newer contributions weighted more)
+    temporal_decay: f64,
+    /// Maximum cache size
+    max_cache_size: usize,
+}
+
+impl ShapleyCreditor {
+    /// Create new Shapley creditor
+    pub fn new(num_samples: usize) -> Self {
+        Self {
+            num_samples,
+            shapley_values: HashMap::new(),
+            sample_counts: HashMap::new(),
+            coalition_cache: HashMap::new(),
+            temporal_decay: 0.95,
+            max_cache_size: 10000,
+        }
+    }
+
+    /// Compute Shapley values for a set of synapses given performance function
+    ///
+    /// Uses Monte Carlo approximation with random permutations.
+    ///
+    /// # Arguments
+    /// * `synapses` - List of (pre_id, post_id, weight) tuples
+    /// * `evaluate` - Function that takes synapse subset and returns performance value
+    pub fn compute_shapley<F>(
+        &mut self,
+        synapses: &[(u32, u32, f64)],
+        mut evaluate: F,
+    ) where
+        F: FnMut(&[(u32, u32, f64)]) -> f64,
+    {
+        let n = synapses.len();
+        if n == 0 {
+            return;
+        }
+
+        // Initialize marginal contributions
+        let mut marginals: HashMap<(u32, u32), Vec<f64>> = HashMap::new();
+        for (pre, post, _) in synapses {
+            marginals.insert((*pre, *post), Vec::with_capacity(self.num_samples));
+        }
+
+        // Simple pseudo-random for reproducibility (Fisher-Yates with modular arithmetic)
+        let mut rng_state = (synapses.len() as u64 * 31337) ^ 0xDEADBEEF;
+
+        // Monte Carlo sampling with random permutations
+        for _ in 0..self.num_samples {
+            // Generate random permutation
+            let mut perm: Vec<usize> = (0..n).collect();
+            for i in (1..n).rev() {
+                // LCG random
+                rng_state = rng_state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let j = (rng_state as usize) % (i + 1);
+                perm.swap(i, j);
+            }
+
+            // Compute marginal contributions for this permutation
+            let mut current_coalition: Vec<(u32, u32, f64)> = Vec::new();
+            let mut prev_value = evaluate(&current_coalition);
+
+            for idx in perm {
+                let synapse = synapses[idx];
+                let key = (synapse.0, synapse.1);
+
+                current_coalition.push(synapse);
+                let new_value = evaluate(&current_coalition);
+
+                // Marginal contribution = v(S∪{i}) - v(S)
+                let marginal = new_value - prev_value;
+                marginals.get_mut(&key).unwrap().push(marginal);
+
+                prev_value = new_value;
+            }
+        }
+
+        // Average marginal contributions to get Shapley values
+        for (key, contributions) in marginals {
+            let avg = contributions.iter().sum::<f64>() / contributions.len() as f64;
+
+            // Exponential moving average with existing values
+            let current = self.shapley_values.entry(key).or_insert(0.0);
+            let count = self.sample_counts.entry(key).or_insert(0);
+
+            if *count > 0 {
+                *current = self.temporal_decay * (*current) + (1.0 - self.temporal_decay) * avg;
+            } else {
+                *current = avg;
+            }
+            *count += 1;
+        }
+    }
+
+    /// Fast approximate Shapley for large networks
+    ///
+    /// Uses correlation-based approximation: synapses that fire together
+    /// and correlate with reward get proportional credit.
+    pub fn compute_fast_shapley(
+        &mut self,
+        synapses: &[(u32, u32, f64)],
+        activities: &[(u32, u32, f64)], // (pre, post, activity_level)
+        total_reward: f64,
+    ) {
+        // Compute total weighted activity
+        let total_activity: f64 = activities.iter()
+            .map(|(_, _, act)| act.abs())
+            .sum::<f64>()
+            .max(1e-10);
+
+        // Distribute reward proportionally to activity
+        for (pre, post, activity) in activities {
+            let key = (*pre, *post);
+            let contribution = total_reward * activity.abs() / total_activity;
+
+            // Find corresponding synapse weight for weight-adjusted credit
+            let weight = synapses.iter()
+                .find(|(p, q, _)| p == pre && q == post)
+                .map(|(_, _, w)| *w)
+                .unwrap_or(1.0);
+
+            let credit = contribution * weight;
+
+            let current = self.shapley_values.entry(key).or_insert(0.0);
+            let count = self.sample_counts.entry(key).or_insert(0);
+
+            *current = self.temporal_decay * (*current) + (1.0 - self.temporal_decay) * credit;
+            *count += 1;
+        }
+    }
+
+    /// Get Shapley value for a synapse
+    pub fn get_value(&self, pre_id: u32, post_id: u32) -> f64 {
+        self.shapley_values.get(&(pre_id, post_id)).copied().unwrap_or(0.0)
+    }
+
+    /// Get normalized Shapley values (sum to 1)
+    pub fn get_normalized_values(&self) -> HashMap<(u32, u32), f64> {
+        let total: f64 = self.shapley_values.values().map(|v| v.abs()).sum::<f64>().max(1e-10);
+        self.shapley_values.iter()
+            .map(|(k, v)| (*k, v / total))
+            .collect()
+    }
+
+    /// Scale STDP weight updates by Shapley values
+    ///
+    /// Synapses with higher Shapley values (more contribution) get amplified updates.
+    /// Synapses with low/negative Shapley values get attenuated/reversed updates.
+    pub fn scale_updates(&self, updates: &mut [((u32, u32), f64)]) {
+        // Compute statistics for scaling
+        let values: Vec<f64> = self.shapley_values.values().copied().collect();
+        if values.is_empty() {
+            return;
+        }
+
+        let mean = values.iter().sum::<f64>() / values.len() as f64;
+        let variance = values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / values.len() as f64;
+        let std = variance.sqrt().max(1e-10);
+
+        for ((pre, post), delta_w) in updates.iter_mut() {
+            let shapley = self.get_value(*pre, *post);
+
+            // Z-score normalization: synapses with high contribution get boosted
+            let z_score = (shapley - mean) / std;
+
+            // Scaling factor: sigmoid of z-score, centered at 1.0
+            // High z-score (>0) -> scale > 1 (amplify)
+            // Low z-score (<0) -> scale < 1 (attenuate)
+            let scale = 2.0 / (1.0 + (-z_score).exp());
+
+            *delta_w *= scale;
+        }
+    }
+
+    /// Clear all stored values
+    pub fn clear(&mut self) {
+        self.shapley_values.clear();
+        self.sample_counts.clear();
+        self.coalition_cache.clear();
+    }
+
+    /// Get statistics
+    pub fn stats(&self) -> ShapleyStats {
+        let values: Vec<f64> = self.shapley_values.values().copied().collect();
+        let n = values.len();
+
+        if n == 0 {
+            return ShapleyStats::default();
+        }
+
+        let sum: f64 = values.iter().sum();
+        let mean = sum / n as f64;
+        let variance = values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n as f64;
+
+        let positive = values.iter().filter(|&&v| v > 0.0).count();
+        let negative = values.iter().filter(|&&v| v < 0.0).count();
+
+        ShapleyStats {
+            num_synapses: n,
+            mean_value: mean,
+            std_value: variance.sqrt(),
+            positive_contributors: positive,
+            negative_contributors: negative,
+            total_value: sum,
+        }
+    }
+}
+
+/// Statistics for Shapley value distribution
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ShapleyStats {
+    /// Number of synapses with computed values
+    pub num_synapses: usize,
+    /// Mean Shapley value
+    pub mean_value: f64,
+    /// Standard deviation of Shapley values
+    pub std_value: f64,
+    /// Number of synapses with positive contribution
+    pub positive_contributors: usize,
+    /// Number of synapses with negative contribution
+    pub negative_contributors: usize,
+    /// Total sum of Shapley values
+    pub total_value: f64,
+}
+
+/// STDP learner with Shapley-based credit assignment
+#[derive(Debug, Clone)]
+pub struct ShapleySTDP {
+    /// Base STDP learner
+    stdp: STDPLearner,
+    /// Shapley value calculator
+    shapley: ShapleyCreditor,
+    /// Whether to use Shapley scaling for weight updates
+    use_shapley_scaling: bool,
+    /// Recent spike activities for fast Shapley
+    recent_activities: HashMap<(u32, u32), f64>,
+    /// Activity decay rate
+    activity_decay: f64,
+}
+
+impl ShapleySTDP {
+    /// Create new Shapley-modulated STDP learner
+    pub fn new(config: STDPConfig, shapley_samples: usize) -> Self {
+        Self {
+            stdp: STDPLearner::new(config),
+            shapley: ShapleyCreditor::new(shapley_samples),
+            use_shapley_scaling: true,
+            recent_activities: HashMap::new(),
+            activity_decay: 0.9,
+        }
+    }
+
+    /// Record spike and track activity
+    pub fn record_spike(&mut self, neuron_id: u32, time: f64) {
+        self.stdp.record_spike(neuron_id, time);
+    }
+
+    /// Process spike pair with activity tracking
+    pub fn process_spike_pair(
+        &mut self,
+        pre_id: u32,
+        post_id: u32,
+        pre_time: f64,
+        post_time: f64,
+        current_weight: f64,
+        hyperbolic_distance: f64,
+    ) -> f64 {
+        // Track synapse activity
+        let key = (pre_id, post_id);
+        let activity = self.recent_activities.entry(key).or_insert(0.0);
+        *activity = self.activity_decay * (*activity) + (1.0 - self.activity_decay);
+
+        // Standard STDP processing
+        self.stdp.process_spike_pair(
+            pre_id, post_id, pre_time, post_time, current_weight, hyperbolic_distance
+        )
+    }
+
+    /// Update Shapley values after receiving reward signal
+    pub fn update_shapley_with_reward(
+        &mut self,
+        synapses: &[(u32, u32, f64)],
+        reward: f64,
+    ) {
+        // Collect activities for synapses
+        let activities: Vec<_> = synapses.iter()
+            .map(|(pre, post, _)| {
+                let act = self.recent_activities.get(&(*pre, *post)).copied().unwrap_or(0.0);
+                (*pre, *post, act)
+            })
+            .collect();
+
+        // Fast Shapley approximation
+        self.shapley.compute_fast_shapley(synapses, &activities, reward);
+
+        // Decay all activities
+        for activity in self.recent_activities.values_mut() {
+            *activity *= self.activity_decay;
+        }
+    }
+
+    /// Apply Shapley-scaled modulation
+    pub fn apply_shapley_modulation(&mut self, current_time: f64) -> Vec<((u32, u32), f64)> {
+        // Get base updates from three-factor learning
+        let mut updates = self.stdp.apply_modulation(current_time);
+
+        // Scale by Shapley values
+        if self.use_shapley_scaling {
+            self.shapley.scale_updates(&mut updates);
+        }
+
+        updates
+    }
+
+    /// Flush updates with Shapley scaling
+    pub fn flush_updates(&mut self) -> Vec<((u32, u32), f64)> {
+        let mut updates = self.stdp.flush_updates();
+
+        if self.use_shapley_scaling {
+            self.shapley.scale_updates(&mut updates);
+        }
+
+        updates
+    }
+
+    /// Get Shapley value for a synapse
+    pub fn get_shapley_value(&self, pre_id: u32, post_id: u32) -> f64 {
+        self.shapley.get_value(pre_id, post_id)
+    }
+
+    /// Get Shapley statistics
+    pub fn shapley_stats(&self) -> ShapleyStats {
+        self.shapley.stats()
+    }
+
+    /// Get STDP statistics
+    pub fn stdp_stats(&self) -> &STDPStats {
+        self.stdp.stats()
+    }
+
+    /// Enable/disable Shapley scaling
+    pub fn set_shapley_scaling(&mut self, enabled: bool) {
+        self.use_shapley_scaling = enabled;
+    }
+
+    /// Reset all state
+    pub fn reset(&mut self) {
+        self.stdp.reset();
+        self.shapley.clear();
+        self.recent_activities.clear();
+    }
+}
+
+// ============================================================================
 // Integrated Chunk-Aware STDP
 // ============================================================================
 
@@ -985,5 +1374,98 @@ mod tests {
 
         // Should have weight update
         assert!(!updates.is_empty() || learner.eligibility.active_count() > 0);
+    }
+
+    #[test]
+    fn test_shapley_creditor_basic() {
+        let mut creditor = ShapleyCreditor::new(10);
+
+        // Simple evaluation function: sum of weights
+        let synapses = vec![(0, 1, 0.5), (0, 2, 0.3), (1, 2, 0.2)];
+
+        creditor.compute_shapley(&synapses, |coalition| {
+            coalition.iter().map(|(_, _, w)| w).sum()
+        });
+
+        // Each synapse should have a Shapley value approximately equal to its weight
+        let v01 = creditor.get_value(0, 1);
+        let v02 = creditor.get_value(0, 2);
+        let v12 = creditor.get_value(1, 2);
+
+        // Values should be positive and sum to total
+        assert!(v01 > 0.0);
+        assert!(v02 > 0.0);
+        assert!(v12 > 0.0);
+
+        let total = v01 + v02 + v12;
+        let expected_total = 0.5 + 0.3 + 0.2;
+        assert!((total - expected_total).abs() < 0.1, "Total Shapley {} vs expected {}", total, expected_total);
+    }
+
+    #[test]
+    fn test_shapley_fast_approximation() {
+        let mut creditor = ShapleyCreditor::new(10);
+
+        let synapses = vec![(0, 1, 0.5), (0, 2, 0.5)];
+        let activities = vec![(0, 1, 1.0), (0, 2, 0.5)];
+        let reward = 1.0;
+
+        creditor.compute_fast_shapley(&synapses, &activities, reward);
+
+        // Synapse (0,1) has higher activity, should get more credit
+        let v01 = creditor.get_value(0, 1);
+        let v02 = creditor.get_value(0, 2);
+
+        assert!(v01 > v02, "Higher activity synapse should get more credit: {} vs {}", v01, v02);
+    }
+
+    #[test]
+    fn test_shapley_scaling() {
+        let mut creditor = ShapleyCreditor::new(10);
+
+        // Set up Shapley values manually
+        creditor.shapley_values.insert((0, 1), 1.0);  // High contributor
+        creditor.shapley_values.insert((0, 2), -0.5); // Low contributor
+
+        let mut updates = vec![((0, 1), 0.1), ((0, 2), 0.1)];
+        creditor.scale_updates(&mut updates);
+
+        // High contributor should have amplified update
+        // Low contributor should have attenuated update
+        assert!(updates[0].1 > 0.1, "High Shapley should amplify update");
+        assert!(updates[1].1 < 0.1, "Low Shapley should attenuate update");
+    }
+
+    #[test]
+    fn test_shapley_stdp_integration() {
+        let config = STDPConfig::default();
+        let mut shapley_stdp = ShapleySTDP::new(config, 10);
+
+        // Process some spike pairs
+        shapley_stdp.process_spike_pair(0, 1, 0.0, 10.0, 0.5, 1.0);
+        shapley_stdp.process_spike_pair(0, 2, 0.0, 15.0, 0.5, 1.0);
+
+        // Update Shapley values with reward
+        let synapses = vec![(0, 1, 0.5), (0, 2, 0.5)];
+        shapley_stdp.update_shapley_with_reward(&synapses, 1.0);
+
+        // Should have Shapley values
+        let stats = shapley_stdp.shapley_stats();
+        assert!(stats.num_synapses > 0);
+    }
+
+    #[test]
+    fn test_shapley_stats() {
+        let mut creditor = ShapleyCreditor::new(10);
+
+        creditor.shapley_values.insert((0, 1), 0.5);
+        creditor.shapley_values.insert((0, 2), 0.3);
+        creditor.shapley_values.insert((1, 2), -0.1);
+
+        let stats = creditor.stats();
+        assert_eq!(stats.num_synapses, 3);
+        assert_eq!(stats.positive_contributors, 2);
+        assert_eq!(stats.negative_contributors, 1);
+        assert!((stats.total_value - 0.7).abs() < 0.01);
     }
 }

@@ -43,10 +43,10 @@ impl ImmuneQuantumAnomalyDetector {
         let hw_caps = hardware::detect_hardware();
         info!("Hardware capabilities: {:?}", hw_caps);
         
-        // Create quantum backend
+        // Create quantum backend (seed from shots for reproducibility)
         let quantum_backend = QuantumBackend::new(
             config.quantum_dimension,
-            config.quantum_shots,
+            config.quantum_shots.map(|s| s as u64),
         )?;
         
         // Create quantum circuits
@@ -304,15 +304,8 @@ impl ImmuneQuantumAnomalyDetector {
             return Ok(cached[0]);
         }
         
-        // Build quantum circuit
-        let circuit = self.quantum_circuits.build_affinity_circuit(pattern, detector)?;
-        
-        // Execute circuit
-        let mut backend = self.quantum_backend.lock().await;
-        let measurements = backend.execute(&circuit)?;
-        
-        // Calculate affinity from measurements
-        let affinity = measurements.iter().sum::<f64>() / measurements.len() as f64;
+        // Calculate quantum affinity directly (no-roqoqo version computes inline)
+        let affinity = self.quantum_circuits.build_affinity_circuit(pattern, detector)?;
         
         // Cache result
         self.cache.insert(cache_key, vec![affinity]).await;

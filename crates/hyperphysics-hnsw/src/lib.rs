@@ -84,7 +84,7 @@ pub mod gpu;
 // Public Re-exports
 // ============================================================================
 
-pub use metric::{DistanceMetric, HyperbolicMetric, EuclideanMetric, CosineMetric};
+pub use metric::{DistanceMetric, HyperbolicMetric, EuclideanMetric, CosineMetric, LorentzMetric, InnerProductMetric};
 pub use index::{HotIndex, SearchResult, InsertResult};
 pub use config::IndexConfig;
 pub use error::{HnswError, Result};

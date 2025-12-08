@@ -1,0 +1,123 @@
+[package]
+
+name = "cdfa-examples"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Examples and benchmarks for Cross-Domain Feature Alignment"
+repository = "https://github.com/tengri/ats-cp-trader"
+license = "MIT OR Apache-2.0"
+keywords = ["cdfa", "examples", "benchmarks", "demo", "tutorial"]
+categories = ["algorithms", "development-tools::testing"]
+publish = false
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# All CDFA crates with full features
+cdfa-core = { path = "../cdfa-core", features = ["serde", "parallel"] }
+cdfa-algorithms = { path = "../cdfa-algorithms", features = ["parallel", "optimized"] }
+cdfa-simd = { path = "../cdfa-simd", features = ["runtime-detection"] }
+cdfa-parallel = { path = "../cdfa-parallel", features = ["gpu", "simd", "metrics"] }
+cdfa-ml = { path = "../cdfa-ml", features = ["neural", "classical", "gpu"] }
+cdfa-ffi = { path = "../cdfa-ffi", features = ["c-api", "python"] }
+
+# Core dependencies
+ndarray = { workspace = true }
+nalgebra = { workspace = true }
+num-traits = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Async runtime
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+
+# Parallel processing
+rayon = { workspace = true }
+
+# Random number generation
+rand = { workspace = true }
+rand_distr = { workspace = true }
+
+# Logging and profiling
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+metrics = { workspace = true }
+prometheus = { workspace = true }
+
+# CLI and configuration
+clap = { workspace = true }
+config = { workspace = true }
+toml = { workspace = true }
+
+# Visualization (optional)
+plotters = { version = "0.3", optional = true }
+
+# Time measurement
+chrono = { workspace = true }
+criterion = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+approx = { workspace = true }
+tempfile = { workspace = true }
+
+[features]
+default = ["visualization"]
+visualization = ["plotters"]
+all-examples = []
+
+[[example]]
+name = "basic_cdfa"
+path = "examples/basic_cdfa.rs"
+
+[[example]]
+name = "streaming_cdfa"
+path = "examples/streaming_cdfa.rs"
+
+[[example]]
+name = "parallel_processing"
+path = "examples/parallel_processing.rs"
+
+[[example]]
+name = "simd_optimization"
+path = "examples/simd_optimization.rs"
+
+[[example]]
+name = "ml_integration"
+path = "examples/ml_integration.rs"
+
+[[example]]
+name = "ffi_usage"
+path = "examples/ffi_usage.rs"
+
+[[example]]
+name = "performance_comparison"
+path = "examples/performance_comparison.rs"
+
+[[bench]]
+name = "comprehensive_benchmarks"
+harness = false
+
+[[bench]]
+name = "simd_vs_scalar"
+harness = false
+
+[[bench]]
+name = "parallel_scaling"
+harness = false
+
+[[bench]]
+name = "ml_performance"
+harness = false
+
+# Binary for running all examples
+[[bin]]
+name = "cdfa-demo"
+path = "src/main.rs"

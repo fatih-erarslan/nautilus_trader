@@ -1,0 +1,147 @@
+[package]
+name = "pads-assembly"
+version = "0.1.0"
+edition = "2021"
+authors = ["NautilusTrader Team"]
+description = "Panarchy Adaptive Decision System (PADS) - Central Assembly for 12 Quantum Agents"
+license = "MIT"
+
+[lib]
+name = "pads_assembly"
+crate-type = ["cdylib", "rlib"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Quantum Computing Integration
+quantum-bridge = { path = "../quantum-bridge" }
+
+# Mathematical Foundations
+nalgebra = { workspace = true }  # Using workspace version - removed non-existent simd and sparse features
+ndarray = { workspace = true }  # Using workspace version
+num-complex = "0.4"
+
+# Async and Concurrency
+tokio = { version = "1.35", features = ["full", "tracing", "rt-multi-thread"] }
+async-trait = "0.1"
+futures = "0.3"
+tokio-stream = "0.1"
+
+# High-Performance Data Structures
+dashmap = "5.5"
+crossbeam = { version = "0.8", features = ["std"] }
+parking_lot = "0.12"
+lockfree = "0.5"
+
+# Agent Coordination
+rayon = { workspace = true }
+flume = "0.11"
+kanal = "0.1"
+
+# Mathematical Computing
+approx = "0.5"
+statrs = { workspace = true }
+smartcore = { workspace = true }
+
+# Panarchy and Complex Systems
+petgraph = "0.6"
+rand = { workspace = true }  # removed simd_support feature to avoid packed_simd_2 compilation errors
+rand_distr = "0.4"
+
+# Serialization and Configuration
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Error Handling and Logging
+anyhow = "1.0"
+thiserror = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Performance and Optimization
+criterion = { version = "0.5", optional = true }
+dhat = { version = "0.3", optional = true }
+
+# SIMD and Low-Level Optimization
+bytemuck = { version = "1.14", features = ["derive"] }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tokio-test = "0.4"
+
+[[bench]]
+name = "pads_performance"
+harness = false
+required-features = ["criterion"]
+
+[[bench]]
+name = "agent_coordination"
+harness = false
+required-features = ["criterion"]
+
+[features]
+default = ["all-quantum-agents", "panarchy-full"]
+
+# Quantum Agent Features
+all-quantum-agents = [
+    "quantum-agentic-reasoning",
+    "quantum-biological-intuition", 
+    "quantum-bdia",
+    "quantum-annealing-regression",
+    "qerc",
+    "iqad", 
+    "nqo",
+    "quantum-lmsr",
+    "quantum-prospect-theory",
+    "quantum-hedge",
+    "quantum-lstm",
+    "quantum-whale-defense"
+]
+
+# Individual Quantum Agents
+quantum-agentic-reasoning = []
+quantum-biological-intuition = []
+quantum-bdia = []
+quantum-annealing-regression = []
+qerc = []
+iqad = []
+nqo = []
+quantum-lmsr = []
+quantum-prospect-theory = []
+quantum-hedge = []
+quantum-lstm = []
+quantum-whale-defense = []
+
+# Panarchy Features
+panarchy-full = ["adaptive-cycles", "cross-scale-interactions", "resilience-mechanisms"]
+adaptive-cycles = []
+cross-scale-interactions = []
+resilience-mechanisms = []
+
+# Performance Features
+simd-optimized = []
+zero-copy = []
+lock-free = []
+
+# Development Features
+profiling = ["criterion", "dhat"]
+debug-coordination = []
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+
+[profile.bench]
+opt-level = 3
+lto = true
+codegen-units = 1
+debug = true
+
+[package.metadata.docs.rs]
+features = ["all-quantum-agents", "panarchy-full", "profiling"]

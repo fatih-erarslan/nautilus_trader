@@ -34,3 +34,7 @@ pollster = { version = "0.3", optional = true }
 [dev-dependencies]
 criterion.workspace = true
 proptest.workspace = true
+
+[[bench]]
+name = "geometry_benchmarks"
+harness = false

@@ -1,0 +1,60 @@
+[package]
+
+name = "cdfa-advanced-detectors"
+version = "0.1.0"
+edition = "2021"
+description = "Advanced market pattern detectors with sub-microsecond performance"
+license = "MIT"
+repository = "https://github.com/cdfa-rs/cdfa-advanced-detectors"
+keywords = ["trading", "finance", "patterns", "accumulation", "distribution"]
+categories = ["algorithms", "mathematics", "science"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core dependencies
+serde = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+num-traits = { workspace = true }
+
+# Performance optimization
+wide = { workspace = true, optional = true }
+rayon = { workspace = true, optional = true }
+ndarray = { workspace = true, features = ["rayon"] }
+
+# Mathematical operations
+approx = { workspace = true }
+statrs = { workspace = true }
+once_cell = { workspace = true }
+
+# Networking and clustering
+petgraph = { workspace = true, optional = true }
+
+# Time series analysis
+ta = { version = "0.5", optional = true }
+
+# Serialization
+bincode = { version = "1.3", optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true, features = ["html_reports"] }
+proptest = { workspace = true }
+rand = { workspace = true }
+
+[features]
+default = ["simd", "parallel", "clustering"]
+simd = ["dep:wide"]
+parallel = ["dep:rayon"]
+clustering = ["dep:petgraph"]
+technical-analysis = ["dep:ta"]
+serialization = ["dep:bincode"]
+
+# Performance profiles
+full-performance = ["simd", "parallel", "clustering", "technical-analysis"]
+minimal = []
+
+[lib]
+name = "cdfa_advanced_detectors"
+crate-type = ["cdylib", "rlib"]

@@ -1,0 +1,96 @@
+[package]
+
+name = "cdfa-ml"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Machine learning integrations for Cross-Domain Feature Alignment"
+repository.workspace = true
+keywords = ["cdfa", "machine-learning", "neural-networks", "deep-learning", "candle"]
+categories = ["algorithms", "science", "mathematics"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core CDFA dependencies
+cdfa-core = { path = "../cdfa-core" }
+cdfa-algorithms = { path = "../cdfa-algorithms" }
+cdfa-parallel = { path = "../cdfa-parallel", features = ["gpu"] }
+
+# Core dependencies
+ndarray = { workspace = true }
+nalgebra = { workspace = true }
+num-traits = { workspace = true }
+num-complex = { workspace = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Machine learning frameworks
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+linfa = { workspace = true }
+linfa-linear = { workspace = true }
+smartcore = { workspace = true }
+
+# Statistics and mathematical operations
+statrs = { workspace = true }
+rustfft = { workspace = true }
+approx = { workspace = true }
+
+# Parallel processing
+rayon = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+
+# Random number generation
+rand = { workspace = true }
+rand_distr = { workspace = true }
+
+# Memory optimization
+parking_lot = { workspace = true }
+smallvec = { workspace = true }
+ahash = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+# Python interop (optional)
+pyo3 = { version = "0.25.1", optional = true }
+numpy = { version = "0.25", optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+proptest = { workspace = true }
+pretty_assertions = { workspace = true }
+approx = { workspace = true }
+tempfile = { workspace = true }
+tokio-test = { workspace = true }
+
+[features]
+default = ["neural", "classical"]
+neural = []
+classical = []
+python = ["pyo3", "numpy"]
+gpu = []
+serde = ["dep:serde", "dep:serde_json", "cdfa-core/serde", "cdfa-algorithms/serde"]
+
+[lib]
+name = "cdfa_ml"
+path = "src/lib.rs"
+
+[[bench]]
+name = "ml_benchmarks"
+harness = false
+
+[[example]]
+name = "neural_cdfa"
+path = "examples/neural_cdfa.rs"
+
+[[example]]
+name = "classical_ml"
+path = "examples/classical_ml.rs"

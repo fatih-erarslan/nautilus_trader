@@ -12,6 +12,9 @@ categories = ["science", "algorithms", "mathematics"]
 name = "iqad"
 path = "src/main.rs"
 
+# Standalone crate
+[workspace]
+
 [dependencies]
 # pBit-based quantum computing (primary)
 quantum-core = { path = "../quantum-core" }

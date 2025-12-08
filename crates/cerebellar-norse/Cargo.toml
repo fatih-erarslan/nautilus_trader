@@ -1,0 +1,129 @@
+[package]
+name = "cerebellar-norse"
+version = "0.1.0"
+edition = "2021"
+authors = ["Claude Code Swarm <noreply@anthropic.com>"]
+description = "High-performance Rust implementation of CERFLANN Norse cerebellar SNN"
+license = "MIT"
+keywords = ["neural-networks", "spiking", "cerebellar", "norse", "rust"]
+categories = ["science", "algorithms"]
+
+[lib]
+name = "cerebellar_norse"
+crate-type = ["lib", "cdylib"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core tensor operations - Pure Rust SNN implementation
+nalgebra.workspace = true
+ndarray.workspace = true
+ndarray-linalg = { version = "0.16", features = ["openblas-static"] }
+
+# Pure Rust ML framework for ultra-low latency
+candle-core.workspace = true
+candle-nn.workspace = true
+
+# Removed PyTorch bindings for sub-microsecond latency
+# tch = "0.13" # Replaced with candle for pure Rust implementation
+
+# High-performance computing
+rayon = { workspace = true, optional = true }
+num_cpus.workspace = true
+wide.workspace = true
+
+# Complex numbers and special functions
+num-complex.workspace = true
+special = "0.10"
+
+# Probability and statistics
+rand.workspace = true
+rand_distr.workspace = true
+statrs.workspace = true
+
+# Serialization and I/O
+serde.workspace = true
+serde_json.workspace = true
+bincode.workspace = true
+
+# Error handling and logging
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Observability and monitoring
+prometheus = { workspace = true, optional = true }
+metrics = { workspace = true, optional = true }
+metrics-exporter-prometheus = { workspace = true, optional = true }
+opentelemetry = { version = "0.21", optional = true }
+opentelemetry-jaeger = { version = "0.20", optional = true }
+opentelemetry-otlp = { version = "0.14", optional = true }
+tracing-opentelemetry = { version = "0.22", optional = true }
+tracing-appender = { version = "0.2", optional = true }
+elasticsearch = { version = "8.18.0-alpha.1", optional = true }
+sysinfo = { version = "0.30", optional = true }
+psutil = { version = "3.2", optional = true }
+
+# Async and parallel processing
+tokio.workspace = true
+futures.workspace = true
+
+# HTTP server for metrics export
+warp = "0.3"
+hyper = "0.14"
+
+# Utilities
+itertools.workspace = true
+approx.workspace = true
+once_cell.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+ordered-float = "4.2"
+
+# Security dependencies
+aes-gcm = "0.10"
+sha2 = "0.10"
+hex.workspace = true
+regex.workspace = true
+
+# Quantum-hive integration (removed to prevent circular dependency)
+# quantum-hive = { path = "../quantum-hive" }
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true
+rstest.workspace = true
+test-case = "3.0"
+mockall = "0.11"
+serial_test = "2.0"
+tempfile.workspace = true
+
+[features]
+default = ["simd", "lightning-gpu", "parallel", "observability"]
+simd = []
+lightning-gpu = []
+parallel = ["rayon"]
+quantum = []
+observability = ["prometheus", "metrics", "metrics-exporter-prometheus", "opentelemetry", "opentelemetry-jaeger", "opentelemetry-otlp", "tracing-opentelemetry", "tracing-appender", "elasticsearch", "sysinfo", "psutil"]
+
+# Optimization profiles
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+opt-level = 3
+debug = true
+
+[profile.test]
+opt-level = 1
+debug = true
+
+# Benchmarks would be added here when implemented
+# [[bench]]
+# name = "neuron_benchmarks"
+# harness = false

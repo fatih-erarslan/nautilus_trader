@@ -22,8 +22,12 @@ pub mod cache;
 pub mod error;
 pub mod types;
 
-// Legacy support
+// Quantum circuits - use pBit version by default, roqoqo if feature enabled
 #[cfg(feature = "roqoqo")]
+pub mod quantum_circuits;
+
+#[cfg(not(feature = "roqoqo"))]
+#[path = "quantum_circuits_no_roqoqo.rs"]
 pub mod quantum_circuits;
 
 // Re-exports

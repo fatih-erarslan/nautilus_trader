@@ -57,6 +57,11 @@ pub mod ringbuf;
 pub mod error;
 pub mod scalable_pbit;
 
+/// ChunkProcessor bridge for temporal spike hierarchy (requires `geometry` feature)
+#[cfg(feature = "geometry")]
+#[cfg_attr(docsrs, doc(cfg(feature = "geometry")))]
+pub mod chunk_bridge;
+
 // ============================================================================
 // Ecosystem Integration Modules
 // ============================================================================
@@ -133,4 +138,9 @@ pub mod prelude {
 
     #[cfg(feature = "gpu")]
     pub use hyperphysics_gpu_unified::GpuOrchestrator;
+
+    #[cfg(feature = "geometry")]
+    pub use crate::chunk_bridge::{
+        ChunkProcessorBridge, ChunkBridgeConfig, TimescaleMapper, BridgeStats,
+    };
 }

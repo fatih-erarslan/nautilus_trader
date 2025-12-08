@@ -2,9 +2,30 @@
 //!
 //! Defines how neural activity is translated to muscle forces and
 //! how body state feeds back into the neural network.
+//!
+//! ## STDP Integration
+//!
+//! This module now integrates with `hyperphysics-stdp` for spike-timing-dependent
+//! plasticity in sensorimotor loops. STDP enables:
+//!
+//! - **Sensory-Motor Learning**: Strengthen connections when motor outputs match
+//!   predicted sensory consequences (forward model learning)
+//! - **Proprioceptive Calibration**: Adapt neural-body mapping based on
+//!   body state feedback timing
+//! - **Three-Factor Learning**: Modulate plasticity with reward/neuromodulator signals
+//!
+//! ## References
+//! - Wolpert & Kawato (1998) "Multiple paired forward and inverse models"
+//! - Dayan & Abbott (2001) "Theoretical Neuroscience" Ch. 8
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+
+use hyperphysics_stdp::{
+    ClassicalStdp, ClassicalStdpParams, TripletStdp, TripletStdpParams,
+    RewardModulatedStdp, RewardModulatedParams, RewardSignal,
+    PlasticityController, PlasticityRule, WeightBounds, WeightUpdate,
+};
 
 /// Coupling configuration
 #[derive(Debug, Clone)]
@@ -31,6 +52,16 @@ pub struct CouplingConfig {
 
     /// Proprioceptive delay (ms)
     pub proprioceptive_delay: f32,
+
+    /// Classical STDP parameters for sensorimotor plasticity
+    #[cfg_attr(feature = "serde", serde(skip))]
+    pub stdp_params: Option<ClassicalStdpParams>,
+
+    /// Enable STDP-based sensorimotor learning
+    pub stdp_enabled: bool,
+
+    /// Reward signal gain for three-factor learning
+    pub reward_gain: f32,
 }
 
 impl Default for CouplingConfig {
@@ -43,6 +74,9 @@ impl Default for CouplingConfig {
             proprioception_enabled: true,
             activation_tau: 20.0,
             proprioceptive_delay: 5.0,
+            stdp_params: None,
+            stdp_enabled: false,
+            reward_gain: 1.0,
         }
     }
 }
@@ -58,6 +92,9 @@ impl CouplingConfig {
             proprioception_enabled: true,
             activation_tau: 15.0,
             proprioceptive_delay: 3.0,
+            stdp_params: None,
+            stdp_enabled: false,
+            reward_gain: 1.0,
         }
     }
 
@@ -71,6 +108,9 @@ impl CouplingConfig {
             proprioception_enabled: false,
             activation_tau: 20.0,
             proprioceptive_delay: 0.0,
+            stdp_params: None,
+            stdp_enabled: false,
+            reward_gain: 0.0,
         }
     }
 
@@ -84,7 +124,153 @@ impl CouplingConfig {
             proprioception_enabled: true,
             activation_tau: 10.0,
             proprioceptive_delay: 2.0,
+            stdp_params: None,
+            stdp_enabled: false,
+            reward_gain: 1.0,
         }
+    }
+
+    /// Configuration with STDP-based sensorimotor learning
+    ///
+    /// Enables spike-timing-dependent plasticity for:
+    /// - Forward model learning (sensory prediction from motor commands)
+    /// - Inverse model learning (motor commands from desired sensory states)
+    /// - Proprioceptive calibration
+    pub fn with_stdp_learning() -> Self {
+        let stdp_params = ClassicalStdpParams {
+            tau_plus: 20.0,   // LTP time constant (ms)
+            tau_minus: 20.0,  // LTD time constant (ms)
+            a_plus: 0.01,     // LTP amplitude
+            a_minus: 0.012,   // LTD amplitude (slightly stronger for stability)
+            ..Default::default()
+        };
+
+        Self {
+            mode: CouplingMode::Bidirectional,
+            time_ratio: 20,
+            force_scale: 1.0,
+            proprioceptive_gain: 1.5,
+            proprioception_enabled: true,
+            activation_tau: 15.0,
+            proprioceptive_delay: 5.0,
+            stdp_params: Some(stdp_params),
+            stdp_enabled: true,
+            reward_gain: 1.0,
+        }
+    }
+
+    /// Enable STDP with custom configuration
+    pub fn with_stdp_params(mut self, params: ClassicalStdpParams) -> Self {
+        self.stdp_params = Some(params);
+        self.stdp_enabled = true;
+        self
+    }
+
+    /// Set reward gain for three-factor learning
+    pub fn with_reward_gain(mut self, gain: f32) -> Self {
+        self.reward_gain = gain;
+        self
+    }
+}
+
+/// Sensorimotor STDP coordinator
+///
+/// Manages spike-timing-dependent plasticity between motor commands
+/// and sensory feedback for closed-loop sensorimotor learning.
+///
+/// Uses the hyperphysics-stdp crate's reward-modulated STDP for
+/// three-factor learning in sensorimotor loops.
+pub struct SensorimotorSTDP {
+    /// Plasticity controller with reward-modulated STDP
+    controller: PlasticityController,
+    /// Number of motor neurons
+    num_motor: usize,
+    /// Number of sensory neurons
+    num_sensory: usize,
+    /// Current reward/neuromodulator signal
+    reward_signal: f32,
+    /// Weights for motor-sensory connections
+    weights: Vec<f32>,
+}
+
+impl SensorimotorSTDP {
+    /// Create new sensorimotor STDP coordinator
+    pub fn new(params: ClassicalStdpParams, num_motor: usize, num_sensory: usize) -> Self {
+        let num_synapses = num_motor * num_sensory;
+        let mut controller = PlasticityController::new();
+
+        // Add classical STDP rule
+        controller.add_rule(Box::new(ClassicalStdp::new(num_synapses, params)));
+
+        Self {
+            controller,
+            num_motor,
+            num_sensory,
+            reward_signal: 0.0,
+            weights: vec![0.5; num_synapses], // Initialize at midpoint
+        }
+    }
+
+    /// Create with reward-modulated STDP for three-factor learning
+    pub fn with_reward_modulation(num_motor: usize, num_sensory: usize) -> Self {
+        let num_synapses = num_motor * num_sensory;
+        let controller = PlasticityController::with_reward_stdp(num_synapses);
+
+        Self {
+            controller,
+            num_motor,
+            num_sensory,
+            reward_signal: 0.0,
+            weights: vec![0.5; num_synapses],
+        }
+    }
+
+    /// Record motor neuron spike (presynaptic for forward model)
+    pub fn record_motor_spike(&mut self, neuron_id: usize, time: f64) {
+        // Motor spikes are presynaptic in the forward model
+        // (motor command → expected sensory consequence)
+        for sensory_id in 0..self.num_sensory {
+            let synapse_id = neuron_id * self.num_sensory + sensory_id;
+            self.controller.on_pre_spike(synapse_id, time);
+        }
+    }
+
+    /// Record sensory neuron spike (postsynaptic for forward model)
+    pub fn record_sensory_spike(&mut self, neuron_id: usize, time: f64) {
+        // Sensory spikes are postsynaptic in the forward model
+        self.controller.on_post_spike(neuron_id, time);
+    }
+
+    /// Set reward signal for three-factor learning
+    pub fn set_reward(&mut self, reward: f32) {
+        self.reward_signal = reward;
+        self.controller.set_learning_rate(reward.abs());
+    }
+
+    /// Apply STDP updates to weights
+    pub fn apply_updates(&mut self) {
+        self.controller.apply(&mut self.weights);
+    }
+
+    /// Get weight for motor→sensory connection
+    pub fn get_weight(&self, motor_id: usize, sensory_id: usize) -> f32 {
+        let idx = motor_id * self.num_sensory + sensory_id;
+        self.weights.get(idx).copied().unwrap_or(0.0)
+    }
+
+    /// Get all weights
+    pub fn weights(&self) -> &[f32] {
+        &self.weights
+    }
+
+    /// Reset learning state
+    pub fn reset(&mut self) {
+        self.controller.reset();
+    }
+
+    /// Get plasticity statistics
+    pub fn stats(&self) -> hyperphysics_stdp::PlasticityStats {
+        self.controller.stats()
     }
 }
 

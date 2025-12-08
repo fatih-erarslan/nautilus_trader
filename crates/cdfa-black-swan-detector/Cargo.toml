@@ -1,0 +1,124 @@
+[package]
+
+name = "cdfa-black-swan-detector"
+version = "0.1.0"
+edition = "2021"
+authors = ["CDFA Team <team@cdfa.ai>"]
+description = "Ultra-low latency Black Swan event detector with Extreme Value Theory"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/cdfa/cdfa-black-swan-detector"
+keywords = ["finance", "black-swan", "extreme-value-theory", "simd", "risk"]
+categories = ["algorithms", "mathematics", "science"]
+
+[lib]
+name = "cdfa_black_swan_detector"
+crate-type = ["cdylib", "rlib"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core dependencies
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+candle-transformers = "0.4"
+half = "2.3"
+num-traits = "0.2"
+rayon = "1.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.10"
+
+# Mathematical libraries
+nalgebra = "0.32"
+ndarray = "0.15"
+ndarray-stats = "0.5"
+statrs = "0.16"
+rand = "0.8"
+rand_distr = "0.4"
+
+# Performance optimizations
+wide = "0.7"
+bytemuck = "1.14"
+memmap2 = "0.9"
+parking_lot = "0.12"
+crossbeam = "0.8"
+tokio = { version = "1.0", features = ["full"] }
+
+# SIMD optimizations
+# packed_simd = { version = "0.3", optional = true }  # Commented out due to compilation issues with newer Rust versions
+pulp = { version = "0.18", optional = true }
+
+# Memory management
+mimalloc = { version = "0.1", optional = true }
+jemallocator = { version = "0.5.4", optional = true }
+
+# FFI bindings
+pyo3 = { version = "0.25.1", features = ["extension-module"], optional = true }
+numpy = { version = "0.25", optional = true }
+
+# Development dependencies
+criterion = { version = "0.5", optional = true }
+proptest = { version = "1.0", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.0"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+tokio-test = "0.4"
+approx = "0.5"
+
+[features]
+default = ["gpu", "mimalloc"]  # Removed "simd" due to packed_simd compilation issues
+# simd = ["dep:packed_simd", "dep:pulp"]  # Commented out due to compilation issues with newer Rust versions
+gpu = ["candle-core/cuda", "candle-core/metal"]
+python = ["pyo3", "numpy"]
+jemalloc = ["dep:jemallocator"]
+mimalloc = ["dep:mimalloc"]
+benchmarks = ["criterion"]
+property-tests = ["proptest"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+opt-level = 3
+strip = true
+
+[profile.bench]
+lto = true
+codegen-units = 1
+opt-level = 3
+debug = true
+
+[[bench]]
+name = "black_swan_benchmarks"
+harness = false
+required-features = ["benchmarks"]
+
+[[bench]]
+name = "evt_benchmarks"
+harness = false
+required-features = ["benchmarks"]
+
+[[bench]]
+name = "simd_benchmarks"
+harness = false
+required-features = ["benchmarks", "simd"]
+
+[[example]]
+name = "real_time_detection"
+required-features = ["simd", "gpu"]
+
+[[example]]
+name = "python_integration"
+required-features = ["python"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

@@ -1,0 +1,53 @@
+[package]
+name = "nn_models"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+# Core dependencies - using workspace versions
+rand.workspace = true
+rayon = { workspace = true, optional = true }
+serde.workspace = true
+
+# Legacy rand dependencies (to be phased out)
+rand_chacha = "0.3"
+rand_xorshift = "0.3"
+
+# CUDA dependencies - UPGRADED to latest workspace version (optional)
+cudarc = { workspace = true, optional = true }
+half = { version = "2.4", optional = true }
+
+# Linear algebra and numerics - UPGRADED workspace versions
+ndarray.workspace = true
+num-complex.workspace = true
+
+# Optimization - UPGRADED workspace version
+argmin.workspace = true
+finitediff = "0.1"
+
+# Additional neural computing dependencies
+nalgebra.workspace = true
+wide = { workspace = true, optional = true }
+simba = { workspace = true, optional = true }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = ["parallel", "simd"]
+parallel = ["rayon"]
+simd = ["dep:wide", "dep:simba"]
+cuda = ["dep:cudarc", "dep:half"]
+no-cuda = []
+
+[[bench]]
+name = "isolation_forest"
+harness = false
+
+[[bench]]
+name = "cuda_quantum_kernels"
+harness = false
+required-features = ["cuda"]

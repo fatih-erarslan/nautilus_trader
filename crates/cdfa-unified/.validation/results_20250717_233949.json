@@ -1,0 +1,47 @@
+{
+  "timestamp": "20250717_233949",
+  "features": "default",
+  "profile": "release",
+  "results": {
+    "security": {
+      "status": "pass",
+      "details": "Security validation completed",
+      "duration": 0
+    },
+    "memory": {
+      "status": "pass",
+      "details": "Memory validation completed",
+      "duration": 3
+    },
+    "compatibility": {
+      "status": "pass",
+      "details": "Compatibility checks completed",
+      "duration": 4
+    },
+    "benchmarks": {
+      "status": "fail",
+      "details": "Benchmark execution failed",
+      "duration": 5
+    },
+    "docs": {
+      "status": "fail",
+      "details": "Documentation build failed",
+      "duration": 7
+    },
+    "tests": {
+      "status": "fail",
+      "details": "Unit tests failed",
+      "duration": 10
+    },
+    "examples": {
+      "status": "fail",
+      "details": "1 examples failed",
+      "duration": 12
+    },
+    "build": {
+      "status": "fail",
+      "details": "5 build configurations failed",
+      "duration": 18
+    }
+  }
+}

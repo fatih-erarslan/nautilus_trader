@@ -1,0 +1,330 @@
+[package]
+name = "pads-unified"
+version = "0.1.0"
+edition = "2021"
+authors = ["Neuro Trader Team <noreply@neuro-trader.com>"]
+description = "Unified Panarchy Adaptive Decision System - Complete Python PADS Feature Port"
+license = "MIT"
+homepage = "https://github.com/neuro-trader/pads-unified"
+repository = "https://github.com/neuro-trader/pads-unified"
+keywords = ["panarchy", "adaptive", "decision", "quantum", "trading", "ai", "ml"]
+categories = ["algorithms", "science", "simulation", "finance"]
+readme = "README.md"
+
+[lib]
+name = "pads_unified"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# === CORE RUNTIME ===
+tokio = { version = "1.45", features = ["full", "tracing", "rt-multi-thread", "macros", "time"] }
+async-trait = "0.1"
+futures = "0.3"
+async-std = "1.13"
+
+# === PYTHON INTEGRATION ===
+pyo3 = { version = "0.20", features = ["extension-module", "chrono", "serde"], optional = true }
+pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"], optional = true }
+numpy = { version = "0.20", optional = true }
+pythonize = { version = "0.20", optional = true }
+
+# === QUANTUM COMPUTING ===
+# Quantum circuit simulation
+# Note: Using num-complex for quantum state representations
+# qiskit-terra is Python-only, not available in Rust
+ndarray-linalg = { version = "0.16", features = ["openblas-static"] }
+
+# === MACHINE LEARNING & AI ===
+candle-core = { version = "0.6", features = ["cuda", "metal"] }
+candle-nn = { version = "0.6", optional = true }
+candle-transformers = { version = "0.6", optional = true }
+tch = { version = "0.17", features = ["download-libtorch"], optional = true }
+ort = { version = "2.0.0-rc.10", features = ["cuda", "tensorrt"], optional = true }
+smartcore = { version = "0.3", features = ["serde"] }
+linfa = { version = "0.7", features = ["serde"] }
+linfa-clustering = "0.7"
+linfa-trees = { version = "0.7", optional = true }
+linfa-linear = "0.7"
+linfa-logistic = "0.7"
+linfa-nn = "0.7"
+xgboost = { version = "0.1", optional = true }
+
+# === MATHEMATICAL FOUNDATIONS ===
+nalgebra = { version = "0.33", features = ["serde-serialize", "rand", "sparse"] }
+ndarray = { version = "0.16", features = ["rayon", "serde", "blas"] }
+ndarray-rand = "0.14"
+ndarray-stats = "0.5"
+statrs = "0.17"
+num-complex = "0.4"
+num-traits = "0.2"
+approx = "0.5"
+rand = { version = "0.8", features = ["serde1"] }
+rand_distr = "0.4"
+rand_xoshiro = "0.6"
+
+# === HIGH-PERFORMANCE COMPUTING ===
+rayon = "1.10"
+crossbeam = "0.8"
+parking_lot = "0.12"
+dashmap = "6.1"
+lockfree = "0.5"
+flume = "0.11"
+kanal = "0.1"
+once_cell = "1.20"
+lazy_static = "1.5"
+
+# === SIMD & VECTORIZATION ===
+wide = { version = "0.7", optional = true }
+simdeez = { version = "2.0.0-dev5", optional = true }
+bytemuck = { version = "1.18", features = ["derive"] }
+half = "2.4"
+
+# === MEMORY MANAGEMENT ===
+memmap2 = { version = "0.9", optional = true }
+mmap = "0.1"
+jemalloc = { version = "0.6", package = "tikv-jemalloc-ctl", optional = true }
+
+# === NETWORKING & COMMUNICATION ===
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive", "rc"] }
+serde_yaml = "0.9"
+toml = "0.8"
+bincode = "1.3"
+
+# === TIME HANDLING ===
+chrono = { version = "0.4", features = ["serde"] }
+time = { version = "0.3", features = ["serde"] }
+
+# === LOGGING & MONITORING ===
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+log = "0.4"
+metrics = "0.23"
+metrics-exporter-prometheus = "0.17"
+prometheus = "0.13"
+
+# === ERROR HANDLING ===
+anyhow = "1.0"
+thiserror = "1.0"
+color-eyre = "0.6"
+
+# === DATABASE & STORAGE ===
+rusqlite = { version = "0.32", features = ["bundled", "chrono"] }
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "sqlite", "chrono"] }
+redis = { version = "0.26", features = ["tokio-comp"] }
+
+# === GRAPH ALGORITHMS ===
+petgraph = "0.6"
+graphlib = "0.6"
+
+# === CRYPTOGRAPHY ===
+ring = "0.17"
+sha2 = "0.10"
+aes = "0.8"
+uuid = { version = "1.11", features = ["v4", "serde"] }
+
+# === CONFIGURATION ===
+config = "0.14"
+clap = { version = "4.5", features = ["derive"] }
+
+# === TESTING ===
+proptest = { version = "1.5", optional = true }
+quickcheck = { version = "1.0", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+tokio-test = "0.4"
+proptest = "1.5"
+quickcheck = "1.0"
+pretty_assertions = "1.4"
+rstest = "0.23"
+mockall = "0.13"
+
+[features]
+default = ["python-integration", "quantum-full", "ml-full", "performance-optimized"]
+
+# === PYTHON INTEGRATION ===
+python-integration = ["pyo3", "pyo3-asyncio", "numpy", "pythonize"]
+
+# === QUANTUM FEATURES ===
+quantum-full = ["quantum-simulation", "quantum-ml", "quantum-optimization"]
+quantum-simulation = []  # Using num-complex for quantum state representations
+quantum-ml = []
+quantum-optimization = []
+
+# === ML FEATURES ===
+ml-full = ["neural-networks", "ensemble-methods", "deep-learning", "reinforcement-learning"]
+neural-networks = ["candle-nn", "tch"]
+ensemble-methods = ["xgboost", "linfa-trees"]
+deep-learning = ["candle-transformers", "ort"]
+reinforcement-learning = []
+
+# === PERFORMANCE FEATURES ===
+performance-optimized = ["simd-accelerated", "gpu-acceleration", "memory-optimized"]
+simd-accelerated = ["wide", "simdeez"]
+gpu-acceleration = ["candle-core/cuda"]
+memory-optimized = ["jemalloc", "memmap2"]
+
+# === QUANTUM AGENTS (from Python PADS) ===
+quantum-agents-full = [
+    "qar-agent",
+    "qerc-agent", 
+    "iqad-agent",
+    "nqo-agent",
+    "qstar-agent",
+    "narrative-agent",
+    "quantum-lmsr",
+    "quantum-prospect-theory",
+    "quantum-hedge",
+    "quantum-lstm",
+    "quantum-whale-defense",
+    "quantum-biological-intuition"
+]
+
+# Individual agent features
+qar-agent = []
+qerc-agent = []
+iqad-agent = []
+nqo-agent = []
+qstar-agent = []
+narrative-agent = []
+quantum-lmsr = []
+quantum-prospect-theory = []
+quantum-hedge = []
+quantum-lstm = []
+quantum-whale-defense = []
+quantum-biological-intuition = []
+
+# === ANALYZERS & DETECTORS (from Python PADS) ===
+analyzers-full = [
+    "antifragility-analyzer",
+    "fibonacci-analyzer",
+    "panarchy-analyzer",
+    "soc-analyzer",
+    "whale-detector",
+    "black-swan-detector"
+]
+
+antifragility-analyzer = []
+fibonacci-analyzer = []
+panarchy-analyzer = []
+soc-analyzer = []
+whale-detector = []
+black-swan-detector = []
+
+# === RISK MANAGEMENT (from Python PADS) ===
+risk-management-full = [
+    "via-negativa-filter",
+    "luck-vs-skill-analyzer",
+    "barbell-allocator",
+    "reputation-system",
+    "enhanced-anomaly-detector",
+    "antifragile-risk-manager",
+    "prospect-theory-manager"
+]
+
+via-negativa-filter = []
+luck-vs-skill-analyzer = []
+barbell-allocator = []
+reputation-system = []
+enhanced-anomaly-detector = []
+antifragile-risk-manager = []
+prospect-theory-manager = []
+
+# === DECISION STRATEGIES (from Python PADS) ===
+decision-strategies-full = [
+    "consensus-strategy",
+    "opportunistic-strategy", 
+    "defensive-strategy",
+    "calculated-risk-strategy",
+    "contrarian-strategy",
+    "momentum-strategy"
+]
+
+consensus-strategy = []
+opportunistic-strategy = []
+defensive-strategy = []
+calculated-risk-strategy = []
+contrarian-strategy = []
+momentum-strategy = []
+
+# === PANARCHY SYSTEM (from Python PADS) ===
+panarchy-system-full = [
+    "adaptive-cycles",
+    "cross-scale-interactions",
+    "resilience-mechanisms",
+    "phase-transitions",
+    "regime-detection"
+]
+
+adaptive-cycles = []
+cross-scale-interactions = []
+resilience-mechanisms = []
+phase-transitions = []
+regime-detection = []
+
+# === BOARD SYSTEM (from Python PADS) ===
+board-system-full = [
+    "board-voting",
+    "lmsr-aggregation",
+    "reputation-scoring",
+    "decision-fusion",
+    "narrative-integration"
+]
+
+board-voting = []
+lmsr-aggregation = []
+reputation-scoring = []
+decision-fusion = []
+narrative-integration = []
+
+# === HARDWARE ACCELERATION ===
+hardware-acceleration = ["cuda", "opencl", "simd", "avx"]
+cuda = ["candle-core/cuda"]
+opencl = []
+simd = ["wide", "simdeez"]
+avx = []
+
+# === DEVELOPMENT & DEBUGGING ===
+development = ["debug-logging", "performance-profiling", "testing-utilities"]
+debug-logging = []
+performance-profiling = []
+testing-utilities = ["proptest", "quickcheck"]
+
+# Benchmarks would go here when implemented
+# [[bench]]
+# name = "pads_unified_benchmark"
+# harness = false
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
+overflow-checks = true
+
+[profile.bench]
+opt-level = 3
+lto = true
+codegen-units = 1
+debug = true
+overflow-checks = false
+
+[profile.test]
+opt-level = 1
+debug = true
+overflow-checks = true
+
+[package.metadata.docs.rs]
+features = ["default", "quantum-agents-full", "analyzers-full", "risk-management-full", "decision-strategies-full", "panarchy-system-full", "board-system-full"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.cargo-machete]
+ignored = ["pyo3", "numpy", "pythonize"]

@@ -1,9 +1,20 @@
 //! Integrated Information (Φ) calculation
 //!
 //! Research: Tononi et al. (2016), Oizumi et al. (2014)
+//!
+//! ## Hyperbolic SNN Integration
+//!
+//! This module now supports Φ calculation over hyperbolic spiking neural networks,
+//! leveraging the geometry crate's HyperbolicSNN for criticality-aware consciousness metrics.
+//!
+//! The hyperbolic embedding provides:
+//! - Natural hierarchical structure for information integration
+//! - SOC-aware Φ optimization (Φ peaks at criticality σ ≈ 1.0)
+//! - Distance-modulated effective information (geodesic-based partitioning)
 
 use crate::{ConsciousnessError, Result, MAX_EXACT_PHI_SIZE, MAX_APPROX_PHI_SIZE};
 use hyperphysics_pbit::PBitLattice;
+use hyperphysics_geometry::{HyperbolicSNN, SOCStats, LorentzVec4D};
 // Future: ndarray for matrix operations in partition analysis
 use rayon::prelude::*;
 
@@ -45,8 +56,16 @@ pub struct Partition {
 }
 
 /// Φ calculator with multiple approximation strategies
+///
+/// Now supports both pBit lattices and hyperbolic SNNs for consciousness metrics.
+/// When using hyperbolic SNNs, the calculator leverages SOC criticality to optimize
+/// Φ computation - integrated information peaks at the critical branching ratio σ ≈ 1.0.
 pub struct PhiCalculator {
     approximation: PhiApproximation,
+    /// Optional hyperbolic SNN for hyperbolic Φ calculation
+    hyperbolic_snn: Option<HyperbolicSNN>,
+    /// SOC-aware mode: modulate Φ based on criticality
+    soc_aware: bool,
 }
 
 /// Approximation strategy
@@ -67,6 +86,8 @@ impl PhiCalculator {
     pub fn exact() -> Self {
         Self {
             approximation: PhiApproximation::Exact,
+            hyperbolic_snn: None,
+            soc_aware: false,
         }
     }
 
@@ -74,6 +95,8 @@ impl PhiCalculator {
     pub fn monte_carlo(samples: usize) -> Self {
         Self {
             approximation: PhiApproximation::MonteCarlo { samples },
+            hyperbolic_snn: None,
+            soc_aware: false,
         }
     }
 
@@ -81,6 +104,8 @@ impl PhiCalculator {
     pub fn greedy() -> Self {
         Self {
             approximation: PhiApproximation::Greedy,
+            hyperbolic_snn: None,
+            soc_aware: false,
         }
     }
 
@@ -88,7 +113,225 @@ impl PhiCalculator {
     pub fn hierarchical(levels: usize) -> Self {
         Self {
             approximation: PhiApproximation::Hierarchical { levels },
+            hyperbolic_snn: None,
+            soc_aware: false,
         }
+    }
+
+    /// Attach a hyperbolic SNN for hyperbolic Φ calculation
+    ///
+    /// When attached, the calculator can compute Φ over the hyperbolic
+    /// manifold using geodesic-based partitioning.
+    pub fn with_hyperbolic_snn(mut self, snn: HyperbolicSNN) -> Self {
+        self.hyperbolic_snn = Some(snn);
+        self
+    }
+
+    /// Enable SOC-aware mode
+    ///
+    /// In SOC-aware mode, Φ is modulated by the system's proximity to criticality.
+    /// Integrated information peaks when the branching ratio σ ≈ 1.0.
+    pub fn with_soc_awareness(mut self, enabled: bool) -> Self {
+        self.soc_aware = enabled;
+        self
+    }
+
+    /// Calculate Φ for a hyperbolic SNN
+    ///
+    /// Uses geodesic distance for partitioning and SOC metrics for optimization.
+    /// The effective information is computed using hyperbolic distance modulation.
+    ///
+    /// ## Mathematical Foundation
+    ///
+    /// For hyperbolic SNN with neurons at positions {p_i} on the hyperboloid:
+    /// - Partition by geodesic distance: d_H(p_i, p_j) = acosh(-⟨p_i, p_j⟩_M)
+    /// - Weight effective information by locality factor: exp(-d/λ)
+    /// - Modulate by SOC factor when near criticality
+    pub fn calculate_hyperbolic(&self, snn: &HyperbolicSNN) -> Result<HyperbolicIntegratedInformation> {
+        let n = snn.neurons.len();
+
+        if n == 0 {
+            return Err(ConsciousnessError::ComputationError {
+                message: "Cannot compute Φ for empty SNN".to_string(),
+            });
+        }
+
+        // Get SOC statistics for criticality modulation
+        let soc_stats = snn.soc_monitor.stats();
+        let soc_factor = self.compute_soc_modulation(&soc_stats);
+
+        // Compute hyperbolic Φ using geodesic-based partitioning
+        let (phi, mip) = self.compute_hyperbolic_phi(snn)?;
+
+        // Apply SOC modulation if enabled
+        let modulated_phi = if self.soc_aware {
+            phi * soc_factor
+        } else {
+            phi
+        };
+
+        Ok(HyperbolicIntegratedInformation {
+            phi: modulated_phi,
+            raw_phi: phi,
+            mip,
+            soc_stats,
+            soc_modulation_factor: soc_factor,
+            method: self.approximation,
+        })
+    }
+
+    /// Compute SOC modulation factor
+    ///
+    /// Φ peaks at criticality (σ = 1.0) with a Gaussian modulation:
+    /// factor = exp(-((σ - 1)² / (2 * 0.1²)))
+    fn compute_soc_modulation(&self, stats: &SOCStats) -> f64 {
+        let sigma_deviation = stats.sigma_measured - stats.sigma_target;
+        let variance = 0.1 * 0.1; // Width of criticality window
+
+        // Gaussian centered at criticality
+        let base_factor = (-sigma_deviation * sigma_deviation / (2.0 * variance)).exp();
+
+        // Boost factor when power-law exponent is near τ ≈ 1.5 (optimal criticality)
+        let tau_deviation = stats.power_law_tau - 1.5;
+        let tau_factor = (-tau_deviation * tau_deviation / 0.5).exp();
+
+        // Combined modulation
+        base_factor * (0.7 + 0.3 * tau_factor)
+    }
+
+    /// Compute hyperbolic Φ using geodesic-based partitioning
+    fn compute_hyperbolic_phi(&self, snn: &HyperbolicSNN) -> Result<(f64, Option<HyperbolicPartition>)> {
+        let n = snn.neurons.len();
+
+        if n <= 1 {
+            return Ok((0.0, None));
+        }
+
+        // Use greedy geodesic-based partitioning
+        // Start by finding the geodesic center
+        let center_idx = self.find_geodesic_center(snn);
+
+        // Partition by geodesic distance from center
+        let median_distance = self.compute_median_distance(snn, center_idx);
+
+        let mut subset_a = Vec::new();
+        let mut subset_b = Vec::new();
+        let center_pos = snn.neurons[center_idx].position;
+
+        for (i, neuron) in snn.neurons.iter().enumerate() {
+            let dist = center_pos.hyperbolic_distance(&neuron.position);
+            if dist <= median_distance {
+                subset_a.push(i);
+            } else {
+                subset_b.push(i);
+            }
+        }
+
+        // Ensure non-degenerate partition
+        if subset_a.is_empty() || subset_b.is_empty() {
+            let mid = n / 2;
+            subset_a = (0..mid).collect();
+            subset_b = (mid..n).collect();
+        }
+
+        // Compute effective information across the geodesic partition
+        let effective_info = self.compute_hyperbolic_effective_info(snn, &subset_a, &subset_b);
+
+        let partition = HyperbolicPartition {
+            subset_a,
+            subset_b,
+            effective_info,
+            geodesic_cut_distance: median_distance,
+        };
+
+        Ok((effective_info, Some(partition)))
+    }
+
+    /// Find the geodesic center (Fréchet mean) of the network
+    fn find_geodesic_center(&self, snn: &HyperbolicSNN) -> usize {
+        let n = snn.neurons.len();
+        let mut min_total_dist = f64::INFINITY;
+        let mut center_idx = 0;
+
+        for i in 0..n {
+            let mut total_dist = 0.0;
+            for j in 0..n {
+                if i != j {
+                    total_dist += snn.neurons[i].position.hyperbolic_distance(&snn.neurons[j].position);
+                }
+            }
+            if total_dist < min_total_dist {
+                min_total_dist = total_dist;
+                center_idx = i;
+            }
+        }
+
+        center_idx
+    }
+
+    /// Compute median geodesic distance from a reference point
+    fn compute_median_distance(&self, snn: &HyperbolicSNN, ref_idx: usize) -> f64 {
+        let ref_pos = snn.neurons[ref_idx].position;
+        let mut distances: Vec<f64> = snn.neurons.iter()
+            .enumerate()
+            .filter(|(i, _)| *i != ref_idx)
+            .map(|(_, n)| ref_pos.hyperbolic_distance(&n.position))
+            .collect();
+
+        distances.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+        if distances.is_empty() {
+            0.0
+        } else {
+            distances[distances.len() / 2]
+        }
+    }
+
+    /// Compute effective information across a hyperbolic partition
+    ///
+    /// Uses geodesic distance to modulate information flow:
+    /// EI = Σ w_ij × exp(-d_H(i,j) / λ) where w_ij is synapse weight
+    fn compute_hyperbolic_effective_info(&self, snn: &HyperbolicSNN, subset_a: &[usize], subset_b: &[usize]) -> f64 {
+        let lambda = snn.stdp.lambda_stdp; // Use STDP length constant
+
+        let mut total_info = 0.0;
+        let mut connection_count = 0;
+
+        // Compute information flow from A to B
+        for synapse in &snn.synapses {
+            let pre_in_a = subset_a.contains(&synapse.pre_id);
+            let post_in_b = subset_b.contains(&synapse.post_id);
+
+            if pre_in_a && post_in_b {
+                // Geodesic distance modulation
+                let locality = (-(synapse.distance as f64) / lambda).exp();
+                total_info += synapse.weight.abs() * locality;
+                connection_count += 1;
+            }
+        }
+
+        // Also compute B to A
+        for synapse in &snn.synapses {
+            let pre_in_b = subset_b.contains(&synapse.pre_id);
+            let post_in_a = subset_a.contains(&synapse.post_id);
+
+            if pre_in_b && post_in_a {
+                let locality = (-(synapse.distance as f64) / lambda).exp();
+                total_info += synapse.weight.abs() * locality;
+                connection_count += 1;
+            }
+        }
+
+        if connection_count > 0 {
+            total_info / connection_count as f64
+        } else {
+            0.0
+        }
+    }
+
+    /// Get the attached hyperbolic SNN (if any)
+    pub fn hyperbolic_snn(&self) -> Option<&HyperbolicSNN> {
+        self.hyperbolic_snn.as_ref()
     }
 
     /// Calculate Φ for pBit lattice
@@ -473,9 +716,40 @@ impl PhiCalculator {
     }
 }
 
+/// Integrated Information result for hyperbolic SNNs
+#[derive(Debug, Clone)]
+pub struct HyperbolicIntegratedInformation {
+    /// Φ value (SOC-modulated if enabled)
+    pub phi: f64,
+    /// Raw Φ before SOC modulation
+    pub raw_phi: f64,
+    /// Minimum information partition in hyperbolic space
+    pub mip: Option<HyperbolicPartition>,
+    /// SOC statistics at computation time
+    pub soc_stats: SOCStats,
+    /// SOC modulation factor applied
+    pub soc_modulation_factor: f64,
+    /// Computation method used
+    pub method: PhiApproximation,
+}
+
+/// Partition in hyperbolic space using geodesic distance
+#[derive(Debug, Clone)]
+pub struct HyperbolicPartition {
+    /// Indices in subsystem A (interior, closer to geodesic center)
+    pub subset_a: Vec<usize>,
+    /// Indices in subsystem B (boundary, farther from center)
+    pub subset_b: Vec<usize>,
+    /// Effective information across partition
+    pub effective_info: f64,
+    /// Geodesic distance at the partition cut
+    pub geodesic_cut_distance: f64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use hyperphysics_geometry::adversarial_lattice::DefenseTopology;
 
     #[test]
     fn test_phi_small_system() {
@@ -510,5 +784,48 @@ mod tests {
 
         // 2^4 - 2 = 14 non-trivial partitions
         assert_eq!(partitions.len(), 14);
+    }
+
+    #[test]
+    fn test_hyperbolic_phi_calculation() {
+        // Create a small hyperbolic SNN
+        let topology = DefenseTopology::balanced_fanout(2);
+        let snn = HyperbolicSNN::from_topology(topology).unwrap();
+
+        let calculator = PhiCalculator::greedy().with_soc_awareness(true);
+        let result = calculator.calculate_hyperbolic(&snn).unwrap();
+
+        assert!(result.phi >= 0.0);
+        assert!(result.phi.is_finite());
+        assert!(result.soc_modulation_factor > 0.0);
+        assert!(result.soc_modulation_factor <= 1.0);
+    }
+
+    #[test]
+    fn test_soc_modulation_peaks_at_criticality() {
+        let calculator = PhiCalculator::greedy();
+
+        // At criticality (σ = 1.0)
+        let critical_stats = SOCStats {
+            sigma_measured: 1.0,
+            sigma_target: 1.0,
+            power_law_tau: 1.5,
+            is_critical: true,
+            ..Default::default()
+        };
+        let factor_critical = calculator.compute_soc_modulation(&critical_stats);
+
+        // Away from criticality (σ = 1.5)
+        let subcritical_stats = SOCStats {
+            sigma_measured: 1.5,
+            sigma_target: 1.0,
+            power_law_tau: 1.5,
+            is_critical: false,
+            ..Default::default()
+        };
+        let factor_subcritical = calculator.compute_soc_modulation(&subcritical_stats);
+
+        // Modulation should be higher at criticality
+        assert!(factor_critical > factor_subcritical);
     }
 }

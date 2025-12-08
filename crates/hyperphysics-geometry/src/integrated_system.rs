@@ -814,6 +814,555 @@ impl IntegratedCognitiveSystem {
 }
 
 // ============================================================================
+// Phase 4 Integration: GlobalWorkspace ↔ PredictiveEnactive Bridge
+// ============================================================================
+
+use crate::global_workspace::{GlobalWorkspace, GlobalWorkspaceConfig, BroadcastEvent, WorkspaceContent, SpecialistType};
+use crate::predictive_coding::{PredictiveEnactiveSystem, PredictiveCodingConfig, LevelError};
+use crate::iit_phi::{PhiCalculator, PhiConfig, PhiResult};
+use crate::bateson_ecology::{EcologicalMind, EcologyConfig, LearningLevel};
+
+/// Bridge connecting Global Workspace broadcasts to Predictive Coding hierarchy
+///
+/// Implements the interface between:
+/// - GWT conscious broadcast → top-down predictions
+/// - Prediction errors → bottom-up specialist activation
+#[derive(Debug)]
+pub struct WorkspacePredictiveBridge {
+    /// Coupling strength from workspace to predictive system
+    pub broadcast_to_prediction_coupling: f64,
+    /// Coupling strength from prediction errors to workspace
+    pub error_to_activation_coupling: f64,
+    /// Prediction error history for specialist modulation
+    error_history: VecDeque<Vec<LevelError>>,
+    /// Maximum history length
+    max_history: usize,
+    /// Specialist activation modulations from prediction errors
+    pub specialist_modulations: Vec<f64>,
+}
+
+impl WorkspacePredictiveBridge {
+    /// Create new bridge with coupling strengths
+    pub fn new(broadcast_coupling: f64, error_coupling: f64, num_specialists: usize) -> Self {
+        Self {
+            broadcast_to_prediction_coupling: broadcast_coupling,
+            error_to_activation_coupling: error_coupling,
+            error_history: VecDeque::with_capacity(100),
+            max_history: 100,
+            specialist_modulations: vec![0.0; num_specialists],
+        }
+    }
+
+    /// Process broadcast event: inject into predictive system's top level
+    pub fn process_broadcast(
+        &mut self,
+        broadcast: &BroadcastEvent,
+        predictive: &mut PredictiveEnactiveSystem,
+    ) {
+        // Broadcast content becomes top-level prediction target
+        let features = broadcast.content.features.clone();
+        let position = broadcast.content.position;
+
+        // Modulate top level belief based on broadcast
+        if let Some(top_belief) = predictive.belief.levels.last_mut() {
+            // Inject broadcast position into belief (weighted by coupling)
+            let direction = top_belief.position_mean.log_map(&position);
+            top_belief.position_mean = top_belief.position_mean.exp_map(
+                &direction,
+                self.broadcast_to_prediction_coupling * broadcast.strength,
+            );
+
+            // Inject broadcast features into hidden state
+            for i in 0..top_belief.hidden_state.len().min(features.len()) {
+                let current = top_belief.hidden_state[i];
+                let broadcast_val = features[i];
+                top_belief.hidden_state[i] = current * (1.0 - self.broadcast_to_prediction_coupling)
+                    + broadcast_val * self.broadcast_to_prediction_coupling * broadcast.strength;
+            }
+
+            // Increase precision at top level (broadcast = confident content)
+            top_belief.hidden_precision *= 1.0 + 0.1 * broadcast.strength;
+        }
+    }
+
+    /// Process prediction errors: modulate specialist activations
+    pub fn process_errors(
+        &mut self,
+        errors: &[LevelError],
+        workspace: &mut GlobalWorkspace,
+    ) {
+        // Store error history
+        self.error_history.push_back(errors.to_vec());
+        if self.error_history.len() > self.max_history {
+            self.error_history.pop_front();
+        }
+
+        // Compute specialist modulations from error distribution
+        // High errors at low levels → boost sensory specialists
+        // High errors at high levels → boost cognitive specialists
+        let num_specialists = workspace.specialists.len();
+        self.specialist_modulations = vec![0.0; num_specialists];
+
+        for (i, specialist) in workspace.specialists.iter_mut().enumerate() {
+            let modulation = match specialist.module_type {
+                SpecialistType::Sensory | SpecialistType::Motor => {
+                    // Sensory/motor specialists activated by low-level errors
+                    errors.first()
+                        .map(|e| e.weighted_error * self.error_to_activation_coupling)
+                        .unwrap_or(0.0)
+                }
+                SpecialistType::Memory | SpecialistType::Attention => {
+                    // Memory/attention by mid-level errors
+                    errors.get(1)
+                        .map(|e| e.weighted_error * self.error_to_activation_coupling)
+                        .unwrap_or(0.0)
+                }
+                SpecialistType::Language | SpecialistType::Spatial | SpecialistType::Temporal => {
+                    // Higher cognitive by high-level errors
+                    errors.last()
+                        .map(|e| e.weighted_error * self.error_to_activation_coupling)
+                        .unwrap_or(0.0)
+                }
+                _ => {
+                    // Default: average across all levels
+                    let avg_error: f64 = errors.iter().map(|e| e.weighted_error).sum::<f64>()
+                        / errors.len().max(1) as f64;
+                    avg_error * self.error_to_activation_coupling
+                }
+            };
+
+            self.specialist_modulations[i] = modulation;
+
+            // Apply modulation to specialist activation
+            specialist.activation = (specialist.activation + modulation).clamp(0.0, 1.0);
+        }
+    }
+
+    /// Get average prediction error for monitoring
+    pub fn average_error(&self) -> f64 {
+        if self.error_history.is_empty() {
+            return 0.0;
+        }
+
+        let total: f64 = self.error_history.iter()
+            .flat_map(|errors| errors.iter().map(|e| e.weighted_error))
+            .sum();
+        let count = self.error_history.iter()
+            .map(|errors| errors.len())
+            .sum::<usize>();
+
+        if count > 0 { total / count as f64 } else { 0.0 }
+    }
+}
+
+// ============================================================================
+// Phase 4 Integration: PhiCalculator ↔ GlobalWorkspace Bridge
+// ============================================================================
+
+/// Bridge connecting IIT Φ computation to Global Workspace ignition
+///
+/// Based on the hypothesis that conscious content corresponds to
+/// information that is both integrated (high Φ) and globally available (broadcast)
+pub struct PhiWorkspaceBridge {
+    /// Minimum Φ required for workspace ignition boost
+    pub phi_ignition_threshold: f64,
+    /// Coupling strength from Φ to ignition threshold
+    pub phi_to_ignition_coupling: f64,
+    /// Recent Φ values for averaging
+    phi_history: VecDeque<f64>,
+    /// Maximum history
+    max_history: usize,
+}
+
+impl PhiWorkspaceBridge {
+    pub fn new(phi_threshold: f64, coupling: f64) -> Self {
+        Self {
+            phi_ignition_threshold: phi_threshold,
+            phi_to_ignition_coupling: coupling,
+            phi_history: VecDeque::with_capacity(100),
+            max_history: 100,
+        }
+    }
+
+    /// Process Φ computation: modulate workspace ignition threshold
+    pub fn process_phi(
+        &mut self,
+        phi_result: &PhiResult,
+        workspace: &mut GlobalWorkspace,
+    ) {
+        let phi = phi_result.phi;
+        self.phi_history.push_back(phi);
+        if self.phi_history.len() > self.max_history {
+            self.phi_history.pop_front();
+        }
+
+        // High Φ indicates integrated information → lower ignition threshold
+        // This implements the hypothesis that integrated content more easily
+        // achieves conscious access
+        if phi > self.phi_ignition_threshold {
+            let phi_excess = phi - self.phi_ignition_threshold;
+            let threshold_reduction = phi_excess * self.phi_to_ignition_coupling;
+
+            // Apply to workspace (would need accessor method in GlobalWorkspace)
+            // For now, boost specialist activations uniformly
+            for specialist in &mut workspace.specialists {
+                specialist.activation *= 1.0 + threshold_reduction;
+            }
+        }
+    }
+
+    /// Identify which specialists contribute most to Φ
+    pub fn phi_specialist_contribution(
+        &self,
+        phi_result: &PhiResult,
+        workspace: &GlobalWorkspace,
+    ) -> Vec<(usize, f64)> {
+        // Map mechanism state to specialists based on position
+        let mut contributions = Vec::new();
+
+        // PhiResult has a single mechanism, not a vector
+        // Find closest specialist based on mechanism elements
+        for &element_idx in &phi_result.mechanism.elements {
+            if let Some((specialist_id, _)) = workspace.specialists.iter()
+                .enumerate()
+                .min_by(|(_, a), (_, b)| {
+                    let dist_a = element_idx.abs_diff(a.id);
+                    let dist_b = element_idx.abs_diff(b.id);
+                    dist_a.cmp(&dist_b)
+                })
+            {
+                // Contribution proportional to intrinsic causal power if available
+                let icp = phi_result.intrinsic_causal_power
+                    .as_ref()
+                    .map(|icp| icp.icp_total)
+                    .unwrap_or(1.0);
+                contributions.push((specialist_id, icp));
+            }
+        }
+
+        contributions
+    }
+
+    /// Average Φ over history
+    pub fn average_phi(&self) -> f64 {
+        if self.phi_history.is_empty() {
+            return 0.0;
+        }
+        self.phi_history.iter().sum::<f64>() / self.phi_history.len() as f64
+    }
+}
+
+// ============================================================================
+// Phase 4 Integration: EcologicalMind ↔ Learning Bridge
+// ============================================================================
+
+/// Bridge connecting Bateson's Ecological Mind to learning systems
+///
+/// Implements multi-level learning where:
+/// - Level 0: Direct stimulus-response (STDP)
+/// - Level 1: Learning to learn (topology evolution)
+/// - Level 2: Deutero-learning (meta-learning from double binds)
+pub struct EcologyLearningBridge {
+    /// Coupling from ecological learning to STDP
+    pub ecology_to_stdp_coupling: f64,
+    /// Coupling from ecological learning to topology
+    pub ecology_to_topology_coupling: f64,
+    /// Recent learning results
+    learning_history: VecDeque<LearningLevel>,
+    /// Maximum history
+    max_history: usize,
+}
+
+impl EcologyLearningBridge {
+    pub fn new(stdp_coupling: f64, topology_coupling: f64) -> Self {
+        Self {
+            ecology_to_stdp_coupling: stdp_coupling,
+            ecology_to_topology_coupling: topology_coupling,
+            learning_history: VecDeque::with_capacity(100),
+            max_history: 100,
+        }
+    }
+
+    /// Process ecological learning: modulate STDP and topology
+    pub fn process_learning(
+        &mut self,
+        ecology: &EcologicalMind,
+        stdp: &mut ChunkAwareSTDP,
+        topology: &mut TopologyEvolver,
+    ) {
+        // Learning level strength based on current level
+        let level_strength = match ecology.learning_level {
+            LearningLevel::Zero => 1.0,  // Basic stimulus-response
+            LearningLevel::One => 0.8,   // Context-dependent learning
+            LearningLevel::Two => 0.6,   // Learning to learn
+            LearningLevel::Three => 0.4, // Meta-learning
+        };
+
+        // Level 0/1 learning modulates STDP rates
+        if matches!(ecology.learning_level, LearningLevel::Zero | LearningLevel::One) {
+            stdp.set_learning_rate_factor(1.0 + self.ecology_to_stdp_coupling * level_strength);
+        }
+
+        // Level 1/2 learning modulates topology plasticity
+        if matches!(ecology.learning_level, LearningLevel::One | LearningLevel::Two) {
+            topology.modulate_plasticity(1.0 + self.ecology_to_topology_coupling * level_strength);
+        }
+
+        // Level 2/3 (deutero) affects both in complex ways
+        if matches!(ecology.learning_level, LearningLevel::Two | LearningLevel::Three) {
+            // High deutero-learning: system is learning how to learn
+            // Increase both STDP and topology plasticity
+            stdp.set_learning_rate_factor(1.5);
+            topology.modulate_plasticity(1.5);
+        }
+
+        // Record learning level history
+        self.learning_history.push_back(ecology.learning_level);
+        if self.learning_history.len() > self.max_history {
+            self.learning_history.pop_front();
+        }
+    }
+
+    /// Detect if system is in a double bind (contradictory constraints)
+    pub fn detect_double_bind(&self, ecology: &EcologicalMind) -> bool {
+        ecology.deutero_stats.double_binds_encountered > 0
+    }
+
+    /// Get dominant learning level
+    pub fn dominant_level(&self) -> Option<LearningLevel> {
+        if self.learning_history.is_empty() {
+            return None;
+        }
+
+        // Count occurrences
+        let mut counts = std::collections::HashMap::new();
+        for level in &self.learning_history {
+            *counts.entry(*level).or_insert(0) += 1;
+        }
+
+        counts.into_iter()
+            .max_by_key(|(_, count)| *count)
+            .map(|(level, _)| level)
+    }
+}
+
+// ============================================================================
+// Unified Conscious Integration Hub
+// ============================================================================
+
+/// Configuration for the conscious integration hub
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConsciousHubConfig {
+    /// Global workspace configuration
+    pub workspace_config: GlobalWorkspaceConfig,
+    /// Predictive coding configuration
+    pub predictive_config: PredictiveCodingConfig,
+    /// IIT Φ configuration
+    pub phi_config: PhiConfig,
+    /// Ecological mind configuration
+    pub ecology_config: EcologyConfig,
+    /// Bridge coupling strengths
+    pub broadcast_to_prediction: f64,
+    pub error_to_activation: f64,
+    pub phi_threshold: f64,
+    pub phi_coupling: f64,
+    pub ecology_to_stdp: f64,
+    pub ecology_to_topology: f64,
+}
+
+impl Default for ConsciousHubConfig {
+    fn default() -> Self {
+        Self {
+            workspace_config: GlobalWorkspaceConfig::default(),
+            predictive_config: PredictiveCodingConfig::default(),
+            phi_config: PhiConfig::default(),
+            ecology_config: EcologyConfig::default(),
+            broadcast_to_prediction: 0.3,
+            error_to_activation: 0.2,
+            phi_threshold: 0.1,
+            phi_coupling: 0.1,
+            ecology_to_stdp: 0.2,
+            ecology_to_topology: 0.2,
+        }
+    }
+}
+
+/// Unified hub for conscious integration
+///
+/// Coordinates all Phase 4 cognitive systems:
+/// - GlobalWorkspace (Baars): conscious broadcast
+/// - PredictiveEnactive (Friston/Clark): hierarchical inference
+/// - PhiCalculator (Tononi): integrated information
+/// - EcologicalMind (Bateson): multi-level learning
+pub struct ConsciousIntegrationHub {
+    /// Global workspace
+    pub workspace: GlobalWorkspace,
+    /// Predictive-enactive system
+    pub predictive: PredictiveEnactiveSystem,
+    /// IIT Φ calculator
+    pub phi: PhiCalculator,
+    /// Ecological mind
+    pub ecology: EcologicalMind,
+    /// Workspace ↔ Predictive bridge
+    workspace_predictive_bridge: WorkspacePredictiveBridge,
+    /// Φ ↔ Workspace bridge
+    phi_workspace_bridge: PhiWorkspaceBridge,
+    /// Ecology ↔ Learning bridge (stored for use with external STDP/topology)
+    pub ecology_learning_config: (f64, f64),
+    /// Current time
+    time: f64,
+    /// Integration statistics
+    pub stats: ConsciousHubStats,
+}
+
+/// Statistics for conscious integration hub
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ConsciousHubStats {
+    /// Total steps
+    pub total_steps: u64,
+    /// Total broadcasts
+    pub total_broadcasts: u64,
+    /// Total ignitions
+    pub total_ignitions: u64,
+    /// Average Φ
+    pub avg_phi: f64,
+    /// Average prediction error
+    pub avg_prediction_error: f64,
+    /// Dominant learning level
+    pub dominant_learning_level: Option<String>,
+    /// System coherence (correlation between subsystems)
+    pub coherence: f64,
+}
+
+impl ConsciousIntegrationHub {
+    /// Create new conscious integration hub
+    pub fn new(config: ConsciousHubConfig) -> Self {
+        let num_specialists = config.workspace_config.num_specialists;
+        let num_levels = config.predictive_config.num_levels;
+
+        Self {
+            workspace: GlobalWorkspace::new(config.workspace_config),
+            predictive: PredictiveEnactiveSystem::new(config.predictive_config),
+            // PhiCalculator needs system_size (use num_levels as proxy for mechanism elements)
+            phi: PhiCalculator::new(config.phi_config, num_levels),
+            ecology: EcologicalMind::new(config.ecology_config),
+            workspace_predictive_bridge: WorkspacePredictiveBridge::new(
+                config.broadcast_to_prediction,
+                config.error_to_activation,
+                num_specialists,
+            ),
+            phi_workspace_bridge: PhiWorkspaceBridge::new(
+                config.phi_threshold,
+                config.phi_coupling,
+            ),
+            ecology_learning_config: (config.ecology_to_stdp, config.ecology_to_topology),
+            time: 0.0,
+            stats: ConsciousHubStats::default(),
+        }
+    }
+
+    /// Step all systems with proper coordination
+    pub fn step(&mut self, dt: f64, observation: Observation) -> Option<BroadcastEvent> {
+        self.time += dt;
+        self.stats.total_steps += 1;
+
+        // 1. Process observation through predictive hierarchy
+        let process_result = self.predictive.process_observation(observation.clone());
+
+        // 2. Feed prediction errors to workspace (bottom-up attention)
+        self.workspace_predictive_bridge.process_errors(
+            &process_result.errors,
+            &mut self.workspace,
+        );
+
+        // 3. Run workspace competition
+        let broadcast_event = self.workspace.step(dt);
+
+        // 4. If broadcast, inject into predictive top level (top-down)
+        if let Some(ref broadcast) = broadcast_event {
+            self.workspace_predictive_bridge.process_broadcast(
+                broadcast,
+                &mut self.predictive,
+            );
+            self.stats.total_broadcasts += 1;
+            if broadcast.ignited {
+                self.stats.total_ignitions += 1;
+            }
+        }
+
+        // 5. Compute Φ (periodically, as it's expensive)
+        if self.stats.total_steps % 10 == 0 {
+            // Combine hidden states from all levels into a single binary state vector
+            // Take one element from each level to form the state
+            let combined_state: Vec<bool> = self.predictive.belief.levels.iter()
+                .map(|belief| {
+                    // Average of hidden state > 0.5 indicates "active"
+                    let avg: f64 = belief.hidden_state.iter().sum::<f64>()
+                        / belief.hidden_state.len().max(1) as f64;
+                    avg > 0.5
+                })
+                .collect();
+
+            // Set the combined state
+            self.phi.set_state(combined_state);
+
+            // Compute Φ (returns PhiResult directly, not Result)
+            let phi_result = self.phi.compute_phi();
+            self.phi_workspace_bridge.process_phi(&phi_result, &mut self.workspace);
+            self.stats.avg_phi = 0.95 * self.stats.avg_phi + 0.05 * phi_result.phi;
+        }
+
+        // 6. Update ecological learning from context changes
+        // (Ecological mind updates are context-driven, not time-stepped)
+
+        // 7. Update statistics
+        self.stats.avg_prediction_error = self.workspace_predictive_bridge.average_error();
+        self.stats.coherence = self.compute_coherence();
+
+        broadcast_event
+    }
+
+    /// Compute system coherence (correlation between subsystem states)
+    fn compute_coherence(&self) -> f64 {
+        // Coherence = correlation between workspace activation and prediction confidence
+        let workspace_activation: f64 = self.workspace.specialists.iter()
+            .map(|s| s.activation)
+            .sum::<f64>() / self.workspace.specialists.len() as f64;
+
+        let prediction_confidence: f64 = self.predictive.belief.levels.iter()
+            .map(|b| b.hidden_precision)
+            .sum::<f64>() / self.predictive.belief.levels.len() as f64;
+
+        // Simple coherence: product of normalized values
+        let max_precision = 10.0; // From predictive config
+        (workspace_activation * prediction_confidence / max_precision).min(1.0)
+    }
+
+    /// Get the current conscious content (if any)
+    pub fn conscious_content(&self) -> Option<&WorkspaceContent> {
+        self.workspace.workspace.as_ref()
+    }
+
+    /// Check if workspace is ignited (conscious access)
+    pub fn is_conscious(&self) -> bool {
+        self.workspace.is_ignited
+    }
+
+    /// Get integration statistics
+    pub fn stats(&self) -> &ConsciousHubStats {
+        &self.stats
+    }
+
+    /// Create ecology-learning bridge for external use
+    pub fn create_ecology_learning_bridge(&self) -> EcologyLearningBridge {
+        EcologyLearningBridge::new(
+            self.ecology_learning_config.0,
+            self.ecology_learning_config.1,
+        )
+    }
+}
+
+// ============================================================================
 // Tests
 // ============================================================================
 

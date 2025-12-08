@@ -1,0 +1,26 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "quantum-hive"
+version = "0.1.0"
+description = "Autopoietic hyperbolic lattice quantum trading hive with QAR as Supreme Sovereign Queen"
+requires-python = ">=3.8"
+authors = [
+    {name = "Quantum Hive Collective", email = "hive@quantum.trading"},
+]
+license = {text = "MIT OR Apache-2.0"}
+keywords = ["quantum", "trading", "hive", "autopoietic", "hyperbolic", "neuromorphic"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+
+[tool.maturin]
+python-source = "python"
+module-name = "quantum_hive"

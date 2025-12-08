@@ -1,0 +1,88 @@
+[package]
+name = "quantum-agent-unification"
+version = "0.1.0"
+edition = "2021"
+authors = ["Nautilus Quantum Team <quantum@nautilus.ai>"]
+description = "Unified quantum agent system with 12 specialized agents and PADS integration"
+license = "MIT OR Apache-2.0"
+keywords = ["quantum", "agents", "trading", "unification", "pads"]
+categories = ["algorithms", "science", "finance"]
+
+[dependencies]
+# Local dependencies
+hyperbolic-geometry = { path = "../hyperbolic-geometry" }
+swarm-intelligence = { path = "../swarm-intelligence" }
+cdfa-core = { path = "../cdfa-core" }
+quantum-core = { path = "../quantum-core" }
+
+# Core mathematical computing
+nalgebra = { workspace = true, features = ["serde"] }
+num-complex = { workspace = true }
+num-traits = { workspace = true }
+ndarray = { workspace = true, features = ["serde"] }
+statrs = { workspace = true }
+rand = { workspace = true }
+rand_distr = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Concurrency and performance
+rayon = { workspace = true }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+crossbeam = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+futures = { workspace = true }
+async-trait = { workspace = true }
+
+# SIMD optimization
+wide = { workspace = true, optional = true }
+bytemuck = { workspace = true }
+
+# Serialization
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+
+# Logging and metrics
+tracing = { workspace = true }
+metrics = { workspace = true }
+
+# Utilities
+itertools = { workspace = true }
+derive_more = { workspace = true }
+bitflags = { workspace = true }
+ahash = { workspace = true }
+once_cell = { workspace = true }
+atomic_float = { workspace = true }
+
+# Memory optimization
+memmap2 = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true, features = ["html_reports"] }
+proptest = { workspace = true }
+approx = { workspace = true }
+tokio-test = { workspace = true }
+pretty_assertions = { workspace = true }
+
+[features]
+default = ["simd", "parallel"]
+simd = ["wide"]
+parallel = []
+quantum_enhanced = []
+pads_integration = []
+
+[lib]
+name = "quantum_agent_unification"
+crate-type = ["rlib"]
+
+[[bench]]
+name = "quantum_agent_benchmarks"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1

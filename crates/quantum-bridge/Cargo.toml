@@ -1,0 +1,106 @@
+[package]
+name = "quantum-bridge"
+version = "0.1.0"
+edition = "2021"
+authors = ["NautilusTrader Team"]
+description = "High-performance Rust-Python bridge for PennyLane quantum computing integration"
+license = "MIT"
+
+[lib]
+name = "quantum_bridge"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Quantum Computing Integration
+pyo3 = { version = "0.25.1", features = ["extension-module", "abi3", "multiple-pymethods"] }
+numpy = { version = "0.25", features = ["nalgebra"] }
+pythonize = "0.25"
+
+# Mathematical Foundations
+nalgebra = { workspace = true }  # Using workspace version - removed non-existent simd and sparse features
+ndarray = { workspace = true }  # Using workspace version
+num-complex = "0.4"
+
+# Performance and Concurrency
+tokio = { version = "1.35", features = ["full", "tracing"] }
+rayon = { workspace = true }
+crossbeam = { version = "0.8", features = ["std"], optional = true }
+dashmap = "5.5"
+parking_lot = "0.12"
+
+# SIMD and Low-Level Optimization
+# std-simd = { package = "portable_simd", version = "0.1", optional = true }  # Package not found - commented out
+wide = { workspace = true }
+bytemuck = { version = "1.14", features = ["derive"] }
+
+# Memory Management
+memmap2 = { version = "0.9", optional = true }
+slab = "0.4"
+
+# Error Handling and Serialization
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { workspace = true }
+serde_json = "1.0"
+
+# Logging and Telemetry
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Async utilities
+futures = "0.3"
+async-trait = "0.1"
+
+# Random number generation
+rand = { workspace = true }  # removed simd_support feature to avoid packed_simd_2 compilation errors
+rand_chacha = "0.3"
+
+# System information
+sysinfo = "0.30"
+num_cpus = "1.16"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tokio-test = "0.4"
+
+[[bench]]
+name = "quantum_execution"
+harness = false
+
+[[bench]]
+name = "bridge_performance"
+harness = false
+
+[features]
+default = ["gpu-acceleration", "kokkos-backend"]
+
+# Device support features
+gpu-acceleration = []
+kokkos-backend = []
+cpu-only = []
+
+# Performance features
+# simd-optimized = ["dep:std-simd"]  # Disabled - std-simd dependency removed
+zero-copy = ["dep:memmap2"]
+lock-free = ["dep:crossbeam"]
+
+# Development features
+debug-quantum = []
+performance-profiling = []
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+
+[profile.bench]
+opt-level = 3
+lto = true
+codegen-units = 1
+debug = true
+
+[package.metadata.docs.rs]
+features = ["gpu-acceleration", "kokkos-backend"]

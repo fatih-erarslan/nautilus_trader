@@ -15,7 +15,9 @@ default = ["pbit", "similarity"]
 pbit = ["dep:hyperphysics-pbit"]
 similarity = ["dep:hyperphysics-similarity", "dep:hyperphysics-hnsw", "dep:hyperphysics-lsh"]
 gpu = ["dep:hyperphysics-gpu-unified"]
-full = ["pbit", "similarity", "gpu"]
+# ChunkProcessor integration for temporal spike hierarchy
+geometry = ["dep:hyperphysics-geometry"]
+full = ["pbit", "similarity", "gpu", "geometry"]
 nightly = []    # Enable nightly-only optimizations
 
 [dependencies]
@@ -33,6 +35,9 @@ hyperphysics-lsh = { path = "../hyperphysics-lsh", optional = true }
 
 # Unified GPU orchestration
 hyperphysics-gpu-unified = { path = "../hyperphysics-gpu-unified", optional = true }
+
+# Geometry crate for ChunkProcessor temporal hierarchy
+hyperphysics-geometry = { path = "../hyperphysics-geometry", optional = true }
 
 # ============================================================================
 # Core Dependencies

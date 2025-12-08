@@ -1,0 +1,56 @@
+[package]
+name = "market_analysis"
+version = "0.1.0"
+edition = "2021"
+
+# [workspace]
+# Empty workspace table to make this a standalone package
+
+[lib]
+name = "market_analysis"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Core dependencies
+ndarray = "0.16.1"
+rayon = "1.10.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4.41", features = ["serde"] }
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.10"
+statrs = "0.16"
+approx = "0.5"
+
+# Mathematical and statistical libraries
+nalgebra = "0.33.2"
+
+# Optional dependencies
+pyo3 = { version = "0.25.1", features = ["extension-module"], optional = true }
+numpy = { version = "0.25", optional = true }
+plotters = { version = "0.3", optional = true }
+tokio = { version = "1.46", features = ["full"], optional = true }
+linfa = { version = "0.7", optional = true }
+smartcore = { version = "0.3", optional = true }
+ta = { version = "0.5", optional = true }
+cbindgen = { version = "0.26", optional = true }
+
+[features]
+default = ["python-bindings"]
+python-bindings = ["pyo3", "numpy"]
+plotting = ["plotters"]
+async = ["tokio"]
+ml = ["linfa", "smartcore"]
+technical-analysis = ["ta"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[[bin]]
+name = "market_analyzer"
+path = "src/bin/main.rs"

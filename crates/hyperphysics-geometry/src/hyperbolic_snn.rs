@@ -152,23 +152,186 @@ impl LorentzVec {
     }
 
     /// Parallel transport tangent vector v from base point to this point
+    /// Parallel transport vector v from `from` to `self` using Schild's ladder algorithm.
+    ///
+    /// Schild's ladder is a discrete approximation to parallel transport that
+    /// converges to true parallel transport as the number of steps increases.
+    ///
+    /// Algorithm:
+    /// 1. Construct geodesic γ from `from` to `self`
+    /// 2. For each step, construct parallelogram via midpoint construction
+    /// 3. Transported vector maintains angle with geodesic
+    ///
+    /// Reference: Kheyfets et al. (2000) "Schild's ladder parallel transport"
+    /// Convergence: O(h²) where h is step size
     pub fn parallel_transport(&self, v: &Self, from: &Self) -> Self {
-        let _log_v = from.log_map(self);
         let d = from.hyperbolic_distance(self);
 
         if d < 1e-10 {
             return *v;
         }
 
-        // Simplified parallel transport along geodesic
-        let factor = self.minkowski_inner(v) / (1.0 + from.minkowski_inner(self));
+        // Number of ladder steps (more steps = better approximation)
+        let num_steps = (d * 10.0).ceil().max(4.0) as usize;
 
-        Self {
-            t: v.t + factor * (from.t + self.t),
-            x: v.x + factor * (from.x + self.x),
-            y: v.y + factor * (from.y + self.y),
-            z: v.z + factor * (from.z + self.z),
+        // Current position along geodesic and current vector
+        let mut current_pos = *from;
+        let mut current_vec = *v;
+
+        for i in 0..num_steps {
+            let t_start = i as f64 / num_steps as f64;
+            let t_end = (i + 1) as f64 / num_steps as f64;
+
+            // Points on the main geodesic
+            let p0 = from.geodesic_point(self, t_start);
+            let p1 = from.geodesic_point(self, t_end);
+
+            // Endpoint of current vector from p0
+            // Scale vector to be a tangent vector at p0, then exp map
+            let vec_norm = (-current_vec.t * current_vec.t
+                + current_vec.x * current_vec.x
+                + current_vec.y * current_vec.y
+                + current_vec.z * current_vec.z).abs().sqrt();
+
+            if vec_norm < 1e-12 {
+                return Self::origin(); // Zero vector stays zero
+            }
+
+            // Small step along vector direction
+            let step_size = (d / num_steps as f64).min(0.1);
+            let q0 = p0.exp_map(&current_vec, step_size);
+
+            // Find midpoint of geodesic from p1 to q0
+            let midpoint = p1.geodesic_midpoint(&q0);
+
+            // Reflect p0 through midpoint to get q1
+            // q1 = Exp_midpoint(Log_midpoint(p0) * -1)
+            let log_p0 = midpoint.log_map(&p0);
+            let q1 = midpoint.exp_map(&log_p0, -1.0);
+
+            // New vector is from p1 to q1, scaled back
+            let new_vec = p1.log_map(&q1);
+            let new_norm = (-new_vec.t * new_vec.t
+                + new_vec.x * new_vec.x
+                + new_vec.y * new_vec.y
+                + new_vec.z * new_vec.z).abs().sqrt();
+
+            // Scale to preserve original magnitude
+            if new_norm > 1e-12 {
+                current_vec = Self {
+                    t: new_vec.t * vec_norm / new_norm,
+                    x: new_vec.x * vec_norm / new_norm,
+                    y: new_vec.y * vec_norm / new_norm,
+                    z: new_vec.z * vec_norm / new_norm,
+                };
+            }
+
+            current_pos = p1;
         }
+
+        current_vec
+    }
+
+    /// Compute point along geodesic from self to other at parameter t ∈ [0,1]
+    #[inline]
+    pub fn geodesic_point(&self, other: &Self, t: f64) -> Self {
+        let log_vec = self.log_map(other);
+        self.exp_map(&log_vec, t)
+    }
+
+    /// Compute geodesic midpoint between self and other
+    #[inline]
+    pub fn geodesic_midpoint(&self, other: &Self) -> Self {
+        self.geodesic_point(other, 0.5)
+    }
+
+    /// Pole ladder parallel transport (alternative to Schild's ladder)
+    /// More accurate but requires 2x the geodesic computations
+    ///
+    /// Reference: Lorenzi & Pennec (2013) "Geodesics, Parallel Transport & One-parameter Subgroups"
+    pub fn parallel_transport_pole_ladder(&self, v: &Self, from: &Self) -> Self {
+        let d = from.hyperbolic_distance(self);
+
+        if d < 1e-10 {
+            return *v;
+        }
+
+        let num_steps = (d * 10.0).ceil().max(4.0) as usize;
+        let mut current_pos = *from;
+        let mut current_vec = *v;
+
+        for i in 0..num_steps {
+            let t_end = (i + 1) as f64 / num_steps as f64;
+            let p1 = from.geodesic_point(self, t_end);
+
+            // Endpoint of vector
+            let vec_norm = (-current_vec.t * current_vec.t
+                + current_vec.x * current_vec.x
+                + current_vec.y * current_vec.y
+                + current_vec.z * current_vec.z).abs().sqrt();
+
+            if vec_norm < 1e-12 {
+                return Self::origin();
+            }
+
+            let step_size = (d / num_steps as f64).min(0.1);
+            let q0 = current_pos.exp_map(&current_vec, step_size);
+
+            // Pole ladder: reflect through geodesic midpoint twice
+            let mid1 = current_pos.geodesic_midpoint(&p1);
+            let q0_reflected = Self {
+                t: 2.0 * mid1.t - q0.t,
+                x: 2.0 * mid1.x - q0.x,
+                y: 2.0 * mid1.y - q0.y,
+                z: 2.0 * mid1.z - q0.z,
+            };
+            // Project back to hyperboloid
+            let spatial_sq = q0_reflected.x * q0_reflected.x
+                + q0_reflected.y * q0_reflected.y
+                + q0_reflected.z * q0_reflected.z;
+            let q0_proj = Self {
+                t: (1.0 + spatial_sq).sqrt(),
+                x: q0_reflected.x,
+                y: q0_reflected.y,
+                z: q0_reflected.z,
+            };
+
+            let mid2 = p1.geodesic_midpoint(&q0_proj);
+            let q1_reflected = Self {
+                t: 2.0 * mid2.t - current_pos.t,
+                x: 2.0 * mid2.x - current_pos.x,
+                y: 2.0 * mid2.y - current_pos.y,
+                z: 2.0 * mid2.z - current_pos.z,
+            };
+            let spatial_sq2 = q1_reflected.x * q1_reflected.x
+                + q1_reflected.y * q1_reflected.y
+                + q1_reflected.z * q1_reflected.z;
+            let q1 = Self {
+                t: (1.0 + spatial_sq2).sqrt(),
+                x: q1_reflected.x,
+                y: q1_reflected.y,
+                z: q1_reflected.z,
+            };
+
+            let new_vec = p1.log_map(&q1);
+            let new_norm = (-new_vec.t * new_vec.t
+                + new_vec.x * new_vec.x
+                + new_vec.y * new_vec.y
+                + new_vec.z * new_vec.z).abs().sqrt();
+
+            if new_norm > 1e-12 {
+                current_vec = Self {
+                    t: new_vec.t * vec_norm / new_norm,
+                    x: new_vec.x * vec_norm / new_norm,
+                    y: new_vec.y * vec_norm / new_norm,
+                    z: new_vec.z * vec_norm / new_norm,
+                };
+            }
+
+            current_pos = p1;
+        }
+
+        current_vec
     }
 
     /// Convert from f32 sentry LorentzVec

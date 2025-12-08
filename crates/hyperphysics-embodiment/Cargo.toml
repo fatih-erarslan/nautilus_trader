@@ -10,10 +10,16 @@ authors.workspace = true
 [features]
 default = []
 serde = ["dep:serde", "hyperphysics-sph/serde", "hyperphysics-connectome/serde"]
+# Enable STDP-based sensorimotor plasticity
+stdp = []
+# Enable hyperbolic geometry integration
+geometry = ["hyperphysics-geometry"]
 
 [dependencies]
 hyperphysics-sph.workspace = true
 hyperphysics-connectome.workspace = true
+hyperphysics-stdp.workspace = true
+hyperphysics-geometry = { path = "../hyperphysics-geometry", optional = true }
 thiserror.workspace = true
 tracing.workspace = true
 serde = { workspace = true, optional = true }

@@ -1,0 +1,35 @@
+[package]
+
+name = "cdfa-algorithms"
+version = "0.1.0"
+edition = "2021"
+authors = ["CDFA Development Team"]
+description = "Advanced signal processing algorithms for CDFA"
+license = "MIT"
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+ndarray = { version = "0.15", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"], optional = true }
+num-traits = "0.2"
+
+[dev-dependencies]
+approx = "0.5"
+criterion = "0.5"
+
+[features]
+default = []
+# Enable parallel processing
+parallel = ["ndarray/rayon"]
+# Enable serde serialization
+serde = ["dep:serde", "ndarray/serde"]
+# Enable no_std support
+no_std = []
+# Enable optimized implementations
+optimized = []
+
+[[bench]]
+name = "signal_processing_benchmarks"
+harness = false

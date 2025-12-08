@@ -1,0 +1,678 @@
+openapi: 3.0.3
+info:
+  title: Cerebellar-Norse Neural Network API
+  description: |
+    High-performance spiking neural network API for ultra-low latency applications.
+    
+    The Cerebellar-Norse system provides biologically-inspired neural processing
+    with sub-microsecond inference latency, designed for high-frequency trading
+    and real-time decision making applications.
+    
+    ## Key Features
+    - Sub-microsecond inference latency (< 1μs)
+    - Biologically accurate cerebellar microcircuit
+    - CUDA-accelerated processing
+    - Real-time spike-timing dependent plasticity (STDP)
+    - Enterprise-grade monitoring and observability
+    
+  version: 0.1.0
+  contact:
+    name: Cerebellar-Norse Team
+    url: https://github.com/nautilus_trader/cerebellar-norse
+    email: support@cerebellar-norse.ai
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+  - url: https://api.cerebellar-norse.ai/v1
+    description: Production server
+
+paths:
+  /neural/process:
+    post:
+      summary: Process market data through neural network
+      description: |
+        Process real-time market data through the cerebellar neural circuit
+        and return trading signals with sub-microsecond latency.
+      operationId: processMarketData
+      tags:
+        - Neural Processing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketDataRequest'
+            examples:
+              simple_tick:
+                summary: Simple market tick
+                value:
+                  price: 100.50
+                  volume: 1000.0
+                  timestamp: 1640995200000
+                  market_id: "BTCUSD"
+              batch_data:
+                summary: Batch market data
+                value:
+                  batch_data:
+                    - price: 100.50
+                      volume: 1000.0
+                      timestamp: 1640995200000
+                    - price: 100.51
+                      volume: 500.0
+                      timestamp: 1640995200100
+                  market_id: "BTCUSD"
+      responses:
+        '200':
+          description: Neural processing completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NeuralResponse'
+              examples:
+                trading_signal:
+                  summary: Trading signal response
+                  value:
+                    trading_signals: [0.8, 0.2, 0.1]
+                    processing_time_ns: 750
+                    confidence: 0.95
+                    neural_metrics:
+                      spike_counts:
+                        granule_layer: 1250
+                        purkinje_layer: 87
+                        dcn_layer: 12
+                      firing_rates:
+                        granule_layer: 0.31
+                        purkinje_layer: 0.87
+                        dcn_layer: 1.2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /neural/configure:
+    post:
+      summary: Configure neural network parameters
+      description: |
+        Update neural network configuration including neuron parameters,
+        connectivity patterns, and plasticity rules.
+      operationId: configureNeuralNetwork
+      tags:
+        - Configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NeuralConfig'
+      responses:
+        '200':
+          description: Configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /neural/metrics:
+    get:
+      summary: Get neural network performance metrics
+      description: |
+        Retrieve detailed performance metrics including processing latency,
+        memory usage, spike counts, and firing rates.
+      operationId: getNeuralMetrics
+      tags:
+        - Monitoring
+      parameters:
+        - name: timeRange
+          in: query
+          description: Time range for metrics collection
+          required: false
+          schema:
+            type: string
+            enum: [1m, 5m, 15m, 1h, 24h]
+            default: 5m
+        - name: layer
+          in: query
+          description: Specific layer to get metrics for
+          required: false
+          schema:
+            $ref: '#/components/schemas/LayerType'
+      responses:
+        '200':
+          description: Metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+
+  /neural/health:
+    get:
+      summary: Check neural network health status
+      description: |
+        Comprehensive health check including system status, memory usage,
+        CUDA availability, and performance validation.
+      operationId: checkNeuralHealth
+      tags:
+        - Health
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /training/start:
+    post:
+      summary: Start neural network training
+      description: |
+        Initiate training process with specified training data and parameters.
+        Supports both STDP and supervised learning approaches.
+      operationId: startTraining
+      tags:
+        - Training
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainingRequest'
+      responses:
+        '202':
+          description: Training started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingResponse'
+
+  /training/status/{trainingId}:
+    get:
+      summary: Get training status
+      description: |
+        Monitor the progress of an ongoing training session including
+        loss metrics, convergence status, and performance metrics.
+      operationId: getTrainingStatus
+      tags:
+        - Training
+      parameters:
+        - name: trainingId
+          in: path
+          required: true
+          description: Training session ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Training status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingStatus'
+
+components:
+  schemas:
+    MarketDataRequest:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+          description: Current market price
+          example: 100.50
+        volume:
+          type: number
+          format: float
+          description: Trading volume
+          example: 1000.0
+        timestamp:
+          type: integer
+          format: int64
+          description: Timestamp in milliseconds
+          example: 1640995200000
+        market_id:
+          type: string
+          description: Market identifier
+          example: "BTCUSD"
+        batch_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MarketTick'
+          description: Batch of market data for processing
+      required:
+        - market_id
+      oneOf:
+        - required: [price, volume, timestamp]
+        - required: [batch_data]
+
+    MarketTick:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        volume:
+          type: number
+          format: float
+        timestamp:
+          type: integer
+          format: int64
+      required: [price, volume, timestamp]
+
+    NeuralResponse:
+      type: object
+      properties:
+        trading_signals:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Neural network output signals for trading decisions
+        processing_time_ns:
+          type: integer
+          format: int64
+          description: Processing latency in nanoseconds
+        confidence:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: Confidence level of the prediction
+        neural_metrics:
+          $ref: '#/components/schemas/NeuralMetrics'
+      required:
+        - trading_signals
+        - processing_time_ns
+        - confidence
+
+    NeuralConfig:
+      type: object
+      properties:
+        granule_size:
+          type: integer
+          minimum: 1000
+          maximum: 10000000
+          description: Number of granule cells
+        purkinje_size:
+          type: integer
+          minimum: 100
+          maximum: 100000
+          description: Number of Purkinje cells
+        learning_rate:
+          type: number
+          format: float
+          minimum: 0.0001
+          maximum: 1.0
+          description: Learning rate for plasticity
+        sparsity:
+          type: number
+          format: float
+          minimum: 0.01
+          maximum: 0.5
+          description: Connection sparsity ratio
+        device:
+          type: string
+          enum: [cpu, cuda]
+          description: Computation device
+      required:
+        - granule_size
+        - purkinje_size
+
+    ConfigurationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        validation_results:
+          $ref: '#/components/schemas/ValidationResult'
+      required:
+        - success
+
+    NeuralMetrics:
+      type: object
+      properties:
+        spike_counts:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Spike counts per layer
+        firing_rates:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          description: Firing rates per layer (Hz)
+        memory_usage_bytes:
+          type: integer
+          format: int64
+          description: Current memory usage in bytes
+        cuda_utilization:
+          type: number
+          format: float
+          description: CUDA GPU utilization percentage
+
+    MetricsResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        time_range:
+          type: string
+        neural_metrics:
+          $ref: '#/components/schemas/NeuralMetrics'
+        performance_metrics:
+          $ref: '#/components/schemas/PerformanceMetrics'
+        health_status:
+          $ref: '#/components/schemas/HealthStatus'
+
+    PerformanceMetrics:
+      type: object
+      properties:
+        avg_latency_ns:
+          type: integer
+          format: int64
+        p95_latency_ns:
+          type: integer
+          format: int64
+        p99_latency_ns:
+          type: integer
+          format: int64
+        throughput_ops_per_sec:
+          type: number
+          format: float
+        error_rate:
+          type: number
+          format: float
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/HealthStatus'
+        timestamp:
+          type: string
+          format: date-time
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthCheck'
+        uptime_seconds:
+          type: integer
+          format: int64
+
+    HealthStatus:
+      type: string
+      enum: [healthy, degraded, unhealthy]
+      description: Overall system health status
+
+    HealthCheck:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [pass, fail, warn]
+        message:
+          type: string
+        duration_ms:
+          type: integer
+
+    LayerType:
+      type: string
+      enum: [granule_cell, purkinje_cell, golgi_cell, deep_cerebellar_nucleus]
+      description: Neural layer type
+
+    TrainingRequest:
+      type: object
+      properties:
+        training_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrainingExample'
+        training_config:
+          $ref: '#/components/schemas/TrainingConfig'
+        validation_split:
+          type: number
+          format: float
+          minimum: 0.1
+          maximum: 0.5
+          default: 0.2
+      required:
+        - training_data
+        - training_config
+
+    TrainingExample:
+      type: object
+      properties:
+        input:
+          type: array
+          items:
+            type: number
+            format: float
+        target:
+          type: array
+          items:
+            type: number
+            format: float
+        weight:
+          type: number
+          format: float
+          default: 1.0
+
+    TrainingConfig:
+      type: object
+      properties:
+        epochs:
+          type: integer
+          minimum: 1
+          maximum: 10000
+        batch_size:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        learning_rate:
+          type: number
+          format: float
+        optimizer:
+          type: string
+          enum: [adam, sgd, rmsprop]
+        loss_function:
+          type: string
+          enum: [mse, mae, huber]
+
+    TrainingResponse:
+      type: object
+      properties:
+        training_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [started, queued]
+        estimated_duration_minutes:
+          type: integer
+
+    TrainingStatus:
+      type: object
+      properties:
+        training_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [running, completed, failed, stopped]
+        progress:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+        current_epoch:
+          type: integer
+        total_epochs:
+          type: integer
+        metrics:
+          $ref: '#/components/schemas/TrainingMetrics'
+
+    TrainingMetrics:
+      type: object
+      properties:
+        loss:
+          type: number
+          format: float
+        accuracy:
+          type: number
+          format: float
+        validation_loss:
+          type: number
+          format: float
+        validation_accuracy:
+          type: number
+          format: float
+        learning_rate:
+          type: number
+          format: float
+
+    ValidationResult:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        validation_score:
+          type: number
+          format: float
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationWarning'
+
+    ValidationError:
+      type: object
+      properties:
+        error_type:
+          type: string
+        message:
+          type: string
+        severity:
+          type: string
+          enum: [critical, major, minor]
+
+    ValidationWarning:
+      type: object
+      properties:
+        warning_type:
+          type: string
+        message:
+          type: string
+        recommendation:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+        correlation_id:
+          type: string
+          format: uuid
+      required:
+        - error
+        - message
+        - timestamp
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "invalid_request"
+            message: "Price must be a positive number"
+            timestamp: "2024-01-01T12:00:00Z"
+            correlation_id: "550e8400-e29b-41d4-a716-446655440000"
+
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "rate_limited"
+            message: "Too many requests. Rate limit: 1000 requests/second"
+            timestamp: "2024-01-01T12:00:00Z"
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "internal_error"
+            message: "Neural processing failed due to CUDA memory error"
+            timestamp: "2024-01-01T12:00:00Z"
+
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authentication
+
+security:
+  - ApiKey: []
+  - BearerAuth: []
+
+tags:
+  - name: Neural Processing
+    description: Core neural network processing operations
+  - name: Configuration
+    description: Neural network configuration management
+  - name: Monitoring
+    description: Performance monitoring and metrics
+  - name: Health
+    description: System health checks and status
+  - name: Training
+    description: Neural network training operations
+
+externalDocs:
+  description: Cerebellar-Norse Documentation
+  url: https://docs.cerebellar-norse.ai

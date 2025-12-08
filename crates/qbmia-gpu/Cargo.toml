@@ -1,0 +1,94 @@
+[package]
+name = "qbmia-gpu"
+version = "0.1.0"
+edition = "2021"
+authors = ["Neuro Trader Team"]
+description = "GPU acceleration for QBMIA quantum circuits and Nash equilibrium solving"
+license = "MIT"
+
+[features]
+default = []
+cuda = ["cudarc", "nvml-wrapper"]
+rocm = ["ocl", "hip"]
+webgpu = ["wgpu", "wgpu-core", "wgpu-hal", "wgpu-types"]
+multi-gpu = []
+profiling = []
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core dependencies
+qbmia-core = { path = "../qbmia-core" }
+quantum-core = { path = "../quantum-core" }
+ndarray = "0.15"
+num-complex = "0.4"
+rayon = "1.7"
+crossbeam = "0.8"
+parking_lot = "0.12"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
+
+# GPU Backend - CUDA (using workspace version to avoid conflicts)
+cudarc = { workspace = true, optional = true }
+nvml-wrapper = { version = "0.9", optional = true }
+
+# GPU Backend - ROCm
+ocl = { version = "0.19", optional = true }
+hip = { version = "0.0.0", optional = true }
+
+# GPU Backend - WebGPU
+wgpu = { version = "0.19", optional = true }
+wgpu-core = { version = "0.19", optional = true }
+wgpu-hal = { version = "0.19", optional = true }
+wgpu-types = { version = "0.19", optional = true }
+
+# Multi-GPU support - Note: These crates don't exist yet, placeholder for future implementation
+# nccl = { version = "0.1", optional = true }
+# rccl = { version = "0.1", optional = true }
+
+# Memory management
+memmap2 = "0.9"
+aligned-vec = "0.5"
+cache-padded = "1.3"
+
+# Performance monitoring - Note: These may not exist, placeholder for future implementation
+# nvtx = { version = "1.3", optional = true }
+# rocprofiler-sys = { version = "0.4", optional = true }
+
+# Async runtime for GPU operations
+tokio = { version = "1.35", features = ["full"] }
+futures = "0.3"
+
+# Logging and metrics
+tracing = "0.1"
+tracing-subscriber = "0.3"
+metrics = "0.22"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+approx = "0.5"
+
+[build-dependencies]
+cc = "1.0"
+bindgen = "0.69"
+pkg-config = "0.3"
+
+[[bench]]
+name = "quantum_circuits"
+harness = false
+
+[[bench]]
+name = "nash_equilibrium"
+harness = false
+
+[[bench]]
+name = "memory_pooling"
+harness = false
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"

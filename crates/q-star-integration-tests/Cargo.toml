@@ -1,0 +1,80 @@
+[package]
+name = "q-star-integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+q-star-core = { path = "../q-star-core" }
+q-star-neural = { path = "../q-star-neural" }
+q-star-quantum = { path = "../q-star-quantum" }
+q-star-trading = { path = "../q-star-trading" }
+q-star-orchestrator = { path = "../q-star-orchestrator" }
+
+# Async runtime
+tokio = { version = "1.39", features = ["full", "test-util", "macros"] }
+async-trait = "0.1"
+
+# Testing utilities
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+proptest = "1.5"
+quickcheck = "1.0"
+test-log = "0.2"
+tracing = "0.1"
+tracing-test = "0.2"
+env_logger = "0.11"
+
+# Performance measurement
+jemallocator = { workspace = true }
+mimalloc = { version = "0.1", default-features = false }
+
+# Data and serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Math and statistics
+statrs = "0.16"
+ndarray = "0.15"
+nalgebra = "0.32"
+
+# Time measurement
+chrono = "0.4"
+quanta = "0.12"
+
+[[bench]]
+name = "latency"
+harness = false
+
+[[bench]]
+name = "throughput"
+harness = false
+
+[[bench]]
+name = "accuracy"
+harness = false
+
+[[bench]]
+name = "scalability"
+harness = false
+
+[[test]]
+name = "integration"
+path = "tests/integration.rs"
+
+[[test]]
+name = "performance"
+path = "tests/performance.rs"
+
+[[test]]
+name = "stress"
+path = "tests/stress.rs"
+
+[[test]]
+name = "fault_tolerance"
+path = "tests/fault_tolerance.rs"
+
+[dev-dependencies]
+futures = "0.3"

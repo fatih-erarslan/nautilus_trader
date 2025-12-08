@@ -1,0 +1,51 @@
+FROM rust:1.75-slim as builder
+
+WORKDIR /app
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    libopenblas-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy manifests
+COPY Cargo.toml Cargo.lock ./
+
+# Copy source code
+COPY src ./src
+COPY benches ./benches
+COPY tests ./tests
+
+# Build the application
+RUN cargo build --release --bin metrics-exporter
+
+FROM debian:bookworm-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libssl3 \
+    libopenblas0 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy the binary from builder stage
+COPY --from=builder /app/target/release/metrics-exporter /app/metrics-exporter
+
+# Create non-root user
+RUN useradd -r -s /bin/false cerebellar && \
+    chown -R cerebellar:cerebellar /app
+
+USER cerebellar
+
+# Expose metrics port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
+
+# Run the exporter
+CMD ["./metrics-exporter"]

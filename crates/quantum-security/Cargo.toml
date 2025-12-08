@@ -1,0 +1,123 @@
+[package]
+name = "quantum-security"
+version = "0.1.0"
+edition = "2021"
+description = "Quantum-resistant cryptography and security protocols for ATS-CP Trading System"
+authors = ["Quantum Security Team <security@ats-cp.com>"]
+license = "MIT"
+repository = "https://github.com/ats-cp/quantum-security"
+keywords = ["quantum", "cryptography", "security", "post-quantum", "trading"]
+categories = ["cryptography", "security"]
+
+[dependencies]
+# Core async and concurrency
+tokio = { version = "1.46", features = ["full"] }
+tokio-util = "0.7"
+async-trait = "0.1"
+futures = "0.3"
+rayon = "1.10.0"
+
+# Cryptography - Post-Quantum (Note: These are placeholder deps - use actual PQC libraries)
+# crystals-kyber = "0.1"  # Replace with actual library when available
+# crystals-dilithium = "0.1"  # Replace with actual library when available
+# falcon = "0.1"  # Replace with actual library when available
+# sphincs = "0.1"  # Replace with actual library when available
+
+# Classical cryptography
+aes-gcm = "0.10"
+chacha20poly1305 = "0.10"
+blake3 = "1.5"
+sha3 = "0.10"
+sha2 = "0.10"
+ed25519-dalek = "1.0"
+curve25519-dalek = "4.0"
+x25519-dalek = "2.0"
+
+# Key derivation and random
+argon2 = "0.5"
+rand = "0.8"
+rand_chacha = "0.3"
+ring = "0.17"
+hkdf = "0.12"
+
+# Quantum Key Distribution (Note: Placeholder deps - implement custom protocols)
+# qkd-protocol = "0.1"  # Replace with actual library when available
+# bb84 = "0.1"  # Replace with actual library when available
+# quantum-entropy = "0.1"  # Replace with actual library when available
+
+# Secure communication
+# noise-protocol = "0.1"  # Not available, implement custom if needed
+rustls = "0.21"
+webpki = "0.22"
+
+# Hardware Security Module (Optional, enable as needed)
+pkcs11 = { version = "0.5", optional = true }
+# yubikey = "0.7"  # Not available, implement custom if needed
+# tpm = "0.2"  # Not available, implement custom if needed
+
+# Serialization and encoding
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+base64 = "0.21"
+hex = "0.4"
+
+# Error handling and logging
+thiserror = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+anyhow = "1.0"
+
+# Time and UUID
+chrono = { version = "0.4.41", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Networking and protocols
+reqwest = { version = "0.11", features = ["json"] }
+tungstenite = "0.20"
+tokio-tungstenite = "0.20"
+
+# Memory management
+zeroize = { version = "1.6", features = ["zeroize_derive"] }
+secrecy = "0.8"
+subtle = "2.5"
+
+# Configuration and validation
+config = "0.13"
+validator = { version = "0.16", features = ["derive"] }
+
+# Benchmarking and testing
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.0"
+quickcheck = "1.0"
+
+# Performance monitoring
+prometheus = "0.13"
+metrics = "0.21"
+
+# Database integration
+sqlx = { workspace = true, features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid"] }
+redis = { version = "0.23", features = ["tokio-comp"] }
+
+# SIMD and hardware acceleration
+wide = { version = "0.7", optional = true }
+# packed_simd = "0.3"  # Removed due to unstable features
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3.8"
+pretty_assertions = "1.4"
+rstest = "0.18"
+
+[[bench]]
+name = "quantum_security_benchmark"
+harness = false
+
+[features]
+default = ["full"]
+full = ["post-quantum", "quantum-kd", "hsm", "hardware-acceleration"]
+post-quantum = []  # Enable when PQC libraries are available
+quantum-kd = []  # Enable when QKD libraries are available
+hsm = ["pkcs11"]  # Hardware Security Module support
+hardware-acceleration = ["wide"]  # SIMD acceleration
+testing = []

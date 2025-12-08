@@ -1,0 +1,104 @@
+[package]
+
+name = "cdfa-fibonacci-analyzer"
+version = "0.1.0"
+edition = "2021"
+authors = ["ATS-CP Trading Team"]
+description = "High-performance Fibonacci analysis with sub-microsecond precision for CDFA"
+license = "MIT"
+repository = "https://github.com/your-org/cdfa-fibonacci-analyzer"
+readme = "README.md"
+categories = ["finance", "mathematics", "science"]
+keywords = ["fibonacci", "trading", "analysis", "finance", "high-frequency"]
+
+[lib]
+name = "cdfa_fibonacci_analyzer"
+crate-type = ["cdylib", "rlib"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core dependencies
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.10"
+
+# Math and numerical computation
+num-traits = "0.2"
+num-complex = "0.4"
+approx = "0.5"
+statrs = "0.16"
+
+# SIMD acceleration
+wide = { version = "0.7", optional = true }
+simba = { version = "0.8", optional = true }
+
+# Parallel processing
+rayon = { version = "1.8", optional = true }
+crossbeam = { version = "0.8", optional = true }
+
+# Memory management
+aligned-vec = "0.5"
+memmap2 = "0.9"
+
+# Time and performance
+instant = "0.1"
+criterion = { version = "0.5", optional = true }
+
+# Optional Python bindings
+pyo3 = { version = "0.25.1", features = ["extension-module"], optional = true }
+numpy = { version = "0.25", optional = true }
+
+# Optional C FFI
+libc = { version = "0.2", optional = true }
+
+# Local crate dependencies
+cdfa-core = { path = "../cdfa-core" }
+cdfa-simd = { path = "../cdfa-simd", optional = true }
+cdfa-algorithms = { path = "../cdfa-algorithms" }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+pretty_assertions = "1.4"
+approx = "0.5"
+
+[features]
+default = ["simd", "parallel"]
+simd = ["dep:wide", "dep:simba", "dep:cdfa-simd"]
+parallel = ["dep:rayon", "dep:crossbeam"]
+python = ["pyo3", "numpy"]
+c-ffi = ["libc"]
+benchmarks = ["criterion"]
+all = ["simd", "parallel", "python", "c-ffi", "benchmarks"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+opt-level = 3
+
+[profile.bench]
+lto = true
+codegen-units = 1
+opt-level = 3
+debug = true
+
+[[bench]]
+name = "fibonacci_benchmarks"
+harness = false
+required-features = ["benchmarks"]
+
+[[bench]]
+name = "simd_benchmarks"
+harness = false
+required-features = ["simd", "benchmarks"]
+
+[[example]]
+name = "fibonacci_analysis"
+required-features = ["simd"]

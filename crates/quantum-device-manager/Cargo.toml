@@ -1,0 +1,92 @@
+[package]
+name = "quantum-device-manager"
+version = "0.1.0"
+edition = "2021"
+authors = ["Quantum Device Management Specialist <quantum@hive.ai>"]
+description = "Quantum device orchestration and management for FreqTrade ATS-CP trading system"
+license = "MIT"
+repository = "https://github.com/hive-mind/quantum-device-manager"
+documentation = "https://docs.rs/quantum-device-manager"
+keywords = ["quantum", "device", "management", "trading", "hive"]
+categories = ["hardware-support", "algorithms", "science"]
+
+[dependencies]
+# Core dependencies
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.0", features = ["v4"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Quantum computing
+quantum-core = { path = "../quantum-core" }
+quantum-backend = { path = "../quantum-backend" }
+quantum-hive = { path = "../quantum-hive" }
+pennylane-quantum-core = { path = "../pennylane-quantum-core" }
+
+# Hive mind coordination
+dashmap = "5.0"
+parking_lot = "0.12"
+arc-swap = "1.0"
+lockfree = "0.5"
+
+# Performance and monitoring
+metrics = "0.23"
+prometheus = "0.13"
+histogram = "0.6"
+
+# Device management
+device-query = "2.0"
+sysinfo = "0.30"
+nvml-wrapper = "0.9"
+opencl3 = "0.9"
+
+# Nash solver integration
+qbmia-gpu = { path = "../qbmia-gpu" }
+qbmia-acceleration = { path = "../qbmia-acceleration" }
+quantum-nash-solver = { path = "../quantum-nash-solver" }
+
+# Network and communication
+tonic = "0.11"
+prost = "0.12"
+hyper = "1.0"
+tower = "0.4"
+futures = "0.3"
+
+# Configuration
+config = "0.13"
+toml = "0.8"
+
+# Utilities
+rayon = "1.8"
+num_cpus = "1.16"
+crossbeam = "0.8"
+once_cell = "1.19"
+lazy_static = "1.4"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3.8"
+criterion = "0.5"
+proptest = "1.4"
+mock_instant = "0.3"
+
+[[bench]]
+name = "device_orchestration"
+harness = false
+
+[[bench]]
+name = "quantum_device_selection"
+harness = false
+
+[features]
+default = ["gpu", "nash-solver", "monitoring"]
+gpu = ["opencl3", "nvml-wrapper"]
+nash-solver = ["qbmia-gpu", "quantum-nash-solver"]
+monitoring = ["metrics", "prometheus"]
+debug = []

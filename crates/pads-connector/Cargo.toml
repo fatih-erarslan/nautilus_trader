@@ -1,0 +1,84 @@
+[package]
+name = "pads-connector"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Panarchy Adaptive Decision System connector for sophisticated cross-scale interaction handling"
+repository.workspace = true
+keywords = ["panarchy", "adaptive", "decision", "cross-scale", "trading"]
+categories = ["algorithms", "science", "simulation"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core dependencies
+tokio = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Data structures
+dashmap = { workspace = true }
+crossbeam = { workspace = true }
+parking_lot = { workspace = true }
+petgraph = { workspace = true }
+ndarray = { workspace = true }
+
+# Performance
+rayon = { workspace = true }
+num_cpus = { workspace = true }
+once_cell = { workspace = true }
+
+# Metrics and monitoring
+prometheus = { workspace = true }
+metrics = { workspace = true }
+metrics-exporter-prometheus = { workspace = true }
+
+# Time handling
+chrono = { workspace = true }
+
+# Local crates
+cdfa-core = { path = "../cdfa-core" }
+cdfa-algorithms = { path = "../cdfa-algorithms" }
+cdfa-panarchy-analyzer = { path = "../cdfa-panarchy-analyzer" }
+cdfa-soc-analyzer = { path = "../cdfa-soc-analyzer" }
+mcp-orchestration = { path = "../mcp-orchestration" }
+cognitive-integration = { path = "../cognitive-integration" }
+ml-ensemble = { path = "../ml-ensemble" }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+proptest = "1.6"
+quickcheck = "1.0"
+tokio-test = "0.4"
+pretty_assertions = "1.4"
+
+[features]
+default = ["full"]
+full = ["simd", "gpu", "distributed"]
+simd = []
+gpu = []
+distributed = []
+
+[[bench]]
+name = "pads_benchmarks"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+opt-level = 3
+lto = true
+codegen-units = 1

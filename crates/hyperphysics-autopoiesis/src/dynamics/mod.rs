@@ -9,6 +9,14 @@
 //! - **Self-Organized Criticality**: Systems naturally evolving to critical states
 //! - **Emergence Detection**: Identifying higher-order patterns from component interactions
 //!
+//! ## SOC Integration (hyperphysics-geometry)
+//!
+//! Now integrates with `hyperphysics-geometry::SOCCoordinator` for criticality-driven
+//! bifurcation detection. SOC provides:
+//! - Branching ratio σ ≈ 1.0 at criticality
+//! - Power-law avalanche distributions (τ ≈ 1.5)
+//! - Automatic emergence detection at phase transitions
+//!
 //! ## References
 //! - Strogatz (2014) "Nonlinear Dynamics and Chaos"
 //! - Bak (1996) "How Nature Works: Self-Organized Criticality"
@@ -19,6 +27,7 @@ use nalgebra::{DMatrix, DVector};
 use serde::{Deserialize, Serialize};
 
 use crate::error::{AutopoiesisError, Result};
+use hyperphysics_geometry::{SOCCoordinator, SOCModulation, SOCStats, LorentzVec4D};
 
 /// Configuration for dynamical analysis
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -47,6 +56,7 @@ impl Default for DynamicsConfig {
 /// Core dynamics engine for autopoietic systems
 ///
 /// Tracks system evolution, detects transitions, and monitors stability.
+/// Now integrates with SOCCoordinator for criticality-driven bifurcation detection.
 #[derive(Debug)]
 pub struct AutopoieticDynamics {
     /// Configuration
@@ -61,6 +71,10 @@ pub struct AutopoieticDynamics {
     lyapunov_estimate: f64,
     /// Dimension of state space
     state_dimension: usize,
+    /// SOC coordinator for criticality-driven dynamics
+    soc_coordinator: Option<SOCCoordinator>,
+    /// History of SOC statistics for criticality tracking
+    soc_history: VecDeque<SOCStats>,
 }
 
 impl AutopoieticDynamics {
@@ -73,7 +87,123 @@ impl AutopoieticDynamics {
             bifurcations: Vec::new(),
             lyapunov_estimate: 0.0,
             state_dimension,
+            soc_coordinator: None,
+            soc_history: VecDeque::with_capacity(1000),
         }
+    }
+
+    /// Attach an SOC coordinator for criticality-driven dynamics
+    ///
+    /// When attached, bifurcation detection is enhanced with SOC metrics:
+    /// - Bifurcations are more likely near σ = 1.0 (critical branching ratio)
+    /// - Power-law exponent τ ≈ 1.5 indicates proximity to phase transition
+    /// - Emergence events are detected when SOC avalanche distributions shift
+    pub fn with_soc_coordinator(mut self, coordinator: SOCCoordinator) -> Self {
+        self.soc_coordinator = Some(coordinator);
+        self
+    }
+
+    /// Record SOC statistics and check for criticality-driven bifurcation
+    ///
+    /// SOC provides an alternative view of system dynamics:
+    /// - Branching ratio σ → 1 indicates approach to criticality
+    /// - Power-law exponent τ → 1.5 indicates optimal criticality
+    /// - Large avalanches indicate potential phase transition
+    pub fn record_soc_stats(&mut self, stats: SOCStats) -> Option<BifurcationEvent> {
+        self.soc_history.push_back(stats.clone());
+
+        // Maintain history size
+        while self.soc_history.len() > self.config.window_size {
+            self.soc_history.pop_front();
+        }
+
+        // Check for criticality-driven bifurcation
+        self.detect_soc_bifurcation(&stats)
+    }
+
+    /// Detect bifurcation from SOC statistics
+    ///
+    /// A bifurcation is likely when:
+    /// 1. σ crosses 1.0 (criticality threshold)
+    /// 2. τ shifts significantly (power-law exponent change)
+    /// 3. Avalanche size distribution changes shape
+    fn detect_soc_bifurcation(&mut self, stats: &SOCStats) -> Option<BifurcationEvent> {
+        if self.soc_history.len() < 2 {
+            return None;
+        }
+
+        let prev_stats = &self.soc_history[self.soc_history.len() - 2];
+
+        // Check for criticality crossing (σ crosses 1.0)
+        let prev_subcritical = prev_stats.sigma_measured < 1.0;
+        let curr_subcritical = stats.sigma_measured < 1.0;
+        let criticality_crossed = prev_subcritical != curr_subcritical;
+
+        // Check for power-law exponent shift
+        let tau_shift = (stats.power_law_tau - prev_stats.power_law_tau).abs();
+        let significant_tau_shift = tau_shift > 0.2;
+
+        // Check for avalanche distribution change
+        let avg_size_ratio = if prev_stats.avg_avalanche_size > 1e-10 {
+            stats.avg_avalanche_size / prev_stats.avg_avalanche_size
+        } else {
+            1.0
+        };
+        let avalanche_shift = avg_size_ratio > 2.0 || avg_size_ratio < 0.5;
+
+        if criticality_crossed || significant_tau_shift || avalanche_shift {
+            let bifurcation_type = if criticality_crossed {
+                if stats.sigma_measured > 1.0 {
+                    BifurcationType::Hopf // Transition to oscillatory/chaotic
+                } else {
+                    BifurcationType::SaddleNode // Transition to stable attractor
+                }
+            } else if significant_tau_shift {
+                BifurcationType::PeriodDoubling // Power-law change often precedes period doubling
+            } else {
+                BifurcationType::PitchforkSupercritical
+            };
+
+            let event = BifurcationEvent {
+                timestamp: chrono::Utc::now(),
+                control_parameter: stats.sigma_measured,
+                bifurcation_type,
+                variance_ratio: avg_size_ratio,
+                eigenvalue_crossing: Some(stats.sigma_measured - 1.0),
+            };
+
+            self.bifurcations.push(event.clone());
+            return Some(event);
+        }
+
+        None
+    }
+
+    /// Get current SOC modulation factor
+    ///
+    /// Returns a factor in [0, 1] indicating proximity to criticality.
+    /// Used to modulate other system parameters based on SOC state.
+    pub fn soc_modulation(&self) -> f64 {
+        self.soc_history.back().map(|stats| {
+            let sigma_dev = (stats.sigma_measured - 1.0).abs();
+            let tau_dev = (stats.power_law_tau - 1.5).abs();
+
+            // Gaussian modulation centered at criticality
+            let sigma_factor = (-sigma_dev * sigma_dev / 0.02).exp();
+            let tau_factor = (-tau_dev * tau_dev / 0.5).exp();
+
+            sigma_factor * 0.7 + tau_factor * 0.3
+        }).unwrap_or(0.5)
+    }
+
+    /// Check if system is at SOC criticality
+    pub fn is_at_criticality(&self) -> bool {
+        self.soc_history.back().map(|stats| stats.is_critical).unwrap_or(false)
+    }
+
+    /// Get SOC history for analysis
+    pub fn soc_history(&self) -> &VecDeque<SOCStats> {
+        &self.soc_history
     }
 
     /// Record a new state observation

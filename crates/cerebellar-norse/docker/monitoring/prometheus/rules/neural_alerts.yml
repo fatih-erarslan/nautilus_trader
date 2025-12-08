@@ -1,0 +1,260 @@
+groups:
+  - name: neural_network_alerts
+    rules:
+      # High neural network inference latency
+      - alert: NeuralInferenceLatencyHigh
+        expr: histogram_quantile(0.95, neural_inference_latency_seconds) > 0.010
+        for: 30s
+        labels:
+          severity: warning
+          component: neural_network
+        annotations:
+          summary: "Neural network inference latency is high"
+          description: "95th percentile inference latency is {{ $value }}s, which is above the 10ms threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/neural-latency"
+
+      # Critical neural network inference latency
+      - alert: NeuralInferenceLatencyCritical
+        expr: histogram_quantile(0.95, neural_inference_latency_seconds) > 0.050
+        for: 15s
+        labels:
+          severity: critical
+          component: neural_network
+        annotations:
+          summary: "Neural network inference latency is critically high"
+          description: "95th percentile inference latency is {{ $value }}s, which is above the 50ms critical threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/neural-latency"
+
+      # Low neural network accuracy
+      - alert: NeuralAccuracyLow
+        expr: neural_accuracy_percentage < 95
+        for: 60s
+        labels:
+          severity: warning
+          component: neural_network
+        annotations:
+          summary: "Neural network accuracy is below threshold"
+          description: "Neural network accuracy is {{ $value }}%, below the 95% threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/neural-accuracy"
+
+      # Critical neural network accuracy
+      - alert: NeuralAccuracyCritical
+        expr: neural_accuracy_percentage < 90
+        for: 30s
+        labels:
+          severity: critical
+          component: neural_network
+        annotations:
+          summary: "Neural network accuracy is critically low"
+          description: "Neural network accuracy is {{ $value }}%, below the 90% critical threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/neural-accuracy"
+
+      # High neural network error rate
+      - alert: NeuralErrorRateHigh
+        expr: rate(neural_errors_total[5m]) > 0.01
+        for: 30s
+        labels:
+          severity: warning
+          component: neural_network
+        annotations:
+          summary: "Neural network error rate is high"
+          description: "Neural network error rate is {{ $value }} errors/sec over the last 5 minutes"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/neural-errors"
+
+      # Low neural network throughput
+      - alert: NeuralThroughputLow
+        expr: neural_throughput_ops_per_sec < 100
+        for: 60s
+        labels:
+          severity: warning
+          component: neural_network
+        annotations:
+          summary: "Neural network throughput is low"
+          description: "Neural network throughput is {{ $value }} ops/sec, below the 100 ops/sec threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/neural-throughput"
+
+      # Neural network service down
+      - alert: NeuralNetworkDown
+        expr: up{job="cerebellar-norse"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: neural_network
+        annotations:
+          summary: "Neural network service is down"
+          description: "Neural network service has been down for more than 30 seconds"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/service-down"
+
+  - name: trading_system_alerts
+    rules:
+      # High order processing latency
+      - alert: OrderLatencyHigh
+        expr: histogram_quantile(0.95, trading_order_latency_seconds) > 0.100
+        for: 30s
+        labels:
+          severity: warning
+          component: trading_system
+        annotations:
+          summary: "Order processing latency is high"
+          description: "95th percentile order latency is {{ $value }}s, above the 100ms threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/order-latency"
+
+      # Critical order processing latency
+      - alert: OrderLatencyCritical
+        expr: histogram_quantile(0.95, trading_order_latency_seconds) > 0.500
+        for: 15s
+        labels:
+          severity: critical
+          component: trading_system
+        annotations:
+          summary: "Order processing latency is critically high"
+          description: "95th percentile order latency is {{ $value }}s, above the 500ms critical threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/order-latency"
+
+      # High risk score
+      - alert: RiskScoreHigh
+        expr: trading_risk_score > 0.8
+        for: 60s
+        labels:
+          severity: warning
+          component: risk_management
+        annotations:
+          summary: "Trading risk score is high"
+          description: "Current risk score is {{ $value }}, above the 0.8 threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/risk-management"
+
+      # Critical risk score
+      - alert: RiskScoreCritical
+        expr: trading_risk_score > 0.9
+        for: 30s
+        labels:
+          severity: critical
+          component: risk_management
+        annotations:
+          summary: "Trading risk score is critically high"
+          description: "Current risk score is {{ $value }}, above the 0.9 critical threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/risk-management"
+
+      # Low order throughput
+      - alert: OrderThroughputLow
+        expr: rate(trading_orders_total[5m]) < 10
+        for: 120s
+        labels:
+          severity: warning
+          component: trading_system
+        annotations:
+          summary: "Order throughput is low"
+          description: "Order processing rate is {{ $value }} orders/sec over the last 5 minutes"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/order-throughput"
+
+  - name: system_health_alerts
+    rules:
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 60s
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}%, above the 90% threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/high-cpu"
+
+      # Critical CPU usage
+      - alert: CriticalCPUUsage
+        expr: 100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 30s
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical CPU usage detected"
+          description: "CPU usage is {{ $value }}%, above the 95% critical threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/high-cpu"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 60s
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}%, above the 85% threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/high-memory"
+
+      # Critical memory usage
+      - alert: CriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 30s
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical memory usage detected"
+          description: "Memory usage is {{ $value }}%, above the 95% critical threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/high-memory"
+
+      # High disk usage
+      - alert: HighDiskUsage
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 90
+        for: 60s
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High disk usage detected"
+          description: "Disk usage is {{ $value }}% on {{ $labels.device }}, above the 90% threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/high-disk"
+
+      # Critical disk usage
+      - alert: CriticalDiskUsage
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 95
+        for: 30s
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical disk usage detected"
+          description: "Disk usage is {{ $value }}% on {{ $labels.device }}, above the 95% critical threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/high-disk"
+
+      # Service down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: service
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} service has been down for more than 30 seconds"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/service-down"
+
+  - name: performance_alerts
+    rules:
+      # Response time degradation
+      - alert: ResponseTimeDegradation
+        expr: histogram_quantile(0.95, http_request_duration_seconds) > 1.0
+        for: 120s
+        labels:
+          severity: warning
+          component: performance
+        annotations:
+          summary: "HTTP response time degradation"
+          description: "95th percentile response time is {{ $value }}s, above the 1s threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/response-time"
+
+      # Error rate spike
+      - alert: ErrorRateSpike
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 60s
+        labels:
+          severity: warning
+          component: application
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }}, above the 5% threshold"
+          runbook_url: "https://docs.cerebellar-norse.com/runbooks/error-rate"

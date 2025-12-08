@@ -1,0 +1,58 @@
+[package]
+name = "quantum-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Core dependencies
+quantum-core = { path = "../quantum-core" }
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0"
+async-trait = "0.1"
+tokio = { version = "1.46", features = ["full"] }
+tracing = "0.1"
+num-complex = "0.4"
+ndarray = "0.16.1"
+nalgebra = "0.33.2"
+rayon = "1.10.0"
+parking_lot = "0.12"
+
+# Python/PennyLane interface
+pyo3 = { version = "0.25.1", features = ["auto-initialize", "multiple-pymethods"], optional = true }
+numpy = { version = "0.25", optional = true }
+
+# GPU support
+cudarc = { workspace = true, optional = true }  # Latest available - using workspace version to avoid CUDA conflicts
+
+# Performance
+ahash = "0.8"
+crossbeam = "0.8"
+dashmap = "5.5"
+
+# Math and optimization
+statrs = "0.16"
+rand = "0.8"
+rand_distr = "0.4"
+argmin = "0.9"
+argmin-math = "0.4"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+approx = "0.5"
+proptest = "1.4"
+
+[features]
+default = ["cuda", "pennylane"]
+cuda = ["cudarc"]
+pennylane = ["pyo3", "numpy"]
+simd = []
+
+[[bench]]
+name = "quantum_circuits"
+harness = false
+
+[[bench]]
+name = "nash_solver"
+harness = false

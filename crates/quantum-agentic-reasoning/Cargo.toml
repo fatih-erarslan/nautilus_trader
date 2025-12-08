@@ -1,0 +1,71 @@
+[package]
+name = "quantum-agentic-reasoning"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Quantum Agentic Reasoning engine with Prospect Theory, LMSR, and Hedge algorithms"
+
+[lib]
+name = "quantum_agentic_reasoning"
+path = "src/lib.rs"
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core dependencies
+tokio = { version = "1.0", features = ["full", "rt-multi-thread", "macros"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-trait = "0.1"
+thiserror = "1.0"
+anyhow = "1.0"
+log = "0.4"
+tracing = "0.1"
+
+# Configuration and serialization
+toml = "0.8"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Math and quantum computing
+num-complex = "0.4"
+complex = "0.8"
+nalgebra = "0.32"
+ndarray = "0.15"
+
+# Encoding and crypto
+base64 = "0.22"
+
+# UUID generation
+uuid = { version = "1.10", features = ["v4"] }
+
+# Random number generation
+rand = "0.8"
+
+# ML and tensor operations
+candle-core = "0.6"
+parking_lot = "0.12"
+
+# Local dependencies
+prospect-theory = { path = "../prospect-theory" }
+quantum-core = { path = "../quantum-core" }
+lmsr = { path = "../lmsr" }
+hedge-algorithms = { path = "../hedge-algorithms" }
+whale-defense-ml = { path = "../whale-defense-ml" }
+cdfa-core = { path = "../cdfa-core" }
+boardroom-interface = { path = "../boardroom-interface" }
+pads-connector = { path = "../pads-connector" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+proptest = "1.2"
+quickcheck = "1.0"
+criterion = { version = "0.5", features = ["html_reports"] }
+tempfile = "3.8"
+
+[features]
+default = ["std"]
+std = []

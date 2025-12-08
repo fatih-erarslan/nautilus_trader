@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CDFA Unified Validation Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
+        .section { margin: 20px 0; }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+        .warn { color: orange; font-weight: bold; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CDFA Unified Validation Report</h1>
+        <p><strong>Generated:</strong> Prş 17 Tem 2025 23:40:07 +03</p>
+        <p><strong>Features:</strong> default</p>
+        <p><strong>Profile:</strong> release</p>
+    </div>
+    
+    <div class="section">
+        <h2>Validation Results</h2>
+        <table>
+            <tr><th>Category</th><th>Status</th><th>Details</th><th>Duration (s)</th></tr>
+<tr><td>security</td><td class="pass">PASS</td><td>Security validation completed</td><td>0</td></tr>
+<tr><td>memory</td><td class="pass">PASS</td><td>Memory validation completed</td><td>3</td></tr>
+<tr><td>compatibility</td><td class="pass">PASS</td><td>Compatibility checks completed</td><td>4</td></tr>
+<tr><td>benchmarks</td><td class="fail">FAIL</td><td>Benchmark execution failed</td><td>5</td></tr>
+<tr><td>docs</td><td class="fail">FAIL</td><td>Documentation build failed</td><td>7</td></tr>
+<tr><td>tests</td><td class="fail">FAIL</td><td>Unit tests failed</td><td>10</td></tr>
+<tr><td>examples</td><td class="fail">FAIL</td><td>1 examples failed</td><td>12</td></tr>
+<tr><td>build</td><td class="fail">FAIL</td><td>5 build configurations failed</td><td>18</td></tr>
+        </table>
+    </div>
+    
+    <div class="section">
+        <h2>System Information</h2>
+        <ul>
+            <li><strong>Rust Version:</strong> rustc 1.88.0 (6b00bc388 2025-06-23)</li>
+            <li><strong>Cargo Version:</strong> cargo 1.88.0 (873a06493 2025-05-10)</li>
+            <li><strong>Platform:</strong> Linux cachyos-x8664 6.15.4-3-cachyos #1 SMP PREEMPT_DYNAMIC Fri, 27 Jun 2025 19:15:53 +0000 x86_64 GNU/Linux</li>
+            <li><strong>CPU Cores:</strong> 8</li>
+            <li><strong>Memory:</strong> 31Gi</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+# Pre-commit hooks for Zero-Mock Policy enforcement
+# Prevents commits that violate zero-mock policy
+
+repos:
+  - repo: local
+    hooks:
+      # Zero-Mock Policy Enforcement Hook
+      - id: zero-mock-policy
+        name: Zero-Mock Policy Enforcement
+        entry: ./scripts/zero-mock-enforcer.sh
+        language: script
+        files: '^(src/.*\.rs|Cargo\.toml|Cargo\.lock)$'
+        pass_filenames: false
+        always_run: true
+        stages: [commit, push]
+        
+      # Mock Dependency Blocker
+      - id: block-mock-dependencies
+        name: Block Mock Dependencies in Production
+        entry: bash -c 'if grep -n "mockall\|mock_\|faker" Cargo.toml | grep -v "dev-dependencies"; then echo "❌ BLOCKED: Mock dependencies in production dependencies"; exit 1; fi'
+        language: system
+        files: '^Cargo\.toml$'
+        
+      # Placeholder Implementation Blocker
+      - id: block-placeholders
+        name: Block Placeholder Implementations
+        entry: bash -c 'if find src/ -name "*.rs" -exec grep -l "placeholder\|TODO\|FIXME\|unimplemented!\|panic!" {} \; | head -1; then echo "❌ BLOCKED: Placeholder implementations in source code"; exit 1; fi'
+        language: system
+        files: '^src/.*\.rs$'
+        
+      # Mock Pattern Blocker
+      - id: block-mock-patterns
+        name: Block Mock Patterns in Production Code
+        entry: bash -c 'if find src/ -name "*.rs" -exec grep -l "mock_\|\.mock(\|MockBuilder" {} \; | head -1; then echo "❌ BLOCKED: Mock patterns in production code"; exit 1; fi'
+        language: system
+        files: '^src/.*\.rs$'
+        
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      # Basic file validation
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+        
+      # Rust-specific validation
+      - id: check-toml
+      
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      # Rust formatting and linting
+      - id: fmt
+        args: ['--verbose', '--', '--check']
+      - id: clippy
+        args: ['--verbose', '--', '-D', 'warnings']
+        
+  - repo: local
+    hooks:
+      # Custom Rust validation
+      - id: cargo-check
+        name: Cargo Check
+        entry: cargo check --all-targets --all-features
+        language: system
+        files: '^(src/.*\.rs|Cargo\.toml|Cargo\.lock)$'
+        pass_filenames: false
+        
+      # Security audit
+      - id: cargo-audit
+        name: Cargo Security Audit
+        entry: bash -c 'cargo install --quiet cargo-audit 2>/dev/null || true; cargo audit'
+        language: system
+        files: '^(Cargo\.toml|Cargo\.lock)$'
+        pass_filenames: false
+        
+      # Performance benchmark validation
+      - id: benchmark-check
+        name: Validate Performance Benchmarks
+        entry: bash -c 'if grep -r "sub-microsecond\|ultra-low.*latency\|10x.*speedup" src/ --include="*.rs" >/dev/null; then if [ ! -d "benches/" ] || [ -z "$(find benches/ -name "*.rs" 2>/dev/null)" ]; then echo "❌ BLOCKED: Performance claims without supporting benchmarks"; exit 1; fi; fi'
+        language: system
+        files: '^(src/.*\.rs|benches/.*\.rs)$'
+        pass_filenames: false
+
+# Configuration
+default_stages: [commit]
+fail_fast: true
+
+# CI configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: [zero-mock-policy]  # Skip heavy enforcement in CI, rely on workflow
+  submodules: false

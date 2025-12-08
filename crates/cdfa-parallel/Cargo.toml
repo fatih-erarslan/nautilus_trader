@@ -1,0 +1,89 @@
+[package]
+
+name = "cdfa-parallel"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Parallel processing backends for Cross-Domain Feature Alignment"
+repository.workspace = true
+keywords = ["cdfa", "parallel", "gpu", "async", "distributed"]
+categories = ["algorithms", "concurrency", "asynchronous"]
+
+# Standalone crate
+[workspace]
+
+[dependencies]
+# Core CDFA dependencies
+cdfa-core = { path = "../cdfa-core" }
+cdfa-algorithms = { path = "../cdfa-algorithms" }
+cdfa-simd = { path = "../cdfa-simd", optional = true }
+
+# Core dependencies
+ndarray = { workspace = true }
+nalgebra = { workspace = true }
+num-traits = { workspace = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Parallel processing
+rayon = { workspace = true }
+crossbeam = { workspace = true }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+
+# GPU support (optional)
+candle-core = { workspace = true, optional = true }
+candle-nn = { workspace = true, optional = true }
+
+# Memory optimization
+smallvec = { workspace = true }
+arrayvec = { workspace = true }
+ahash = { workspace = true }
+atomic_float = { workspace = true }
+
+# Thread pool management
+num_cpus = { workspace = true }
+threadpool = { workspace = true }
+core_affinity = { workspace = true }
+libc = { workspace = true }
+
+# Logging and metrics
+tracing = { workspace = true }
+metrics = { workspace = true, optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+proptest = { workspace = true }
+pretty_assertions = { workspace = true }
+approx = { workspace = true }
+tokio-test = { workspace = true }
+rand = { workspace = true }
+
+[features]
+default = ["rayon", "tokio"]
+rayon = []
+tokio = []
+gpu = ["candle-core", "candle-nn"]
+simd = ["cdfa-simd"]
+distributed = []
+metrics = ["dep:metrics"]
+serde = ["dep:serde", "dep:serde_json", "cdfa-core/serde", "cdfa-algorithms/serde"]
+
+[lib]
+name = "cdfa_parallel"
+path = "src/lib.rs"
+
+[[bench]]
+name = "parallel_benchmarks"
+harness = false
+
+[[example]]
+name = "parallel_cdfa"
+path = "examples/parallel_cdfa.rs"
