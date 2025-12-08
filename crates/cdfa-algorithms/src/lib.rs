@@ -5,6 +5,7 @@
 pub mod wavelet;
 pub mod entropy;
 pub mod volatility;
+pub mod pbit_algorithms;
 
 // Re-export main types and functions
 pub use wavelet::{WaveletTransform, WaveletPacket};
