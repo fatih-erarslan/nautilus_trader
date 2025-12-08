@@ -34,23 +34,25 @@ pub mod agent;
 pub mod algorithm;
 pub mod state;
 pub mod action;
-pub mod reward;
+// pub mod reward;  // Missing file
 pub mod memory;
 pub mod search;
 pub mod policy;
 pub mod value;
-pub mod exploration;
+// pub mod exploration;  // Missing file
+pub mod pbit_qstar;
 
 pub use agent::*;
 pub use algorithm::*;
 pub use state::*;
 pub use action::*;
-pub use reward::*;
+// pub use reward::*;  // Missing module
 pub use memory::*;
 pub use search::*;
 pub use policy::*;
 pub use value::*;
-pub use exploration::*;
+// pub use exploration::*;  // Missing module
+pub use pbit_qstar::*;
 
 /// Q* algorithm errors
 #[derive(Error, Debug)]

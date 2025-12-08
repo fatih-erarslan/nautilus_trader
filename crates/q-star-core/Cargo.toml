@@ -1,12 +1,10 @@
 [package]
 name = "q-star-core"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-authors.workspace = true
-license.workspace = true
+version = "0.1.0"
+edition = "2021"
+authors = ["Q-Star Team"]
+license = "MIT"
 description = "Advanced Q* algorithm core with DAA framework integration for ultra-low latency trading decisions"
-repository.workspace = true
 keywords = ["q-star", "quantum", "neural", "trading"]
 categories = ["algorithms", "science"]
 
@@ -15,41 +13,38 @@ categories = ["algorithms", "science"]
 
 [dependencies]
 # Async runtime and utilities
-tokio = { workspace = true }
-async-trait = { workspace = true }
-futures = { workspace = true }
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
 
 # Data structures and serialization
-serde = { workspace = true }
-serde_json = { workspace = true }
-dashmap = { workspace = true }
-crossbeam = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dashmap = "5.0"
+crossbeam = "0.8"
 
 # Performance and mathematical operations
-ndarray = { workspace = true }
-nalgebra = { workspace = true }
-rayon = { workspace = true, optional = true }
-num-traits = { workspace = true }
+ndarray = "0.15"
+nalgebra = "0.32"
+rayon = { version = "1.8", optional = true }
+num-traits = "0.2"
 
 # Time and random
-chrono = { workspace = true }
-rand = { workspace = true }
-rand_distr = { workspace = true }
+chrono = { version = "0.4", features = ["serde"] }
+rand = "0.8"
+rand_distr = "0.4"
 
 # Error handling and utilities
-anyhow = { workspace = true }
-thiserror = { workspace = true }
-log = { workspace = true }
-tracing = { workspace = true }
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+tracing = "0.1"
 
 # SIMD optimizations (optional)
-wide = { workspace = true, optional = true }
+wide = { version = "0.7", optional = true }
 
 # Memory management
-aligned-vec = { workspace = true }
-
-# DAA framework integration (path dependency)
-# ruv-swarm = { path = "../../ruv_FANN/ruv-swarm" }
+aligned-vec = "0.5"
 
 [dev-dependencies]
 criterion = "0.5"
