@@ -184,6 +184,42 @@ impl MarketState {
                 }
                 next_state.price *= 1.02; // Price impact from take profit
             }
+            
+            QStarAction::CloseAll => {
+                // Close all positions
+                if let Some(position) = next_state.features.get_mut(0) {
+                    *position = 0.0;
+                }
+                next_state.volume *= 1.5; // Increased volume from closing
+            }
+            
+            QStarAction::Rebalance { weights } => {
+                // Rebalance portfolio according to weights
+                let total_weight: f64 = weights.iter().sum();
+                if total_weight > 0.0 {
+                    next_state.volume += 1000.0; // Rebalancing activity
+                }
+            }
+            
+            QStarAction::Scale { factor } => {
+                // Scale position by factor
+                if let Some(position) = next_state.features.get_mut(0) {
+                    *position *= factor;
+                }
+            }
+            
+            QStarAction::Hedge { ratio } => {
+                // Hedge position with opposite trade
+                if next_state.features.len() > 1 {
+                    let position = next_state.features[0];
+                    next_state.features[1] = -position * ratio;
+                }
+            }
+            
+            QStarAction::Wait => {
+                // Do nothing, just advance time
+                next_state.volume *= 0.95;
+            }
         }
         
         // Update derived indicators

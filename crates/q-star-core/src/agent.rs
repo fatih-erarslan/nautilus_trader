@@ -12,7 +12,7 @@ use crate::{QStarError, MarketState, QStarAction, Experience};
 
 /// Core trait for Q* agents
 #[async_trait]
-pub trait QStarAgent {
+pub trait QStarAgent: Send + Sync {
     /// Unique identifier for the agent
     fn id(&self) -> &str;
     

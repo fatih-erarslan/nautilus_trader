@@ -130,50 +130,58 @@ impl QStarAlgorithmImpl {
     }
     
     /// Execute Q* search with tree exploration
-    async fn q_star_search(&self, state: &MarketState, depth: usize) -> Result<(QStarAction, f64), QStarError> {
-        if depth == 0 {
-            // Base case: use learned Q-values
-            return self.get_best_action_greedy(state).await;
-        }
-        
-        let actions = state.get_legal_actions();
-        let mut best_action = actions[0].clone();
-        let mut best_value = f64::NEG_INFINITY;
-        
-        for action in actions {
-            // Calculate Q* value recursively
-            let q_value = self.calculate_q_star_value(state, &action, depth).await?;
-            
-            if q_value > best_value {
-                best_value = q_value;
-                best_action = action;
+    fn q_star_search<'a>(
+        &'a self, 
+        state: &'a MarketState, 
+        depth: usize
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(QStarAction, f64), QStarError>> + Send + 'a>> {
+        Box::pin(async move {
+            if depth == 0 {
+                // Base case: use learned Q-values
+                return self.get_best_action_greedy(state).await;
             }
-        }
-        
-        Ok((best_action, best_value))
+            
+            let actions = state.get_legal_actions();
+            let mut best_action = actions[0].clone();
+            let mut best_value = f64::NEG_INFINITY;
+            
+            for action in actions {
+                // Calculate Q* value recursively
+                let q_value = self.calculate_q_star_value(state, &action, depth).await?;
+                
+                if q_value > best_value {
+                    best_value = q_value;
+                    best_action = action;
+                }
+            }
+            
+            Ok((best_action, best_value))
+        })
     }
     
     /// Calculate Q* value with recursive search
-    async fn calculate_q_star_value(
-        &self,
-        state: &MarketState,
-        action: &QStarAction,
+    fn calculate_q_star_value<'a>(
+        &'a self,
+        state: &'a MarketState,
+        action: &'a QStarAction,
         depth: usize,
-    ) -> Result<f64, QStarError> {
-        // Get immediate reward and next state
-        let next_state = state.apply_action(action)?;
-        let immediate_reward = self.calculate_immediate_reward(state, action, &next_state);
-        
-        if depth <= 1 {
-            // Base case: return immediate reward + learned Q-value
-            let learned_q = self.get_q_value_from_table(state, action);
-            return Ok(immediate_reward + self.discount_factor * learned_q);
-        }
-        
-        // Recursive case: search deeper
-        let (_, future_value) = self.q_star_search(&next_state, depth - 1).await?;
-        
-        Ok(immediate_reward + self.discount_factor * future_value)
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<f64, QStarError>> + Send + 'a>> {
+        Box::pin(async move {
+            // Get immediate reward and next state
+            let next_state = state.apply_action(action)?;
+            let immediate_reward = self.calculate_immediate_reward(state, action, &next_state);
+            
+            if depth <= 1 {
+                // Base case: return immediate reward + learned Q-value
+                let learned_q = self.get_q_value_from_table(state, action);
+                return Ok(immediate_reward + self.discount_factor * learned_q);
+            }
+            
+            // Recursive case: search deeper
+            let (_, future_value) = self.q_star_search(&next_state, depth - 1).await?;
+            
+            Ok(immediate_reward + self.discount_factor * future_value)
+        })
     }
     
     /// Calculate immediate reward for state transition

@@ -80,6 +80,9 @@ pub enum QStarError {
     
     #[error("Performance constraint violated: {0}")]
     PerformanceError(String),
+    
+    #[error("Algorithm error: {0}")]
+    AlgorithmError(String),
 }
 
 /// Configuration for Q* algorithm
@@ -281,7 +284,7 @@ impl QStarEngine {
                 }
                 
                 // Early termination if time constraint approached
-                if iteration_start.elapsed().as_micros() > self.config.max_latency_us / 2 {
+                if iteration_start.elapsed().as_micros() > (self.config.max_latency_us / 2) as u128 {
                     break;
                 }
             }
@@ -298,40 +301,42 @@ impl QStarEngine {
     }
     
     /// Calculate Q* value combining neural networks and search
-    async fn calculate_q_star_value(
-        &self,
-        state: &MarketState,
-        action: &QStarAction,
+    fn calculate_q_star_value<'a>(
+        &'a self,
+        state: &'a MarketState,
+        action: &'a QStarAction,
         depth: usize,
-    ) -> Result<f64, QStarError> {
-        // Base case: use value network for leaf nodes
-        if depth == 0 {
-            return self.value.evaluate(state).await;
-        }
-        
-        // Get next state after taking action
-        let next_state = state.apply_action(action)?;
-        
-        // Calculate immediate reward
-        let immediate_reward = self.calculate_reward(state, action, &next_state).await?;
-        
-        // Recursive Q* calculation with exploration
-        let future_value = if depth > 1 {
-            let next_actions = next_state.get_legal_actions();
-            let mut max_future_value = f64::NEG_INFINITY;
-            
-            for next_action in next_actions {
-                let future_q = self.calculate_q_star_value(&next_state, &next_action, depth - 1).await?;
-                max_future_value = max_future_value.max(future_q);
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<f64, QStarError>> + Send + 'a>> {
+        Box::pin(async move {
+            // Base case: use value network for leaf nodes
+            if depth == 0 {
+                return self.value.evaluate(state).await;
             }
             
-            max_future_value
-        } else {
-            self.value.evaluate(&next_state).await?
-        };
-        
-        // Q* formula: Q*(s,a) = R(s,a) + γ * max Q*(s',a')
-        Ok(immediate_reward + self.config.discount_factor * future_value)
+            // Get next state after taking action
+            let next_state = state.apply_action(action)?;
+            
+            // Calculate immediate reward
+            let immediate_reward = self.calculate_reward(state, action, &next_state).await?;
+            
+            // Recursive Q* calculation with exploration
+            let future_value = if depth > 1 {
+                let next_actions = next_state.get_legal_actions();
+                let mut max_future_value = f64::NEG_INFINITY;
+                
+                for next_action in next_actions {
+                    let future_q = self.calculate_q_star_value(&next_state, &next_action, depth - 1).await?;
+                    max_future_value = max_future_value.max(future_q);
+                }
+                
+                max_future_value
+            } else {
+                self.value.evaluate(&next_state).await?
+            };
+            
+            // Q* formula: Q*(s,a) = R(s,a) + γ * max Q*(s',a')
+            Ok(immediate_reward + self.config.discount_factor * future_value)
+        })
     }
     
     /// Calculate reward for state-action transition
