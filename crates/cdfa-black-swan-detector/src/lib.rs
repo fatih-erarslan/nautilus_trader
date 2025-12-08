@@ -29,6 +29,7 @@ pub mod metrics;
 pub mod simd;
 pub mod types;
 pub mod utils;
+pub mod pbit_detector;
 
 // Re-export main components
 pub use config::*;
