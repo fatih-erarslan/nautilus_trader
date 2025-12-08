@@ -12,6 +12,7 @@
 
 pub mod diversity;
 pub mod fusion;
+pub mod pbit_fusion;
 
 #[cfg(feature = "combinatorial")]
 pub mod combinatorial;
@@ -29,6 +30,12 @@ pub use fusion::{
     CdfaFusion, FusionMethod, FusionParams,
     ScoreFusion, RankFusion, AdaptiveScoreFusion,
     scores_to_rankings, rankings_to_scores
+};
+
+// pBit-enhanced fusion (Wolfram validated)
+pub use pbit_fusion::{
+    PBitConsensus, PBitScoreFusion, PBitEnsemble,
+    pbit_importance_sample
 };
 
 #[cfg(feature = "combinatorial")]
