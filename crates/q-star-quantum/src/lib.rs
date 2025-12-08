@@ -21,10 +21,7 @@
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use nalgebra::{Complex, DMatrix, DVector};
-use ndarray::{Array1, Array2, Array3};
 use num_complex::Complex64;
-use pyo3::prelude::*;
 use q_star_core::{
     QStarError, MarketState, QStarAction, Experience, QStarAgent,
     QStarSearchResult, AgentStats, CoordinationResult
@@ -35,26 +32,37 @@ use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::RwLock;
 
+/// Quantum gate types
+#[derive(Debug, Clone)]
+pub enum QuantumGate {
+    Hadamard,
+    PauliX,
+    PauliY,
+    PauliZ,
+    CNOT,
+    RX { angle: f64 },
+    RY { angle: f64 },
+    RZ { angle: f64 },
+}
+
+/// QERC client trait (stub)
+pub trait QERCClient: Send + Sync {
+    fn protect(&self, data: &[f64]) -> Vec<f64>;
+    fn correct(&self, data: &[f64]) -> Vec<f64>;
+}
+
 pub mod pbit_quantum;
-pub mod quantum_state;
-pub mod quantum_gates;
-pub mod quantum_circuits;
-pub mod quantum_algorithms;
-pub mod quantum_error_correction;
-pub mod quantum_machine_learning;
-pub mod qerc_integration;
+// Legacy modules (not yet implemented - use pbit_quantum instead)
+// pub mod quantum_state;
+// pub mod quantum_gates;
+// pub mod quantum_circuits;
+// pub mod quantum_algorithms;
+// pub mod quantum_error_correction;
+// pub mod quantum_machine_learning;
+// pub mod qerc_integration;
 
-// Primary pBit-based exports
+// Primary pBit-based exports (recommended)
 pub use pbit_quantum::{PBitQuantumState, PBitQuantumCircuit, PBitQStarEngine};
-
-// Legacy exports
-pub use quantum_state::*;
-pub use quantum_gates::*;
-pub use quantum_circuits::*;
-pub use quantum_algorithms::*;
-pub use quantum_error_correction::*;
-pub use quantum_machine_learning::*;
-pub use qerc_integration::*;
 
 /// Quantum-specific errors
 #[derive(Error, Debug)]
@@ -86,8 +94,9 @@ pub enum QuantumError {
     #[error("Q* error: {0}")]
     QStarError(#[from] QStarError),
     
-    #[error("PyO3 error: {0}")]
-    PyO3Error(#[from] PyErr),
+    /// Generic external error
+    #[error("External error: {0}")]
+    External(String),
 }
 
 /// Quantum computing configuration

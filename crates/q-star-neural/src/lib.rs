@@ -19,10 +19,11 @@
 //! - Accuracy: >99.9% convergence rate
 
 use async_trait::async_trait;
+#[cfg(feature = "candle")]
 use candle_core::{Device, Tensor, DType};
+#[cfg(feature = "candle")]
 use candle_nn::{Module, VarBuilder, Linear, Activation};
 use chrono::{DateTime, Utc};
-use ndarray::{Array1, Array2, ArrayView1};
 use q_star_core::{
     QStarError, MarketState, QStarAction, Experience, 
     ValueFunction, Policy, PolicyNetwork, ValueNetwork
@@ -33,23 +34,30 @@ use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::RwLock;
 
-pub mod policy;
-pub mod value;
-pub mod critic;
-pub mod actor;
-pub mod ensemble;
-pub mod optimizer;
-pub mod memory;
-pub mod loss;
+// Module files not yet created - commenting out
+// pub mod policy;
+// pub mod value;
+// pub mod critic;
+// pub mod actor;
+// pub mod ensemble;
+// pub mod optimizer;
+// pub mod memory;
+// pub mod loss;
 
-pub use policy::*;
-pub use value::*;
-pub use critic::*;
-pub use actor::*;
-pub use ensemble::*;
-pub use optimizer::*;
-pub use memory::*;
-pub use loss::*;
+// pub use policy::*;
+// pub use value::*;
+// pub use critic::*;
+// pub use actor::*;
+// pub use ensemble::*;
+// pub use optimizer::*;
+// pub use memory::*;
+// pub use loss::*;
+
+/// Neural optimizer trait stub
+pub trait NeuralOptimizer: Send + Sync {
+    fn step(&mut self);
+    fn zero_grad(&mut self);
+}
 
 /// Neural network specific errors
 #[derive(Error, Debug)]

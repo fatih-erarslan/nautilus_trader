@@ -11,8 +11,8 @@ description = "Advanced trading reward functions and market mechanics for Q* alg
 [dependencies]
 # Core Q* dependencies
 q-star-core = { path = "../q-star-core" }
-q-star-neural = { path = "../q-star-neural" }
-q-star-quantum = { path = "../q-star-quantum" }
+q-star-neural = { path = "../q-star-neural", optional = true }
+q-star-quantum = { path = "../q-star-quantum", optional = true }
 
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }

@@ -38,6 +38,7 @@ pub mod portfolio;
 pub mod market_impact;
 pub mod advanced_metrics;
 pub mod reinforcement;
+pub mod pbit_rewards;
 
 pub use profit::*;
 pub use risk::*;

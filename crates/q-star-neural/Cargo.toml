@@ -23,8 +23,8 @@ nalgebra = "0.33.2"
 num-traits = "0.2"
 
 # Neural network frameworks
-candle-core = { workspace = true, optional = true }
-candle-nn = { workspace = true, optional = true }
+candle-core = { version = "0.8", optional = true }
+candle-nn = { version = "0.8", optional = true }
 candle-transformers = { version = "0.8.0", optional = true }
 linfa = { version = "0.7", optional = true }
 smartcore = { version = "0.3", optional = true }

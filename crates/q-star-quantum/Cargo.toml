@@ -5,6 +5,9 @@ edition = "2021"
 authors = ["QuantumHive Q* Team"]
 description = "Quantum enhancement for Q* algorithm leveraging QERC infrastructure for exponential decision space exploration"
 
+# Standalone crate
+[workspace]
+
 [dependencies]
 # Core Q* dependencies
 q-star-core = { path = "../q-star-core" }

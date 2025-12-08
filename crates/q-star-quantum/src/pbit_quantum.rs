@@ -272,7 +272,7 @@ impl PBitQStarEngine {
         }
         
         // Execute and measure
-        let state = circuit.execute()?;
+        let mut state = circuit.execute()?;
         let measurements = state.measure_all(100)?;
         
         // Decode decision from measurements
