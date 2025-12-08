@@ -25,6 +25,9 @@ num-complex = "0.4"
 wide = { version = "0.7", optional = true }
 simba = { version = "0.8", optional = true }
 
+# Random number generation
+rand = "0.8"
+
 # Statistical and mathematical functions
 statrs = "0.16"
 special = "0.10"

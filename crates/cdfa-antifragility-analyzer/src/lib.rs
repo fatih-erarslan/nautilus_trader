@@ -54,6 +54,7 @@ pub mod utils;
 pub mod simd_utils;
 pub mod cache;
 pub mod performance;
+pub mod pbit_antifragility;
 
 #[cfg(feature = "python")]
 pub mod python_bindings;
