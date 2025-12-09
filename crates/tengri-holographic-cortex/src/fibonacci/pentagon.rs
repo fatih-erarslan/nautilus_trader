@@ -8,7 +8,6 @@ use crate::fibonacci::constants::{
     PHI, PHI_INV, FIBONACCI_COUPLING, PENTAGON_PHASES,
     fibonacci_sequence, golden_ratio_approximation,
 };
-use crate::Result;
 
 use std::f64::consts::PI;
 
@@ -18,14 +17,17 @@ pub const PENTAGON_ENGINES: usize = 5;
 /// Coupling scale factor
 pub const FIBONACCI_COUPLING_SCALE: f64 = 0.1;
 
-/// Phase coherence threshold
+/// Phase coherence threshold for synchronization detection
 pub const PHASE_COHERENCE_THRESHOLD: f64 = 0.8;
 
-/// Minimum coherence (random phases)
-const MIN_COHERENCE: f64 = 0.0;
+/// Minimum coherence (random phases) - used for normalization
+pub const MIN_COHERENCE: f64 = 0.0;
 
-/// Maximum coherence (perfect synchronization)
-const MAX_COHERENCE: f64 = 1.0;
+/// Maximum coherence (perfect synchronization) - used for normalization
+pub const MAX_COHERENCE: f64 = 1.0;
+
+/// Critical coherence threshold (golden ratio derived: 1/φ)
+pub const CRITICAL_COHERENCE: f64 = 0.618033988749895;
 
 /// Temperature modulation phases (golden angle spiral)
 const FIBONACCI_TEMP_PHASES: [f64; PENTAGON_ENGINES] = [
@@ -341,6 +343,85 @@ impl FibonacciPentagon {
             spectral_radius: self.coupling.spectral_radius(),
             msocl_order_parameter: self.msocl.order_parameter(),
         }
+    }
+
+    /// Compute normalized coherence in [0, 1] range
+    /// Uses MIN_COHERENCE and MAX_COHERENCE for normalization
+    pub fn normalized_coherence(&self) -> f64 {
+        let raw = self.phase_coherence();
+        (raw - MIN_COHERENCE) / (MAX_COHERENCE - MIN_COHERENCE)
+    }
+
+    /// Check if system is synchronized (coherence above threshold)
+    pub fn is_synchronized(&self) -> bool {
+        self.phase_coherence() >= PHASE_COHERENCE_THRESHOLD
+    }
+
+    /// Check if system is near critical point (coherence near φ⁻¹)
+    pub fn is_critical(&self) -> bool {
+        let coherence = self.phase_coherence();
+        (coherence - CRITICAL_COHERENCE).abs() < 0.1
+    }
+
+    /// Compute golden ratio phase alignment using PENTAGON_PHASES
+    /// Returns how well engine phases align with ideal pentagonal phases
+    pub fn golden_phase_alignment(&self) -> f64 {
+        let rates = self.spike_rates();
+        let mut alignment_sum = 0.0;
+
+        for i in 0..PENTAGON_ENGINES {
+            // Map spike rate to phase and compare to ideal pentagon phase
+            let actual_phase = rates[i] * 360.0;
+            let ideal_phase = PENTAGON_PHASES[i];
+            let phase_diff = (actual_phase - ideal_phase).abs() % 180.0;
+            let normalized_diff = if phase_diff > 90.0 { 180.0 - phase_diff } else { phase_diff };
+            alignment_sum += 1.0 - (normalized_diff / 90.0);
+        }
+
+        alignment_sum / PENTAGON_ENGINES as f64
+    }
+
+    /// Compute golden ratio convergence using Fibonacci approximation
+    /// Uses fibonacci_sequence and golden_ratio_approximation from constants
+    pub fn fibonacci_convergence(&self, n_terms: usize) -> f64 {
+        let n = n_terms.max(2);
+        let fib_seq = fibonacci_sequence(n);
+        let phi_approx = golden_ratio_approximation(n);
+
+        // Compute convergence error: how fast Fibonacci ratios approach φ
+        let convergence_rate = if fib_seq.len() >= 2 {
+            let last_ratio = fib_seq[fib_seq.len() - 1] as f64 / fib_seq[fib_seq.len() - 2] as f64;
+            (last_ratio - PHI).abs()
+        } else {
+            1.0
+        };
+
+        // Measure how close our coupling ratios are to the Fibonacci limit
+        let adjacent_ratio = self.coupling.coupling(0, 1) / self.coupling.coupling(0, 2);
+        let coupling_error = (adjacent_ratio - phi_approx).abs();
+
+        // Return combined convergence metric
+        (convergence_rate + coupling_error) / 2.0
+    }
+
+    /// Compute effective coupling strength using PHI and PHI_INV
+    pub fn effective_coupling_strength(&self) -> f64 {
+        // Weighted sum: adjacent (φ) contributes more than skip (φ⁻¹)
+        let adjacent_weight = PHI / (PHI + PHI_INV);
+        let skip_weight = PHI_INV / (PHI + PHI_INV);
+
+        let rates = self.spike_rates();
+        let mut effective = 0.0;
+
+        for i in 0..PENTAGON_ENGINES {
+            let adjacent_idx = (i + 1) % PENTAGON_ENGINES;
+            let skip_idx = (i + 2) % PENTAGON_ENGINES;
+
+            effective += adjacent_weight * rates[adjacent_idx] * self.coupling.coupling(i, adjacent_idx);
+            effective += skip_weight * rates[skip_idx] * self.coupling.coupling(i, skip_idx);
+        }
+
+        effective / PENTAGON_ENGINES as f64
     }
 }
 

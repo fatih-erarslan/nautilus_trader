@@ -44,7 +44,7 @@
 //! - Ganea, O., Bécigneul, G., & Hofmann, T. (2018). "Hyperbolic Neural Networks"
 //! - Nickel, M., & Kiela, D. (2017). "Poincaré Embeddings for Learning Hierarchical Representations"
 
-use std::f64::consts::PI;
+// PI constant available if needed for angular calculations in hyperbolic geometry
 
 /// Dimension of hyperbolic space (spatial dimensions)
 pub const HYPERBOLIC_DIM: usize = 11;
@@ -122,16 +122,11 @@ impl MobiusBlender {
 
         let n = x.len();
 
-        // Compute inner products
-        let xy = dot_product(x, y);
-        let xx = dot_product(x, x);
-        let yy = dot_product(y, y);
-
         // Project to valid Poincaré ball if needed
         let x_proj = project_to_poincare(x);
         let y_proj = project_to_poincare(y);
 
-        // Recompute with projected vectors
+        // Compute inner products with projected vectors
         let xy = dot_product(&x_proj, &y_proj);
         let xx = dot_product(&x_proj, &x_proj);
         let yy = dot_product(&y_proj, &y_proj);

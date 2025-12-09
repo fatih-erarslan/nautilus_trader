@@ -94,7 +94,7 @@ pub fn conditional_entropy(joint: &[Vec<f64>], marginal_y: &[f64]) -> f64 {
 
     let mut h_xy = 0.0;
 
-    for (y_idx, row) in joint.iter().enumerate() {
+    for row in joint.iter() {
         for &p_xy in row.iter() {
             if p_xy > MIN_ENTROPY {
                 h_xy -= p_xy * p_xy.log2();
@@ -681,18 +681,25 @@ impl CriticalityAnalysis {
     ///
     /// # Arguments
     /// * `cascade_sizes` - Sizes of neuronal avalanches
-    /// * `cascade_durations` - Durations of avalanches
+    /// * `cascade_durations` - Durations of avalanches (used for duration scaling analysis)
+    ///
+    /// At criticality, avalanche duration T scales with size S as: T ~ S^(1/2)
+    /// (Beggs & Plenz, 2003)
     pub fn from_cascades(cascade_sizes: &[usize], cascade_durations: &[usize]) -> Self {
         let avalanche_exponent = Self::estimate_power_law_exponent(cascade_sizes);
         let branching_ratio = Self::estimate_branching_ratio(cascade_sizes);
         let hurst_exponent = Self::estimate_hurst_exponent(cascade_sizes);
 
+        // Analyze duration-size scaling relationship (T ~ S^γ, γ ≈ 0.5 at criticality)
+        let duration_scaling = Self::estimate_duration_scaling(cascade_sizes, cascade_durations);
+
         // Critical distance: weighted deviation from critical values
         let alpha_dev = (avalanche_exponent - AVALANCHE_EXPONENT_CRITICAL).abs();
         let sigma_dev = (branching_ratio - CRITICAL_BRANCHING_RATIO).abs();
         let hurst_dev = (hurst_exponent - CRITICAL_HURST).abs();
+        let duration_dev = (duration_scaling - 0.5).abs(); // γ = 0.5 at criticality
 
-        let critical_distance = (alpha_dev + sigma_dev + hurst_dev) / 3.0;
+        let critical_distance = (alpha_dev + sigma_dev + hurst_dev + duration_dev) / 4.0;
 
         Self {
             avalanche_exponent,
@@ -700,6 +707,46 @@ impl CriticalityAnalysis {
             hurst_exponent,
             critical_distance,
         }
+    }
+
+    /// Estimate duration-size scaling exponent γ where T ~ S^γ
+    /// At criticality, γ ≈ 0.5 (Beggs & Plenz, 2003)
+    fn estimate_duration_scaling(sizes: &[usize], durations: &[usize]) -> f64 {
+        if sizes.len() != durations.len() || sizes.len() < 2 {
+            return 0.5; // Default to critical value
+        }
+
+        // Log-log linear regression: log(T) = γ * log(S) + c
+        let mut sum_log_s = 0.0;
+        let mut sum_log_t = 0.0;
+        let mut sum_log_s_log_t = 0.0;
+        let mut sum_log_s_sq = 0.0;
+        let mut count = 0;
+
+        for (&size, &duration) in sizes.iter().zip(durations.iter()) {
+            if size > 0 && duration > 0 {
+                let log_s = (size as f64).ln();
+                let log_t = (duration as f64).ln();
+                sum_log_s += log_s;
+                sum_log_t += log_t;
+                sum_log_s_log_t += log_s * log_t;
+                sum_log_s_sq += log_s * log_s;
+                count += 1;
+            }
+        }
+
+        if count < 2 {
+            return 0.5;
+        }
+
+        let n = count as f64;
+        let denominator = n * sum_log_s_sq - sum_log_s * sum_log_s;
+        if denominator.abs() < MIN_ENTROPY {
+            return 0.5;
+        }
+
+        // γ = slope of log-log regression
+        (n * sum_log_s_log_t - sum_log_s * sum_log_t) / denominator
     }
 
     /// Check if system is near critical point

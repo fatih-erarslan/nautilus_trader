@@ -45,7 +45,7 @@
 //!   learning through spike-timing-dependent synaptic plasticity." Nature
 //!   Neuroscience, 3(9), 919-926.
 
-use super::constants::{PHI, PHI_INV, FIBONACCI_TAU};
+use super::constants::{PHI_INV, FIBONACCI_TAU};
 use crate::constants::{STDP_A_PLUS, STDP_A_MINUS};
 
 // ============================================================================
