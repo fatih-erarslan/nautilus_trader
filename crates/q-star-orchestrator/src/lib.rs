@@ -50,6 +50,7 @@ pub mod fault_tolerance;
 pub mod consensus;
 pub mod integration;
 pub mod deployment;
+pub mod pbit_consensus;
 
 pub use topology::*;
 pub use scheduler::*;

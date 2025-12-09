@@ -210,6 +210,7 @@ pub mod confluence;
 pub mod bubble;
 pub mod utils;
 pub mod simd_ops;
+pub mod pbit_detectors;
 
 // Re-exports
 pub use accumulation::*;

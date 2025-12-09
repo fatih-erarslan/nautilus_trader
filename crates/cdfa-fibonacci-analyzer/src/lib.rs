@@ -52,6 +52,7 @@ mod extensions;
 mod volatility;
 mod utils;
 mod types;
+pub mod pbit_fibonacci;
 
 pub use config::*;
 pub use core::*;

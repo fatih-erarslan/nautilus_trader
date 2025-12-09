@@ -1,0 +1,40 @@
+{
+  "name": "dilithium-mcp",
+  "version": "3.0.0",
+  "description": "Post-Quantum Secure MCP Server with Dilithium ML-DSA",
+  "transport": "stdio",
+  "command": "bun",
+  "args": ["run", "dist/index.js"],
+  "env": {
+    "DILITHIUM_NATIVE_PATH": "./native/target/release/libdilithium_native.dylib"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": false,
+    "prompts": false
+  },
+  "security": {
+    "authentication": "dilithium",
+    "signature_algorithm": "ML-DSA-65",
+    "nonce_window_seconds": 300,
+    "max_payload_bytes": 1048576
+  },
+  "tools": {
+    "categories": [
+      "core",
+      "dilithium_auth",
+      "hyperbolic",
+      "pbit",
+      "symbolic",
+      "swarm",
+      "design_thinking",
+      "systems_dynamics",
+      "llm",
+      "devops",
+      "project_management",
+      "documentation",
+      "code_quality"
+    ],
+    "total_count": 133
+  }
+}

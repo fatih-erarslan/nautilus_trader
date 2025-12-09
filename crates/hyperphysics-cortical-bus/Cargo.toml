@@ -93,6 +93,32 @@ harness = false
 name = "ringbuf"
 harness = false
 
+# =============================================================================
+# Performance Profiles (from SCAFFOLDING_GUIDE)
+# =============================================================================
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+panic = "abort"
+strip = true
+
+[profile.bench]
+lto = "thin"
+opt-level = 3
+
+# Ultra-optimized profile for production trading
+[profile.production]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+panic = "abort"
+debug = false
+strip = true
+overflow-checks = false
+
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]

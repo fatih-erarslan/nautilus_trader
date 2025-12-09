@@ -45,6 +45,7 @@ pub mod pcr;
 pub mod phase;
 pub mod simd;
 pub mod types;
+pub mod pbit_panarchy;
 
 pub use analyzer::{PanarchyAnalyzer, BatchPanarchyAnalyzer};
 pub use types::{

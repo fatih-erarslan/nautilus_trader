@@ -22,6 +22,7 @@ pub mod performance;
 pub mod orchestration;
 pub mod biological_patterns;
 pub mod neural_adaptation;
+pub mod pbit_biological;
 
 /// Main QBMIA biological system
 #[derive(Debug)]

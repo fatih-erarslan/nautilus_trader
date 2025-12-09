@@ -1,0 +1,97 @@
+[package]
+name = "tengri-holographic-cortex"
+version = "0.1.0"
+edition = "2021"
+authors = ["Fatih Erarslan <fatih@tengritek.com>"]
+description = """
+Tengri Holographic Cortex - A unified pBit-based cognitive architecture
+combining Graph Neural Networks (GNN) and Spiking Neural Networks (SNN)
+in an 11D Hyperbolic Lattice Spacetime Continuum.
+
+Features:
+- 4-Engine pBit Topology with Möbius blending
+- Meta-Stable Oscillatory Control Layer (MSOCL)
+- Ultra-Fast Cortical Bus (UFCB) with tiered priorities
+- HNSW + LSH memory fabric
+- Lorentz H^11 hyperbolic geometry
+- Dilithium post-quantum cryptography layer
+"""
+license = "MIT"
+repository = "https://github.com/tengritek/hyperphysics"
+keywords = ["pbit", "neural", "hyperbolic", "cortex", "snn", "gnn"]
+categories = ["science", "simulation", "algorithms"]
+
+[dependencies]
+# Core pBit dynamics
+hyperphysics-pbit = { path = "../hyperphysics-pbit", optional = true }
+
+# Hyperbolic geometry (Lorentz model)
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz", optional = true }
+
+# Cortical bus infrastructure
+hyperphysics-cortical-bus = { path = "../hyperphysics-cortical-bus", optional = true }
+
+# HNSW + LSH for memory fabric
+hyperphysics-hnsw = { path = "../hyperphysics-hnsw", optional = true }
+hyperphysics-lsh = { path = "../hyperphysics-lsh", optional = true }
+
+# STDP plasticity
+hyperphysics-stdp = { path = "../hyperphysics-stdp", optional = true }
+
+# Post-quantum cryptography
+hyperphysics-dilithium = { path = "../hyperphysics-dilithium", optional = true }
+
+# Swarm intelligence for multi-agent coordination
+hyperphysics-swarm-intelligence = { path = "../hyperphysics-swarm-intelligence", optional = true }
+
+# Core utilities
+thiserror = "1.0"
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = { version = "0.8", features = ["small_rng"] }
+rayon = { version = "1.8", optional = true }
+crossbeam-queue = "0.3"
+log = "0.4"
+
+# SIMD support
+wide = { version = "0.7", optional = true }
+
+# GPU compute
+wgpu = { version = "22.0", optional = true }
+bytemuck = { version = "1.14", features = ["derive"] }
+pollster = { version = "0.3", optional = true }
+
+[dev-dependencies]
+approx = "0.5"
+criterion = "0.5"
+env_logger = "0.11"
+
+[features]
+default = ["pbit", "lorentz", "cortical"]
+pbit = ["dep:hyperphysics-pbit"]
+lorentz = ["dep:hyperphysics-lorentz"]
+cortical = ["dep:hyperphysics-cortical-bus"]
+hnsw = ["dep:hyperphysics-hnsw"]
+lsh = ["dep:hyperphysics-lsh"]
+stdp = ["dep:hyperphysics-stdp"]
+dilithium = ["dep:hyperphysics-dilithium"]
+swarm = ["dep:hyperphysics-swarm-intelligence"]
+simd = ["dep:wide"]
+parallel = ["dep:rayon"]
+gpu = ["dep:wgpu", "dep:pollster"]
+full = ["pbit", "lorentz", "cortical", "hnsw", "lsh", "stdp", "dilithium", "swarm", "simd", "parallel", "gpu"]
+
+[[bench]]
+name = "cortex_bench"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+inherits = "release"
+debug = true
