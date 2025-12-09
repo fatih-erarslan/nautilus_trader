@@ -97,6 +97,7 @@ pub mod autopoietic;
 pub mod temporal_consciousness;
 pub mod morphogenetic;
 pub mod holonomic_memory;
+pub mod fibonacci;
 
 pub use constants::*;
 pub use msocl::{Msocl, MsoclPhase, MsoclConfig};
@@ -147,6 +148,10 @@ pub use holonomic_memory::{
 };
 // Note: STM_DECAY_TAU, LTM_DECAY_TAU exported from temporal_consciousness
 // Access holonomic versions via holonomic_memory::STM_DECAY_TAU
+pub use fibonacci::{
+    FibonacciPentagon, PentagonConfig, FibonacciCoupling,
+    PENTAGON_ENGINES, FIBONACCI_COUPLING_SCALE, PHASE_COHERENCE_THRESHOLD,
+};
 
 use thiserror::Error;
 
