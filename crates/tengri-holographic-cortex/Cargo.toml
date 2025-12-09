@@ -86,6 +86,26 @@ full = ["pbit", "lorentz", "cortical", "hnsw", "lsh", "stdp", "dilithium", "swar
 name = "cortex_bench"
 harness = false
 
+[[bench]]
+name = "curvature_bench"
+harness = false
+
+[[bench]]
+name = "autopoietic_bench"
+harness = false
+
+[[bench]]
+name = "temporal_bench"
+harness = false
+
+[[bench]]
+name = "morphogenetic_bench"
+harness = false
+
+[[bench]]
+name = "holonomic_bench"
+harness = false
+
 [profile.release]
 opt-level = 3
 lto = true

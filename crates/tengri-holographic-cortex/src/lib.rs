@@ -92,6 +92,11 @@ pub mod eligibility;
 pub mod csr;
 pub mod ricci;
 pub mod sgnn;
+pub mod curvature_adaptive;
+pub mod autopoietic;
+pub mod temporal_consciousness;
+pub mod morphogenetic;
+pub mod holonomic_memory;
 
 pub use constants::*;
 pub use msocl::{Msocl, MsoclPhase, MsoclConfig};
@@ -105,6 +110,43 @@ pub use eligibility::{SparseEligibilityTrace, TraceParams, TraceStats};
 pub use csr::CSRGraph;
 pub use ricci::{Regime, RegimeDetector, RicciGraph, forman_ricci};
 pub use sgnn::{LIFNeuron, LIFConfig, SpikeEvent, Synapse, SynapseConfig, SGNNLayer, LayerConfig, MultiScaleSGNN, MultiScaleConfig};
+pub use curvature_adaptive::{
+    CurvatureController, HyperbolicAttention, CurvatureAdaptiveAttentionLayer,
+    AdaptiveAttentionConfig, RicciFlowAttention, FisherRaoMetric,
+    curvature_softmax, CURVATURE_MIN, CURVATURE_MAX, CURVATURE_DEFAULT,
+};
+pub use autopoietic::{
+    AvalancheTracker, HomeostaticRegulator, PhiComputer, AutopoieticTopology,
+    AutopoieticNetwork, AutopoieticConfig, AutopoieticStats,
+    SOC_CRITICAL_TEMP, SOC_TARGET_BRANCHING, SOC_POWER_LAW_EXPONENT,
+};
+pub use temporal_consciousness::{
+    HyperbolicTimeEmbedding, GammaOscillator, TemporalBinder, TemporalEvent,
+    BoundEventGroup, BindingStats, MemoryConsolidator, MemoryTrace, ConsolidationStats,
+    SubjectiveTimeClock, TemporalAttention, TemporalConsciousnessFabric,
+    TemporalConfig, TemporalStats, TEMPORAL_TAU, STM_DECAY_TAU, LTM_DECAY_TAU,
+    CONSOLIDATION_RATE, GAMMA_FREQUENCY, GAMMA_PERIOD, BINDING_WINDOW,
+    ATTENTION_DECAY_TAU, TEMPORAL_SCALES, TEMPORAL_EPSILON,
+};
+pub use morphogenetic::{
+    MorphogenField, FieldStats, CellFate, ReactionDiffusion, PatternStats,
+    AttractorLandscape, Attractor, AttractorType, FieldPBitCoupler,
+    MorphogeneticSystem, MorphogeneticConfig, MorphogeneticStats,
+    ACTIVATOR_DIFFUSION, INHIBITOR_DIFFUSION, TURING_WAVELENGTH,
+    MORPHOGEN_DECAY_LENGTH, FRENCH_FLAG_THRESHOLD_HIGH, FRENCH_FLAG_THRESHOLD_LOW,
+};
+pub use holonomic_memory::{
+    MemoryTrace as HolonomicTrace, WorkingMemory, ShortTermMemory, LongTermMemory,
+    HyperbolicMemoryOps, HyperbolicHopfield, PathIntegralRecall,
+    RecallGating, MemoryRegime, HolonomicMemory, HolonomicConfig, HolonomicStats,
+    WMStats, STMStats, LTMStats,
+    WM_DECAY_TAU, WM_CAPACITY, STM_CAPACITY,
+    CONSOLIDATION_GAMMA, FORGETTING_LAMBDA, REPLAY_FACTOR,
+    WEBER_FECHNER_K, WEBER_FECHNER_THRESHOLD, HOPFIELD_TEMPERATURE, HOPFIELD_KAPPA,
+    PATTERN_COMPLETION_ETA, PATTERN_MATCH_THRESHOLD, EMBEDDING_DIM,
+};
+// Note: STM_DECAY_TAU, LTM_DECAY_TAU exported from temporal_consciousness
+// Access holonomic versions via holonomic_memory::STM_DECAY_TAU
 
 use thiserror::Error;
 
