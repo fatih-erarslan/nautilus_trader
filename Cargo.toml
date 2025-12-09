@@ -84,6 +84,16 @@ members = [
     "crates/hyperphysics-mcp-auth",
     # Exotic hyperbolic lattice topologies with SOC dynamics
     "crates/hyperphysics-lattice",
+    # Wolfram Language bridge for scientific validation and CAS
+    "crates/hyperphysics-wolfram",
+    # Tengri Holographic Cortex: pBit-based unified cognitive architecture
+    "crates/tengri-holographic-cortex",
+    # Thermodynamic Portfolio Engine components (Dilithium MCP validated)
+    "crates/hyperphysics-thermodynamic-scheduler",
+    "crates/hyperphysics-path-integral",
+    "crates/hyperphysics-market-microstructure",
+    "crates/hyperphysics-event-sgnn",
+    "crates/hyperphysics-portfolio-engine",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [
@@ -292,3 +302,13 @@ hyperphysics-embodiment = { path = "crates/hyperphysics-embodiment", default-fea
 hyperphysics-stdp = { path = "crates/hyperphysics-stdp", default-features = false }
 hyperphysics-nas = { path = "crates/hyperphysics-nas", default-features = false }
 hyperphysics-sentinel = { path = "crates/hyperphysics-sentinel", default-features = false }
+
+# Wolfram bridge
+hyperphysics-wolfram = { path = "crates/hyperphysics-wolfram", default-features = false }
+
+# Async runtime
+tokio = { version = "1", features = ["full", "process"] }
+
+# Utility
+which = "6"
+regex = "1"

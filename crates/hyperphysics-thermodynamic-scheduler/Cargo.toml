@@ -1,0 +1,31 @@
+[package]
+name = "hyperphysics-thermodynamic-scheduler"
+version = "0.1.0"
+edition = "2021"
+authors = ["Fatih Erarslan <fatih@tengritek.com>"]
+description = """
+Thermodynamic Adaptive Learning Rate Scheduler based on Ising Model Physics.
+
+Novel contribution: Uses statistical physics principles (Ising model critical temperature,
+Boltzmann statistics, simulated annealing) to adaptively set learning rates based on the
+"temperature" of the loss landscape.
+
+Wolfram-Verified Constants:
+- Critical temperature: T_c = 2.269185314213022 (Onsager 1944)
+- Boltzmann sampling: P(s=1) = σ((h-bias)/T)
+- Logarithmic cooling: T(t) = T₀/ln(1+kt)
+"""
+license = "MIT"
+keywords = ["ising", "thermodynamic", "scheduler", "learning-rate", "physics"]
+
+[dependencies]
+rand = { version = "0.8", features = ["small_rng"] }
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+approx = "0.5"
+criterion = "0.5"
+
+[[bench]]
+name = "scheduler_bench"
+harness = false

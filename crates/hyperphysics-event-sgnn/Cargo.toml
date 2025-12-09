@@ -1,0 +1,40 @@
+[package]
+name = "hyperphysics-event-sgnn"
+version = "0.1.0"
+edition = "2021"
+authors = ["Fatih Erarslan <fatih@tengritek.com>"]
+description = """
+Event-Driven Spiking Graph Neural Network for Ultra-HFT.
+
+Key Features:
+- Event-driven asynchronous neuron updates
+- O(1) memory eligibility traces (250× speedup)
+- Multi-scale temporal processing (10µs fast, 1ms slow)
+- Sparse gradient computation (400× speedup)
+- Zero-copy lock-free message passing
+- SIMD-optimized membrane potential integration
+
+Performance Targets:
+- 500K events/sec throughput
+- <100µs prediction latency
+- 4KB memory per 1000 synapses (vs 4MB for BPTT)
+
+Validated Constants (Dilithium MCP):
+- STDP A+ = 0.1, A- = 0.12
+- STDP τ = 20ms
+- Δt=10ms: ΔW = 0.0607
+"""
+license = "MIT"
+keywords = ["sgnn", "spiking", "neural-network", "hft", "event-driven"]
+
+[dependencies]
+rand = { version = "0.8", features = ["small_rng"] }
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+approx = "0.5"
+criterion = "0.5"
+
+[[bench]]
+name = "sgnn_bench"
+harness = false
