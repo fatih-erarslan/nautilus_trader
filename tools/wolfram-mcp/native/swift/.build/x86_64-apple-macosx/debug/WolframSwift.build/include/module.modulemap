@@ -1,0 +1,3 @@
+module WolframSwift {
+    header "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/include/WolframSwift-Swift.h"
+}

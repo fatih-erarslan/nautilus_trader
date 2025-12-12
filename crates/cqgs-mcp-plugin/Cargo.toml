@@ -1,0 +1,136 @@
+[package]
+name = "cqgs-mcp-plugin"
+version = "2.0.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["CQGS Team"]
+description = "Code Quality Governance Sentinels MCP Plugin v2.0 - Native hyperbolic geometry, Fibonacci-scaled thresholds, post-quantum security with Dilithium ML-DSA-65"
+keywords = ["cqgs", "governance", "mcp", "dilithium", "fibonacci", "post-quantum"]
+categories = ["development-tools", "code-analysis", "security"]
+readme = "README.md"
+repository = "https://github.com/cqgs/mcp-plugin"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["full"]
+full = ["parallel", "serde", "mcp", "hyperbolic", "symbolic", "wolfram"]
+# dilithium temporarily disabled - pqc_dilithium API needs investigation
+parallel = ["dep:rayon"]
+serde = ["dep:serde", "dep:serde_json"]
+async = ["dep:tokio"]
+
+# Security & Cryptography
+dilithium = ["dep:pqc_dilithium", "dep:blake3"]
+hyperbolic = []      # Use CQGS hyperbolic module
+symbolic = []        # Use CQGS symbolic module
+
+# MCP Integration
+mcp = []
+napi = ["dep:napi", "dep:napi-derive"]
+wasm = ["dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:js-sys", "dep:web-sys"]
+
+# External Computation
+wolfram = []         # WolframAlpha/Mathematica integration
+verification = []    # Formal verification (Z3, Lean)
+
+[dependencies]
+# Core
+thiserror = "1.0"
+anyhow = "1.0"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Math
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
+ndarray = "0.15"
+num-traits = "0.2"
+
+# Concurrency
+rayon = { version = "1.7", optional = true }
+parking_lot = "0.12"
+dashmap = "6.1"
+crossbeam = "0.8"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
+
+# Async
+tokio = { version = "1.0", features = ["rt-multi-thread", "sync", "io-util"], optional = true }
+async-trait = "0.1"
+futures = "0.3"
+
+# Logging
+tracing = "0.1"
+
+# Post-Quantum Cryptography
+pqc_dilithium = { version = "0.2", optional = true }
+blake3 = { version = "1.8", optional = true }
+sha2 = "0.10"
+hex = "0.4"
+
+# NAPI Bindings (for Bun.JS/Node.JS)
+napi = { version = "3.0.0-alpha.11", optional = true, default-features = false, features = ["napi9", "async", "tokio_rt", "chrono_date"] }
+napi-derive = { version = "3.0.0-alpha.7", optional = true, default-features = false }
+
+# WASM Bindings
+wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+js-sys = { version = "0.3", optional = true }
+web-sys = { version = "0.3", features = ["console"], optional = true }
+
+# CQGS Core Dependencies (local workspace) - ✅ ENABLED v2.0
+cqgs-core = { path = "../cqgs-core" }
+
+# HyperPhysics Integration
+hyperphysics-plugin = { path = "../hyperphysics-plugin", optional = true }
+
+# Sentinel Integration (reference all 49 sentinels)
+# TODO: Re-enable when sentinel dependencies are resolved
+# Core Sentinels (17)
+# cqgs-sentinel-core = { path = "../cqgs-sentinels/src/cqgs-sentinel-core" }
+# cqgs-sentinel-mock-detection = { path = "../cqgs-sentinels/src/cqgs-sentinel-mock-detection" }
+# cqgs-sentinel-framework = { path = "../cqgs-sentinels/src/cqgs-sentinel-framework" }
+# cqgs-sentinel-runtime = { path = "../cqgs-sentinels/src/cqgs-sentinel-runtime" }
+# cqgs-sentinel-reward-hacking = { path = "../cqgs-sentinels/src/cqgs-sentinel-reward-hacking" }
+# cqgs-sentinel-policy-enforcement = { path = "../cqgs-sentinels/src/cqgs-sentinel-policy-enforcement" }
+# cqgs-sentinel-real-data = { path = "../cqgs-sentinels/src/cqgs-sentinel-real-data" }
+# cqgs-sentinel-semantic = { path = "../cqgs-sentinels/src/cqgs-sentinel-semantic" }
+# cqgs-sentinel-behavioral = { path = "../cqgs-sentinels/src/cqgs-sentinel-behavioral" }
+# cqgs-sentinel-cross-scale = { path = "../cqgs-sentinels/src/cqgs-sentinel-cross-scale" }
+# cqgs-sentinel-audit = { path = "../cqgs-sentinels/src/cqgs-sentinel-audit" }
+# cqgs-sentinel-neural = { path = "../cqgs-sentinels/src/cqgs-sentinel-neural" }
+# cqgs-sentinel-zero-synthetic = { path = "../cqgs-sentinels/src/cqgs-sentinel-zero-synthetic" }
+# cqgs-sentinel-self-healing = { path = "../cqgs-sentinels/src/cqgs-sentinel-self-healing" }
+# cqgs-sentinel-synthetic-data = { path = "../cqgs-sentinels/src/cqgs-sentinel-synthetic-data" }
+# cqgs-sentinel-regression = { path = "../cqgs-sentinels/src/cqgs-sentinel-regression" }
+# cqgs-sentinel-ast-pattern = { path = "../cqgs-sentinels/src/cqgs-sentinel-ast-pattern" }
+
+[dev-dependencies]
+criterion = "0.5"
+tokio-test = "0.4"
+approx = "0.5"
+tempfile = "3.10"
+
+[build-dependencies]
+napi-build = "2.1.3"
+
+[[example]]
+name = "mcp_server"
+path = "examples/mcp_server.rs"
+required-features = ["mcp", "napi"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 1

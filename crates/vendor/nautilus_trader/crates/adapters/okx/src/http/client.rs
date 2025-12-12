@@ -60,11 +60,10 @@ use nautilus_model::{
     types::{Price, Quantity},
 };
 use nautilus_network::{
-    http::HttpClient,
+    http::{HttpClient, Method, StatusCode, USER_AGENT},
     ratelimiter::quota::Quota,
     retry::{RetryConfig, RetryManager},
 };
-use reqwest::{Method, StatusCode, header::USER_AGENT};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use tokio_util::sync::CancellationToken;
@@ -1323,6 +1322,9 @@ impl OKXHttpClient {
             }
 
             // Determine which fee fields to use based on contract type
+            // OKX fee rate convention: positive = rebate, negative = commission
+            // Nautilus convention: negative = rebate, positive = commission
+            // Negate to convert between conventions
             let (maker_fee, taker_fee) = if let Some(ref fee_rate) = fee_rate_opt {
                 let is_usdt_margined = inst.ct_type == OKXContractType::Linear;
                 let (maker_str, taker_str) = if is_usdt_margined {
@@ -1332,12 +1334,12 @@ impl OKXHttpClient {
                 };
 
                 let maker = if !maker_str.is_empty() {
-                    Decimal::from_str(maker_str).ok()
+                    Decimal::from_str(maker_str).ok().map(|v| -v)
                 } else {
                     None
                 };
                 let taker = if !taker_str.is_empty() {
-                    Decimal::from_str(taker_str).ok()
+                    Decimal::from_str(taker_str).ok().map(|v| -v)
                 } else {
                     None
                 };
@@ -1421,6 +1423,9 @@ impl OKXHttpClient {
             }
         };
 
+        // OKX fee rate convention: positive = rebate, negative = commission
+        // Nautilus convention: negative = rebate, positive = commission
+        // Negate to convert between conventions
         let (maker_fee, taker_fee) = if let Some(ref fee_rate) = fee_rate_opt {
             let is_usdt_margined = raw_inst.ct_type == OKXContractType::Linear;
             let (maker_str, taker_str) = if is_usdt_margined {
@@ -1430,12 +1435,12 @@ impl OKXHttpClient {
             };
 
             let maker = if !maker_str.is_empty() {
-                Decimal::from_str(maker_str).ok()
+                Decimal::from_str(maker_str).ok().map(|v| -v)
             } else {
                 None
             };
             let taker = if !taker_str.is_empty() {
-                Decimal::from_str(taker_str).ok()
+                Decimal::from_str(taker_str).ok().map(|v| -v)
             } else {
                 None
             };

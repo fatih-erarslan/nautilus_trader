@@ -1,0 +1,36 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "talebian-risk-rs"
+version = "0.1.0"
+description = "Comprehensive Talebian risk management and antifragility framework for trading systems"
+authors = [{name = "TENGRI Trading Swarm", email = "swarm@tengri.ai"}]
+license = {text = "MIT OR Apache-2.0"}
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+keywords = ["antifragile", "black-swan", "barbell", "taleb", "risk-management", "trading"]
+
+[project.urls]
+Homepage = "https://github.com/tengri/talebian-risk-rs"
+Repository = "https://github.com/tengri/talebian-risk-rs"
+
+[tool.maturin]
+module-name = "talebian_risk_rs"
+features = ["python-bindings"]
+python-source = "python"
+strip = true

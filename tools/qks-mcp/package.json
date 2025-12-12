@@ -1,0 +1,53 @@
+{
+  "name": "@qks/qks-mcp",
+  "version": "2.0.0",
+  "description": "Quantum Knowledge System MCP Server - 8-Layer Cognitive Architecture for Agentic AI",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "qks-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build:native": "cd ../../rust-core && cargo build --release && cp target/release/libqks_core.dylib ../tools/qks-mcp/dist/ 2>/dev/null || true",
+    "build:all": "npm run build:native && npm run build",
+    "start": "bun run dist/index.js",
+    "dev": "bun run --watch src/index.ts",
+    "test": "bun test",
+    "clean": "rm -rf dist",
+    "lint": "bunx @biomejs/biome check src/"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.7.0",
+    "@types/bun": "latest",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "keywords": [
+    "mcp",
+    "quantum",
+    "cognitive-architecture",
+    "8-layer",
+    "thermodynamic",
+    "consciousness",
+    "metacognition",
+    "active-inference",
+    "collective-intelligence",
+    "agency",
+    "hyperphysics",
+    "rust",
+    "bun"
+  ],
+  "author": "QKS Team <team@qks.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qks/quantum_knowledge_system"
+  }
+}

@@ -1,0 +1,103 @@
+[package]
+name = "risk-management"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Quantum-Enhanced Risk Management System for Ultra-High Performance Trading"
+repository = "https://github.com/tengri/ats-cp-trader"
+license = "MIT OR Apache-2.0"
+keywords = ["trading", "risk-management", "quantum", "high-frequency", "var"]
+categories = ["science", "algorithms", "mathematics", "finance"]
+
+[dependencies]
+# Core dependencies (commented out - no such crates exist)
+# quantum-uncertainty = { path = "../quantum-uncertainty" }
+# performance-engine = { path = "../performance-engine" }  # DISABLED
+# ats-core = { path = "../ats-core" }
+
+# High-performance computing
+rayon = "1.8"
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Mathematical computing
+ndarray = { version = "0.15", features = ["rayon", "serde"] }
+nalgebra = "0.32"
+num-traits = "0.2"
+num-complex = "0.4"
+statrs = "0.16"
+rand = "0.8"
+rand_distr = "0.4"
+
+# Linear algebra and optimization
+linfa = "0.7"
+linfa-linear = "0.7"
+linfa-clustering = "0.7"
+argmin = "0.8"
+argmin-math = "0.3"
+
+# GPU acceleration
+wgpu = "25.0.2"
+bytemuck = { version = "1.0", features = ["derive"] }
+pollster = "0.3"
+
+# Serialization and configuration
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+config = "0.13"
+
+# Time and scheduling
+chrono = { version = "0.4", features = ["serde"] }
+time = "0.3"
+
+# Logging and monitoring
+tracing = "0.1"
+tracing-subscriber = "0.3"
+metrics = "0.21"
+prometheus = "0.13"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Database and persistence
+rusqlite = { version = "0.32.0", features = ["bundled"] }
+redis = { version = "0.23", features = ["tokio-comp"] }
+
+# Parallel processing
+crossbeam = "0.8"
+crossbeam-channel = "0.5"
+parking_lot = "0.12"
+
+# Financial mathematics
+black_scholes = "0.2"
+
+# UUID generation
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tokio-test = "0.4"
+approx = "0.5"
+pretty_assertions = "1.4"
+tempfile = "3.8"
+
+[features]
+default = ["simd", "gpu", "parallel", "real-time"]
+simd = []
+gpu = []
+parallel = []
+real-time = []
+benchmarking = []
+testing = []
+
+[[bench]]
+name = "risk_management_benchmark"
+harness = false

@@ -1,0 +1,102 @@
+[package]
+name = "advanced-cdfa-hardware"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["TENGRI Hardware Acceleration Swarm <hwaccel@tengri.ai>"]
+description = "Hardware Acceleration for Advanced CDFA - CUDA, ROCm, MPS, Tensor Cores"
+repository = "https://github.com/tengri/ats-cp-trader"
+license = "MIT OR Apache-2.0"
+keywords = ["hardware", "acceleration", "cuda", "rocm", "mps"]
+categories = ["science", "algorithms", "mathematics", "finance"]
+
+[lib]
+name = "advanced_cdfa_hardware"
+path = "src/lib.rs"
+
+[dependencies]
+# Core computation
+ndarray = { workspace = true }
+nalgebra = { workspace = true }
+num-traits = "0.2"
+num-complex = "0.4"
+
+# GPU computation
+candle-core = { workspace = true, optional = true }
+candle-nn = { workspace = true, optional = true }
+tch = { workspace = true, optional = true }  # Using workspace version - resolves torch-sys native library conflict
+
+# CUDA support
+cudarc = { workspace = true, optional = true }  # Using workspace version - removed non-existent cufft feature
+half = { version = "2.3", optional = true }
+
+# ROCm/HIP support  
+hip-sys = { version = "0.1", optional = true }
+
+# Metal/MPS support (Apple Silicon)
+metal = { version = "0.28", optional = true }
+objc = { version = "0.2", optional = true }
+
+# SIMD acceleration
+wide = "0.7"
+simdeez = "1.0"
+
+# Async and concurrency
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+rayon = { workspace = true, optional = true }
+parking_lot = "0.12"
+
+# Serialization
+serde = { workspace = true }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+log = "0.4"
+
+# Performance monitoring
+metrics = "0.21"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+approx = "0.5"
+tokio-test = "0.4"
+
+[features]
+default = ["auto-detect", "simd", "parallel"]
+
+# Hardware backends
+cuda = ["dep:cudarc", "dep:half", "dep:tch"]
+rocm = ["dep:hip-sys"]
+metal = ["dep:metal", "dep:objc"]
+mps = ["dep:candle-core", "dep:candle-nn"]
+
+# Auto-detection
+auto-detect = []
+
+# Performance features
+simd = []
+parallel = ["dep:rayon"]
+tensor-cores = ["cuda"]
+
+# Integration features
+candle = ["dep:candle-core", "dep:candle-nn"]
+torch = ["dep:tch"]
+
+# Full acceleration
+full-acceleration = ["cuda", "rocm", "metal", "mps", "simd", "parallel", "tensor-cores"]
+
+[[bench]]
+name = "hardware_benchmarks"
+harness = false
+required-features = ["cuda"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

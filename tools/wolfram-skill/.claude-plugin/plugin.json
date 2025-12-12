@@ -1,0 +1,21 @@
+{
+  "name": "wolfram-scientific-computing",
+  "version": "1.0.0",
+  "description": "Wolfram Alpha and WolframScript integration for scientific computing, mathematical validation, and HyperPhysics research",
+  "author": "HyperPhysics",
+  "skills": [
+    {
+      "name": "wolfram-scientific-computing",
+      "path": "../SKILL.md"
+    }
+  ],
+  "mcpServers": {
+    "wolfram": {
+      "command": "node",
+      "args": ["${PLUGIN_DIR}/../wolfram-mcp/dist/index.js"],
+      "env": {
+        "WOLFRAM_APP_ID": "${WOLFRAM_APP_ID}"
+      }
+    }
+  }
+}

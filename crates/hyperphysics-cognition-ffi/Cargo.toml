@@ -1,0 +1,28 @@
+[package]
+name = "hyperphysics-cognition-ffi"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+license = "MIT OR Apache-2.0"
+description = "Swift FFI bindings for hyperphysics-cognition"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+name = "hyperphysics_cognition_ffi"
+
+[dependencies]
+hyperphysics-cognition = { path = "../hyperphysics-cognition", features = ["full"] }
+
+# Core
+libc = "0.2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[build-dependencies]
+cbindgen = "0.26"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+strip = true

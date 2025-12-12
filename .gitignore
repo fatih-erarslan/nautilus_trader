@@ -81,3 +81,4 @@ crates/cwts-ultra/freqtrade/strategies/core/complex_adaptive_agentic_orchestrato
 crates/cwts-ultra/freqtrade/strategies/core/tengri/
 *.profraw
 coverage/
+/.venv

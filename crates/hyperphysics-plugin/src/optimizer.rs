@@ -30,6 +30,7 @@ pub struct OptimizationResult {
 }
 
 /// Agent in the optimizer population
+/// Tracks position, velocity, fitness, and performance metadata for adaptive optimization
 #[derive(Debug, Clone)]
 struct Agent {
     position: DVector<f64>,
@@ -37,18 +38,29 @@ struct Agent {
     fitness: f64,
     personal_best: DVector<f64>,
     personal_best_fitness: f64,
+    /// Performance tracking metadata for adaptive optimization
+    /// Keys: "improvement_rate", "stagnation_count", "exploration_score", "exploitation_score"
     metadata: HashMap<String, f64>,
 }
 
 impl Agent {
     fn new(dim: usize) -> Self {
+        let mut metadata = HashMap::new();
+        // Initialize performance tracking metrics
+        metadata.insert("improvement_rate".to_string(), 0.0);
+        metadata.insert("stagnation_count".to_string(), 0.0);
+        metadata.insert("exploration_score".to_string(), 1.0);
+        metadata.insert("exploitation_score".to_string(), 0.0);
+        metadata.insert("velocity_magnitude".to_string(), 0.0);
+        metadata.insert("distance_to_best".to_string(), f64::INFINITY);
+        
         Self {
             position: DVector::zeros(dim),
             velocity: DVector::zeros(dim),
             fitness: f64::INFINITY,
             personal_best: DVector::zeros(dim),
             personal_best_fitness: f64::INFINITY,
-            metadata: HashMap::new(),
+            metadata,
         }
     }
     
@@ -61,7 +73,54 @@ impl Agent {
             agent.velocity[i] = (max - min) * 0.1 * (rng.gen::<f64>() - 0.5);
         }
         agent.personal_best = agent.position.clone();
+        // Initial velocity magnitude
+        agent.metadata.insert("velocity_magnitude".to_string(), agent.velocity.norm());
         agent
+    }
+    
+    /// Update agent metadata after fitness evaluation
+    fn update_metadata(&mut self, global_best: &DVector<f64>, improved: bool) {
+        // Track improvement rate (exponential moving average)
+        let prev_rate = *self.metadata.get("improvement_rate").unwrap_or(&0.0);
+        let improvement = if improved { 1.0 } else { 0.0 };
+        self.metadata.insert("improvement_rate".to_string(), 0.9 * prev_rate + 0.1 * improvement);
+        
+        // Track stagnation
+        if improved {
+            self.metadata.insert("stagnation_count".to_string(), 0.0);
+        } else {
+            let stag = *self.metadata.get("stagnation_count").unwrap_or(&0.0);
+            self.metadata.insert("stagnation_count".to_string(), stag + 1.0);
+        }
+        
+        // Update velocity magnitude
+        self.metadata.insert("velocity_magnitude".to_string(), self.velocity.norm());
+        
+        // Distance to global best
+        let dist = (&self.position - global_best).norm();
+        self.metadata.insert("distance_to_best".to_string(), dist);
+        
+        // Exploration vs exploitation scores
+        let stag = *self.metadata.get("stagnation_count").unwrap_or(&0.0);
+        let vel_mag = *self.metadata.get("velocity_magnitude").unwrap_or(&0.0);
+        
+        // High velocity + high stagnation = exploring
+        // Low distance + low stagnation = exploiting
+        let exploration = (vel_mag / (vel_mag + 1.0)) * (stag / (stag + 5.0)).min(1.0);
+        let exploitation = 1.0 / (1.0 + dist) * (1.0 - stag / (stag + 10.0));
+        
+        self.metadata.insert("exploration_score".to_string(), exploration);
+        self.metadata.insert("exploitation_score".to_string(), exploitation);
+    }
+    
+    /// Get stagnation count for adaptive behavior
+    fn stagnation(&self) -> f64 {
+        *self.metadata.get("stagnation_count").unwrap_or(&0.0)
+    }
+    
+    /// Check if agent needs exploration boost
+    fn needs_exploration(&self) -> bool {
+        self.stagnation() > 10.0
     }
 }
 
@@ -159,12 +218,14 @@ impl Optimizer {
                 _ => self.step_pso(), // Default to PSO
             }
             
-            // Evaluate
+            // Evaluate and update metadata
+            let global_best_clone = self.global_best.clone();
             for agent in &mut self.agents {
                 agent.fitness = eval(agent.position.as_slice());
                 self.evaluations += 1;
                 
-                if agent.fitness < agent.personal_best_fitness {
+                let improved = agent.fitness < agent.personal_best_fitness;
+                if improved {
                     agent.personal_best = agent.position.clone();
                     agent.personal_best_fitness = agent.fitness;
                 }
@@ -173,6 +234,9 @@ impl Optimizer {
                     self.global_best = agent.position.clone();
                     self.global_best_fitness = agent.fitness;
                 }
+                
+                // Update agent metadata for adaptive optimization
+                agent.update_metadata(&global_best_clone, improved);
             }
             
             self.history.push(self.global_best_fitness);
@@ -396,9 +460,9 @@ impl Optimizer {
         }
     }
     
-    /// Adaptive step
+    /// Adaptive step using agent metadata for intelligent strategy selection
     fn step_adaptive(&mut self) {
-        // Select strategy based on progress
+        // Select strategy based on progress and agent metadata
         let progress = self.iteration as f64 / self.config.max_iterations as f64;
         let improvement = if self.history.len() >= 10 {
             let recent = &self.history[self.history.len() - 10..];
@@ -407,14 +471,41 @@ impl Optimizer {
             0.1
         };
         
-        if improvement < 0.001 && progress > 0.3 {
-            self.step_cuckoo(); // Stuck - explore
-        } else if progress < 0.3 {
-            self.step_whale(); // Early - explore
-        } else if progress < 0.7 {
-            self.step_grey_wolf(); // Middle - balanced
+        // Calculate population-level statistics from agent metadata
+        let avg_stagnation = self.agents.iter()
+            .map(|a| a.stagnation())
+            .sum::<f64>() / self.agents.len() as f64;
+        
+        let agents_needing_exploration = self.agents.iter()
+            .filter(|a| a.needs_exploration())
+            .count();
+        
+        let exploration_ratio = agents_needing_exploration as f64 / self.agents.len() as f64;
+        
+        let avg_exploration_score = self.agents.iter()
+            .map(|a| *a.metadata.get("exploration_score").unwrap_or(&0.5))
+            .sum::<f64>() / self.agents.len() as f64;
+        
+        let avg_exploitation_score = self.agents.iter()
+            .map(|a| *a.metadata.get("exploitation_score").unwrap_or(&0.5))
+            .sum::<f64>() / self.agents.len() as f64;
+        
+        // Adaptive strategy selection based on population state
+        if exploration_ratio > 0.5 || (improvement < 0.001 && avg_stagnation > 5.0) {
+            // Many agents stuck - use Cuckoo for Lévy flight exploration
+            self.step_cuckoo();
+        } else if progress < 0.2 || avg_exploration_score > avg_exploitation_score {
+            // Early stage or population exploring - use Whale for broad search
+            self.step_whale();
+        } else if progress < 0.5 {
+            // Middle stage - balanced Grey Wolf
+            self.step_grey_wolf();
+        } else if progress < 0.8 {
+            // Later stage - Differential Evolution for refinement
+            self.step_de();
         } else {
-            self.step_pso(); // Late - exploit
+            // Final stage - PSO for fine-tuning
+            self.step_pso();
         }
     }
     

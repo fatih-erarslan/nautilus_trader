@@ -1,0 +1,33 @@
+{
+  "name": "@hyperphysics/wolfram-mcp",
+  "version": "2.0.0",
+  "description": "High-performance MCP Server for Wolfram Alpha with Bun.js and native Rust/Swift bindings",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "wolfram-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build:native": "cd native && npm run build",
+    "build:all": "npm run build:native && npm run build",
+    "start": "bun run dist/index.js",
+    "dev": "bun run --watch src/index.ts",
+    "test": "bun test",
+    "clean": "rm -rf dist native/target"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "trustedDependencies": [
+    "@hyperphysics/wolfram-native"
+  ]
+}

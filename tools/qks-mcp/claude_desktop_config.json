@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "qks": {
+      "command": "bun",
+      "args": [
+        "run",
+        "/Volumes/Tengritek/Ashina/quantum_knowledge_system/tools/qks-mcp/src/index.ts"
+      ],
+      "env": {
+        "RUST_CORE_PATH": "/Volumes/Tengritek/Ashina/quantum_knowledge_system/rust-core/target/release/libquantum_knowledge_core.dylib"
+      }
+    },
+    "dilithium": {
+      "command": "bun",
+      "args": [
+        "run",
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/dilithium-mcp/dist/index.js"
+      ]
+    }
+  }
+}

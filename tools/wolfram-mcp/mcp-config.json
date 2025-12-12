@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "wolfram": {
+      "command": "node",
+      "args": ["/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/dist/index.js"],
+      "env": {
+        "WOLFRAM_APP_ID": "YOUR_WOLFRAM_APP_ID_HERE"
+      }
+    }
+  }
+}

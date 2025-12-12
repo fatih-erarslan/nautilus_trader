@@ -1,0 +1,86 @@
+[package]
+name = "data-collector"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88.0"
+authors = ["Nautilus Trader Contributors"]
+description = "Comprehensive cryptocurrency data collection for backtesting"
+keywords = ["cryptocurrency", "data", "backtesting", "binance", "trading"]
+categories = ["finance", "algorithms", "data-structures"]
+
+[dependencies]
+# Core Rust dependencies for standalone operation
+
+# HTTP clients and async
+tokio = { version = "1.46", features = ["full"] }
+reqwest = { version = "0.12", features = ["json", "gzip"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Data processing
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+csv = "1.3"
+# arrow = { version = "53.0", features = ["csv", "json"] }  # Commented out - large dependency
+# parquet = { version = "53.0" }  # Commented out - large dependency
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Database
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "chrono", "uuid", "sqlite", "postgres"] }
+
+# Compression
+flate2 = "1.0"
+zstd = "0.13"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Progress tracking
+indicatif = { version = "0.17", features = ["tokio"] }
+
+# Concurrency
+rayon = "1.10.0"
+dashmap = "6.0"
+parking_lot = "0.12"
+
+# File I/O
+tempfile = "3.0"
+uuid = { version = "1.0", features = ["v4"] }
+
+# Logging
+tracing = "0.1"
+log = "0.4"
+
+# Configuration
+config = "0.14"
+clap = { version = "4.0", features = ["derive"] }
+
+# Rate limiting
+governor = "0.6"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3.0"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[features]
+default = ["binance", "coinbase", "kraken", "parquet"]
+binance = []
+coinbase = []
+kraken = []
+okx = []
+bybit = []
+parquet = []
+csv-export = []
+real-time = []
+
+[[bin]]
+name = "data-downloader"
+path = "src/bin/downloader.rs"
+
+[[bench]]
+name = "data_processing"
+harness = false

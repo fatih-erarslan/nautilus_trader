@@ -94,6 +94,16 @@ members = [
     "crates/hyperphysics-market-microstructure",
     "crates/hyperphysics-event-sgnn",
     "crates/hyperphysics-portfolio-engine",
+    "crates/hyperphysics-agency",
+    "crates/hyperphysics-plugin",
+    "crates/hyperphysics-swarm-intelligence",
+    # Bio-Digital Isomorphic Cognition System
+    "crates/hyperphysics-cognition",
+    "crates/hyperphysics-cognition-ffi",
+    "crates/hyperphysics-cognition-napi",
+    # Vendor integrations
+    "crates/hyperphysics-varlociraptor",
+    "crates/hyperphysics-wassette",
 ]
 # Exclude legacy/external crates not part of core workspace
 exclude = [

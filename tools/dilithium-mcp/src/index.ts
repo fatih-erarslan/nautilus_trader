@@ -38,6 +38,12 @@ import {
 import { z } from "zod";
 import { spawn } from "child_process";
 import { existsSync } from "fs";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
+
+// Module path resolution
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const projectRoot = resolve(__dirname, "..");
 
 // Import local modules
 import { swarmTools, handleSwarmTool } from "./swarm/index.js";
@@ -104,9 +110,9 @@ let native: NativeModule | null = null;
 // Try to load native Rust module
 const nativePaths = [
   process.env.DILITHIUM_NATIVE_PATH,
-  "./native/target/release/libdilithium_native.dylib",
-  "./native/dilithium-native.darwin-arm64.node",
-  "./dist/libdilithium_native.dylib",
+  resolve(projectRoot, "native/dilithium-native.darwin-x64.node"),
+  resolve(projectRoot, "native/dilithium-native.darwin-arm64.node"),
+  resolve(projectRoot, "native/target/release/libdilithium_native.dylib"),
 ];
 
 for (const path of nativePaths) {
@@ -488,9 +494,9 @@ async function handleToolCall(name: string, args: Record<string, unknown>): Prom
         if (name.startsWith("swarm_")) {
           return handleSwarmTool(name, args);
         }
-        // Enhanced tools (design, systems, llm, devops, docs, code quality, project management)
+        // Enhanced tools (design, systems, llm, devops, docs, code quality, project management, agency, vector)
         if (enhancedTools.some(t => t.name === name)) {
-          return handleEnhancedTool(name, args);
+          return handleEnhancedTool(name, args, native);
         }
         return JSON.stringify({ error: `Unknown tool: ${name}` });
     }

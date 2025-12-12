@@ -1,0 +1,53 @@
+[package]
+name = "whale-defense-ml"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Core QBMIA framework - Transformer-based whale detection"
+
+[dependencies]
+# Core dependencies
+tokio.workspace = true
+serde.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+log.workspace = true
+tracing.workspace = true
+
+# ML framework dependencies
+candle-core.workspace = true
+candle-nn.workspace = true
+
+# Math and array operations
+nalgebra.workspace = true
+ndarray.workspace = true
+num-traits.workspace = true
+num-complex.workspace = true
+statrs.workspace = true
+
+# Random and distributions
+rand.workspace = true
+rand_distr = "0.4"  # Not in this workspace
+
+# Time handling
+chrono.workspace = true
+
+# Serialization
+serde_json.workspace = true
+
+# Performance
+rayon.workspace = true
+parking_lot.workspace = true
+
+# Additional dependencies
+atomic_float = "0.1"
+metrics = "0.21"
+
+[dev-dependencies]
+tokio-test.workspace = true
+
+[features]
+default = ["std"]
+std = []

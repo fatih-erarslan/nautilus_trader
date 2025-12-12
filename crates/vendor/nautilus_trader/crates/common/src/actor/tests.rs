@@ -44,7 +44,9 @@ use ustr::Ustr;
 #[cfg(feature = "defi")]
 use {
     alloy_primitives::Address,
-    nautilus_model::defi::{Block, Blockchain, Pool, PoolLiquidityUpdate, PoolSwap},
+    nautilus_model::defi::{
+        Block, Blockchain, Pool, PoolIdentifier, PoolLiquidityUpdate, PoolSwap,
+    },
 };
 
 use super::{Actor, DataActor, DataActorCore, data_actor::DataActorConfig};
@@ -371,7 +373,7 @@ fn test_get_nonexistent() {
 fn test_get_actor_unchecked_panic() {
     let id = Ustr::from_str("unknown").unwrap();
     // Should panic due to missing actor
-    let _: &mut DummyActor = get_actor_unchecked(&id);
+    let _guard = get_actor_unchecked::<DummyActor>(&id);
 }
 
 #[rstest]
@@ -379,11 +381,15 @@ fn test_get_actor_unchecked_mutate() {
     let name = "mutant";
     let _rc = register_dummy(name);
     let id = Ustr::from_str(name).unwrap();
-    // Mutate via unchecked
-    let actor_ref: &mut DummyActor = get_actor_unchecked(&id);
-    actor_ref.count = 42;
-    // Read back via unchecked again
-    let actor_ref2: &mut DummyActor = get_actor_unchecked(&id);
+
+    // Mutate via unchecked - must scope the borrow
+    {
+        let mut actor_ref = get_actor_unchecked::<DummyActor>(&id);
+        actor_ref.count = 42;
+    } // Guard dropped here, releasing borrow
+
+    // Read back via unchecked again (now allowed since previous borrow dropped)
+    let actor_ref2 = get_actor_unchecked::<DummyActor>(&id);
     assert_eq!(actor_ref2.count, 42);
 }
 
@@ -394,7 +400,7 @@ fn test_subscribe_and_receive_custom_data(
     trader_id: TraderId,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let data_type = DataType::new(stringify!(String), None);
@@ -416,7 +422,7 @@ fn test_unsubscribe_custom_data(
     trader_id: TraderId,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let data_type = DataType::new(stringify!(String), None);
@@ -448,7 +454,7 @@ fn test_subscribe_and_receive_book_deltas(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_book_deltas(audusd_sim.id, BookType::L2_MBP, None, None, false, None);
@@ -485,7 +491,7 @@ fn test_unsubscribe_book_deltas(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_book_deltas(audusd_sim.id, BookType::L2_MBP, None, None, false, None);
@@ -540,7 +546,7 @@ fn test_subscribe_and_receive_book_at_interval(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let book_type = BookType::L2_MBP;
@@ -564,7 +570,7 @@ fn test_unsubscribe_book_at_interval(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let book_type = BookType::L2_MBP;
@@ -597,7 +603,7 @@ fn test_subscribe_and_receive_quotes(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_quotes(audusd_sim.id, None, None);
@@ -618,7 +624,7 @@ fn test_unsubscribe_quotes(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_quotes(audusd_sim.id, None, None);
@@ -646,7 +652,7 @@ fn test_subscribe_and_receive_trades(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_trades(audusd_sim.id, None, None);
@@ -667,7 +673,7 @@ fn test_unsubscribe_trades(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_trades(audusd_sim.id, None, None);
@@ -695,7 +701,7 @@ fn test_subscribe_and_receive_bars(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let bar_type = BarType::from_str(&format!("{}-1-MINUTE-LAST-INTERNAL", audusd_sim.id)).unwrap();
@@ -716,7 +722,7 @@ fn test_unsubscribe_bars(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let bar_type = BarType::from_str(&format!("{}-1-MINUTE-LAST-INTERNAL", audusd_sim.id)).unwrap();
@@ -745,7 +751,7 @@ fn test_request_instrument(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let request_id = actor
@@ -782,7 +788,7 @@ fn test_request_instruments(
     gbpusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let venue = Venue::from("SIM");
@@ -821,7 +827,7 @@ fn test_request_quotes(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let request_id = actor
@@ -857,7 +863,7 @@ fn test_request_trades(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let request_id = actor
@@ -893,7 +899,7 @@ fn test_request_bars(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let bar_type = BarType::from_str(&format!("{}-1-MINUTE-LAST-INTERNAL", audusd_sim.id)).unwrap();
@@ -932,7 +938,7 @@ fn test_subscribe_and_receive_instruments(
     gbpusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let venue = Venue::from("SIM");
@@ -958,7 +964,7 @@ fn test_subscribe_and_receive_instrument(
     gbpusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_instrument(audusd_sim.id, None, None);
@@ -982,7 +988,7 @@ fn test_subscribe_and_receive_mark_prices(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_mark_prices(audusd_sim.id, None, None);
@@ -1016,7 +1022,7 @@ fn test_subscribe_and_receive_index_prices(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_index_prices(audusd_sim.id, None, None);
@@ -1042,7 +1048,7 @@ fn test_subscribe_and_receive_funding_rates(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_funding_rates(audusd_sim.id, None, None);
@@ -1078,7 +1084,7 @@ fn test_subscribe_and_receive_instrument_status(
     stub_instrument_status: InstrumentStatus,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let instrument_id = stub_instrument_status.instrument_id;
@@ -1099,7 +1105,7 @@ fn test_subscribe_and_receive_instrument_close(
     stub_instrument_close: InstrumentClose,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let instrument_id = stub_instrument_close.instrument_id;
@@ -1121,7 +1127,7 @@ fn test_unsubscribe_instruments(
     gbpusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let venue = Venue::from("SIM");
@@ -1154,7 +1160,7 @@ fn test_unsubscribe_instrument(
     gbpusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_instrument(audusd_sim.id, None, None);
@@ -1185,7 +1191,7 @@ fn test_unsubscribe_mark_prices(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_mark_prices(audusd_sim.id, None, None);
@@ -1236,7 +1242,7 @@ fn test_unsubscribe_index_prices(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_index_prices(audusd_sim.id, None, None);
@@ -1273,7 +1279,7 @@ fn test_unsubscribe_funding_rates(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     actor.subscribe_funding_rates(audusd_sim.id, None, None);
@@ -1312,7 +1318,7 @@ fn test_unsubscribe_instrument_status(
     stub_instrument_status: InstrumentStatus,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let instrument_id = stub_instrument_status.instrument_id;
@@ -1339,7 +1345,7 @@ fn test_unsubscribe_instrument_close(
     stub_instrument_close: InstrumentClose,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let instrument_id = stub_instrument_close.instrument_id;
@@ -1366,7 +1372,7 @@ fn test_request_book_snapshot(
     audusd_sim: CurrencyPair,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     // Request a book snapshot
@@ -1406,7 +1412,7 @@ fn test_request_data(
     test_logging();
 
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     // Request custom data
@@ -1453,7 +1459,7 @@ fn test_subscribe_and_receive_blocks(
     trader_id: TraderId,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let blockchain = Blockchain::Ethereum;
@@ -1484,7 +1490,7 @@ fn test_unsubscribe_blocks(
     trader_id: TraderId,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let blockchain = Blockchain::Ethereum;
@@ -1531,7 +1537,7 @@ fn test_subscribe_and_receive_pools(
     trader_id: TraderId,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     use nautilus_model::defi::{Dex, DexType, Pool, Token, chain::chains, dex::AmmType};
@@ -1565,10 +1571,12 @@ fn test_subscribe_and_receive_pools(
         "WETH".to_string(),
         18,
     );
+    let pool_address = Address::from([0x12; 20]);
     let pool = Pool::new(
         chain,
         Arc::new(dex),
-        Address::from([0x12; 20]),
+        pool_address,
+        PoolIdentifier::from_address(pool_address),
         1000000,
         token0,
         token1,
@@ -1602,7 +1610,7 @@ fn test_subscribe_and_receive_pool_swaps(
     };
 
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let chain = Arc::new(chains::ETHEREUM.clone());
@@ -1627,7 +1635,7 @@ fn test_subscribe_and_receive_pool_swaps(
         chain,
         Arc::new(dex),
         instrument_id,
-        pool_address,
+        PoolIdentifier::from_address(pool_address),
         1000u64,
         "0x123".to_string(),
         0,
@@ -1663,7 +1671,7 @@ fn test_unsubscribe_pool_swaps(
     use nautilus_model::defi::{Dex, DexType, Pool, chain::chains, dex::AmmType};
 
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let chain = Arc::new(chains::ETHEREUM.clone());
@@ -1680,7 +1688,8 @@ fn test_unsubscribe_pool_swaps(
         "Collect",
     );
     let pool_address = Address::from_str("0xC31E54c7A869B9fCbECC14363CF510d1C41Fa443").unwrap();
-    let instrument_id = Pool::create_instrument_id(chain.name, &dex, &pool_address);
+    let pool_identifier = pool_address.to_string();
+    let instrument_id = Pool::create_instrument_id(chain.name, &dex, &pool_identifier);
 
     actor.subscribe_pool_swaps(instrument_id, None, None);
 
@@ -1690,7 +1699,7 @@ fn test_unsubscribe_pool_swaps(
         chain.clone(),
         Arc::new(dex.clone()),
         instrument_id,
-        pool_address,
+        PoolIdentifier::from_address(pool_address),
         1000u64,
         "0x123".to_string(),
         0,
@@ -1713,7 +1722,7 @@ fn test_unsubscribe_pool_swaps(
         chain,
         Arc::new(dex),
         instrument_id,
-        pool_address,
+        PoolIdentifier::from_address(pool_address),
         2000u64,
         "0x456".to_string(),
         0,
@@ -1742,7 +1751,7 @@ fn test_duplicate_subscribe_custom_data(
 ) {
     // Register actor
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     // Subscribe twice to the same DataType
@@ -1766,7 +1775,7 @@ fn test_unsubscribe_before_subscribe_custom_data(
     trader_id: TraderId,
 ) {
     let actor_id = register_data_actor(clock, cache, trader_id);
-    let actor = get_actor_unchecked::<TestDataActor>(&actor_id);
+    let mut actor = get_actor_unchecked::<TestDataActor>(&actor_id);
     actor.start().unwrap();
 
     let data_type = DataType::new(stringify!(String), None);
@@ -1842,7 +1851,7 @@ fn test_on_save_and_on_load(
 
     // Fetch back to mutate
     let actor_key = actor_id.inner();
-    let actor_ref = get_actor_unchecked::<SaveLoadActor>(&actor_key);
+    let mut actor_ref = get_actor_unchecked::<SaveLoadActor>(&actor_key);
 
     // Invoke on_save – emulate persistence snapshot
     let snapshot = actor_ref.on_save().unwrap();

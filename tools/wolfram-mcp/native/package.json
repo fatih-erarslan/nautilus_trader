@@ -1,0 +1,34 @@
+{
+  "name": "@hyperphysics/wolfram-native",
+  "version": "1.0.0",
+  "description": "Native Rust bindings for Wolfram MCP via NAPI-RS",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "wolfram-native",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.node"
+  ],
+  "license": "MIT"
+}

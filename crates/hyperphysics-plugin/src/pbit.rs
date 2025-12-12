@@ -27,7 +27,6 @@
 //!   p-bits"
 
 use rand::Rng;
-use rand_chacha::ChaCha8Rng;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -587,6 +586,7 @@ impl PBitLattice {
 mod tests {
     use super::*;
     use rand::SeedableRng;
+    use rand_chacha::ChaCha8Rng;
 
     #[test]
     fn test_pbit_probability_bounds() {

@@ -1,0 +1,19 @@
+{
+    "redis_url": "redis://localhost:6379",
+    "use_real_messaging": true,
+    "zmq_ports": {
+        "pads": 9090,
+        "qbmia": 9091,
+        "quasar": 9092,
+        "quantum_amos": 9093
+    },
+    "enable_pads": true,
+    "enable_qbmia": true,
+    "enable_quasar": true,
+    "enable_quantum_amos": true,
+    "decision_timeout": 5.0,
+    "health_check_interval": 30.0,
+    "auto_restart_failed": true,
+    "simulate_market_data": true,
+    "market_update_interval": 2.0
+}

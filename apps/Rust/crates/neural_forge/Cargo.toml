@@ -1,0 +1,193 @@
+[package]
+name = "neural-forge"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "High-performance, modular neural network training framework for financial markets"
+repository.workspace = true
+keywords = ["machine-learning", "neural-networks", "trading", "finance", "cuda"]
+categories = ["science", "algorithms"]
+
+[lib]
+name = "neural_forge"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["cuda", "optimization", "distributed"]
+cuda = ["candle-core/cuda", "cudarc"]
+metal = ["candle-core/metal"]
+mkl = ["candle-core/mkl"]
+optimization = ["argmin", "argmin-math"]
+# calibration = ["isotonic-regression"]  # Disabled due to dependency
+distributed = ["tokio", "tonic", "prost"]
+python-bindings = ["pyo3"]
+wasm = ["wasm-bindgen", "js-sys"]
+onnx-export = ["candle-onnx"]
+tensorrt = ["tensorrt-rs"]
+profiling = ["tracy-client", "puffin"]
+
+[dependencies]
+# Workspace dependencies - Core
+tokio = { workspace = true, optional = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+log = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+
+# Workspace dependencies - Mathematical computing
+ndarray = { workspace = true }
+num-traits = { workspace = true }
+num-complex = { workspace = true }
+statrs = { workspace = true }
+nalgebra = { workspace = true }
+rand = { workspace = true }
+
+# Workspace dependencies - Machine learning
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+cudarc = { workspace = true, optional = true }
+half = { workspace = true }
+safetensors = { workspace = true }
+libc = { workspace = true }
+
+# Workspace dependencies - Performance
+rayon = { workspace = true }
+crossbeam = { workspace = true }
+parking_lot = { workspace = true }
+
+# Workspace dependencies - Memory management
+moka = { workspace = true }
+lru = { workspace = true }
+once_cell = { workspace = true }
+memmap2 = { workspace = true }
+
+# Workspace dependencies - Networking
+reqwest = { workspace = true }
+axum = { workspace = true }
+petgraph = { workspace = true }
+
+# Workspace dependencies - Statistical distributions
+rand_distr = { workspace = true }
+
+# Workspace dependencies - SIMD
+wide = { workspace = true }
+bytemuck = { workspace = true }
+
+# Workspace dependencies - Async
+futures = { workspace = true }
+
+# Workspace dependencies - Additional
+bitflags = { workspace = true }
+ahash = { workspace = true }
+ringbuf = { workspace = true }
+regex = { workspace = true }
+bincode = { workspace = true }
+dashmap = { workspace = true }
+rust_decimal = { workspace = true }
+derive_more = { workspace = true }
+itertools = { workspace = true }
+ordered-float = { workspace = true }
+atomic_float = { workspace = true }
+smallvec = { workspace = true }
+arrayvec = { workspace = true }
+num_cpus = { workspace = true }
+threadpool = { workspace = true }
+core_affinity = { workspace = true }
+config = { workspace = true }
+simba = { workspace = true }
+
+# Workspace dependencies - Observability
+tracing = { workspace = true }
+prometheus = { workspace = true }
+metrics = { workspace = true }
+
+# Additional ML and Neural Network specific dependencies
+candle-transformers = "0.9"
+# candle-optimizers = "0.9"  # Not available on crates.io yet
+candle-onnx = { version = "0.9", optional = true }
+
+# Data Processing
+polars = { version = "0.35", features = ["lazy", "temporal", "strings", "dtype-datetime"] }
+ndarray-stats = "0.5"
+linfa = "0.7"
+linfa-preprocessing = "0.7"
+smartcore = "0.3"
+
+# Configuration & Serialization
+serde_yaml = "0.9"
+toml = "0.8"
+
+# Optimization
+argmin = { version = "0.8", optional = true }
+argmin-math = { version = "0.3", optional = true }
+# isotonic-regression = { version = "0.1", optional = true }  # Not available on crates.io
+
+# CUDA & GPU acceleration
+tensorrt-rs = { version = "0.3", optional = true }
+
+# Distributed Training
+tonic = { version = "0.10", optional = true }
+prost = { version = "0.12", optional = true }
+
+# Python Bindings
+pyo3 = { workspace = true, features = ["extension-module"], optional = true }
+
+# WASM Support
+wasm-bindgen = { version = "0.2", optional = true }
+js-sys = { version = "0.3", optional = true }
+
+# Profiling & Monitoring
+tracy-client = { version = "0.15", optional = true }
+puffin = { version = "0.16", optional = true }
+metrics-exporter-prometheus = "0.12"
+
+# CLI utilities
+clap = { version = "4.0", features = ["derive"] }
+
+# Financial & Time Series
+ta-lib = "0.1"
+# timeframe = "0.1"  # Not available on crates.io
+
+# Integration with existing Nautilus crates
+ats-core = { path = "../ats-core" }
+cdfa-core = { path = "../cdfa-core" }
+ml-ensemble = { path = "../ml-ensemble" }
+quantum-core = { path = "../quantum-core" }
+hedge-algorithms = { path = "../hedge-algorithms" }
+lmsr = { path = "../lmsr" }
+nautilus-risk = { path = "../risk" }
+nautilus-common = { workspace = true }
+nautilus-core = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+rstest = { workspace = true }
+tokio-test = { workspace = true }
+approx = { workspace = true }
+proptest = { workspace = true }
+pretty_assertions = { workspace = true }
+tempfile = "3.8"
+
+[build-dependencies]
+prost-build = "0.12"
+tonic-build = "0.13.1"
+
+[[bin]]
+name = "neural-forge-cli"
+path = "src/bin/cli.rs"
+
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 1

@@ -1,0 +1,76 @@
+[package]
+name = "q-star-orchestrator"
+version = "0.1.0"
+edition = "2021"
+authors = ["QuantumHive Q* Team"]
+description = "Advanced swarm orchestration for Q* algorithm leveraging ruv-swarm with production-grade coordination"
+
+[dependencies]
+# Core Q* dependencies
+q-star-core = { path = "../q-star-core" }
+q-star-neural = { path = "../q-star-neural" }
+q-star-quantum = { path = "../q-star-quantum" }
+q-star-trading = { path = "../q-star-trading" }
+
+# Integration crates
+market-intelligence = { path = "../market-intelligence" }
+sentiment-engine = { path = "../sentiment-engine" }
+trend-analyzer = { path = "../trend-analyzer" }
+narrative-forecaster = { path = "../narrative-forecaster" }
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Swarm coordination
+# ruv-swarm = { path = "../../ruv_FANN/ruv-swarm" }
+
+# Data structures
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dashmap = "5.5"
+crossbeam = "0.8"
+petgraph = "0.6"
+
+# Time and utilities
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+rand = "0.8"
+
+# Monitoring and metrics
+prometheus = { version = "0.13", optional = true }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+
+# Message passing
+flume = "0.11"
+zeromq = { version = "0.3", optional = true }
+
+# Performance
+rayon = "1.8"
+parking_lot = "0.12"
+
+# Configuration
+config = "0.13"
+toml = "0.8"
+
+[dev-dependencies]
+criterion = "0.5"
+tokio-test = "0.4"
+proptest = "1.4"
+
+[features]
+default = ["distributed", "monitoring"]
+distributed = ["zeromq"]
+monitoring = ["prometheus"]
+debug-mode = []
+
+[[bench]]
+name = "orchestrator_benchmarks"
+harness = false

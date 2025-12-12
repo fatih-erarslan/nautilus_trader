@@ -1,0 +1,131 @@
+[package]
+name = "neural-forecast"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Advanced neural forecasting models for financial time series with WebGPU acceleration"
+repository.workspace = true
+keywords = ["neural-networks", "forecasting", "time-series", "finance", "webgpu"]
+categories = ["science", "algorithms", "mathematics", "finance"]
+
+
+[dependencies]
+# Core ruv-FANN integration (disabled for now to avoid dependency issues)
+# ruv-fann = { path = "../../../ruv_FANN", features = ["gpu", "parallel", "simd"] }
+
+# Mathematical computing
+ndarray = { workspace = true, features = ["serde"] }
+nalgebra = { workspace = true }
+num-traits = "0.2"
+num-complex = "0.4"
+statrs = "0.16"
+
+# High-performance computing
+rayon = { workspace = true, optional = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+
+# WebGPU acceleration - LATEST
+wgpu = { version = "26.0.1", optional = true }
+bytemuck = { version = "1.19", features = ["derive"], optional = true }
+pollster = { version = "0.3", optional = true }
+
+# CUDA acceleration (optional) - LATEST
+cudarc = { version = "0.16.6", features = ["cuda-12060"], optional = true }
+half = { version = "2.3", optional = true }
+
+# High-performance linear algebra
+blis-src = { version = "0.2", optional = true }
+intel-mkl-src = { version = "0.8", optional = true }
+
+# Advanced SIMD
+wide = { version = "0.7", optional = true }
+simdeez = { version = "1.0", optional = true }
+
+# Serialization and persistence
+serde = { workspace = true }
+serde_json = { workspace = true }
+bincode = "1.3"
+
+# Memory management
+mimalloc = "0.1"
+memmap2 = { version = "0.9", optional = true }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+# Neural network framework (enabled for real neural networks)
+tch = { version = "0.17", optional = true }
+candle-core = { version = "0.9.1", default-features = false, features = ["mkl"], optional = true }
+candle-nn = { version = "0.9.1", default-features = false, optional = true }
+candle-transformers = { version = "0.9.1", optional = true, default-features = false }
+
+# Missing dependencies
+toml = "0.8"
+num_cpus = "1.16"
+
+# Signal processing
+rustfft = "6.1"
+
+# Linear algebra optimizations - ENHANCED
+blas-src = { version = "0.8", features = ["openblas"] }
+openblas-src = { version = "0.10", features = ["cblas", "system"] }
+
+# Random number generation (for proper weight initialization)
+rand = { version = "0.8", features = ["small_rng"] }
+rand_distr = { version = "0.4" }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tokio-test = "0.4"
+approx = "0.5"
+pretty_assertions = "1.4"
+tempfile = "3.8"
+
+[features]
+default = ["parallel", "ensemble", "real-time", "candle", "neural-networks"]
+gpu = ["dep:wgpu", "dep:bytemuck", "dep:pollster"]
+cuda = ["dep:cudarc", "dep:half", "gpu"]
+cuda-optimized = ["cuda", "dep:blis-src", "dep:intel-mkl-src"]
+simd = ["dep:wide", "dep:simdeez"]
+parallel = ["dep:rayon", "tokio/rt-multi-thread"]
+ensemble = []
+real-time = []
+benchmarking = []
+candle = ["dep:candle-core", "dep:candle-nn", "dep:candle-transformers"]
+torch = ["dep:tch"]
+neural-networks = ["candle"]
+ultra-fast = ["cuda-optimized", "simd", "parallel", "candle"]
+
+# Model architectures
+nhits = []
+nbeats = []
+transformer = []
+lstm = []
+gru = []
+
+# Advanced features
+attention = []
+memory-efficient = ["dep:memmap2"]
+streaming = []
+
+
+# Benchmarks and examples disabled for now
+# [[bench]]
+# name = "neural_forecast_benchmark"
+# harness = false
+
+# [[example]]
+# name = "basic_forecasting"
+# path = "examples/basic_forecasting.rs"

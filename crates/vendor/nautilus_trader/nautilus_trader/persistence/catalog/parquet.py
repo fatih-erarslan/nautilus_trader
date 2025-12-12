@@ -20,7 +20,6 @@ import os
 import platform
 import re
 from collections import defaultdict
-from collections.abc import Callable
 from collections.abc import Generator
 from itertools import groupby
 from os import PathLike
@@ -38,7 +37,6 @@ import pyarrow.parquet as pq
 from fsspec.implementations.local import make_path_posix
 from fsspec.implementations.memory import MemoryFileSystem
 from fsspec.utils import infer_storage_options
-from pyarrow import ArrowInvalid
 
 from nautilus_trader.core import nautilus_pyo3
 from nautilus_trader.core.correctness import PyCondition
@@ -217,7 +215,8 @@ class ParquetDataCatalog(BaseDataCatalog):
         """
         if "://" not in uri:
             # Assume a local path
-            uri = "file://" + uri
+            # .resolve() will return absolute path in case relative one is provided, and .as_uri() will return path that follows RFC3986
+            uri = Path(uri).resolve().as_uri()
 
         parsed = infer_storage_options(uri)
         path = parsed.pop("path")
@@ -1474,7 +1473,6 @@ class ParquetDataCatalog(BaseDataCatalog):
         self,
         base_cls: type,
         identifiers: list[str] | None = None,
-        filter_expr: Callable | None = None,
         **kwargs: Any,
     ) -> list[Data]:
         subclasses = [base_cls, *base_cls.__subclasses__()]
@@ -1484,7 +1482,6 @@ class ParquetDataCatalog(BaseDataCatalog):
             try:
                 data_list = self.query(
                     data_cls=cls,
-                    filter_expr=filter_expr,
                     identifiers=identifiers,
                     raise_on_empty=False,
                     **kwargs,
@@ -1495,14 +1492,6 @@ class ParquetDataCatalog(BaseDataCatalog):
                     continue
 
                 raise
-            except ArrowInvalid as e:
-                # If we're using a `filter_expr` here, there's a good chance
-                # this error is using a filter that is specific to one set of
-                # instruments and not to others, so we ignore it (if not; raise).
-                if filter_expr is not None:
-                    continue
-                else:
-                    raise e
 
         non_empty_data_lists = [data_list for data_list in data_lists if data_list is not None]
         objects = [o for objs in non_empty_data_lists for o in objs]  # flatten of list of lists
@@ -1967,7 +1956,7 @@ class ParquetDataCatalog(BaseDataCatalog):
         identifiers: list[str] | None = None,
         start: TimestampLike | None = None,
         end: TimestampLike | None = None,
-    ):
+    ) -> list[str]:
         file_prefix = class_to_filename(data_cls)
         base_path = self.path.rstrip("/")
         glob_path = f"{base_path}/data/{file_prefix}/**/*.parquet"
@@ -2015,6 +2004,21 @@ class ParquetDataCatalog(BaseDataCatalog):
                 print(file_path)
 
         return file_paths
+
+    def query_first_timestamp(
+        self,
+        data_cls: type,
+        identifier: str | None = None,
+    ) -> pd.Timestamp | None:
+        subclasses = [data_cls, *data_cls.__subclasses__()]
+
+        for cls in subclasses:
+            intervals = self.get_intervals(cls, identifier)
+
+            if intervals:
+                return time_object_to_dt(intervals[0][0])
+
+        return None
 
     def query_last_timestamp(
         self,
@@ -2354,6 +2358,9 @@ class ParquetDataCatalog(BaseDataCatalog):
             table = table.replace_schema_metadata(metadata)
 
         data = ArrowSerializer.deserialize(data_cls=data_cls, batch=table)
+        if len(data) == 0:
+            return []
+
         module = data[0].__class__.__module__
 
         if "nautilus_pyo3" in module:

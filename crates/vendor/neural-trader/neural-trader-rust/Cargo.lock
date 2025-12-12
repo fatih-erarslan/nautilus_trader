@@ -4169,6 +4169,7 @@ dependencies = [
  "tokio-tungstenite 0.21.0",
  "tower-http",
  "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -4591,6 +4592,7 @@ dependencies = [
  "lazy_static",
  "libc",
  "log",
+ "multi-market",
  "napi",
  "napi-build",
  "napi-derive",

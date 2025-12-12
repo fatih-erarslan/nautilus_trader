@@ -1,0 +1,70 @@
+[package]
+name = "quantum-annealing-regression"
+version = "0.1.0"
+edition = "2021"
+description = "Quantum Annealing Regression - Advanced quantum annealing algorithms for non-linear regression in trading"
+authors = ["ATS Trading System", "Quantum ML Team"]
+license = "MIT"
+
+[dependencies]
+# Core dependencies
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+rayon = { version = "1.8", optional = true }
+dashmap = "5.5"
+anyhow = "1.0"
+tracing = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Mathematical computing and optimization
+nalgebra = { version = "0.32", features = ["serde-serialize"] }
+ndarray = { version = "0.15", features = ["rayon", "blas"] }
+num-complex = "0.4"
+num-traits = "0.2"
+rand = "0.8"
+rand_distr = "0.4"
+statrs = "0.16"
+
+# Optimization algorithms
+# optimization = "0.1"  # Commented out - not a real crate
+# linfa = { version = "0.7", features = ["ndarray"] }  # Commented out - version may not exist
+# linfa-linear = "0.7"  # Commented out - version may not exist  
+# linfa-logistic = "0.7"  # Commented out - version may not exist
+
+# Quantum computing simulation
+# qiskit-simulator = { version = "0.1", optional = true }  # Commented out - not a real crate
+
+# Performance and SIMD
+simd-json = "0.13"
+parking_lot = "0.12"
+
+# Integration with other crates
+quantum-agentic-reasoning = { path = "../quantum-agentic-reasoning" }
+ats-core = { path = "../ats-core" }
+quantum-core = { path = "../quantum-core" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = "0.5"
+proptest = "1.4"
+approx = "0.5"
+pretty_assertions = "1.4"
+
+[features]
+default = ["quantum-sim", "regression", "parallel"]
+quantum-sim = []
+# quantum-hardware = ["qiskit-simulator"]  # Commented out - qiskit-simulator not available
+regression = []
+parallel = ["rayon"]
+
+[[bench]]
+name = "quantum_annealing_benchmarks"
+harness = false
+
+[lib]
+name = "quantum_annealing_regression"
+path = "src/lib.rs"

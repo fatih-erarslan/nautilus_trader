@@ -216,6 +216,7 @@ impl Genome {
         StrategyConfig {
             strategy_type: self.dominant_strategy(),
             population_size: 50,
+            swarm_size: None,
             max_iterations: 1000,
             bounds,
             params: self.parameters.clone(),
@@ -337,6 +338,16 @@ pub struct EvolutionEngine {
     history: Vec<Generation>,
     rng: ChaCha8Rng,
     best_ever: Option<Genome>,
+}
+
+impl std::fmt::Debug for EvolutionEngine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EvolutionEngine")
+            .field("generation", &self.generation)
+            .field("population_size", &self.population.len())
+            .field("has_best", &self.best_ever.is_some())
+            .finish()
+    }
 }
 
 impl EvolutionEngine {

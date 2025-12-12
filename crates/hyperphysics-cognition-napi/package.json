@@ -1,0 +1,44 @@
+{
+  "name": "@hyperphysics/cognition",
+  "version": "0.1.0",
+  "description": "HyperPhysics Bio-Digital Isomorphic Cognition System for Node.js/Bun.js",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "hyperphysics-cognition",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu"
+      ]
+    }
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "bun test",
+    "version": "napi version"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "keywords": [
+    "cognition",
+    "hyperbolic",
+    "attention",
+    "consciousness",
+    "neuroscience",
+    "napi",
+    "rust",
+    "bun"
+  ],
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperphysics/hyperphysics"
+  }
+}

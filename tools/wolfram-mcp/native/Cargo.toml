@@ -1,0 +1,38 @@
+[package]
+name = "wolfram-native"
+version = "1.0.0"
+edition = "2021"
+description = "Native Rust bindings for Wolfram MCP Server via NAPI-RS"
+license = "MIT"
+
+# Exclude from parent workspace
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# NAPI-RS for Node/Bun bindings
+napi = { version = "2", default-features = false, features = ["napi4", "tokio_rt", "async"] }
+napi-derive = "2"
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# HTTP client for Wolfram API fallback
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+
+# Mathematical computations (for local verification)
+num-complex = "0.4"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1

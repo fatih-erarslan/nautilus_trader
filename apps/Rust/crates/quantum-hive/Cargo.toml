@@ -1,0 +1,25 @@
+[package]
+name = "quantum-hive"
+version = "0.1.0"
+edition = "2021"
+authors = ["Quantum Hive Collective <hive@quantum.trading>"]
+description = "Autopoietic hyperbolic lattice quantum trading hive with QAR as Supreme Sovereign Queen"
+license = "MIT OR Apache-2.0"
+keywords = ["quantum", "trading", "hive", "autopoietic", "hyperbolic", "neuromorphic"]
+categories = ["algorithms", "mathematics", "finance", "science"]
+
+[dependencies]
+# Python bindings - LATEST STABLE
+pyo3 = { version = "0.25.1", features = ["extension-module"] }
+
+# Basic utilities
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0"
+
+[features]
+default = []
+
+[lib]
+name = "quantum_hive"
+crate-type = ["cdylib", "rlib"]
+path = "src/minimal_lib.rs"

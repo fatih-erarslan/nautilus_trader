@@ -1,0 +1,32 @@
+[package]
+name = "hyperphysics-cognition-napi"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+license = "MIT OR Apache-2.0"
+description = "Node.js/Bun.js NAPI bindings for hyperphysics-cognition"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+hyperphysics-cognition = { path = "../hyperphysics-cognition", features = ["full"] }
+
+# NAPI
+napi = "2.16"
+napi-derive = "2.16"
+
+# Core
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[build-dependencies]
+napi-build = "2.1"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+strip = true

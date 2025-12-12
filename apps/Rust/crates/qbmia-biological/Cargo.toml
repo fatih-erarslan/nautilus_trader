@@ -1,0 +1,81 @@
+[package]
+name = "qbmia-biological"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Core QBMIA framework"
+
+[dependencies]
+tokio.workspace = true
+serde.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+log.workspace = true
+tracing.workspace = true
+
+# Mathematical and scientific computing
+ndarray.workspace = true
+linfa.workspace = true
+linfa-clustering.workspace = true
+approx.workspace = true
+rand.workspace = true
+rand_distr.workspace = true
+num-complex.workspace = true
+num-traits.workspace = true
+rustfft.workspace = true
+
+# SIMD and performance
+wide.workspace = true
+rayon.workspace = true
+crossbeam.workspace = true
+dashmap.workspace = true
+
+# Biological pattern matching - using available alternatives
+# biological-algorithms = "0.1"  # Not available on crates.io
+# networkx-rs = "0.1"  # Not available on crates.io
+
+# Serialization and persistence
+bincode.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+
+# Hardware optimization
+# cuda-runtime-sys = { version = "0.3", optional = true }  # Not available on crates.io
+# rocm-sys = { version = "0.1", optional = true }  # Not available on crates.io
+# opencl3 = { version = "0.8", optional = true }  # Not available on crates.io
+
+# Game theory and optimization
+# game-theory = "0.1"  # Not available on crates.io
+# optimization = "0.2"  # Not available on crates.io
+
+# Network and graph algorithms
+petgraph.workspace = true
+
+# Collections and data structures
+indexmap.workspace = true
+smallvec.workspace = true
+
+# Async utilities
+futures.workspace = true
+# async-std = "1.12"  # Not using async-std when we have tokio
+
+# Metrics and monitoring
+metrics.workspace = true
+prometheus = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio-test.workspace = true
+criterion.workspace = true
+proptest.workspace = true
+
+[features]
+default = ["std"]
+std = []
+# cuda = ["cuda-runtime-sys"]  # Disabled - dependency not available
+# rocm = ["rocm-sys"]  # Disabled - dependency not available
+# opencl = ["opencl3"]  # Disabled - dependency not available
+# qiskit = ["qiskit-api"]  # Disabled - dependency not available
+monitoring = ["prometheus"]
+# full = ["cuda", "rocm", "opencl", "qiskit", "monitoring"]  # Disabled - dependencies not available

@@ -1,0 +1,50 @@
+[package]
+name = "quantum-prospect-theory"
+version = "0.1.0"
+edition = "2021"
+authors = ["Claude AI <noreply@anthropic.com>"]
+description = "Enterprise-grade Quantum-Enhanced Prospect Theory for trading systems"
+license = "MIT"
+repository = "https://github.com/hyperbolic/trading-system"
+keywords = ["quantum", "prospect-theory", "trading", "finance", "behavioral"]
+categories = ["science", "algorithms", "mathematics"]
+
+[dependencies]
+# Core dependencies
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tokio = { version = "1.0", features = ["full"] }
+
+# Math and numerics
+nalgebra = "0.33"
+ndarray = "0.16"
+rand = "0.8"
+rand_distr = "0.4"
+statrs = "0.17"
+
+# Parallel processing
+rayon = "1.10"
+
+# Quantum computing (optional) - disabled for now due to dependency issues
+# quantum-rs = { version = "0.1", optional = true }
+
+# Standard factors integration
+lmsr = { path = "../lmsr" }
+
+[features]
+default = []
+quantum = []
+gpu = []
+simd = []
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.0"
+approx = "0.5"
+
+[[bench]]
+name = "prospect_theory_benchmarks"
+harness = false

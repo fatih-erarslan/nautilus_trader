@@ -372,6 +372,17 @@ pub struct EmergentIntellect {
     problem_models: HashMap<String, ProblemModel>,
 }
 
+impl std::fmt::Debug for EmergentIntellect {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EmergentIntellect")
+            .field("num_records", &self.records.len())
+            .field("max_records", &self.max_records)
+            .field("num_insights", &self.insights.len())
+            .field("num_strategies", &self.strategy_stats.len())
+            .finish()
+    }
+}
+
 /// Statistics for a strategy
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct StrategyStats {

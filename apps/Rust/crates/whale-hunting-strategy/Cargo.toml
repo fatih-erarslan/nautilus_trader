@@ -1,0 +1,101 @@
+[package]
+name = "whale-hunting-strategy"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Whale Hunting Strategy - Quantum-Enhanced Large Order Detection and Stealth Execution"
+
+[lib]
+name = "whale_hunting_strategy"
+path = "src/lib.rs"
+
+[dependencies]
+# Core async/concurrency
+tokio = { version = "1.0", features = ["full", "rt-multi-thread", "macros"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+log = "0.4"
+tracing = "0.1"
+
+# Mathematical computing
+nalgebra = { version = "0.32", features = ["serde-serialize"] }
+ndarray = { version = "0.15", features = ["rayon", "serde"] }
+num-traits = "0.2"
+num-complex = "0.4"
+statrs = "0.16"
+
+# Signal processing for whale detection
+rustfft = "6.1"
+spectrum-analyzer = "1.5"
+
+# Machine learning for pattern recognition
+candle-core = { workspace = true, optional = true }
+candle-nn = { workspace = true, optional = true }
+
+# Random number generation
+rand = "0.8"
+rand_distr = "0.4"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Performance
+rayon = "1.7"
+parking_lot = "0.12"
+
+# Order book analysis
+order-book-analyzer = { path = "../order-book-analyzer" }
+
+# Quantum components
+quantum-core = { path = "../quantum-core", optional = true }
+quantum-agentic-reasoning = { path = "../quantum-agentic-reasoning", optional = true }
+
+# Whale defense integration
+whale-defense-core = { path = "../whale-defense-core", optional = true }
+iqad = { path = "../iqad", optional = true }
+
+# Market regime integration
+market-regime-detector = { path = "../market-regime-detector" }
+
+# Game theory for adversarial modeling
+game-theory-engine = { path = "../game-theory-engine", optional = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+quickcheck = "1.0"
+
+[features]
+default = ["quantum", "ml", "stealth-execution"]
+quantum = ["dep:quantum-core", "dep:quantum-agentic-reasoning"]
+ml = ["dep:candle-core", "dep:candle-nn"]
+stealth-execution = []
+market-impact-modeling = []
+order-flow-analysis = []
+whale-defense = ["dep:whale-defense-core", "dep:iqad"]
+adversarial-modeling = ["dep:game-theory-engine"]
+
+[[bench]]
+name = "whale_detection_benchmark"
+harness = false
+
+[[bench]]
+name = "stealth_execution_benchmark"
+harness = false
+
+[[bench]]
+name = "market_impact_benchmark"
+harness = false

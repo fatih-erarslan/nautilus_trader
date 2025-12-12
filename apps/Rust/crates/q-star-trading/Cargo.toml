@@ -1,0 +1,78 @@
+[package]
+name = "q-star-trading"
+version = "0.1.0"
+edition = "2021"
+authors = ["QuantumHive Q* Team"]
+description = "Advanced trading reward functions and market mechanics for Q* algorithm with multi-dimensional optimization"
+
+[dependencies]
+# Core Q* dependencies
+q-star-core = { path = "../q-star-core" }
+q-star-neural = { path = "../q-star-neural" }
+q-star-quantum = { path = "../q-star-quantum" }
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Mathematical operations
+ndarray = { version = "0.15", features = ["rayon"] }
+nalgebra = "0.32"
+statrs = "0.16"
+num-traits = "0.2"
+
+# Technical analysis
+ta = "0.5"
+polars = { version = "0.35", features = ["lazy", "temporal", "rolling_window"] }
+
+# Time series analysis
+augurs = "0.10.0"
+
+# Risk metrics
+quantlib = { version = "0.1", optional = true }
+
+# Performance
+rayon = "1.8"
+crossbeam = "0.8"
+
+# Data structures
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dashmap = "5.5"
+ordered-float = "4.2"
+
+# Time and utilities
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["v4"] }
+rand = "0.8"
+rand_distr = "0.4"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+tracing = "0.1"
+
+# Market data integration
+# binance-rs = { version = "1.0", optional = true }  # Package not available on crates.io
+# coinbase-pro-rs = { version = "0.7", optional = true }  # Package not available on crates.io
+
+[dev-dependencies]
+criterion = "0.5"
+tokio-test = "0.4"
+proptest = "1.4"
+approx = "0.5"
+
+[features]
+default = ["advanced-rewards", "risk-metrics"]
+advanced-rewards = []
+risk-metrics = []
+live-trading = []
+backtesting = []
+reinforcement-learning = []
+
+[[bench]]
+name = "reward_benchmarks"
+harness = false
+path = "benches/reward_benchmarks.rs"

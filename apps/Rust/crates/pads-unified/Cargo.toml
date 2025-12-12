@@ -1,0 +1,62 @@
+[package]
+name = "pads-unified"
+version = "0.1.0"
+edition = "2021"
+authors = ["Neuro Trader Team <noreply@neuro-trader.com>"]
+description = "Unified Panarchy Adaptive Decision System - Core System"
+license = "MIT"
+
+[lib]
+name = "pads_unified"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# === CORE RUNTIME ===
+tokio = { version = "1.45", features = ["full", "tracing", "rt-multi-thread", "macros", "time"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# === MATHEMATICAL FOUNDATIONS ===
+nalgebra = { version = "0.33", features = ["serde-serialize"] }
+ndarray = { version = "0.16", features = ["serde"] }
+num-complex = "0.4"
+num-traits = "0.2"
+rand = { version = "0.8", features = ["serde1"] }
+
+# === SERIALIZATION ===
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+serde_yaml = "0.9"
+
+# === ERROR HANDLING ===
+anyhow = "1.0"
+thiserror = "1.0"
+
+# === UTILITIES ===
+uuid = { version = "1.11", features = ["v4", "serde"] }
+parking_lot = "0.12"
+
+# === TIME HANDLING ===
+chrono = { version = "0.4", features = ["serde"] }
+
+# === LOGGING ===
+tracing = "0.1"
+log = "0.4"
+
+# === NETWORK ===
+reqwest = { version = "0.11", features = ["json"] }
+
+# === DATABASE ===
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite"] }
+
+[features]
+default = []
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+strip = true

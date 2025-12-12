@@ -1,0 +1,82 @@
+[package]
+name = "quantum-bdia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Quantum Belief-Desire-Intention-Action (BDIA) Framework for Trading"
+repository.workspace = true
+keywords = ["quantum", "bdia", "trading", "neural"]
+categories = ["algorithms", "science"]
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Data structures
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+crossbeam = { workspace = true }
+petgraph = { workspace = true }
+
+# Math and SIMD
+ndarray = { workspace = true }
+nalgebra = { workspace = true }
+wide = { workspace = true, optional = true }
+simba = { workspace = true, optional = true }
+num-complex = { workspace = true }
+statrs = { workspace = true }
+rand = { workspace = true }
+rand_distr = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+bincode = { workspace = true }
+
+# Time handling
+chrono = { workspace = true }
+
+# Parallel processing
+rayon = { workspace = true }
+num_cpus = { workspace = true }
+
+# Logging and metrics
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+metrics = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# CUDA support (optional)
+cudarc = { workspace = true, optional = true }
+
+# Local crates
+quantum-hive = { path = "../quantum-hive" }
+qerc = { path = "../qerc" }
+pads-core = { path = "../pads-core" }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+approx = "0.5"
+
+[[bench]]
+name = "bdia_benchmarks"
+harness = false
+
+[features]
+default = ["simd", "quantum"]
+simd = ["wide", "simba"]
+quantum = []
+cuda = ["cudarc"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+debug = false

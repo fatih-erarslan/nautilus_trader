@@ -22,8 +22,6 @@
 //!   to the mechanisms of consciousness: IIT 3.0"
 //! - Beggs, J. M., & Plenz, D. (2003). "Neuronal avalanches in neocortical circuits"
 
-use std::collections::HashMap;
-
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

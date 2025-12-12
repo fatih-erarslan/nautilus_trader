@@ -1,0 +1,76 @@
+[package]
+name = "q-star-quantum"
+version = "0.1.0"
+edition = "2021"
+authors = ["QuantumHive Q* Team"]
+description = "Quantum enhancement for Q* algorithm leveraging QERC infrastructure for exponential decision space exploration"
+
+[dependencies]
+# Core Q* dependencies
+q-star-core = { path = "../q-star-core" }
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Mathematical operations
+ndarray = { version = "0.15", features = ["rayon"] }
+nalgebra = "0.32"
+num-complex = "0.4"
+num-traits = "0.2"
+
+# Quantum computing
+# qiskit = { version = "0.45", optional = true }
+# cirq = { version = "1.0", optional = true }
+
+# QERC integration (path dependency)
+# qerc = { path = "../../../quantum-error-correction" }
+
+# Python integration for quantum frameworks
+pyo3 = { version = "0.25.1", features = ["auto-initialize"], optional = true }
+numpy = { version = "0.25", optional = true }
+
+# Performance optimizations
+rayon = "1.8"
+crossbeam = "0.8"
+wide = "0.7"
+
+# Data structures
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dashmap = "5.5"
+
+# Time and utilities
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["v4"] }
+rand = "0.8"
+rand_distr = "0.4"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+tracing = "0.1"
+
+# Memory management
+aligned-vec = "0.5"
+
+[dev-dependencies]
+criterion = "0.5"
+tokio-test = "0.4"
+proptest = "1.4"
+
+[features]
+default = ["qerc-integration", "python-quantum"]
+qerc-integration = []
+python-quantum = ["pyo3", "numpy"]
+qiskit = []
+cirq = []
+aer-simulator = []
+gpu-quantum = []
+
+[[bench]]
+name = "quantum_benchmarks"
+harness = false
+path = "benches/quantum_benchmarks.rs"

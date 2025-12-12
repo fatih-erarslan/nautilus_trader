@@ -1,0 +1,152 @@
+[workspace]
+
+[package]
+name = "qks-plugin"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["QKS Team"]
+description = "Quantum Knowledge System Plugin - FFI-safe drop-in crate exposing all 8 cognitive layers with cross-language bindings"
+keywords = ["quantum", "gpu", "metal", "cognitive", "consciousness", "ffi"]
+categories = ["algorithms", "science", "mathematics", "simulation", "api-bindings"]
+readme = "README.md"
+repository = "https://github.com/qks/quantum_knowledge_system"
+
+[lib]
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[features]
+default = ["full"]
+full = ["parallel", "serde", "gpu", "pennylane", "hyperphysics", "python", "ffi", "all-layers"]
+
+# Parallelization
+parallel = ["rayon"]
+
+# Serialization
+serde = ["dep:serde", "dep:serde_json"]
+
+# GPU acceleration
+gpu = ["metal"]
+metal = []
+
+# Python bindings
+python = ["pyo3"]
+pennylane = ["python"]
+
+# HyperPhysics integration
+hyperphysics = ["dep:hyperphysics-plugin"]
+
+# FFI bindings
+ffi = []
+
+# Cognitive layer features
+all-layers = [
+    "layer-1-thermodynamic",
+    "layer-2-cognitive",
+    "layer-3-decision",
+    "layer-4-learning",
+    "layer-5-collective",
+    "layer-6-consciousness",
+    "layer-7-metacognition",
+    "layer-8-integration",
+    "layer-9-quantum",
+]
+
+layer-1-thermodynamic = []
+layer-2-cognitive = []
+layer-3-decision = []
+layer-4-learning = []
+layer-5-collective = []
+layer-6-consciousness = []
+layer-7-metacognition = []
+layer-8-integration = []
+layer-9-quantum = []
+
+[dependencies]
+# Core quantum-knowledge-core from parent workspace
+quantum-knowledge-core = { path = "../.." }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Math
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
+ndarray = "0.15"
+rand = "0.8"
+rand_chacha = "0.3"
+num-traits = "0.2"
+num-complex = "0.4"
+
+# UUID
+uuid = { version = "1.0", features = ["v4"] }
+
+# Concurrency
+rayon = { version = "1.7", optional = true }
+parking_lot = "0.12"
+crossbeam = "0.8"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
+bincode = "1.3"
+
+# Python bindings
+pyo3 = { version = "0.20", features = ["extension-module"], optional = true }
+
+# FFI types
+libc = "0.2"
+
+# Tracing
+tracing = "0.1"
+
+# Lazy static for globals
+lazy_static = "1.4"
+
+# HyperPhysics integration (via parent crate)
+hyperphysics-plugin = { path = "../../../../HyperPhysics/crates/hyperphysics-plugin", optional = true, default-features = false, features = ["parallel", "serde", "mcp", "hyperbolic", "consciousness", "neural", "pbit"] }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+approx = "0.5"
+proptest = "1.5"
+
+[build-dependencies]
+cbindgen = "0.27"
+
+[[example]]
+name = "vqe_optimization"
+path = "examples/vqe_optimization.rs"
+required-features = ["gpu", "hyperphysics"]
+
+[[example]]
+name = "metal_benchmark"
+path = "examples/metal_benchmark.rs"
+required-features = ["gpu"]
+
+[[example]]
+name = "pennylane_circuit"
+path = "examples/pennylane_circuit.rs"
+required-features = ["pennylane", "python"]
+
+[[example]]
+name = "ffi_usage"
+path = "examples/ffi_usage.rs"
+required-features = ["ffi"]
+
+# [[bench]]
+# name = "cognitive_benchmark"
+# harness = false
+# required-features = ["all-layers"]
+# Note: Benchmark file not yet created
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.bench]
+inherits = "release"
+debug = true

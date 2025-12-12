@@ -1,0 +1,471 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.WolframSwift-x86_64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/sources",
+      "importPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwift/WolframBridge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "WolframSwift",
+      "moduleOutputPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules/WolframSwift.swiftmodule",
+      "objects" : [
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "x86_64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j32",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/include/WolframSwift-Swift.h",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "swift"
+      ],
+      "outputFileMapPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules/WolframSwift.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwift/WolframBridge.swift"
+      ],
+      "tempsPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.WolframSwiftCLI-x86_64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/sources",
+      "importPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwiftCLI/main.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules/WolframSwift.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "WolframSwiftCLI",
+      "moduleOutputPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules/WolframSwiftCLI.swiftmodule",
+      "objects" : [
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/main.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "x86_64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j32",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "WolframSwiftCLI_main",
+        "-parse-as-library",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "swift"
+      ],
+      "outputFileMapPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/main.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules/WolframSwiftCLI.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwiftCLI/main.swift"
+      ],
+      "tempsPath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "WolframSwift" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "WolframSwift",
+      "-package-name",
+      "swift",
+      "-c",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwift/WolframBridge.swift",
+      "-I",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules",
+      "-target",
+      "x86_64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j32",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/include/WolframSwift-Swift.h",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "swift",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "WolframSwiftCLI" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "WolframSwiftCLI",
+      "-package-name",
+      "swift",
+      "-c",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwiftCLI/main.swift",
+      "-I",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/Modules",
+      "-target",
+      "x86_64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j32",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "WolframSwiftCLI_main",
+      "-parse-as-library",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "swift",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "WolframSwift" : [
+
+    ],
+    "WolframSwiftCLI" : [
+      "WolframSwift"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwift/WolframBridge.swift"
+        }
+      ],
+      "outputFilePath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/sources"
+    },
+    "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.product/Objects.LinkFileList"
+    },
+    "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwiftCLI/main.swift"
+        }
+      ],
+      "outputFilePath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/sources"
+    },
+    "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    },
+    "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/wolfram-swift-cli-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/wolfram-swift-cli-entitlement.plist"
+    },
+    "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/wolfram-swift-cli.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwiftCLI.build/main.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/wolfram-swift-cli.product/Objects.LinkFileList"
+    }
+  }
+}

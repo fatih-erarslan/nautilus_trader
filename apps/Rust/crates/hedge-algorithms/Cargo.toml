@@ -1,0 +1,14 @@
+[package]
+name = "hedge-algorithms"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Placeholder hedge algorithms for backtesting compatibility"
+license = "MIT OR Apache-2.0"
+keywords = ["trading", "hedge", "algorithms", "placeholder"]
+categories = ["mathematics", "algorithms"]
+
+[dependencies]
+# Minimal dependencies for placeholder implementation
+serde = { version = "1.0", features = ["derive"] }

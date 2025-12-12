@@ -43,13 +43,13 @@ use nautilus_model::{
     instruments::{Instrument, InstrumentAny},
 };
 use nautilus_network::{
+    http::USER_AGENT,
     mode::ConnectionMode,
     websocket::{
         AUTHENTICATION_TIMEOUT_SECS, AuthTracker, PingHandler, SubscriptionState, WebSocketClient,
         WebSocketConfig, channel_message_handler,
     },
 };
-use reqwest::header::USER_AGENT;
 use tokio_tungstenite::tungstenite::Message;
 use ustr::Ustr;
 
@@ -948,7 +948,7 @@ impl BitmexWebSocketClient {
     /// Returns an error if the WebSocket is not connected or if the subscription fails.
     pub async fn subscribe_bars(&self, bar_type: BarType) -> Result<(), BitmexWsError> {
         let topic = topic_from_bar_spec(bar_type.spec());
-        let symbol = bar_type.instrument_id().symbol.to_string();
+        let symbol = bar_type.instrument_id().symbol.inner();
         self.subscribe(vec![format!("{topic}:{symbol}")]).await
     }
 
@@ -1115,7 +1115,7 @@ impl BitmexWebSocketClient {
     /// Returns an error if the WebSocket is not connected or if the unsubscription fails.
     pub async fn unsubscribe_bars(&self, bar_type: BarType) -> Result<(), BitmexWsError> {
         let topic = topic_from_bar_spec(bar_type.spec());
-        let symbol = bar_type.instrument_id().symbol.to_string();
+        let symbol = bar_type.instrument_id().symbol.inner();
         self.unsubscribe(vec![format!("{topic}:{symbol}")]).await
     }
 

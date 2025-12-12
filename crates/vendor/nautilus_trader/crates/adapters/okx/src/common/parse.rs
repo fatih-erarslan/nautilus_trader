@@ -1404,7 +1404,7 @@ fn parse_multiplier_product(definition: &OKXInstrument) -> anyhow::Result<Option
     };
 
     let product = mult_value * val_value;
-    Ok(Some(Quantity::from(product.to_string().as_str())))
+    Ok(Some(Quantity::from(product.to_string())))
 }
 
 /// Trait for instrument-specific parsing logic.
@@ -1438,10 +1438,22 @@ fn parse_common_instrument_data(
         )
     })?;
 
+    if definition.lot_sz.is_empty() {
+        anyhow::bail!("`lot_sz` is empty for {}", definition.inst_id);
+    }
+
     let size_increment = Quantity::from(&definition.lot_sz);
     let lot_size = Some(Quantity::from(&definition.lot_sz));
-    let max_quantity = Some(Quantity::from(&definition.max_mkt_sz));
-    let min_quantity = Some(Quantity::from(&definition.min_sz));
+    let max_quantity = if definition.max_mkt_sz.is_empty() {
+        None
+    } else {
+        Some(Quantity::from(&definition.max_mkt_sz))
+    };
+    let min_quantity = if definition.min_sz.is_empty() {
+        None
+    } else {
+        Some(Quantity::from(&definition.min_sz))
+    };
     let max_notional: Option<Money> = None;
     let min_notional: Option<Money> = None;
     let max_price = None; // TBD
@@ -2579,6 +2591,38 @@ mod tests {
         if let InstrumentAny::CurrencyPair(pair) = instrument {
             assert_eq!(pair.maker_fee, dec!(0.0008));
             assert_eq!(pair.taker_fee, dec!(0.0010));
+        } else {
+            panic!("Expected CurrencyPair instrument");
+        }
+    }
+
+    #[rstest]
+    fn test_parse_instrument_any_passes_through_fees() {
+        // parse_instrument_any receives fees already converted to Nautilus format
+        // (negation happens in HTTP client when parsing OKX API values)
+        let json_data = load_test_json("http_get_instruments_spot.json");
+        let response: OKXResponse<OKXInstrument> = serde_json::from_str(&json_data).unwrap();
+        let okx_inst = response.data.first().unwrap();
+
+        // Fees are already in Nautilus convention (negated by HTTP client)
+        let maker_fee = Some(dec!(-0.00025)); // Nautilus: rebate (negative)
+        let taker_fee = Some(dec!(0.00050)); // Nautilus: commission (positive)
+
+        let instrument = parse_instrument_any(
+            okx_inst,
+            None,
+            None,
+            maker_fee,
+            taker_fee,
+            UnixNanos::default(),
+        )
+        .unwrap()
+        .expect("Should parse spot instrument");
+
+        // Fees should pass through unchanged
+        if let InstrumentAny::CurrencyPair(pair) = instrument {
+            assert_eq!(pair.maker_fee, dec!(-0.00025));
+            assert_eq!(pair.taker_fee, dec!(0.00050));
         } else {
             panic!("Expected CurrencyPair instrument");
         }

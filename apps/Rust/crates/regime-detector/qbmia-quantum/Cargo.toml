@@ -1,0 +1,82 @@
+[package]
+name = "qbmia-quantum"
+version = "0.1.0"
+edition = "2021"
+authors = ["QBMIA Team"]
+description = "PennyLane quantum backend integration for QBMIA Nash equilibrium solving"
+license = "MIT OR Apache-2.0"
+keywords = ["quantum", "pennylane", "nash-equilibrium", "optimization", "qbmia"]
+categories = ["science", "simulation", "mathematics"]
+
+[dependencies]
+# Core dependencies
+pyo3 = { version = "0.25.1", features = ["auto-initialize", "extension-module"] }
+numpy = { version = "0.25" }
+ndarray = { version = "0.15", features = ["rayon", "blas"] }
+rayon = "1.10"
+crossbeam = "0.8"
+parking_lot = "0.12"
+
+# CUDA and GPU support
+cuda-sys = "0.2"
+cudnn-sys = "0.8"
+
+# Error handling and utilities
+thiserror = "1.0"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Memory and performance
+once_cell = "1.19"
+dashmap = "6.0"
+lru = "0.12"
+mimalloc = { version = "0.1", default-features = false }
+
+# Internal dependencies
+qbmia-core = { path = "../qbmia-core" }
+qbmia-acceleration = { path = "../qbmia-acceleration" }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+approx = "0.5"
+tempfile = "3.10"
+
+[build-dependencies]
+cc = "1.0"
+bindgen = "0.69"
+
+[features]
+default = ["cuda", "pennylane-gpu"]
+cuda = ["cuda-sys", "cudnn-sys"]
+pennylane-gpu = []
+benchmark = []
+
+[[bench]]
+name = "quantum_nash"
+harness = false
+
+[[bench]]
+name = "circuit_execution"
+harness = false
+
+[[bench]]
+name = "device_switching"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+inherits = "release"
+debug = true

@@ -1,0 +1,93 @@
+[package]
+name = "dynamic-swarm-selector"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Dynamic Swarm Selection Engine - 14+ Bio-Inspired Optimization Algorithms"
+
+[lib]
+name = "dynamic_swarm_selector"
+path = "src/lib.rs"
+
+[dependencies]
+# Core async/concurrency
+tokio = { version = "1.46", features = ["full", "rt-multi-thread", "macros"] }
+async-trait = "0.1"
+futures = "0.3"
+rayon = "1.10.0"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+log = "0.4"
+tracing = "0.1"
+
+# Math and optimization
+nalgebra = { version = "0.33.2", features = ["serde-serialize"] }
+ndarray = { version = "0.16.1", features = ["rayon", "serde"] }
+num-traits = "0.2"
+num-complex = "0.4"
+statrs = "0.16"
+
+# Random number generation
+rand = "0.8"
+rand_distr = "0.4"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Performance
+parking_lot = "0.12"
+dashmap = "5.5"
+
+# Bio-inspired swarm algorithms
+particle-swarm = { path = "../bio-inspired-workspace/particle-swarm", optional = true }
+ant-colony = { path = "../bio-inspired-workspace/ant-colony", optional = true }
+genetic-algorithm = { path = "../bio-inspired-workspace/genetic-algorithm", optional = true }
+differential-evolution = { path = "../bio-inspired-workspace/differential-evolution", optional = true }
+grey-wolf = { path = "../bio-inspired-workspace/grey-wolf", optional = true }
+whale-optimization = { path = "../bio-inspired-workspace/whale-optimization", optional = true }
+bat-algorithm = { path = "../bio-inspired-workspace/bat-algorithm", optional = true }
+firefly-algorithm = { path = "../bio-inspired-workspace/firefly-algorithm", optional = true }
+cuckoo-search = { path = "../bio-inspired-workspace/cuckoo-search", optional = true }
+artificial-bee-colony = { path = "../bio-inspired-workspace/artificial-bee-colony", optional = true }
+bacterial-foraging = { path = "../bio-inspired-workspace/bacterial-foraging", optional = true }
+social-spider = { path = "../bio-inspired-workspace/social-spider", optional = true }
+moth-flame = { path = "../bio-inspired-workspace/moth-flame", optional = true }
+salp-swarm = { path = "../bio-inspired-workspace/salp-swarm", optional = true }
+
+# Market regime integration
+market-regime-detector = { path = "../bio-inspired-workspace/market-regime-detector" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+quickcheck = "1.0"
+
+[features]
+default = ["bio-inspired", "adaptive", "real-time"]
+bio-inspired = [
+    "particle-swarm", "ant-colony", "genetic-algorithm", "differential-evolution",
+    "grey-wolf", "whale-optimization", "bat-algorithm", "firefly-algorithm",
+    "cuckoo-search", "artificial-bee-colony", "bacterial-foraging",
+    "social-spider", "moth-flame", "salp-swarm"
+]
+adaptive = []
+real-time = ["tokio/rt-multi-thread"]
+
+[[bench]]
+name = "swarm_selection_benchmark"
+harness = false
+
+[[bench]]
+name = "algorithm_performance_benchmark"
+harness = false

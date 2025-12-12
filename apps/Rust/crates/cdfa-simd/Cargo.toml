@@ -1,0 +1,91 @@
+[package]
+name = "cdfa-simd"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Platform-specific SIMD optimizations for Cross-Domain Feature Alignment"
+repository = "https://github.com/tengri/ats-cp-trader"
+license = "MIT OR Apache-2.0"
+keywords = ["cdfa", "simd", "avx2", "avx512", "optimization"]
+categories = ["algorithms", "mathematics", "hardware-support"]
+
+[dependencies]
+# Core CDFA dependencies
+cdfa-core = { path = "../cdfa-core" }
+cdfa-algorithms = { path = "../cdfa-algorithms" }
+
+# Core dependencies
+ndarray = { workspace = true }
+nalgebra = { workspace = true }
+num-traits = { workspace = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# SIMD support - Stable, high-performance alternatives with AVX-512 support
+bytemuck = { workspace = true }
+wide = { workspace = true }
+# High-performance SIMD libraries with AVX-512 capability
+pulp = "0.18"  # High-performance SIMD abstraction
+simba = "0.8"  # SIMD linear algebra
+ultraviolet = "0.9"  # Fastest SIMD math library
+# AVX-512 specific dependencies
+target-features = { version = "0.1", optional = true }
+std_detect = "0.1"
+
+# CPU feature detection
+raw-cpuid = { version = "11.0", optional = true }
+
+# Memory optimization
+parking_lot = { workspace = true }
+smallvec = { workspace = true }
+arrayvec = { workspace = true }
+ahash = { workspace = true }
+
+# Platform detection
+once_cell = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+[build-dependencies]
+cc = "1.0"
+rustc_version = "0.4"
+
+[dev-dependencies]
+criterion = { workspace = true }
+proptest = { workspace = true }
+pretty_assertions = { workspace = true }
+approx = { workspace = true }
+rand = { workspace = true }
+
+[features]
+default = ["runtime-detection", "avx512-optimized"]
+runtime-detection = ["raw-cpuid"]
+avx2 = []
+avx512 = ["target-features"]
+avx512-optimized = ["avx512"]
+neon = []
+wasm-simd = []
+serde = ["dep:serde", "dep:serde_json", "cdfa-core/serde"]
+# Phase 1 SIMD optimization profile
+simd-phase1 = ["avx512-optimized", "runtime-detection"]
+
+[lib]
+name = "cdfa_simd"
+path = "src/lib.rs"
+
+[[bench]]
+name = "simd_benchmarks"
+harness = false
+
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+# x86_64 specific dependencies if needed
+
+[target.'cfg(target_arch = "aarch64")'.dependencies]
+# ARM64 specific dependencies if needed
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# WASM specific dependencies if needed

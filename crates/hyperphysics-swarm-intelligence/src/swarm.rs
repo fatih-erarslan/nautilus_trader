@@ -152,6 +152,17 @@ pub struct MetaSwarm {
     active_genome: Option<Genome>,
 }
 
+impl std::fmt::Debug for MetaSwarm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MetaSwarm")
+            .field("iteration", &self.iteration)
+            .field("global_best_fitness", &self.global_best_fitness)
+            .field("num_agents", &self.agents.len())
+            .field("num_strategies", &self.strategies.len())
+            .finish()
+    }
+}
+
 impl MetaSwarm {
     /// Create a new meta-swarm
     pub fn new(config: SwarmConfig) -> SwarmResult<Self> {
@@ -175,6 +186,7 @@ impl MetaSwarm {
             let strategy_config = StrategyConfig {
                 strategy_type: *strategy_type,
                 population_size: config.agent_count / config.strategies.len(),
+                swarm_size: None,
                 max_iterations: config.max_iterations,
                 bounds: config.bounds.clone(),
                 params: HashMap::new(),

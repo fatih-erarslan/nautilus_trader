@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "physics-lab": {
+      "command": "/Volumes/Tengritek/Ashina/.venv/bin/python",
+      "args": ["/Volumes/Tengritek/Ashina/HyperPhysics/mcp-physics-lab/physics_mcp_server.py"],
+      "env": {
+        "PYTHONPATH": "/Volumes/Tengritek/Ashina/.venv/lib/python3.13/site-packages",
+        "MCP_PHYSICS_LAB": "1"
+      }
+    },
+    "sonarqube": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "SONARQUBE_TOKEN",
+        "-e", "SONARQUBE_URL",
+        "mcp/sonarqube"
+      ],
+      "env": {
+        "SONARQUBE_TOKEN": "${SONARQUBE_TOKEN}",
+        "SONARQUBE_URL": "http://localhost:9000"
+      }
+    },
+    "wolfram": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-wolfram"],
+      "env": {
+        "WOLFRAM_APP_ID": "${WOLFRAM_APP_ID}"
+      }
+    }
+  }
+}

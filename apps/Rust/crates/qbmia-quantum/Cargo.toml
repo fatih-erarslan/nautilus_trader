@@ -1,0 +1,23 @@
+[package]
+name = "qbmia-quantum"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Core QBMIA framework"
+
+[dependencies]
+tokio.workspace = true
+serde.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+log.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio-test.workspace = true
+
+[features]
+default = ["std"]
+std = []

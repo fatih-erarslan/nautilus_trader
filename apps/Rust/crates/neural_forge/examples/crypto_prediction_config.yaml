@@ -1,0 +1,399 @@
+# Neural Forge Configuration for Cryptocurrency Prediction
+# Sophisticated training setup with adaptive temperature scaling and conformal prediction
+
+# Model Architecture Configuration
+model:
+  architecture:
+    Transformer:
+      d_model: 512
+      num_heads: 16
+      num_layers: 8
+      d_ff: 2048
+      max_seq_length: 120
+      positional_encoding: Sinusoidal
+      attention_config:
+        attention_type: FlashAttention  # Ultra-fast attention
+        dropout: 0.1
+        bias: true
+        scale: null
+  
+  input_dim: 45
+  output_dim: 1
+  hidden_dims: [512, 256, 128]
+  activation: GELU
+  dropout: 0.1
+  batch_norm: false
+  layer_norm: true
+  
+  init:
+    Xavier:
+      uniform: false
+      gain: 1.0
+
+# Training Configuration
+training:
+  epochs: 50
+  batch_size: 32
+  val_batch_size: 64
+  gradient_accumulation_steps: 2
+  max_grad_norm: 1.0
+  
+  # Mixed Precision Training for 8GB VRAM optimization
+  mixed_precision:
+    enabled: true
+    loss_scaling:
+      Dynamic:
+        init_scale: 65536.0
+        growth_factor: 2.0
+        backoff_factor: 0.5
+        growth_interval: 2000
+    opt_level: O1  # Conservative mixed precision
+  
+  # Early Stopping Configuration
+  early_stopping:
+    monitor: "val_accuracy"
+    min_delta: 0.001
+    patience: 15
+    maximize: true
+    restore_best_weights: true
+  
+  # Validation Configuration
+  validation:
+    frequency: 1
+    split: 0.2
+    stratified: true
+    cross_validation:
+      n_folds: 5
+      stratified: true
+      random_state: 42
+      shuffle: true
+    metrics:
+      - Accuracy:
+          threshold: 0.5
+          top_k: null
+      - F1:
+          average: Macro
+          labels: null
+      - AUC:
+          multi_class: null
+      - Custom:
+          name: "sharpe_ratio"
+          params:
+            risk_free_rate: 0.02
+  
+  # Checkpoint Configuration
+  checkpoint:
+    dir: "./checkpoints"
+    frequency: 1
+    save_best_only: true
+    monitor: "val_accuracy"
+    maximize: true
+    max_checkpoints: 5
+    save_optimizer: true
+    save_scheduler: true
+    format: Candle
+  
+  # Loss Function
+  loss:
+    BCE:
+      pos_weight: 1.2  # Slight bias for positive class
+      label_smoothing: 0.1
+  
+  # Training Metrics
+  metrics:
+    - Accuracy:
+        threshold: 0.5
+        top_k: null
+    - F1:
+        average: Macro
+        labels: null
+    - Precision:
+        average: Macro
+        labels: null
+    - Recall:
+        average: Macro
+        labels: null
+    - Custom:
+        name: "profit_factor"
+        params:
+          transaction_cost: 0.001
+  
+  # Advanced Callbacks
+  callbacks:
+    - LRFinder:
+        start_lr: 1e-8
+        end_lr: 1e-1
+        num_iter: 100
+    - GradientClipping:
+        max_norm: 1.0
+        norm_type: 2.0
+  
+  # Regularization
+  regularization:
+    weight_decay: 0.01
+    dropout:
+      rate: 0.1
+      scheduled:
+        initial_rate: 0.1
+        final_rate: 0.05
+        schedule: Cosine
+    batch_norm:
+      enabled: false
+      momentum: 0.1
+      eps: 1e-5
+      affine: true
+    layer_norm:
+      enabled: true
+      eps: 1e-5
+      elementwise_affine: true
+    label_smoothing: 0.1
+    mixup:
+      alpha: 0.2
+      prob: 0.5
+  
+  # Data Augmentation for Time Series
+  augmentation:
+    techniques:
+      - GaussianNoise:
+          std: 0.01
+      - TimeWarping:
+          sigma: 0.2
+      - MagnitudeWarping:
+          sigma: 0.1
+      - RandomScale:
+          scale_range: [0.95, 1.05]
+    prob: 0.3
+    num_ops: 2
+    magnitude: 0.1
+  
+  # Training Mode
+  mode: Standard
+  
+  # Reproducibility
+  seed: 42
+
+# Data Configuration
+data:
+  # Data paths
+  train_path: "data/preprocessed_neural_dataset/train_dataset_clean.parquet"
+  val_path: "data/preprocessed_neural_dataset/validation_dataset_clean.parquet"
+  test_path: null
+  
+  # Data format
+  format: Parquet
+  
+  # Data loading
+  batch_size: 32
+  shuffle: true
+  drop_last: true
+  num_workers: 4
+  pin_memory: true
+  
+  # Preprocessing
+  preprocessing:
+    normalization:
+      method: RobustScaler
+      per_feature: true
+    feature_selection:
+      method: VarianceThreshold
+      threshold: 0.01
+    sequence_length: 120
+    target_column: "target_direction_1h"
+  
+  # Data validation
+  validation:
+    check_missing: true
+    check_infinite: true
+    check_dtypes: true
+    max_missing_ratio: 0.05
+
+# Optimizer Configuration
+optimizer:
+  AdamW:
+    lr: 0.001
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    weight_decay: 0.01
+    amsgrad: false
+
+# Learning Rate Scheduler
+scheduler:
+  OneCycleLR:
+    max_lr: 0.003
+    total_steps: 50000  # Will be calculated automatically
+    pct_start: 0.1
+    anneal_strategy: "cos"
+    cycle_momentum: true
+    base_momentum: 0.85
+    max_momentum: 0.95
+    div_factor: 25.0
+    final_div_factor: 10000.0
+
+# Advanced Calibration Configuration
+calibration:
+  methods:
+    - TemperatureScaling
+    - ConformalPrediction
+    - EnsembleCalibration
+  
+  calibration_split: 0.2
+  
+  cross_validation:
+    n_folds: 3
+    stratified: true
+    random_state: 42
+  
+  # Temperature Scaling Configuration
+  temperature_scaling:
+    optimizer:
+      LBFGS:
+        history_size: 10
+        line_search: "strong_wolfe"
+    max_iter: 100
+    tol: 1e-6
+    initial_temperature: 1.0
+    temperature_bounds: [0.01, 100.0]
+    use_validation: true
+    regularization: 0.001
+  
+  # Conformal Prediction Configuration
+  conformal_prediction:
+    alpha: 0.1  # 90% prediction intervals
+    method: Split
+    calibration_size: 0.2
+    conditional:
+      conditioning_vars: ["volatility", "volume"]
+      binning_strategy:
+        EqualFrequency:
+          num_bins: 10
+      min_samples_per_bin: 50
+    adaptive:
+      learning_rate: 0.01
+      window_size: 1000
+      forgetting_factor: 0.95
+    exchangeability_test: true
+  
+  # Ensemble Calibration Configuration
+  ensemble_calibration:
+    method: DeepEnsemble
+    num_models: 5
+    bootstrap: true
+    aggregation: Average
+    diversity:
+      metric: Disagreement
+      weight: 0.1
+  
+  # Bayesian Calibration Configuration
+  bayesian_calibration:
+    prior:
+      Normal:
+        mean: 0.0
+        std: 1.0
+    mcmc:
+      sampler:
+        NUTS:
+          step_size: null
+          max_tree_depth: 10
+      num_chains: 4
+      chain_length: 2000
+      thin: 2
+    num_samples: 1000
+    burn_in: 500
+  
+  # Evaluation Metrics
+  evaluation_metrics:
+    - ECE:
+        num_bins: 15
+    - MCE:
+        num_bins: 15
+    - BrierScore
+    - ReliabilityDiagram:
+        num_bins: 10
+    - Coverage
+    - AverageWidth
+  
+  save_calibrated: true
+  output_dir: "./calibration_results"
+
+# Hardware Configuration
+hardware:
+  device:
+    Cuda:
+      device_id: 0
+      memory_fraction: 0.9
+      allow_growth: true
+  
+  memory:
+    max_memory: 8589934592  # 8GB in bytes
+    pool_size: 1073741824   # 1GB pool
+    memory_mapping: true
+    gc_frequency: 100
+    cache_size: 536870912   # 512MB cache
+  
+  parallel:
+    data_threads: 4
+    preprocessing_threads: 8
+    numa_aware: false
+    thread_affinity: null
+
+# Distributed Training (Optional)
+distributed:
+  backend: "nccl"
+  world_size: 1
+  rank: 0
+  local_rank: 0
+  master_addr: "localhost"
+  master_port: 29500
+  
+  gradient_compression:
+    enabled: false
+    method: "topk"
+    compression_ratio: 0.1
+  
+  synchronization:
+    frequency: 1
+    algorithm: "allreduce"
+
+# Logging and Monitoring
+logging:
+  level: Info
+  output_dir: "./logs"
+  tensorboard: true
+  
+  wandb:
+    project: "neural-forge-crypto"
+    entity: "crypto-trading"
+    tags: ["transformer", "calibration", "crypto"]
+    notes: "Adaptive temperature scaling with conformal prediction"
+  
+  metrics:
+    hardware: true
+    training: true
+    custom:
+      gpu_utilization: true
+      memory_usage: true
+      throughput: true
+    frequency: 50
+  
+  checkpoint_frequency: 1000
+  save_best_only: true
+
+# Custom Hyperparameters
+hyperparams:
+  # Financial-specific parameters
+  sharpe_ratio_target: 2.0
+  max_drawdown_threshold: 0.15
+  profit_factor_target: 1.5
+  
+  # Model-specific parameters
+  attention_temperature: 1.0
+  gradient_noise_scale: 0.01
+  
+  # Calibration-specific parameters
+  uncertainty_threshold: 0.1
+  confidence_penalty: 0.05
+  
+  # Trading-specific parameters
+  transaction_cost: 0.001
+  slippage_factor: 0.0005
+  position_size_scaling: 1.0

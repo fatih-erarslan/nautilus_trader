@@ -1,0 +1,4 @@
+module HyperPhysicsCognition {
+    header "include/hyperphysics-cognition-ffi.h"
+    export *
+}

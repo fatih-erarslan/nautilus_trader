@@ -1,0 +1,100 @@
+[package]
+name = "quantum-cerebellar"
+version = "0.1.0"
+edition = "2021"
+description = "Quantum Cerebellar Spiking Neural Network for neuromorphic trading"
+authors = ["Neuromorphic Swarm Agent <cerebellar-engineer@quantum-hive.ai>"]
+
+[dependencies]
+# PennyLane quantum framework with device hierarchy
+quantum-core = { path = "../quantum-core" }
+
+# Neural network and tensor operations (PennyLane compatible)
+# tch = "0.13"
+# candle-core = "0.3" 
+# candle-nn = "0.3"
+ndarray = { version = "0.15", features = ["rayon", "serde", "blas"] }
+nalgebra = { version = "0.32", features = ["rayon", "serde"] }
+
+# Neuromorphic computing (using local implementations)
+# spiking-nn = "0.2"
+# norse-rs = { version = "0.1", optional = true }
+# neuromorphic = "0.3"
+
+# High-performance computing
+rayon = "1.8"
+blas-src = { version = "0.8", features = ["openblas"] }
+lapack-src = { version = "0.8", features = ["openblas"] }
+
+# SIMD and parallelization
+wide = "0.7"
+simdeez = "1.0"
+
+# Serialization and data structures
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Error handling and logging
+anyhow = "1.0"
+thiserror = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Mathematical functions
+special = "0.10"
+libm = "0.2"
+num-complex = "0.4"
+
+# Random number generation
+rand = "0.8"
+rand_distr = "0.4"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# CUDA support (optional) - UPGRADED TO MATCH WORKSPACE
+cudarc = { workspace = true, optional = true }
+half = { version = "2.3", optional = true }
+
+# Quantum-hive integration
+# quantum-hive = { path = "../quantum-hive" } # Removed to prevent circular dependency
+
+# Time and timing
+chrono = { version = "0.4", features = ["serde"] }
+instant = "0.1"
+
+# Collections and utilities
+indexmap = "2.0"
+smallvec = "1.11"
+
+# Performance monitoring
+criterion = { version = "0.5", optional = true }
+
+[features]
+default = ["simd", "openblas", "lightning-gpu"]
+simd = []
+lightning-gpu = ["cudarc", "half"]
+lightning-kokkos = []
+lightning-qubit = []
+openblas = []
+benchmarks = ["criterion"]
+
+[dev-dependencies]
+approx = "0.5"
+proptest = "1.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+debug = false
+panic = "abort"
+
+[profile.bench]
+lto = true
+codegen-units = 1
+opt-level = 3
+debug = true

@@ -1,0 +1,113 @@
+{
+  "factor_weights": {
+    "trend": 0.25439624853458376,
+    "volatility": 0.24150058616647124,
+    "momentum": 0.2532239155920281,
+    "sentiment_score": 0.2508792497069167
+  },
+  "factor_importance": {
+    "trend": 0.5425,
+    "volatility": 0.515,
+    "momentum": 0.54,
+    "sentiment_score": 0.535
+  },
+  "baseline_weights": {
+    "trend": 0.7,
+    "volatility": 0.5,
+    "momentum": 0.6,
+    "sentiment_score": 0.45
+  },
+  "regime_specific_weights": {
+    "GROWTH": {
+      "trend": 0.33333333333333337,
+      "momentum": 0.2916666666666667,
+      "volatility": 0.125,
+      "sentiment_score": 0.25
+    },
+    "RELEASE": {
+      "trend": 0.15789473684210525,
+      "momentum": 0.2631578947368421,
+      "volatility": 0.4736842105263158,
+      "sentiment_score": 0.10526315789473685
+    }
+  },
+  "cumulative_performance": 0.0,
+  "memory_length": 50,
+  "decision_threshold": 0.55,
+  "quantum_failure_count": 0,
+  "performance_metrics": {
+    "total_decisions": 3,
+    "decision_counts": {
+      "HOLD": 3
+    },
+    "avg_quantum_time_ms": 0,
+    "avg_classical_time_ms": 0,
+    "quantum_decision_count": 0,
+    "classical_decision_count": 0,
+    "quantum_usage_ratio": 0,
+    "circuit_cache": {
+      "size": 0,
+      "max_size": 100,
+      "hit_count": 0,
+      "miss_count": 0,
+      "hit_ratio": 0
+    },
+    "cumulative_performance": 0.0,
+    "quantum_lmsr": {
+      "normalize_probability": {
+        "avg_time": 2.951849074590774e-06,
+        "max_time": 6.4373016357421875e-06,
+        "min_time": 1.9073486328125e-06,
+        "call_count": 21
+      },
+      "get_market_probability": {
+        "avg_time": 3.449784384833442e-05,
+        "max_time": 7.867813110351562e-05,
+        "min_time": 2.002716064453125e-05,
+        "call_count": 36
+      },
+      "get_all_market_probabilities": {
+        "avg_time": 0.00015727678934733072,
+        "max_time": 0.00021529197692871094,
+        "min_time": 9.942054748535156e-05,
+        "call_count": 6
+      },
+      "calculate_information_gain": {
+        "avg_time": 1.4861424763997396e-05,
+        "max_time": 1.6927719116210938e-05,
+        "min_time": 1.1682510375976562e-05,
+        "call_count": 3
+      },
+      "to_log_odds": {
+        "avg_time": 3.6496382493239184e-06,
+        "max_time": 7.3909759521484375e-06,
+        "min_time": 1.430511474609375e-06,
+        "call_count": 13
+      },
+      "cost_function": {
+        "avg_time": 2.250075340270996e-05,
+        "max_time": 4.5299530029296875e-05,
+        "min_time": 1.430511474609375e-05,
+        "call_count": 24
+      },
+      "calculate_cost_to_move": {
+        "avg_time": 8.658568064371745e-05,
+        "max_time": 0.00013875961303710938,
+        "min_time": 5.53131103515625e-05,
+        "call_count": 12
+      },
+      "quantum_device": {
+        "name": "lightning.kokkos",
+        "wires": 4,
+        "shots": null,
+        "mode": "auto"
+      },
+      "hardware": {
+        "quantum_available": true,
+        "gpu_available": true,
+        "device_type": "ROCM"
+      }
+    }
+  },
+  "timestamp": 1747160238.4184053
+}

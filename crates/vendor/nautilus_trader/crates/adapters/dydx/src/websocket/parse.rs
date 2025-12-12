@@ -22,7 +22,7 @@
 use std::str::FromStr;
 
 use anyhow::Context;
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use nautilus_core::UnixNanos;
 use nautilus_model::{
@@ -33,7 +33,17 @@ use nautilus_model::{
 };
 use rust_decimal::Decimal;
 
-use crate::{http::models::Order, schemas::ws::DydxWsOrderSubaccountMessageContents};
+use crate::{
+    common::enums::DydxOrderStatus,
+    http::{
+        models::{Fill, Order, PerpetualPosition},
+        parse::{parse_fill_report, parse_order_status_report, parse_position_status_report},
+    },
+    websocket::messages::{
+        DydxPerpetualPosition, DydxWsFillSubaccountMessageContents,
+        DydxWsOrderSubaccountMessageContents,
+    },
+};
 
 /// Parses a WebSocket order update into an OrderStatusReport.
 ///
@@ -84,21 +94,12 @@ pub fn parse_ws_order_report(
     let http_order = convert_ws_order_to_http(ws_order)?;
 
     // Delegate to existing HTTP parser
-    let mut report = crate::http::parse::parse_order_status_report(
-        &http_order,
-        &instrument,
-        account_id,
-        ts_init,
-    )?;
+    let mut report = parse_order_status_report(&http_order, &instrument, account_id, ts_init)?;
 
     // For untriggered conditional orders with an explicit trigger price we
     // surface `PendingUpdate` to match Nautilus semantics and existing dYdX
     // enum mapping.
-    if matches!(
-        ws_order.status,
-        crate::common::enums::DydxOrderStatus::Untriggered
-    ) && ws_order.trigger_price.is_some()
-    {
+    if matches!(ws_order.status, DydxOrderStatus::Untriggered) && ws_order.trigger_price.is_some() {
         report.order_status = OrderStatus::PendingUpdate;
     }
 
@@ -155,7 +156,7 @@ fn convert_ws_order_to_http(
     let good_til_block_time = ws_order
         .good_til_block_time
         .as_ref()
-        .and_then(|s| chrono::DateTime::parse_from_rfc3339(s).ok())
+        .and_then(|s| DateTime::parse_from_rfc3339(s).ok())
         .map(|dt| dt.with_timezone(&Utc));
 
     let trigger_price = ws_order
@@ -167,7 +168,7 @@ fn convert_ws_order_to_http(
     let updated_at = ws_order
         .updated_at
         .as_ref()
-        .and_then(|s| chrono::DateTime::parse_from_rfc3339(s).ok())
+        .and_then(|s| DateTime::parse_from_rfc3339(s).ok())
         .map(|dt| dt.with_timezone(&Utc));
 
     // Parse updated_at_height (optional for BEST_EFFORT_OPENED orders)
@@ -225,7 +226,7 @@ fn convert_ws_order_to_http(
 /// - Field parsing fails (price, size, fee, etc.)
 /// - HTTP parser fails
 pub fn parse_ws_fill_report(
-    ws_fill: &crate::schemas::ws::DydxWsFillSubaccountMessageContents,
+    ws_fill: &DydxWsFillSubaccountMessageContents,
     instruments: &DashMap<InstrumentId, InstrumentAny>,
     account_id: AccountId,
     ts_init: UnixNanos,
@@ -252,7 +253,7 @@ pub fn parse_ws_fill_report(
     let http_fill = convert_ws_fill_to_http(ws_fill)?;
 
     // Delegate to existing HTTP parser
-    crate::http::parse::parse_fill_report(&http_fill, &instrument, account_id, ts_init)
+    parse_fill_report(&http_fill, &instrument, account_id, ts_init)
 }
 
 /// Converts a WebSocket fill message to HTTP Fill format.
@@ -260,11 +261,7 @@ pub fn parse_ws_fill_report(
 /// # Errors
 ///
 /// Returns an error if any field parsing fails.
-fn convert_ws_fill_to_http(
-    ws_fill: &crate::schemas::ws::DydxWsFillSubaccountMessageContents,
-) -> anyhow::Result<crate::http::models::Fill> {
-    use crate::http::models::Fill;
-
+fn convert_ws_fill_to_http(ws_fill: &DydxWsFillSubaccountMessageContents) -> anyhow::Result<Fill> {
     // Parse numeric fields
     let price: Decimal = ws_fill.price.parse().context("Failed to parse price")?;
 
@@ -283,7 +280,7 @@ fn convert_ws_fill_to_http(
         .context("Failed to parse client_metadata")?;
 
     // Parse timestamp
-    let created_at = chrono::DateTime::parse_from_rfc3339(&ws_fill.created_at)
+    let created_at = DateTime::parse_from_rfc3339(&ws_fill.created_at)
         .context("Failed to parse created_at")?
         .with_timezone(&Utc);
 
@@ -316,7 +313,7 @@ fn convert_ws_fill_to_http(
 /// - Field parsing fails (size, prices, etc.)
 /// - HTTP parser fails
 pub fn parse_ws_position_report(
-    ws_position: &crate::schemas::ws::DydxPerpetualPosition,
+    ws_position: &DydxPerpetualPosition,
     instruments: &DashMap<InstrumentId, InstrumentAny>,
     account_id: AccountId,
     ts_init: UnixNanos,
@@ -343,12 +340,7 @@ pub fn parse_ws_position_report(
     let http_position = convert_ws_position_to_http(ws_position)?;
 
     // Delegate to existing HTTP parser
-    crate::http::parse::parse_position_status_report(
-        &http_position,
-        &instrument,
-        account_id,
-        ts_init,
-    )
+    parse_position_status_report(&http_position, &instrument, account_id, ts_init)
 }
 
 /// Converts a WebSocket position to HTTP PerpetualPosition format.
@@ -357,10 +349,8 @@ pub fn parse_ws_position_report(
 ///
 /// Returns an error if any field parsing fails.
 fn convert_ws_position_to_http(
-    ws_position: &crate::schemas::ws::DydxPerpetualPosition,
-) -> anyhow::Result<crate::http::models::PerpetualPosition> {
-    use crate::http::models::PerpetualPosition;
-
+    ws_position: &DydxPerpetualPosition,
+) -> anyhow::Result<PerpetualPosition> {
     // Parse numeric fields
     let size: Decimal = ws_position.size.parse().context("Failed to parse size")?;
 
@@ -407,14 +397,14 @@ fn convert_ws_position_to_http(
         .context("Failed to parse net_funding")?;
 
     // Parse timestamps
-    let created_at = chrono::DateTime::parse_from_rfc3339(&ws_position.created_at)
+    let created_at = DateTime::parse_from_rfc3339(&ws_position.created_at)
         .context("Failed to parse created_at")?
         .with_timezone(&Utc);
 
     let closed_at = ws_position
         .closed_at
         .as_ref()
-        .map(|s| chrono::DateTime::parse_from_rfc3339(s))
+        .map(|s| DateTime::parse_from_rfc3339(s))
         .transpose()
         .context("Failed to parse closed_at")?
         .map(|dt| dt.with_timezone(&Utc));
@@ -444,6 +434,10 @@ fn convert_ws_position_to_http(
         closed_at,
     })
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Tests
+////////////////////////////////////////////////////////////////////////////////
 
 #[cfg(test)]
 mod tests {
@@ -631,7 +625,7 @@ mod tests {
     fn test_convert_ws_fill_to_http() {
         use crate::{
             common::enums::{DydxFillType, DydxLiquidity, DydxTickerType},
-            schemas::ws::DydxWsFillSubaccountMessageContents,
+            websocket::messages::DydxWsFillSubaccountMessageContents,
         };
 
         let ws_fill = DydxWsFillSubaccountMessageContents {
@@ -670,7 +664,7 @@ mod tests {
     fn test_parse_ws_fill_report_success() {
         use crate::{
             common::enums::{DydxFillType, DydxLiquidity, DydxTickerType},
-            schemas::ws::DydxWsFillSubaccountMessageContents,
+            websocket::messages::DydxWsFillSubaccountMessageContents,
         };
 
         let instrument = create_test_instrument();
@@ -715,7 +709,7 @@ mod tests {
     fn test_parse_ws_fill_report_missing_instrument() {
         use crate::{
             common::enums::{DydxFillType, DydxLiquidity, DydxTickerType},
-            schemas::ws::DydxWsFillSubaccountMessageContents,
+            websocket::messages::DydxWsFillSubaccountMessageContents,
         };
 
         let instruments = DashMap::new(); // Empty - no instruments cached
@@ -756,7 +750,9 @@ mod tests {
     fn test_convert_ws_position_to_http() {
         use nautilus_model::enums::PositionSide;
 
-        use crate::{common::enums::DydxPositionStatus, schemas::ws::DydxPerpetualPosition};
+        use crate::{
+            common::enums::DydxPositionStatus, websocket::messages::DydxPerpetualPosition,
+        };
 
         let ws_position = DydxPerpetualPosition {
             market: "BTC-USD".into(),
@@ -803,7 +799,9 @@ mod tests {
     fn test_parse_ws_position_report_success() {
         use nautilus_model::enums::PositionSide;
 
-        use crate::{common::enums::DydxPositionStatus, schemas::ws::DydxPerpetualPosition};
+        use crate::{
+            common::enums::DydxPositionStatus, websocket::messages::DydxPerpetualPosition,
+        };
 
         let instrument = create_test_instrument();
         let instrument_id = instrument.id();
@@ -846,7 +844,9 @@ mod tests {
     fn test_parse_ws_position_report_short() {
         use nautilus_model::enums::PositionSide;
 
-        use crate::{common::enums::DydxPositionStatus, schemas::ws::DydxPerpetualPosition};
+        use crate::{
+            common::enums::DydxPositionStatus, websocket::messages::DydxPerpetualPosition,
+        };
 
         let instrument = create_test_instrument();
         let instrument_id = instrument.id();
@@ -887,7 +887,9 @@ mod tests {
     fn test_parse_ws_position_report_missing_instrument() {
         use nautilus_model::enums::PositionSide;
 
-        use crate::{common::enums::DydxPositionStatus, schemas::ws::DydxPerpetualPosition};
+        use crate::{
+            common::enums::DydxPositionStatus, websocket::messages::DydxPerpetualPosition,
+        };
 
         let instruments = DashMap::new(); // Empty - no instruments cached
 
@@ -1150,7 +1152,9 @@ mod tests {
     fn test_parse_ws_position_closed() {
         use nautilus_model::enums::PositionSide;
 
-        use crate::{common::enums::DydxPositionStatus, schemas::ws::DydxPerpetualPosition};
+        use crate::{
+            common::enums::DydxPositionStatus, websocket::messages::DydxPerpetualPosition,
+        };
 
         let instrument = create_test_instrument();
         let instrument_id = instrument.id();
@@ -1191,7 +1195,7 @@ mod tests {
     fn test_parse_ws_fill_with_maker_rebate() {
         use crate::{
             common::enums::{DydxFillType, DydxLiquidity, DydxTickerType},
-            schemas::ws::DydxWsFillSubaccountMessageContents,
+            websocket::messages::DydxWsFillSubaccountMessageContents,
         };
 
         let instrument = create_test_instrument();
@@ -1233,7 +1237,7 @@ mod tests {
     fn test_parse_ws_fill_taker_with_fee() {
         use crate::{
             common::enums::{DydxFillType, DydxLiquidity, DydxTickerType},
-            schemas::ws::DydxWsFillSubaccountMessageContents,
+            websocket::messages::DydxWsFillSubaccountMessageContents,
         };
 
         let instrument = create_test_instrument();

@@ -46,6 +46,7 @@ reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
 # Mathematical computations
 num-complex = "0.4"
 nalgebra = "0.32"
+ndarray = { version = "0.16", features = ["rayon", "serde"] }
 
 # pBit dynamics
 fastrand = "2.0"
@@ -53,6 +54,7 @@ fastrand = "2.0"
 # Thread-safe collections
 dashmap = "5.5"
 parking_lot = "0.12"
+once_cell = "1.21"
 
 # Error handling
 thiserror = "1.0"
@@ -61,6 +63,9 @@ anyhow = "1.0"
 # Logging
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# HyperPhysics Agency
+hyperphysics-agency = { path = "../../../crates/hyperphysics-agency" }
 
 [build-dependencies]
 napi-build = "2"

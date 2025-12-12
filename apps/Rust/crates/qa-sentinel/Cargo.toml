@@ -1,0 +1,146 @@
+[package]
+name = "qa-sentinel"
+version = "0.1.0"
+edition = "2021"
+authors = ["TENGRI QA Sentinel <qa@tengri.ai>"]
+description = "TENGRI QA Sentinel - Zero-Mock Testing Framework with 100% Coverage Enforcement"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/tengri/ats-cp-trader"
+keywords = ["testing", "qa", "quality-assurance", "zero-mock", "coverage"]
+categories = ["development-tools::testing"]
+
+[dependencies]
+# Core testing dependencies
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Property-based testing for mathematical correctness
+proptest = "1.4"
+proptest-derive = "0.4"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+
+# Mathematical verification and formal methods
+z3 = { version = "0.12", optional = true }
+easy-smt = { version = "0.3.1", optional = true }  # Latest available (replaces non-existent smt2utils)
+num-traits = { version = "0.2", optional = true }
+num-bigint = { version = "0.4", optional = true }
+num-rational = "0.4"
+nalgebra = { version = "0.33", optional = true }
+approx = { version = "0.5", optional = true }
+
+# Mutation testing
+mutagen = { version = "0.1.2", optional = true }  # Latest available (code wanted 0.2)
+cargo-mutants = { version = "24.9", optional = true }
+
+# Real-time system monitoring
+sysinfo = { version = "0.32", optional = true }
+hardware-query = { version = "0.1.0", optional = true }  # Latest available (replaces non-existent hardware-info)
+
+# Coverage and quality metrics
+cargo-tarpaulin = "0.32"
+coverage-helper = "0.1"
+serde_path_to_error = "0.1"
+
+# Performance and profiling
+criterion = { version = "0.5", features = ["html_reports"] }
+pprof = { version = "0.13", features = ["criterion", "flamegraph"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+metrics = "0.22"
+prometheus = "0.13"
+
+# Real data integration for zero-mock testing
+# Note: NO mock/synthetic data generation libraries per TENGRI framework
+# All test data must come from real sources
+
+# Chaos engineering - fault injection only, no synthetic data
+fault-injection = "0.1"
+latency_trace = "0.6.0"  # Latest available (replaces non-existent latency-injection)
+
+# System integration testing - real containers only
+testcontainers = "0.24.0"
+# Note: wiremock and mockito removed per TENGRI zero-mock requirements
+
+# Network testing
+reqwest = { version = "0.11", features = ["json", "stream"] }
+tungstenite = { version = "0.24", features = ["native-tls"] }
+tokio-tungstenite = { version = "0.24", features = ["native-tls"] }
+
+# Database testing
+sqlx = { workspace = true, features = ["runtime-tokio-rustls", "mysql"] }
+redis = { version = "0.25", features = ["tokio-comp"] }
+
+# Security testing
+cargo-audit = "0.20"
+security-framework = "2.11"
+openssl = "0.10"
+
+# Code quality analysis
+syn = { version = "2.0", features = ["full"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+clippy_lints = "0.0.212"  # Latest available (code wanted 0.1.79)
+
+# Command line interface
+clap = { version = "4.0", features = ["derive"] }
+
+# Additional dependencies for ruv-swarm topology
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+glob = "0.3"
+
+# Configuration management
+toml = "0.8"
+config = "0.14"
+
+# Workspace dependencies
+ats-core = { path = "../ats-core" }
+neural-forecast = { path = "../neural-forecast" }
+# performance-engine = { path = "../performance-engine" }  # DISABLED
+memory-manager = { path = "../memory-manager" }
+trading-strategies = { path = "../trading-strategies" }
+api-integration = { path = "../api-integration" }
+data-pipeline = { path = "../data-pipeline" }
+risk-management = { path = "../risk-management" }
+mcp-orchestration = { path = "../mcp-orchestration" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+pretty_assertions = "1.4"
+tempfile = "3.10"
+serial_test = "3.1"
+test-log = "0.2"
+env_logger = "0.11"
+
+[features]
+default = ["property-testing", "chaos-engineering", "performance-testing", "zero-mock", "coverage-enforcement"]
+property-testing = []
+chaos-engineering = []
+performance-testing = []
+security-testing = []
+integration-testing = []
+coverage-enforcement = []
+zero-mock = []
+formal-verification = ["z3", "easy-smt"]
+mutation-testing = ["mutagen", "cargo-mutants"]
+mathematical-verification = ["nalgebra", "num-traits", "num-bigint", "approx"]
+real-time-monitoring = ["sysinfo", "hardware-query"]
+
+[[bin]]
+name = "qa-sentinel"
+path = "src/main.rs"
+
+[lib]
+name = "qa_sentinel"
+path = "src/lib.rs"
+
+# Benchmark configuration (commented out until benchmarks are implemented)
+# [[bench]]
+# name = "qa_benchmarks"
+# harness = false

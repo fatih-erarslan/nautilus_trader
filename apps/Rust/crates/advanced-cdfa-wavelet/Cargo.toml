@@ -1,0 +1,109 @@
+[package]
+name = "advanced-cdfa-wavelet"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["TENGRI Wavelet Analysis Swarm <wavelets@tengri.ai>"]
+description = "Wavelet Analysis for Advanced CDFA - Multi-resolution market regime detection"
+repository = "https://github.com/tengri/ats-cp-trader"
+license = "MIT OR Apache-2.0"
+keywords = ["wavelets", "market-analysis", "regime-detection", "finance", "cdfa"]
+categories = ["science", "algorithms", "mathematics", "finance"]
+
+[lib]
+name = "advanced_cdfa_wavelet"
+path = "src/lib.rs"
+
+[dependencies]
+# Core computation
+ndarray = { version = "0.15", features = ["rayon", "blas"] }
+nalgebra = { version = "0.32", features = ["serde-serialize"] }
+num-traits = "0.2"
+num-complex = "0.4"
+rustfft = "6.2"
+
+# Scientific computing
+approx = "0.5"
+sprs = "0.11"
+itertools = "0.12"
+
+# Wavelet-specific
+# wavelets = "0.4"  # Package not available on crates.io
+# daubechies = "0.2"  # Package not available on crates.io
+
+# Signal processing  
+fftw = { version = "0.8", optional = true }
+spectrum-analyzer = "1.5"
+
+# Async and concurrency
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+rayon = { version = "1.8", optional = true }
+parking_lot = "0.12"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Time and scheduling
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging and metrics
+tracing = "0.1"
+log = "0.4"
+metrics = "0.21"
+
+# Performance optimization
+once_cell = "1.19"
+dashmap = "5.5"
+
+# Random number generation
+rand = "0.8"
+rand_distr = "0.4"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tokio-test = "0.4"
+proptest = "1.4"
+approx = "0.5"
+
+[features]
+default = ["cwt", "dwt", "regime-detection", "parallel"]
+
+# Core wavelet features
+cwt = []  # Continuous Wavelet Transform
+dwt = []  # Discrete Wavelet Transform
+swt = []  # Stationary Wavelet Transform
+
+# Analysis features
+regime-detection = []
+multi-resolution = []
+spectral-analysis = []
+time-frequency = []
+
+# Performance features
+parallel = ["rayon"]
+fftw-backend = ["fftw"]
+simd = []
+
+# Market-specific features
+market-microstructure = []
+volatility-analysis = []
+trend-decomposition = []
+
+[[bench]]
+name = "wavelet_benchmarks"
+harness = false
+path = "benches/wavelet_benchmarks.rs"
+required-features = ["parallel"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

@@ -1,0 +1,1161 @@
+{
+  "pairs": [
+    {
+      "symbol": "BTC/USDT",
+      "base": "BTC",
+      "quote": "USDT",
+      "price": 103012.5075,
+      "volume": 5010877928.585821,
+      "change": -0.791963788726684,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 103012.5075,
+      "volume_24h": 5010877928.585821,
+      "change_24h": -0.791963788726684,
+      "price_formatted": "103012.51",
+      "volume_formatted": "$5,010,877,929",
+      "change_formatted": "-0.79%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ETH/USDT",
+      "base": "ETH",
+      "quote": "USDT",
+      "price": 2417.4725,
+      "volume": 3976716641.1945596,
+      "change": -3.466395550303606,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 2417.4725,
+      "volume_24h": 3976716641.1945596,
+      "change_24h": -3.466395550303606,
+      "price_formatted": "2417.47",
+      "volume_formatted": "$3,976,716,641",
+      "change_formatted": "-3.47%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "SOL/USDT",
+      "base": "SOL",
+      "quote": "USDT",
+      "price": 162.32,
+      "volume": 1127327433.5893521,
+      "change": -4.982780613439475,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 162.32,
+      "volume_24h": 1127327433.5893521,
+      "change_24h": -4.982780613439475,
+      "price_formatted": "162.32",
+      "volume_formatted": "$1,127,327,434",
+      "change_formatted": "-4.98%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "USDC/USDT",
+      "base": "USDC",
+      "quote": "USDT",
+      "price": 0.9996,
+      "volume": 1012510007.9189124,
+      "change": 1.0004001600493265e-06,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.9996,
+      "volume_24h": 1012510007.9189124,
+      "change_24h": 1.0004001600493265e-06,
+      "price_formatted": "0.9996",
+      "volume_formatted": "$1,012,510,008",
+      "change_formatted": "0.00%",
+      "change_color": "green"
+    },
+    {
+      "symbol": "ETH/USDC",
+      "base": "ETH",
+      "quote": "USDC",
+      "price": 2418.265,
+      "volume": 983867730.4269059,
+      "change": -3.4638705396343896,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 2418.265,
+      "volume_24h": 983867730.4269059,
+      "change_24h": -3.4638705396343896,
+      "price_formatted": "2418.26",
+      "volume_formatted": "$983,867,730",
+      "change_formatted": "-3.46%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "PEPE/USDT",
+      "base": "PEPE",
+      "quote": "USDT",
+      "price": 1.277225e-05,
+      "volume": 721578097.6351233,
+      "change": -3.582548294597042,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 1.277225e-05,
+      "volume_24h": 721578097.6351233,
+      "change_24h": -3.582548294597042,
+      "price_formatted": "0.00001277",
+      "volume_formatted": "$721,578,098",
+      "change_formatted": "-3.58%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "DOGE/USDT",
+      "base": "DOGE",
+      "quote": "USDT",
+      "price": 0.21758750000000002,
+      "volume": 700630938.14732,
+      "change": -2.2836011292712497,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.21758750000000002,
+      "volume_24h": 700630938.14732,
+      "change_24h": -2.2836011292712497,
+      "price_formatted": "0.2175875",
+      "volume_formatted": "$700,630,938",
+      "change_formatted": "-2.28%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "BTC/USDC",
+      "base": "BTC",
+      "quote": "USDC",
+      "price": 103049.8125,
+      "volume": 673972534.5780357,
+      "change": -0.7840471332959155,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 103049.8125,
+      "volume_24h": 673972534.5780357,
+      "change_24h": -0.7840471332959155,
+      "price_formatted": "103049.81",
+      "volume_formatted": "$673,972,535",
+      "change_formatted": "-0.78%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "XRP/USDT",
+      "base": "XRP",
+      "quote": "USDT",
+      "price": 2.32264,
+      "volume": 603411188.9886463,
+      "change": -2.8158859869412356,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 2.32264,
+      "volume_24h": 603411188.9886463,
+      "change_24h": -2.8158859869412356,
+      "price_formatted": "2.32",
+      "volume_formatted": "$603,411,189",
+      "change_formatted": "-2.82%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "SUI/USDT",
+      "base": "SUI",
+      "quote": "USDT",
+      "price": 3.6665,
+      "volume": 436416480.8198173,
+      "change": -4.387740772118242,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 3.6665,
+      "volume_24h": 436416480.8198173,
+      "change_24h": -4.387740772118242,
+      "price_formatted": "3.67",
+      "volume_formatted": "$436,416,481",
+      "change_formatted": "-4.39%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "FDUSD/USDT",
+      "base": "FDUSD",
+      "quote": "USDT",
+      "price": 0.9982,
+      "volume": 339024399.5462,
+      "change": -0.03,
+      "exchanges": [
+        "binance"
+      ],
+      "exchange_count": 1,
+      "last_price": 0.9982,
+      "volume_24h": 339024399.5462,
+      "change_24h": -0.03,
+      "price_formatted": "0.9982",
+      "volume_formatted": "$339,024,400",
+      "change_formatted": "-0.03%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "TRUMP/USDT",
+      "base": "TRUMP",
+      "quote": "USDT",
+      "price": 12.565999999999999,
+      "volume": 266418732.38551313,
+      "change": -2.5551520558572536,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 12.565999999999999,
+      "volume_24h": 266418732.38551313,
+      "change_24h": -2.5551520558572536,
+      "price_formatted": "12.57",
+      "volume_formatted": "$266,418,732",
+      "change_formatted": "-2.56%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "NEIRO/USDT",
+      "base": "NEIRO",
+      "quote": "USDT",
+      "price": 0.0401836425,
+      "volume": 244207257.4220207,
+      "change": -3.4548191086250455,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.0401836425,
+      "volume_24h": 244207257.4220207,
+      "change_24h": -3.4548191086250455,
+      "price_formatted": "0.04018364",
+      "volume_formatted": "$244,207,257",
+      "change_formatted": "-3.45%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "TRX/USDT",
+      "base": "TRX",
+      "quote": "USDT",
+      "price": 0.26376999999999995,
+      "volume": 200816327.20252103,
+      "change": -3.2298017722169226,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.26376999999999995,
+      "volume_24h": 200816327.20252103,
+      "change_24h": -3.2298017722169226,
+      "price_formatted": "0.26377",
+      "volume_formatted": "$200,816,327",
+      "change_formatted": "-3.23%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "SOL/USDC",
+      "base": "SOL",
+      "quote": "USDC",
+      "price": 162.435,
+      "volume": 199911172.3737737,
+      "change": -4.950979968417359,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 162.435,
+      "volume_24h": 199911172.3737737,
+      "change_24h": -4.950979968417359,
+      "price_formatted": "162.44",
+      "volume_formatted": "$199,911,172",
+      "change_formatted": "-4.95%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ADA/USDT",
+      "base": "ADA",
+      "quote": "USDT",
+      "price": 0.7287,
+      "volume": 189666839.0090921,
+      "change": -3.719236857746665,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.7287,
+      "volume_24h": 189666839.0090921,
+      "change_24h": -3.719236857746665,
+      "price_formatted": "0.7287",
+      "volume_formatted": "$189,666,839",
+      "change_formatted": "-3.72%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "BNB/USDT",
+      "base": "BNB",
+      "quote": "USDT",
+      "price": 640.328,
+      "volume": 167584338.0621875,
+      "change": -0.7940754220226112,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 640.328,
+      "volume_24h": 167584338.0621875,
+      "change_24h": -0.7940754220226112,
+      "price_formatted": "640.33",
+      "volume_formatted": "$167,584,338",
+      "change_formatted": "-0.79%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "SUI/USDC",
+      "base": "SUI",
+      "quote": "USDC",
+      "price": 3.6712,
+      "volume": 165919849.9412829,
+      "change": -4.360221110995282,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 3.6712,
+      "volume_24h": 165919849.9412829,
+      "change_24h": -4.360221110995282,
+      "price_formatted": "3.67",
+      "volume_formatted": "$165,919,850",
+      "change_formatted": "-4.36%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "WIF/USDT",
+      "base": "WIF",
+      "quote": "USDT",
+      "price": 0.9452,
+      "volume": 162153192.22402692,
+      "change": -7.739460279918072,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.9452,
+      "volume_24h": 162153192.22402692,
+      "change_24h": -7.739460279918072,
+      "price_formatted": "0.9452",
+      "volume_formatted": "$162,153,192",
+      "change_formatted": "-7.74%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "MOODENG/USDT",
+      "base": "MOODENG",
+      "quote": "USDT",
+      "price": 0.24111,
+      "volume": 155864806.86200798,
+      "change": -7.812611338353912,
+      "exchanges": [
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 2,
+      "last_price": 0.24111,
+      "volume_24h": 155864806.86200798,
+      "change_24h": -7.812611338353912,
+      "price_formatted": "0.24111",
+      "volume_formatted": "$155,864,807",
+      "change_formatted": "-7.81%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "NXPC/USDT",
+      "base": "NXPC",
+      "quote": "USDT",
+      "price": 1.953135,
+      "volume": 128538091.860289,
+      "change": -14.023,
+      "exchanges": [
+        "binance",
+        "kucoin"
+      ],
+      "exchange_count": 2,
+      "last_price": 1.953135,
+      "volume_24h": 128538091.860289,
+      "change_24h": -14.023,
+      "price_formatted": "1.95",
+      "volume_formatted": "$128,538,092",
+      "change_formatted": "-14.02%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ENA/USDT",
+      "base": "ENA",
+      "quote": "USDT",
+      "price": 0.35235,
+      "volume": 126306256.60561,
+      "change": -6.2865,
+      "exchanges": [
+        "binance",
+        "kucoin"
+      ],
+      "exchange_count": 2,
+      "last_price": 0.35235,
+      "volume_24h": 126306256.60561,
+      "change_24h": -6.2865,
+      "price_formatted": "0.35235",
+      "volume_formatted": "$126,306,257",
+      "change_formatted": "-6.29%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "PNUT/USDT",
+      "base": "PNUT",
+      "quote": "USDT",
+      "price": 0.31589999999999996,
+      "volume": 124776689.604691,
+      "change": -8.039408998252766,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.31589999999999996,
+      "volume_24h": 124776689.604691,
+      "change_24h": -8.039408998252766,
+      "price_formatted": "0.3159",
+      "volume_formatted": "$124,776,690",
+      "change_formatted": "-8.04%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "PEOPLE/USDT",
+      "base": "PEOPLE",
+      "quote": "USDT",
+      "price": 0.023425,
+      "volume": 119234151.56013796,
+      "change": -5.48608562197092,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.023425,
+      "volume_24h": 119234151.56013796,
+      "change_24h": -5.48608562197092,
+      "price_formatted": "0.023425",
+      "volume_formatted": "$119,234,152",
+      "change_formatted": "-5.49%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "XRP/USDC",
+      "base": "XRP",
+      "quote": "USDC",
+      "price": 2.32442,
+      "volume": 116465757.94764704,
+      "change": -2.7725868200836823,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 2.32442,
+      "volume_24h": 116465757.94764704,
+      "change_24h": -2.7725868200836823,
+      "price_formatted": "2.32",
+      "volume_formatted": "$116,465,758",
+      "change_formatted": "-2.77%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "FDUSD/USDC",
+      "base": "FDUSD",
+      "quote": "USDC",
+      "price": 0.9985,
+      "volume": 107246686.8135,
+      "change": -0.03,
+      "exchanges": [
+        "binance"
+      ],
+      "exchange_count": 1,
+      "last_price": 0.9985,
+      "volume_24h": 107246686.8135,
+      "change_24h": -0.03,
+      "price_formatted": "0.9985",
+      "volume_formatted": "$107,246,687",
+      "change_formatted": "-0.03%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "LTC/USDT",
+      "base": "LTC",
+      "quote": "USDT",
+      "price": 95.8295,
+      "volume": 106510700.29718786,
+      "change": -2.446757683696316,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 95.8295,
+      "volume_24h": 106510700.29718786,
+      "change_24h": -2.446757683696316,
+      "price_formatted": "95.83",
+      "volume_formatted": "$106,510,700",
+      "change_formatted": "-2.45%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "VIRTUAL/USDT",
+      "base": "VIRTUAL",
+      "quote": "USDT",
+      "price": 1.83235,
+      "volume": 104147169.59707516,
+      "change": 0.1785,
+      "exchanges": [
+        "binance",
+        "kucoin"
+      ],
+      "exchange_count": 2,
+      "last_price": 1.83235,
+      "volume_24h": 104147169.59707516,
+      "change_24h": 0.1785,
+      "price_formatted": "1.83",
+      "volume_formatted": "$104,147,170",
+      "change_formatted": "0.18%",
+      "change_color": "green"
+    },
+    {
+      "symbol": "AVAX/USDT",
+      "base": "AVAX",
+      "quote": "USDT",
+      "price": 21.704250000000002,
+      "volume": 100570165.2614419,
+      "change": -5.586621248368855,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 21.704250000000002,
+      "volume_24h": 100570165.2614419,
+      "change_24h": -5.586621248368855,
+      "price_formatted": "21.70",
+      "volume_formatted": "$100,570,165",
+      "change_formatted": "-5.59%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "PEPE/USDC",
+      "base": "PEPE",
+      "quote": "USDC",
+      "price": 1.27695e-05,
+      "volume": 96706179.88849327,
+      "change": -3.644770463975858,
+      "exchanges": [
+        "binance",
+        "okx"
+      ],
+      "exchange_count": 2,
+      "last_price": 1.27695e-05,
+      "volume_24h": 96706179.88849327,
+      "change_24h": -3.644770463975858,
+      "price_formatted": "0.00001277",
+      "volume_formatted": "$96,706,180",
+      "change_formatted": "-3.64%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "LINK/USDT",
+      "base": "LINK",
+      "quote": "USDT",
+      "price": 15.20995,
+      "volume": 96303497.5557179,
+      "change": -2.867167517875383,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 15.20995,
+      "volume_24h": 96303497.5557179,
+      "change_24h": -2.867167517875383,
+      "price_formatted": "15.21",
+      "volume_formatted": "$96,303,498",
+      "change_formatted": "-2.87%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "AAVE/USDT",
+      "base": "AAVE",
+      "quote": "USDT",
+      "price": 220.1165,
+      "volume": 84282676.92797492,
+      "change": -2.380597604259095,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 220.1165,
+      "volume_24h": 84282676.92797492,
+      "change_24h": -2.380597604259095,
+      "price_formatted": "220.12",
+      "volume_formatted": "$84,282,677",
+      "change_formatted": "-2.38%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "PI/USDT",
+      "base": "PI",
+      "quote": "USDT",
+      "price": 0.7172,
+      "volume": 81862601.7840781,
+      "change": -2.884224779959377,
+      "exchanges": [
+        "okx"
+      ],
+      "exchange_count": 1,
+      "last_price": 0.7172,
+      "volume_24h": 81862601.7840781,
+      "change_24h": -2.884224779959377,
+      "price_formatted": "0.7172",
+      "volume_formatted": "$81,862,602",
+      "change_formatted": "-2.88%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ETHFI/USDT",
+      "base": "ETHFI",
+      "quote": "USDT",
+      "price": 1.2582499999999999,
+      "volume": 75895959.4596428,
+      "change": -3.81911127874112,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 1.2582499999999999,
+      "volume_24h": 75895959.4596428,
+      "change_24h": -3.81911127874112,
+      "price_formatted": "1.26",
+      "volume_formatted": "$75,895,959",
+      "change_formatted": "-3.82%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "UNI/USDT",
+      "base": "UNI",
+      "quote": "USDT",
+      "price": 5.7512,
+      "volume": 73786695.6506537,
+      "change": -2.5805899864682003,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 5.7512,
+      "volume_24h": 73786695.6506537,
+      "change_24h": -2.5805899864682003,
+      "price_formatted": "5.75",
+      "volume_formatted": "$73,786,696",
+      "change_formatted": "-2.58%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ORDI/USDT",
+      "base": "ORDI",
+      "quote": "USDT",
+      "price": 9.31775,
+      "volume": 70252670.25916499,
+      "change": -6.6830772581614255,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 9.31775,
+      "volume_24h": 70252670.25916499,
+      "change_24h": -6.6830772581614255,
+      "price_formatted": "9.32",
+      "volume_formatted": "$70,252,670",
+      "change_formatted": "-6.68%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "DOGE/USDC",
+      "base": "DOGE",
+      "quote": "USDC",
+      "price": 0.21764250000000002,
+      "volume": 67477911.29576504,
+      "change": -2.2754337545450465,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.21764250000000002,
+      "volume_24h": 67477911.29576504,
+      "change_24h": -2.2754337545450465,
+      "price_formatted": "0.2176425",
+      "volume_formatted": "$67,477,911",
+      "change_formatted": "-2.28%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "KAITO/USDT",
+      "base": "KAITO",
+      "quote": "USDT",
+      "price": 1.853815,
+      "volume": 65216077.9257327,
+      "change": 6.516067275652074,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 1.853815,
+      "volume_24h": 65216077.9257327,
+      "change_24h": 6.516067275652074,
+      "price_formatted": "1.85",
+      "volume_formatted": "$65,216,078",
+      "change_formatted": "6.52%",
+      "change_color": "green"
+    },
+    {
+      "symbol": "NEAR/USDT",
+      "base": "NEAR",
+      "quote": "USDT",
+      "price": 2.68865,
+      "volume": 64223115.03271687,
+      "change": -2.5951330134009414,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 2.68865,
+      "volume_24h": 64223115.03271687,
+      "change_24h": -2.5951330134009414,
+      "price_formatted": "2.69",
+      "volume_formatted": "$64,223,115",
+      "change_formatted": "-2.60%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ETH/USD",
+      "base": "ETH",
+      "quote": "USD",
+      "price": 2418.24,
+      "volume": 62252557.15134771,
+      "change": -3.411419327781439,
+      "exchanges": [
+        "okx"
+      ],
+      "exchange_count": 1,
+      "last_price": 2418.24,
+      "volume_24h": 62252557.15134771,
+      "change_24h": -3.411419327781439,
+      "price_formatted": "2418.24",
+      "volume_formatted": "$62,252,557",
+      "change_formatted": "-3.41%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "TAO/USDT",
+      "base": "TAO",
+      "quote": "USDT",
+      "price": 392.565,
+      "volume": 60689067.517377,
+      "change": -6.579,
+      "exchanges": [
+        "binance",
+        "kucoin"
+      ],
+      "exchange_count": 2,
+      "last_price": 392.565,
+      "volume_24h": 60689067.517377,
+      "change_24h": -6.579,
+      "price_formatted": "392.56",
+      "volume_formatted": "$60,689,068",
+      "change_formatted": "-6.58%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "BONK/USDT",
+      "base": "BONK",
+      "quote": "USDT",
+      "price": 1.901625e-05,
+      "volume": 56723805.890454814,
+      "change": -4.735527090945492,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 1.901625e-05,
+      "volume_24h": 56723805.890454814,
+      "change_24h": -4.735527090945492,
+      "price_formatted": "0.00001902",
+      "volume_formatted": "$56,723,806",
+      "change_formatted": "-4.74%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ALPACA/USDT",
+      "base": "ALPACA",
+      "quote": "USDT",
+      "price": 0.2244,
+      "volume": 56711152.23062,
+      "change": -55.183,
+      "exchanges": [
+        "binance"
+      ],
+      "exchange_count": 1,
+      "last_price": 0.2244,
+      "volume_24h": 56711152.23062,
+      "change_24h": -55.183,
+      "price_formatted": "0.2244",
+      "volume_formatted": "$56,711,152",
+      "change_formatted": "-55.18%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "WLD/USDT",
+      "base": "WLD",
+      "quote": "USDT",
+      "price": 1.0869749999999998,
+      "volume": 56368502.234841295,
+      "change": -3.970940812720848,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 1.0869749999999998,
+      "volume_24h": 56368502.234841295,
+      "change_24h": -3.970940812720848,
+      "price_formatted": "1.09",
+      "volume_formatted": "$56,368,502",
+      "change_formatted": "-3.97%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "SHIB/USDT",
+      "base": "SHIB",
+      "quote": "USDT",
+      "price": 1.4109e-05,
+      "volume": 56367719.13026752,
+      "change": -4.184530399212438,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 1.4109e-05,
+      "volume_24h": 56367719.13026752,
+      "change_24h": -4.184530399212438,
+      "price_formatted": "0.00001411",
+      "volume_formatted": "$56,367,719",
+      "change_formatted": "-4.18%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "INIT/USDT",
+      "base": "INIT",
+      "quote": "USDT",
+      "price": 0.82975,
+      "volume": 55124293.940383,
+      "change": -12.596,
+      "exchanges": [
+        "binance",
+        "kucoin"
+      ],
+      "exchange_count": 2,
+      "last_price": 0.82975,
+      "volume_24h": 55124293.940383,
+      "change_24h": -12.596,
+      "price_formatted": "0.82975",
+      "volume_formatted": "$55,124,294",
+      "change_formatted": "-12.60%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ONDO/USDT",
+      "base": "ONDO",
+      "quote": "USDT",
+      "price": 0.89664,
+      "volume": 53031782.880177684,
+      "change": -3.9148574949105326,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.89664,
+      "volume_24h": 53031782.880177684,
+      "change_24h": -3.9148574949105326,
+      "price_formatted": "0.89664",
+      "volume_formatted": "$53,031,783",
+      "change_formatted": "-3.91%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "EIGEN/USDT",
+      "base": "EIGEN",
+      "quote": "USDT",
+      "price": 1.3203,
+      "volume": 52223278.8156008,
+      "change": -0.5636201973783336,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 1.3203,
+      "volume_24h": 52223278.8156008,
+      "change_24h": -0.5636201973783336,
+      "price_formatted": "1.32",
+      "volume_formatted": "$52,223,279",
+      "change_formatted": "-0.56%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "RUNE/USDT",
+      "base": "RUNE",
+      "quote": "USDT",
+      "price": 1.74335,
+      "volume": 47448263.75678882,
+      "change": -4.676,
+      "exchanges": [
+        "binance",
+        "kucoin"
+      ],
+      "exchange_count": 2,
+      "last_price": 1.74335,
+      "volume_24h": 47448263.75678882,
+      "change_24h": -4.676,
+      "price_formatted": "1.74",
+      "volume_formatted": "$47,448,264",
+      "change_formatted": "-4.68%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "ARB/USDT",
+      "base": "ARB",
+      "quote": "USDT",
+      "price": 0.372875,
+      "volume": 47199753.53261783,
+      "change": -3.8765123679464057,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.372875,
+      "volume_24h": 47199753.53261783,
+      "change_24h": -3.8765123679464057,
+      "price_formatted": "0.372875",
+      "volume_formatted": "$47,199,754",
+      "change_formatted": "-3.88%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "HBAR/USDT",
+      "base": "HBAR",
+      "quote": "USDT",
+      "price": 0.187815,
+      "volume": 47150188.47175731,
+      "change": -3.1716074853077636,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.187815,
+      "volume_24h": 47150188.47175731,
+      "change_24h": -3.1716074853077636,
+      "price_formatted": "0.187815",
+      "volume_formatted": "$47,150,188",
+      "change_formatted": "-3.17%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "TON/USDT",
+      "base": "TON",
+      "quote": "USDT",
+      "price": 2.99205,
+      "volume": 46511238.082831874,
+      "change": -3.2877881630012937,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 2.99205,
+      "volume_24h": 46511238.082831874,
+      "change_24h": -3.2877881630012937,
+      "price_formatted": "2.99",
+      "volume_formatted": "$46,511,238",
+      "change_formatted": "-3.29%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "DOT/USDT",
+      "base": "DOT",
+      "quote": "USDT",
+      "price": 4.52975,
+      "volume": 44335716.35083156,
+      "change": -4.63119340416579,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 4.52975,
+      "volume_24h": 44335716.35083156,
+      "change_24h": -4.63119340416579,
+      "price_formatted": "4.53",
+      "volume_formatted": "$44,335,716",
+      "change_formatted": "-4.63%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "FIL/USDT",
+      "base": "FIL",
+      "quote": "USDT",
+      "price": 2.7737,
+      "volume": 41734361.63109119,
+      "change": -2.941029566130161,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 2.7737,
+      "volume_24h": 41734361.63109119,
+      "change_24h": -2.941029566130161,
+      "price_formatted": "2.77",
+      "volume_formatted": "$41,734,362",
+      "change_formatted": "-2.94%",
+      "change_color": "red"
+    },
+    {
+      "symbol": "PENGU/USDT",
+      "base": "PENGU",
+      "quote": "USDT",
+      "price": 0.01212175,
+      "volume": 39193770.97547159,
+      "change": -4.958833927591881,
+      "exchanges": [
+        "binance",
+        "okx",
+        "kucoin"
+      ],
+      "exchange_count": 3,
+      "last_price": 0.01212175,
+      "volume_24h": 39193770.97547159,
+      "change_24h": -4.958833927591881,
+      "price_formatted": "0.01212175",
+      "volume_formatted": "$39,193,771",
+      "change_formatted": "-4.96%",
+      "change_color": "red"
+    }
+  ],
+  "timestamp": "2025-05-19T14:46:20.174103",
+  "metadata": {
+    "timestamp": "2025-05-19T14:46:20.174660",
+    "source": "TengriPairlistData",
+    "version": "1.0.0",
+    "exchange_count": 4,
+    "exchanges": [
+      "binance",
+      "okx",
+      "coinbase",
+      "kucoin"
+    ],
+    "quote_currencies": [
+      "USDT",
+      "USD",
+      "BUSD",
+      "USDC"
+    ],
+    "min_volume": 100000
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/master.swiftdeps"
+  },
+  "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/Sources/WolframSwift/WolframBridge.swift": {
+    "dependencies": "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.d",
+    "object": "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.swift.o",
+    "swiftmodule": "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge~partial.swiftmodule",
+    "swift-dependencies": "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.swiftdeps",
+    "diagnostics": "/Volumes/Tengritek/Ashina/HyperPhysics/tools/wolfram-mcp/native/swift/.build/x86_64-apple-macosx/debug/WolframSwift.build/WolframBridge.dia"
+  }
+}

@@ -1,0 +1,102 @@
+[package]
+name = "hyperphysics-cognition"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperPhysics Team"]
+license = "MIT OR Apache-2.0"
+description = "Bio-Digital Isomorphic Cognition System with hyperbolic attention, self-referential loops, and dream state consolidation"
+repository = "https://github.com/hyperphysics/hyperphysics"
+keywords = ["cognition", "hyperbolic", "attention", "consciousness", "neuroscience"]
+categories = ["algorithms", "science", "mathematics"]
+readme = "README.md"
+
+[features]
+default = ["full"]
+full = ["attention", "loops", "dream", "learning", "integration", "cortical-bus"]
+attention = ["dep:hyperphysics-geometry"]
+loops = ["dep:hyperphysics-cortical-bus"]
+dream = ["dep:hyperphysics-pbit"]
+learning = []
+integration = ["dep:hyperphysics-cortical-bus"]
+cortical-bus = ["dep:hyperphysics-cortical-bus"]
+
+[dependencies]
+# HyperPhysics Ecosystem
+hyperphysics-geometry = { path = "../hyperphysics-geometry", optional = true }
+hyperphysics-lorentz = { path = "../hyperphysics-lorentz" }
+hyperphysics-cortical-bus = { path = "../hyperphysics-cortical-bus", optional = true }
+hyperphysics-pbit = { path = "../hyperphysics-pbit", optional = true }
+hyperphysics-consciousness = { path = "../hyperphysics-consciousness" }
+hyperphysics-agency = { path = "../hyperphysics-agency" }
+tengri-holographic-cortex = { path = "../tengri-holographic-cortex" }
+
+# Core
+thiserror = "1.0"
+tracing = "0.1"
+parking_lot = "0.12"
+crossbeam = "0.8"
+dashmap = "6.1"
+
+# Math
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
+ndarray = "0.15"
+num-traits = "0.2"
+statrs = "0.16"
+
+# Concurrency
+rayon = "1.7"
+async-trait = "0.1"
+tokio = { version = "1.0", features = ["sync", "time"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Random
+rand = "0.8"
+rand_chacha = "0.3"
+rand_distr = "0.4"
+
+# Time
+chrono = "0.4"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+approx = "0.5"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "test-util"] }
+proptest = "1.4"
+
+# Examples and benchmarks can be added later
+# [[bench]]
+# name = "attention"
+# harness = false
+
+# [[example]]
+# name = "hyperbolic_attention"
+# required-features = ["attention"]
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+panic = "abort"
+strip = true
+
+[profile.bench]
+lto = "thin"
+opt-level = 3
+
+# Ultra-optimized profile for production
+[profile.production]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+panic = "abort"
+debug = false
+strip = true
+overflow-checks = false
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

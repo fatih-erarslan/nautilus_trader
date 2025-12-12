@@ -2147,6 +2147,13 @@ uint64_t orderbook_deltas_ts_event(const struct OrderBookDeltas_API *deltas);
 
 uint64_t orderbook_deltas_ts_init(const struct OrderBookDeltas_API *deltas);
 
+/**
+ * Drops a `CVec` of `OrderBookDelta` values.
+ *
+ * # Panics
+ *
+ * Panics if `CVec` invariants are violated (corrupted metadata).
+ */
 void orderbook_deltas_vec_drop(CVec v);
 
 /**
@@ -3000,8 +3007,7 @@ uint64_t synthetic_instrument_ts_init(const struct SyntheticInstrument_API *synt
  *
  * Assumes `formula_ptr` is a valid C string pointer.
  */
-uint8_t synthetic_instrument_is_valid_formula(const struct SyntheticInstrument_API *synth,
-                                              const char *formula_ptr);
+uint8_t synthetic_instrument_is_valid_formula(const char *formula_ptr, const char *components_ptr);
 
 /**
  * # Safety
@@ -3167,8 +3173,22 @@ double level_size(const struct BookLevel_API *level);
 
 double level_exposure(const struct BookLevel_API *level);
 
+/**
+ * Drops a `CVec` of `BookLevel_API` values.
+ *
+ * # Panics
+ *
+ * Panics if `CVec` invariants are violated (corrupted metadata).
+ */
 void vec_drop_book_levels(CVec v);
 
+/**
+ * Drops a `CVec` of `BookOrder` values.
+ *
+ * # Panics
+ *
+ * Panics if `CVec` invariants are violated (corrupted metadata).
+ */
 void vec_drop_book_orders(CVec v);
 
 /**

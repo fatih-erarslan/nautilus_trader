@@ -122,6 +122,14 @@ pub mod pbit;
 #[cfg(feature = "mcp")]
 pub mod dilithium_mcp;
 
+/// Cybernetic Agency (Free Energy Principle, IIT Phi, Active Inference)
+#[cfg(feature = "agency")]
+pub mod agency;
+
+/// Bio-Digital Isomorphic Cognition (Hyperbolic Attention, Self-Referential Loops, Dream States, Bateson Learning)
+#[cfg(feature = "cognition")]
+pub mod cognition;
+
 // ============================================================================
 // Re-exports: Core
 // ============================================================================
@@ -273,6 +281,41 @@ pub mod prelude {
     #[cfg(feature = "mcp")]
     pub use crate::dilithium_mcp::{
         DilithiumClient, McpConfig, DilithiumKeyPair,
+    };
+
+    // Agency
+    #[cfg(feature = "agency")]
+    pub use crate::agency::{
+        CyberneticAgent, AgentConfig, AgentState, AgencyObservation, AgencyAction,
+        FreeEnergyEngine, SurvivalDrive, HomeostaticController,
+        ActiveInferenceEngine, PolicySelector, PhiCalculatorTrait,
+        // Negentropy framework (Pedagogic Scaffolding)
+        NegentropyEngine, NegentropyConfig, BatesonLevel, ScaffoldMode,
+        CognitiveRegulator, PedagogicScaffold,
+        // Brain-inspired modules
+        PrefrontalCortex, AnteriorCingulate, Insula, BasalGanglia, Hippocampus, Episode,
+    };
+
+    // Cognition
+    #[cfg(feature = "cognition")]
+    pub use crate::cognition::{
+        // Core system
+        CognitionSystem, CognitionConfig,
+        // Attention
+        AttentionState, HyperbolicAttention, CurvatureModulator, LocusCoeruleusGain,
+        // Loop coordinator
+        SelfReferentialLoop, LoopState, LoopConfig, LoopMessage,
+        PerceptionInput, CognitionOutput, NeocortexState, AgencyIntent, ConsciousnessIntegration,
+        // Dream state
+        DreamState, DreamConfig, DreamConsolidator,
+        ReplayBuffer, EpisodicMemory, ConsolidationMetrics,
+        // Learning
+        LearningLevel, BatesonLearner, LearningContext,
+        ProtoLearning, Learning, DeuteroLearning, LearningIII,
+        // Integration
+        CorticalBusIntegration, MessageRouter, RouteConfig,
+        // Types
+        CognitionPhase, ArousalLevel, CognitiveLoad, AttentionBandwidth,
     };
 }
 

@@ -99,7 +99,7 @@ impl NautilusKernel {
     pub const fn builder(
         name: String,
         trader_id: TraderId,
-        environment: nautilus_common::enums::Environment,
+        environment: Environment,
     ) -> NautilusKernelBuilder {
         NautilusKernelBuilder::new(name, trader_id, environment)
     }
@@ -237,7 +237,35 @@ impl NautilusKernel {
             move |event: &OrderEventAny| {
                 if let Some(engine_rc) = exec_engine_weak_clone.upgrade() {
                     engine_rc.borrow_mut().process(event);
+                } else {
+                    log::error!(
+                        "ExecEngine dropped, cannot process order event: {:?}",
+                        event.client_order_id()
+                    );
                 }
+            },
+        )));
+        msgbus::register(endpoint, handler);
+
+        // TODO: Implement actual reconciliation logic in ExecEngine
+        let endpoint = MessagingSwitchboard::exec_engine_reconcile_execution_report();
+        let handler = ShareableMessageHandler(Rc::new(TypedMessageHandler::with_any(
+            move |report: &dyn Any| {
+                log::debug!(
+                    "Received execution report for reconciliation: {:?}",
+                    report.type_id()
+                );
+            },
+        )));
+        msgbus::register(endpoint, handler);
+
+        let endpoint = MessagingSwitchboard::exec_engine_reconcile_execution_mass_status();
+        let handler = ShareableMessageHandler(Rc::new(TypedMessageHandler::with_any(
+            move |report: &dyn Any| {
+                log::debug!(
+                    "Received execution mass status for reconciliation: {:?}",
+                    report.type_id()
+                );
             },
         )));
         msgbus::register(endpoint, handler);
@@ -282,14 +310,14 @@ impl NautilusKernel {
         instance_id: UUID4,
         config: LoggerConfig,
     ) -> anyhow::Result<LogGuard> {
-        init_tracing()?;
-
         let log_guard = init_logging(
             trader_id,
             instance_id,
             config,
             FileWriterConfig::default(), // TODO: Properly incorporate file writer config
         )?;
+
+        init_tracing()?;
 
         Ok(log_guard)
     }
@@ -474,6 +502,14 @@ impl NautilusKernel {
         // Stop the trader (it will stop all registered components)
         if let Err(e) = self.trader.stop() {
             log::error!("Error stopping trader: {e:?}");
+        }
+
+        // Wait for residual events to be processed (e.g., cancel orders on stop)
+        #[cfg(feature = "live")]
+        {
+            let delay = self.config.delay_post_stop();
+            log::info!("Awaiting residual events ({delay:?})...");
+            std::thread::sleep(delay);
         }
 
         // Stop all adapter clients

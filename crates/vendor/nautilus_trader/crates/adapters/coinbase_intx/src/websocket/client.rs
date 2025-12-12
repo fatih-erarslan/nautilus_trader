@@ -34,8 +34,10 @@ use nautilus_model::{
     identifiers::InstrumentId,
     instruments::{Instrument, InstrumentAny},
 };
-use nautilus_network::websocket::{MessageReader, WebSocketClient, WebSocketConfig};
-use reqwest::header::USER_AGENT;
+use nautilus_network::{
+    http::USER_AGENT,
+    websocket::{MessageReader, WebSocketClient, WebSocketConfig},
+};
 use tokio_tungstenite::tungstenite::{Error, Message};
 use ustr::Ustr;
 
@@ -149,11 +151,7 @@ impl CoinbaseIntxWebSocketClient {
         self.inner
             .try_read()
             .ok()
-            .and_then(|guard| {
-                guard
-                    .as_ref()
-                    .map(nautilus_network::websocket::WebSocketClient::is_active)
-            })
+            .and_then(|guard| guard.as_ref().map(WebSocketClient::is_active))
             .unwrap_or(false)
     }
 
@@ -163,11 +161,7 @@ impl CoinbaseIntxWebSocketClient {
         self.inner
             .try_read()
             .ok()
-            .and_then(|guard| {
-                guard
-                    .as_ref()
-                    .map(nautilus_network::websocket::WebSocketClient::is_closed)
-            })
+            .and_then(|guard| guard.as_ref().map(WebSocketClient::is_closed))
             .unwrap_or(true)
     }
 

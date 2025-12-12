@@ -1,0 +1,106 @@
+[package]
+name = "qbmia-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["QBMIA Porter Agent <qbmia@swarm.ai>"]
+description = "Quantum-Biological Market Intuition Agent core algorithms in Rust"
+license = "MIT"
+repository = "https://github.com/qbmia/qbmia-core"
+keywords = ["quantum", "trading", "ai", "nash-equilibrium", "market-analysis"]
+categories = ["algorithms", "mathematics", "simulation"]
+
+[dependencies]
+# Core numerical computing - UPGRADED workspace versions
+ndarray.workspace = true
+nalgebra.workspace = true
+num-complex.workspace = true
+num-traits.workspace = true
+rand.workspace = true
+rand_distr.workspace = true
+
+# SIMD acceleration - UPGRADED workspace versions
+simba = { workspace = true, optional = true }
+wide = { workspace = true, optional = true }
+
+# Async and concurrency - UPGRADED workspace versions
+tokio.workspace = true
+futures.workspace = true
+rayon = { workspace = true, optional = true }
+
+# Serialization - workspace versions
+serde.workspace = true
+serde_json.workspace = true
+bincode = "1.3"
+
+# Logging and metrics - workspace versions
+log.workspace = true
+env_logger = "0.10"
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Error handling - workspace versions
+thiserror.workspace = true
+anyhow.workspace = true
+
+# Math and algorithms - UPGRADED workspace versions
+approx.workspace = true
+statrs.workspace = true
+
+# Memory management - UPGRADED workspace versions
+memmap2.workspace = true
+parking_lot.workspace = true
+
+# Testing utilities
+proptest = { version = "1.0", optional = true }
+quickcheck = { version = "1.0", optional = true }
+
+# Time handling - workspace version
+chrono.workspace = true
+
+# UUID generation - workspace version
+uuid.workspace = true
+
+# Additional caching - UPGRADED workspace version
+moka.workspace = true
+
+# Additional required dependencies
+num_cpus.workspace = true
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+num_cpus = "1.0"
+tempfile = "3.0"
+futures = "0.3"
+chrono = { version = "0.4", features = ["serde"] }
+proptest = "1.0"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+rstest = "0.18"
+tokio-test = "0.4"
+
+[features]
+default = ["simd", "parallel"]
+simd = ["wide", "simba"]
+parallel = ["rayon"]
+property-testing = ["proptest", "quickcheck"]
+
+[[bench]]
+name = "quantum_nash_benchmark"
+harness = false
+
+[[bench]]
+name = "machiavellian_benchmark"
+harness = false
+
+[[bench]]
+name = "memory_benchmark"
+harness = false
+
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
+opt-level = 3
+
+[profile.bench]
+debug = true

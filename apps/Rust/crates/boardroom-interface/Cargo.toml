@@ -1,0 +1,44 @@
+[package]
+name = "boardroom-interface"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.41", features = ["full"] }
+async-trait = "0.1"
+
+# Messaging protocols
+redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
+zeromq = "0.4"
+futures = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Utilities
+uuid = { version = "1.11", features = ["v4", "serde"] }
+dashmap = "6.1"
+parking_lot = "0.12"
+crossbeam = "0.8"
+
+# Time utilities
+chrono = { version = "0.4", features = ["serde"] }
+
+# Configuration
+config = "0.14"
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.6"
+tokio-test = "0.4"

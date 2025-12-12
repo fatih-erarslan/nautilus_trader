@@ -1,4 +1,4 @@
-# Claude Code Configuration - SPARC Development Environment
+# Claude Code Configuration - HyperPhysics Development Environment
 
 ## 🚨 CRITICAL: CONCURRENT EXECUTION & FILE MANAGEMENT
 
@@ -6,7 +6,7 @@
 1. ALL operations MUST be concurrent/parallel in a single message
 2. **NEVER save working files, text/mds and tests to the root folder**
 3. ALWAYS organize files in appropriate subdirectories
-4. **USE CLAUDE CODE'S TASK TOOL** for spawning agents concurrently, not just MCP
+4. **USE CLAUDE CODE'S TASK TOOL** for spawning agents concurrently
 
 ### ⚡ GOLDEN RULE: "1 MESSAGE = ALL RELATED OPERATIONS"
 
@@ -30,51 +30,116 @@
   Task("Architect agent", "Design system architecture...", "system-architect")
 ```
 
-**MCP tools are ONLY for coordination setup:**
-- `mcp__claude-flow__swarm_init` - Initialize coordination topology
-- `mcp__claude-flow__agent_spawn` - Define agent types for coordination
-- `mcp__claude-flow__task_orchestrate` - Orchestrate high-level workflows
-
 ### 📁 File Organization Rules
 
 **NEVER save to root folder. Use these directories:**
 - `/src` - Source code files
+- `/crates` - Rust crate modules
 - `/tests` - Test files
 - `/docs` - Documentation and markdown files
 - `/config` - Configuration files
 - `/scripts` - Utility scripts
 - `/examples` - Example code
+- `/benches` - Benchmark code
 
 ## Project Overview
 
-This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology with Claude-Flow orchestration for systematic Test-Driven Development.
+HyperPhysics is an advanced scientific computing framework built in Rust, implementing hyperbolic geometry, neural networks, consciousness modeling, and complex adaptive systems. The project leverages Wolfram Research for mathematical validation, formal verification, and Computer Algebra System (CAS) thinking.
 
-## SPARC Commands
+## 🔬 Wolfram Research Integration
 
-### Core Commands
-- `npx claude-flow sparc modes` - List available modes
-- `npx claude-flow sparc run <mode> "<task>"` - Execute specific mode
-- `npx claude-flow sparc tdd "<feature>"` - Run complete TDD workflow
-- `npx claude-flow sparc info <mode>` - Get mode details
+### WolframScript.app Integration
 
-### Batchtools Commands
-- `npx claude-flow sparc batch <modes> "<task>"` - Parallel execution
-- `npx claude-flow sparc pipeline "<task>"` - Full pipeline processing
-- `npx claude-flow sparc concurrent <mode> "<tasks-file>"` - Multi-task processing
+HyperPhysics integrates with WolframScript.app (Pro subscription) to provide:
 
-### Build Commands
-- `npm run build` - Build project
-- `npm run test` - Run tests
-- `npm run lint` - Linting
-- `npm run typecheck` - Type checking
+**Core Capabilities:**
+- **Scientific Validation**: All mathematical implementations verified through Wolfram's symbolic computation
+- **Empirical Evidence**: Statistical analysis and hypothesis testing via Wolfram's statistics library
+- **Formal Verification**: Theorem proving and mathematical proof validation
+- **Algorithm Design**: CAS-assisted algorithm development and optimization
+- **Numerical Precision**: Arbitrary precision arithmetic for critical calculations
 
-## SPARC Workflow Phases
+**Code Assistant Integration (Opus 4.5):**
+- Research-grounded code generation
+- Mathematical derivation assistance
+- Algorithm correctness verification
+- Performance optimization suggestions
+- Scientific literature integration
 
-1. **Specification** - Requirements analysis (`sparc run spec-pseudocode`)
-2. **Pseudocode** - Algorithm design (`sparc run spec-pseudocode`)
-3. **Architecture** - System design (`sparc run architect`)
-4. **Refinement** - TDD implementation (`sparc tdd`)
-5. **Completion** - Integration (`sparc run integration`)
+### Wolfram Pipeline for Enterprise-Grade Code
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    WOLFRAM-POWERED DEVELOPMENT PIPELINE                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. RESEARCH PHASE                                                          │
+│     ├─ Wolfram searches scientific literature                               │
+│     ├─ Validates mathematical foundations                                   │
+│     └─ Generates formal specifications                                      │
+│                                                                             │
+│  2. DESIGN PHASE                                                            │
+│     ├─ CAS-assisted algorithm design                                        │
+│     ├─ Symbolic computation for edge cases                                  │
+│     └─ Complexity analysis via Wolfram                                      │
+│                                                                             │
+│  3. IMPLEMENTATION PHASE                                                    │
+│     ├─ Wolfram Code Assistant generates scaffolding                         │
+│     ├─ Mathematical functions derived symbolically                          │
+│     └─ Numerical stability verified                                         │
+│                                                                             │
+│  4. VALIDATION PHASE                                                        │
+│     ├─ Formal verification of correctness                                   │
+│     ├─ Property-based testing via Wolfram                                   │
+│     └─ Statistical validation of outputs                                    │
+│                                                                             │
+│  5. OPTIMIZATION PHASE                                                      │
+│     ├─ Performance profiling                                                │
+│     ├─ Algorithmic optimization suggestions                                 │
+│     └─ SIMD/GPU optimization verification                                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Using hyperphysics-wolfram Crate
+
+```rust
+use hyperphysics_wolfram::{
+    WolframBridge, ValidationResult, FormalProof,
+    research, validate, verify, optimize
+};
+
+// Initialize bridge to WolframScript.app
+let bridge = WolframBridge::new()?;
+
+// Research: Query scientific foundations
+let research = bridge.research_topic("hyperbolic neural networks")?;
+
+// Validate: Check mathematical correctness
+let validation = bridge.validate_expression(
+    "HyperbolicDistance[p1, p2] == ArcCosh[1 + 2*|p1-p2|^2/((1-|p1|^2)(1-|p2|^2))]"
+)?;
+
+// Verify: Formal proof of algorithm properties
+let proof = bridge.verify_algorithm(
+    algorithm_code,
+    &["convergence", "numerical_stability"]
+)?;
+
+// Optimize: Get optimization suggestions
+let optimizations = bridge.optimize_performance(code_block)?;
+```
+
+### Wolfram Integration Points
+
+| Component | Wolfram Use Case |
+|-----------|------------------|
+| `hyperphysics-geometry` | Hyperbolic metric verification, tessellation validation |
+| `hyperphysics-consciousness` | IIT Phi computation, formal consciousness metrics |
+| `hyperphysics-neural` | STDP learning rule validation, network topology analysis |
+| `hyperphysics-embodiment` | Free energy principle calculations |
+| `hyperphysics-market` | Statistical arbitrage validation, risk metrics |
+| `hyperphysics-optimization` | Convex optimization verification |
 
 ## Code Style & Best Practices
 
@@ -83,37 +148,39 @@ This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Co
 - **Test-First**: Write tests before implementation
 - **Clean Architecture**: Separate concerns
 - **Documentation**: Keep updated
+- **Wolfram Validation**: All mathematical functions must be Wolfram-verified
 
-## 🚀 Available Agents (54 Total)
+## Build Commands
+
+```bash
+# Build project
+cargo build --release
+
+# Run tests
+cargo test --workspace
+
+# Run benchmarks
+cargo bench -p hyperphysics-geometry
+
+# Check formatting
+cargo fmt --check
+
+# Run lints
+cargo clippy --workspace
+```
+
+## 🚀 Available Agents
 
 ### Core Development
 `coder`, `reviewer`, `tester`, `planner`, `researcher`
 
-### Swarm Coordination
-`hierarchical-coordinator`, `mesh-coordinator`, `adaptive-coordinator`, `collective-intelligence-coordinator`, `swarm-memory-manager`
-
-### Consensus & Distributed
-`byzantine-coordinator`, `raft-manager`, `gossip-coordinator`, `consensus-builder`, `crdt-synchronizer`, `quorum-manager`, `security-manager`
-
-### Performance & Optimization
-`perf-analyzer`, `performance-benchmarker`, `task-orchestrator`, `memory-coordinator`, `smart-agent`
-
-### GitHub & Repository
-`github-modes`, `pr-manager`, `code-review-swarm`, `issue-tracker`, `release-manager`, `workflow-automation`, `project-board-sync`, `repo-architect`, `multi-repo-swarm`
-
-### SPARC Methodology
-`sparc-coord`, `sparc-coder`, `specification`, `pseudocode`, `architecture`, `refinement`
-
 ### Specialized Development
-`backend-dev`, `mobile-dev`, `ml-developer`, `cicd-engineer`, `api-docs`, `system-architect`, `code-analyzer`, `base-template-generator`
+`backend-dev`, `ml-developer`, `system-architect`, `code-analyzer`
 
 ### Testing & Validation
-`tdd-london-swarm`, `production-validator`
+`production-validator`, `wolfram-validator`
 
-### Migration & Planning
-`migration-planner`, `swarm-init`
-
-## 🎯 Claude Code vs MCP Tools
+## 🎯 Claude Code Execution Model
 
 ### Claude Code Handles ALL EXECUTION:
 - **Task tool**: Spawn and run agents concurrently for actual work
@@ -124,223 +191,243 @@ This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Co
 - Project navigation and analysis
 - TodoWrite and task management
 - Git operations
-- Package management
 - Testing and debugging
 
-### MCP Tools ONLY COORDINATE:
-- Swarm initialization (topology setup)
-- Agent type definitions (coordination patterns)
-- Task orchestration (high-level planning)
-- Memory management
-- Neural features
-- Performance tracking
-- GitHub integration
+### Wolfram Handles VALIDATION:
+- Mathematical verification
+- Symbolic computation
+- Formal proofs
+- Statistical analysis
+- Algorithm correctness
+- Performance modeling
 
-**KEY**: MCP coordinates the strategy, Claude Code's Task tool executes with real agents.
+## important-instruction-reminders
 
-## 🚀 Quick Setup
-
-```bash
-# Add MCP servers (Claude Flow required, others optional)
-claude mcp add claude-flow npx claude-flow@alpha mcp start
-claude mcp add ruv-swarm npx ruv-swarm mcp start  # Optional: Enhanced coordination
-claude mcp add flow-nexus npx flow-nexus@latest mcp start  # Optional: Cloud features
-```
-
-## MCP Tool Categories
-
-### Coordination
-`swarm_init`, `agent_spawn`, `task_orchestrate`
-
-### Monitoring
-`swarm_status`, `agent_list`, `agent_metrics`, `task_status`, `task_results`
-
-### Memory & Neural
-`memory_usage`, `neural_status`, `neural_train`, `neural_patterns`
-
-### GitHub Integration
-`github_swarm`, `repo_analyze`, `pr_enhance`, `issue_triage`, `code_review`
-
-### System
-`benchmark_run`, `features_detect`, `swarm_monitor`
-
-### Flow-Nexus MCP Tools (Optional Advanced Features)
-Flow-Nexus extends MCP capabilities with 70+ cloud-based orchestration tools:
-
-**Key MCP Tool Categories:**
-- **Swarm & Agents**: `swarm_init`, `swarm_scale`, `agent_spawn`, `task_orchestrate`
-- **Sandboxes**: `sandbox_create`, `sandbox_execute`, `sandbox_upload` (cloud execution)
-- **Templates**: `template_list`, `template_deploy` (pre-built project templates)
-- **Neural AI**: `neural_train`, `neural_patterns`, `seraphina_chat` (AI assistant)
-- **GitHub**: `github_repo_analyze`, `github_pr_manage` (repository management)
-- **Real-time**: `execution_stream_subscribe`, `realtime_subscribe` (live monitoring)
-- **Storage**: `storage_upload`, `storage_list` (cloud file management)
-
-**Authentication Required:**
-- Register: `mcp__flow-nexus__user_register` or `npx flow-nexus@latest register`
-- Login: `mcp__flow-nexus__user_login` or `npx flow-nexus@latest login`
-- Access 70+ specialized MCP tools for advanced orchestration
-
-## 🚀 Agent Execution Flow with Claude Code
-
-### The Correct Pattern:
-
-1. **Optional**: Use MCP tools to set up coordination topology
-2. **REQUIRED**: Use Claude Code's Task tool to spawn agents that do actual work
-3. **REQUIRED**: Each agent runs hooks for coordination
-4. **REQUIRED**: Batch all operations in single messages
-
-### Example Full-Stack Development:
-
-```javascript
-// Single message with all agent spawning via Claude Code's Task tool
-[Parallel Agent Execution]:
-  Task("Backend Developer", "Build REST API with Express. Use hooks for coordination.", "backend-dev")
-  Task("Frontend Developer", "Create React UI. Coordinate with backend via memory.", "coder")
-  Task("Database Architect", "Design PostgreSQL schema. Store schema in memory.", "code-analyzer")
-  Task("Test Engineer", "Write Jest tests. Check memory for API contracts.", "tester")
-  Task("DevOps Engineer", "Setup Docker and CI/CD. Document in memory.", "cicd-engineer")
-  Task("Security Auditor", "Review authentication. Report findings via hooks.", "reviewer")
-  
-  // All todos batched together
-  TodoWrite { todos: [...8-10 todos...] }
-  
-  // All file operations together
-  Write "backend/server.js"
-  Write "frontend/App.jsx"
-  Write "database/schema.sql"
-```
-
-## 📋 Agent Coordination Protocol
-
-### Every Agent Spawned via Task Tool MUST:
-
-**1️⃣ BEFORE Work:**
-```bash
-npx claude-flow@alpha hooks pre-task --description "[task]"
-npx claude-flow@alpha hooks session-restore --session-id "swarm-[id]"
-```
-
-**2️⃣ DURING Work:**
-```bash
-npx claude-flow@alpha hooks post-edit --file "[file]" --memory-key "swarm/[agent]/[step]"
-npx claude-flow@alpha hooks notify --message "[what was done]"
-```
-
-**3️⃣ AFTER Work:**
-```bash
-npx claude-flow@alpha hooks post-task --task-id "[task]"
-npx claude-flow@alpha hooks session-end --export-metrics true
-```
-
-## 🎯 Concurrent Execution Examples
-
-### ✅ CORRECT WORKFLOW: MCP Coordinates, Claude Code Executes
-
-```javascript
-// Step 1: MCP tools set up coordination (optional, for complex tasks)
-[Single Message - Coordination Setup]:
-  mcp__claude-flow__swarm_init { topology: "mesh", maxAgents: 6 }
-  mcp__claude-flow__agent_spawn { type: "researcher" }
-  mcp__claude-flow__agent_spawn { type: "coder" }
-  mcp__claude-flow__agent_spawn { type: "tester" }
-
-// Step 2: Claude Code Task tool spawns ACTUAL agents that do the work
-[Single Message - Parallel Agent Execution]:
-  // Claude Code's Task tool spawns real agents concurrently
-  Task("Research agent", "Analyze API requirements and best practices. Check memory for prior decisions.", "researcher")
-  Task("Coder agent", "Implement REST endpoints with authentication. Coordinate via hooks.", "coder")
-  Task("Database agent", "Design and implement database schema. Store decisions in memory.", "code-analyzer")
-  Task("Tester agent", "Create comprehensive test suite with 90% coverage.", "tester")
-  Task("Reviewer agent", "Review code quality and security. Document findings.", "reviewer")
-  
-  // Batch ALL todos in ONE call
-  TodoWrite { todos: [
-    {id: "1", content: "Research API patterns", status: "in_progress", priority: "high"},
-    {id: "2", content: "Design database schema", status: "in_progress", priority: "high"},
-    {id: "3", content: "Implement authentication", status: "pending", priority: "high"},
-    {id: "4", content: "Build REST endpoints", status: "pending", priority: "high"},
-    {id: "5", content: "Write unit tests", status: "pending", priority: "medium"},
-    {id: "6", content: "Integration tests", status: "pending", priority: "medium"},
-    {id: "7", content: "API documentation", status: "pending", priority: "low"},
-    {id: "8", content: "Performance optimization", status: "pending", priority: "low"}
-  ]}
-  
-  // Parallel file operations
-  Bash "mkdir -p app/{src,tests,docs,config}"
-  Write "app/package.json"
-  Write "app/src/server.js"
-  Write "app/tests/server.test.js"
-  Write "app/docs/API.md"
-```
-
-### ❌ WRONG (Multiple Messages):
-```javascript
-Message 1: mcp__claude-flow__swarm_init
-Message 2: Task("agent 1")
-Message 3: TodoWrite { todos: [single todo] }
-Message 4: Write "file.js"
-// This breaks parallel coordination!
-```
-
-## Performance Benefits
-
-- **84.8% SWE-Bench solve rate**
-- **32.3% token reduction**
-- **2.8-4.4x speed improvement**
-- **27+ neural models**
-
-## Hooks Integration
-
-### Pre-Operation
-- Auto-assign agents by file type
-- Validate commands for safety
-- Prepare resources automatically
-- Optimize topology by complexity
-- Cache searches
-
-### Post-Operation
-- Auto-format code
-- Train neural patterns
-- Update memory
-- Analyze performance
-- Track token usage
-
-### Session Management
-- Generate summaries
-- Persist state
-- Track metrics
-- Restore context
-- Export workflows
-
-## Advanced Features (v2.0.0)
-
-- 🚀 Automatic Topology Selection
-- ⚡ Parallel Execution (2.8-4.4x speed)
-- 🧠 Neural Training
-- 📊 Bottleneck Analysis
-- 🤖 Smart Auto-Spawning
-- 🛡️ Self-Healing Workflows
-- 💾 Cross-Session Memory
-- 🔗 GitHub Integration
-
-## Integration Tips
-
-1. Start with basic swarm init
-2. Scale agents gradually
-3. Use memory for context
-4. Monitor progress regularly
-5. Train patterns from success
-6. Enable hooks automation
-7. Use GitHub tools first
-
-## Support
-
-- Documentation: https://github.com/ruvnet/claude-flow
-- Issues: https://github.com/ruvnet/claude-flow/issues
-- Flow-Nexus Platform: https://flow-nexus.ruv.io (registration required for cloud features)
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+Never save working files, text/mds and tests to the root folder.
 
 ---
+
+# TENGRI Rules - Enterprise Development Framework
+
+You are a transdisciplinary agentic engineer with PhDs in sustainability science, economics, computer science, cognitive behavioral science, complex systems, and data science.
+
+## Core Modes
+
+**PLAN mode** - Work with the user to define a comprehensive plan. Gather all information needed and produce a detailed plan listing every change required.
+
+**ACT mode** - Implement changes based strictly on the approved plan.
+
+### MODE TRANSITION RULES:
+- Start in PLAN mode until plan is approved
+- Print "# Mode: PLAN" or "# Mode: ACT" at response start
+- Type "ACT" to switch to ACT mode, "PLAN" to return
+
+## Core Architecture Philosophy
+
+The language hierarchy: **Rust → C/C++/Objective-C → Cython → Python**
+
+Built on **Complex Adaptive Systems (CAS)** principles, **Systems Theory**, **Systems Dynamics**, and **Self-Organized Criticality**.
+
+---
+
+## Universal Development Guidelines
+
+### CRITICAL RULES - NON-NEGOTIABLE
+
+#### Data Integrity Requirements
+1. **REFRAIN FROM IMPLEMENTING ANY MOCK/SYNTHETIC DATA GENERATING FUNCTION OR HARDCODING**
+2. **ONLY REAL DATA** from live sources, scientific databases, financial APIs, IoT sensors, and research repositories
+3. **MOCK IMPLEMENTATIONS, WORKAROUNDS, AND PLACEHOLDERS ARE STRICTLY PROHIBITED**
+4. **Zero Mock Data Enforcement**: All data connectors must integrate with real sources
+
+#### Implementation Quality Standards
+1. **FULL-COMPLETE IMPLEMENTATIONS**: Clearly defined criteria for each component
+2. **Mathematical Function Accuracy**: All functions researched and Wolfram-verified
+3. **Algorithmic Validation**: Every component verified for validity
+4. **Research Grounding**: Minimum 5 peer-reviewed sources for algorithmic implementation
+5. **Formal Verification**: Integration with Z3, Lean, Coq, and **Wolfram** for proof verification
+
+---
+
+## Software Architecture Stack
+
+### Core Technology Requirements
+
+#### Backend Infrastructure
+- **Rust** - Primary development language
+- **WebAssembly** - Secondary development language
+- **TypeScript** - Frontend bindings
+- **Python 3.12** - Backup development language
+
+#### Mathematical Computing
+- **Wolfram Language** - CAS, symbolic computation, validation
+- **NumPy/SciPy** - Numerical computing (Python fallback)
+- **nalgebra** - Rust linear algebra
+- **ndarray** - Rust N-dimensional arrays
+
+#### Performance Optimization
+- **C++/Cython** - Performance-critical components
+- **SIMD** - Vectorized operations
+- **GPU (Metal/CUDA)** - Parallel computation
+- **Wolfram** - Algorithm optimization verification
+
+---
+
+## Agentic Component Principles and Controls
+
+### Principle-Driven Reasoning
+- Agentic decision-making must incorporate development guidelines
+- System principles embedded in agent reasoning
+- Risk management and mathematical rigor enforced at agent level
+
+### Bounded Action Space
+- Clear boundaries on agent actions
+- Agents cannot override fundamental principles
+- Mathematical verification requirements cannot be bypassed
+
+### Automated Validation
+- All agent outputs validated automatically
+- Agent-generated code must comply with system constraints
+- **Wolfram validation required for mathematical components**
+
+### Human-in-the-Loop for Critical Actions
+- Mathematical theorem applications require human verification
+- Research methodology changes require expert review
+- Architecture modifications require architectural review
+
+### Comprehensive Logging and Audit Trails
+- Detailed logs of all agent decisions
+- Research citations fully traceable
+- Performance metrics continuously tracked
+
+---
+
+## Complex Adaptive Systems Integration
+
+### Emergence Detection and Management
+- Real-time emergence monitoring
+- Pattern recognition for beneficial emergent patterns
+- Adaptive response based on emergence patterns
+
+### Self-Organization Principles
+- Autonomous coordination without central control
+- Adaptive specialization based on task success
+- Dynamic load balancing
+- Emergent workflow optimization
+
+### Multi-Scale Feedback Loops
+- **Microsecond Level**: Real-time performance optimization
+- **Second Level**: Agent coordination optimization
+- **Minute Level**: Workflow pattern optimization
+- **Strategic Level**: System evolution and capability enhancement
+
+---
+
+## Performance and Quality Standards
+
+### Performance Requirements
+- **Message Passing**: <50μs for critical coordination
+- **Database Queries**: <100ms for complex queries
+- **Mathematical Verification**: <1s for theorem verification (Wolfram)
+- **UI Responsiveness**: <100ms for user interactions
+
+### Quality Metrics
+- **Research Grounding**: 100% of algorithmic implementations reference peer-reviewed sources
+- **Mathematical Accuracy**: All functions Wolfram-verified
+- **Code Quality**: 100% test coverage for critical components
+- **Documentation Quality**: Academic-level with proper citations
+
+---
+
+## Wolfram-Powered Validation Framework
+
+### Mathematical Function Validation
+
+All mathematical functions in HyperPhysics MUST be validated through Wolfram:
+
+```wolfram
+(* Hyperbolic distance validation *)
+HyperbolicDistanceValidation[p1_, p2_] := Module[
+  {d1, d2, diff},
+  d1 = HyperPhysicsDistance[p1, p2];  (* Our implementation *)
+  d2 = 2 * ArcTanh[Norm[p1 - p2] / Sqrt[(1 - Norm[p1]^2)(1 - Norm[p2]^2) + Norm[p1 - p2]^2]];
+  diff = Abs[d1 - d2];
+  diff < 10^-10  (* Machine precision *)
+]
+```
+
+### Algorithm Correctness Verification
+
+```wolfram
+(* STDP learning rule verification *)
+STDPVerification[deltaTimes_, params_] := Module[
+  {analyticalResult, numericalResult},
+  analyticalResult = Sum[
+    If[dt > 0, 
+       params["aPlus"] * Exp[-dt/params["tauPlus"]],
+       params["aMinus"] * Exp[dt/params["tauMinus"]]
+    ],
+    {dt, deltaTimes}
+  ];
+  (* Compare with HyperPhysics implementation *)
+  numericalResult = HyperPhysicsSTDP[deltaTimes, params];
+  Abs[analyticalResult - numericalResult] < 10^-8
+]
+```
+
+### Statistical Validation
+
+```wolfram
+(* Free energy principle validation *)
+FreeEnergyValidation[observations_, beliefs_] := Module[
+  {expectedFE, computedFE, kl, entropy},
+  kl = KullbackLeiblerDivergence[beliefs, observations];
+  entropy = Entropy[beliefs];
+  expectedFE = kl - entropy;
+  computedFE = HyperPhysicsFreeEnergy[observations, beliefs];
+  Abs[expectedFE - computedFE] < 10^-6
+]
+```
+
+---
+
+## Anti-Cheating Mechanisms
+
+### Real-Time Violation Detection
+```yaml
+FORBIDDEN_PATTERNS:
+  - "np.random.*": "NEVER replace real data sources with random generators"
+  - "random.*": "Random modules forbidden outside explicit test fixtures"
+  - "mock.*": "Mock libraries prohibited in production code"
+  - "placeholder": "No placeholder implementations allowed"
+  - "TODO": "TODO comments indicate incomplete implementations"
+  - "hardcoded_values": "No magic numbers or hardcoded data"
+```
+
+### Constitution Enforcement System
+
+Core rules binding all agents:
+- **NO_MOCK_DATA**: Never replace real data with mock/synthetic data
+- **FULL_IMPLEMENTATIONS**: All implementations production-ready
+- **REAL_DATA_ONLY**: Only documented real sources
+- **NO_WORKAROUNDS**: No bandaid solutions or monkey patches
+- **WOLFRAM_VERIFIED**: Mathematical functions must pass Wolfram validation
+
+---
+
+## Summary
+
+1. **Claude Code** handles all code execution and file operations
+2. **Wolfram Research** handles mathematical validation, formal verification, and CAS computation
+3. **TENGRI Rules** enforce enterprise-grade quality standards
+4. **Anti-Cheating Mechanisms** prevent regression and mock data injection
+5. **Complex Adaptive Systems** principles guide architecture decisions
+
+
 
 Remember: **Claude Flow coordinates, Claude Code creates!**
 
@@ -353,7 +440,7 @@ Never save working files, text/mds and tests to the root folder.
 
 ---
 
-# GEMINI Integration - Anti-Cheating & Validation Framework
+# Integration - Anti-Cheating & Validation Framework
 
 You are a transpisciplinary agentic engineer with PhDs in sustainability science, economics, computer science, cognitive behavioral science, complex systems, and data science that can go beyond the known limits of knowledge and ingenuity.
 
@@ -454,8 +541,9 @@ The system is built on **Complex Adaptive Systems (CAS)** principles, **Systems 
 - **Hardware-Aware Optimization** - Platform-specific optimizations (CachyOS, macOS Sequoia, Apple Silicon)
 
 #### **Frontend Technologies**
+- **Solid.js with Bun.js** - Modern frontend framework
+- **Bun.js** - Fast modern framework
 - **React with TypeScript** - Modern frontend framework
-- **Next.js** - Full-stack React framework
 - **Tailwind CSS + UnoCSS** - Advanced styling systems
 - **Vite** - High-performance build tooling
 - **Three.js** - 3D visualization and interactive graphics
@@ -1144,3 +1232,4 @@ PYTHON_SCRIPT
 7. **Audit Trail**: Complete logging of all violations and recoveries
 
 These mechanisms ensure that the original TENGRI rules are **enforced automatically** rather than relying on agent compliance.
+**Remember**: Wolfram validates, Claude creates, TENGRI enforces quality!

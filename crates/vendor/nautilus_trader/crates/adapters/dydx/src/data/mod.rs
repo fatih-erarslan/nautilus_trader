@@ -21,6 +21,7 @@ use std::sync::{
 };
 
 use anyhow::Context;
+use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use nautilus_common::{
     live::runner::get_data_event_sender,
@@ -43,10 +44,10 @@ use nautilus_core::{
 use nautilus_data::client::DataClient;
 use nautilus_model::{
     data::{
-        Bar, BarType, BookOrder, Data as NautilusData, IndexPriceUpdate, OrderBookDelta,
-        OrderBookDeltas_API, QuoteTick,
+        Bar, BarSpecification, BarType, BookOrder, Data as NautilusData, IndexPriceUpdate,
+        OrderBookDelta, OrderBookDeltas, OrderBookDeltas_API, QuoteTick,
     },
-    enums::{BookAction, OrderSide, RecordFlag},
+    enums::{BarAggregation, BookAction, BookType, OrderSide, RecordFlag},
     identifiers::{ClientId, InstrumentId, Venue},
     instruments::{Instrument, InstrumentAny},
     orderbook::OrderBook,
@@ -60,6 +61,7 @@ use crate::{
     common::{consts::DYDX_VENUE, parse::extract_raw_symbol},
     config::DydxDataClientConfig,
     http::client::DydxHttpClient,
+    types::DydxOraclePrice,
     websocket::client::DydxWebSocketClient,
 };
 
@@ -131,11 +133,7 @@ impl DydxDataClient {
     /// # Errors
     ///
     /// Returns an error if the bar aggregation or step is not supported by dYdX.
-    fn map_bar_spec_to_resolution(
-        spec: &nautilus_model::data::BarSpecification,
-    ) -> anyhow::Result<&'static str> {
-        use nautilus_model::enums::BarAggregation;
-
+    fn map_bar_spec_to_resolution(spec: &BarSpecification) -> anyhow::Result<&'static str> {
         match spec.step.get() {
             1 => match spec.aggregation {
                 BarAggregation::Minute => Ok("1MIN"),
@@ -461,8 +459,6 @@ impl DataClient for DydxDataClient {
     }
 
     fn subscribe_book_deltas(&mut self, cmd: &SubscribeBookDeltas) -> anyhow::Result<()> {
-        use nautilus_model::enums::BookType;
-
         if cmd.book_type != BookType::L2_MBP {
             anyhow::bail!(
                 "dYdX only supports L2_MBP order book deltas, received {:?}",
@@ -492,8 +488,6 @@ impl DataClient for DydxDataClient {
     }
 
     fn subscribe_book_snapshots(&mut self, cmd: &SubscribeBookSnapshots) -> anyhow::Result<()> {
-        use nautilus_model::enums::BookType;
-
         if cmd.book_type != BookType::L2_MBP {
             anyhow::bail!(
                 "dYdX only supports L2_MBP order book snapshots, received {:?}",
@@ -527,9 +521,6 @@ impl DataClient for DydxDataClient {
         );
 
         // Simply delegate to book deltas subscription
-        use nautilus_common::messages::data::SubscribeBookDeltas;
-        use nautilus_model::enums::BookType;
-
         let book_cmd = SubscribeBookDeltas {
             client_id: cmd.client_id,
             venue: cmd.venue,
@@ -674,36 +665,36 @@ impl DataClient for DydxDataClient {
         // Map BarType spec to dYdX candle resolution string
         let resolution = match spec.step.get() {
             1 => match spec.aggregation {
-                nautilus_model::enums::BarAggregation::Minute => "1MIN",
-                nautilus_model::enums::BarAggregation::Hour => "1HOUR",
-                nautilus_model::enums::BarAggregation::Day => "1DAY",
+                BarAggregation::Minute => "1MIN",
+                BarAggregation::Hour => "1HOUR",
+                BarAggregation::Day => "1DAY",
                 _ => {
                     anyhow::bail!("Unsupported bar aggregation: {:?}", spec.aggregation);
                 }
             },
             5 => {
-                if spec.aggregation == nautilus_model::enums::BarAggregation::Minute {
+                if spec.aggregation == BarAggregation::Minute {
                     "5MINS"
                 } else {
                     anyhow::bail!("Unsupported 5-step aggregation: {:?}", spec.aggregation);
                 }
             }
             15 => {
-                if spec.aggregation == nautilus_model::enums::BarAggregation::Minute {
+                if spec.aggregation == BarAggregation::Minute {
                     "15MINS"
                 } else {
                     anyhow::bail!("Unsupported 15-step aggregation: {:?}", spec.aggregation);
                 }
             }
             30 => {
-                if spec.aggregation == nautilus_model::enums::BarAggregation::Minute {
+                if spec.aggregation == BarAggregation::Minute {
                     "30MINS"
                 } else {
                     anyhow::bail!("Unsupported 30-step aggregation: {:?}", spec.aggregation);
                 }
             }
             4 => {
-                if spec.aggregation == nautilus_model::enums::BarAggregation::Hour {
+                if spec.aggregation == BarAggregation::Hour {
                     "4HOURS"
                 } else {
                     anyhow::bail!("Unsupported 4-step aggregation: {:?}", spec.aggregation);
@@ -719,8 +710,7 @@ impl DataClient for DydxDataClient {
             .remove(&(instrument_id, resolution.to_string()));
 
         // Unregister bar type from handler and local mappings
-        let symbol_str = instrument_id.symbol.to_string();
-        let ticker = extract_raw_symbol(&symbol_str);
+        let ticker = extract_raw_symbol(instrument_id.symbol.as_str());
         let topic = format!("{ticker}/{resolution}");
         self.bar_type_mappings.remove(&topic);
 
@@ -1041,7 +1031,6 @@ impl DataClient for DydxDataClient {
     }
 
     fn request_bars(&self, request: &RequestBars) -> anyhow::Result<()> {
-        use chrono::Duration;
         use nautilus_model::enums::{AggregationSource, BarAggregation, PriceType};
 
         const DYDX_MAX_BARS_PER_REQUEST: u32 = 1_000;
@@ -1244,7 +1233,7 @@ impl DataClient for DydxDataClient {
 
             // Determine chunk duration using max bars per request.
             let bars_per_call = DYDX_MAX_BARS_PER_REQUEST.min(remaining);
-            let chunk_duration = Duration::seconds(bar_secs * bars_per_call as i64);
+            let chunk_duration = chrono::Duration::seconds(bar_secs * bars_per_call as i64);
 
             let mut chunk_start = range_start;
 
@@ -1360,7 +1349,7 @@ fn upsert_instrument(cache: &Arc<DashMap<Ustr, InstrumentAny>>, instrument: Inst
 }
 
 /// Convert optional DateTime to optional UnixNanos timestamp.
-fn datetime_to_unix_nanos(value: Option<chrono::DateTime<chrono::Utc>>) -> Option<UnixNanos> {
+fn datetime_to_unix_nanos(value: Option<DateTime<Utc>>) -> Option<UnixNanos> {
     value
         .and_then(|dt| dt.timestamp_nanos_opt())
         .and_then(|nanos| u64::try_from(nanos).ok())
@@ -1562,8 +1551,7 @@ impl DydxDataClient {
                             }
 
                             // Emit the snapshot deltas
-                            use nautilus_model::data::OrderBookDeltas_API;
-                            let data = nautilus_model::data::Data::from(OrderBookDeltas_API::new(deltas));
+                            let data = NautilusData::from(OrderBookDeltas_API::new(deltas));
                             if let Err(e) = data_sender.send(DataEvent::Data(data)) {
                                 tracing::error!("Failed to emit orderbook snapshot: {}", e);
                             }
@@ -1584,7 +1572,7 @@ impl DydxDataClient {
         instrument_id: InstrumentId,
         snapshot: &crate::http::models::OrderbookResponse,
         instrument: &InstrumentAny,
-    ) -> anyhow::Result<nautilus_model::data::OrderBookDeltas> {
+    ) -> anyhow::Result<OrderBookDeltas> {
         use nautilus_model::{
             data::{BookOrder, OrderBookDelta},
             enums::{BookAction, OrderSide, RecordFlag},
@@ -1648,10 +1636,7 @@ impl DydxDataClient {
             ));
         }
 
-        Ok(nautilus_model::data::OrderBookDeltas::new(
-            instrument_id,
-            deltas,
-        ))
+        Ok(OrderBookDeltas::new(instrument_id, deltas))
     }
 
     /// Get a cached instrument by symbol.
@@ -1666,11 +1651,7 @@ impl DydxDataClient {
         self.instruments.iter().map(|i| i.clone()).collect()
     }
 
-    fn ensure_order_book(
-        &self,
-        instrument_id: InstrumentId,
-        book_type: nautilus_model::enums::BookType,
-    ) {
+    fn ensure_order_book(&self, instrument_id: InstrumentId, book_type: BookType) {
         self.order_books
             .entry(instrument_id)
             .or_insert_with(|| OrderBook::new(instrument_id, book_type));
@@ -1738,14 +1719,14 @@ impl DydxDataClient {
     }
 
     fn handle_ws_message(
-        message: crate::websocket::messages::NautilusWsMessage,
+        message: crate::websocket::enums::NautilusWsMessage,
         ctx: &WsMessageContext,
     ) {
         match message {
-            crate::websocket::messages::NautilusWsMessage::Data(payloads) => {
+            crate::websocket::enums::NautilusWsMessage::Data(payloads) => {
                 Self::handle_data_message(payloads, ctx.data_sender, ctx.incomplete_bars);
             }
-            crate::websocket::messages::NautilusWsMessage::Deltas(deltas) => {
+            crate::websocket::enums::NautilusWsMessage::Deltas(deltas) => {
                 Self::handle_deltas_message(
                     *deltas,
                     ctx.data_sender,
@@ -1754,13 +1735,13 @@ impl DydxDataClient {
                     ctx.instruments,
                 );
             }
-            crate::websocket::messages::NautilusWsMessage::OraclePrices(oracle_prices) => {
+            crate::websocket::enums::NautilusWsMessage::OraclePrices(oracle_prices) => {
                 Self::handle_oracle_prices(oracle_prices, ctx.instruments, ctx.data_sender);
             }
-            crate::websocket::messages::NautilusWsMessage::Error(err) => {
+            crate::websocket::enums::NautilusWsMessage::Error(err) => {
                 tracing::error!("dYdX WS error: {err}");
             }
-            crate::websocket::messages::NautilusWsMessage::Reconnected => {
+            crate::websocket::enums::NautilusWsMessage::Reconnected => {
                 tracing::info!("dYdX WS reconnected - re-subscribing to active subscriptions");
 
                 // Re-subscribe to all active subscriptions after WebSocket reconnection
@@ -1854,12 +1835,12 @@ impl DydxDataClient {
                     tracing::warn!("WebSocket client not available for re-subscription");
                 }
             }
-            crate::websocket::messages::NautilusWsMessage::Order(_)
-            | crate::websocket::messages::NautilusWsMessage::Fill(_)
-            | crate::websocket::messages::NautilusWsMessage::Position(_)
-            | crate::websocket::messages::NautilusWsMessage::AccountState(_)
-            | crate::websocket::messages::NautilusWsMessage::SubaccountSubscribed(_)
-            | crate::websocket::messages::NautilusWsMessage::SubaccountsChannelData(_) => {
+            crate::websocket::enums::NautilusWsMessage::Order(_)
+            | crate::websocket::enums::NautilusWsMessage::Fill(_)
+            | crate::websocket::enums::NautilusWsMessage::Position(_)
+            | crate::websocket::enums::NautilusWsMessage::AccountState(_)
+            | crate::websocket::enums::NautilusWsMessage::SubaccountSubscribed(_)
+            | crate::websocket::enums::NautilusWsMessage::SubaccountsChannelData(_) => {
                 tracing::debug!(
                     "Ignoring execution/subaccount message on dYdX data client (handled by execution adapter)"
                 );
@@ -1933,9 +1914,9 @@ impl DydxDataClient {
     /// The algorithm continues until no more crosses exist or the book is empty.
     fn resolve_crossed_order_book(
         book: &mut OrderBook,
-        venue_deltas: nautilus_model::data::OrderBookDeltas,
+        venue_deltas: OrderBookDeltas,
         instrument: &InstrumentAny,
-    ) -> anyhow::Result<nautilus_model::data::OrderBookDeltas> {
+    ) -> anyhow::Result<OrderBookDeltas> {
         let instrument_id = venue_deltas.instrument_id;
         let ts_init = venue_deltas.ts_init;
         let mut all_deltas = venue_deltas.deltas.clone();
@@ -2071,8 +2052,7 @@ impl DydxDataClient {
             }
 
             // Apply temporary deltas to the book
-            let temp_deltas_obj =
-                nautilus_model::data::OrderBookDeltas::new(instrument_id, temp_deltas.clone());
+            let temp_deltas_obj = OrderBookDeltas::new(instrument_id, temp_deltas.clone());
             book.apply_deltas(&temp_deltas_obj)?;
             all_deltas.extend(temp_deltas);
 
@@ -2091,21 +2071,16 @@ impl DydxDataClient {
             last_delta.flags = RecordFlag::F_LAST as u8;
         }
 
-        Ok(nautilus_model::data::OrderBookDeltas::new(
-            instrument_id,
-            all_deltas,
-        ))
+        Ok(OrderBookDeltas::new(instrument_id, all_deltas))
     }
 
     fn handle_deltas_message(
-        deltas: nautilus_model::data::OrderBookDeltas,
+        deltas: OrderBookDeltas,
         data_sender: &tokio::sync::mpsc::UnboundedSender<DataEvent>,
         order_books: &Arc<DashMap<InstrumentId, OrderBook>>,
         last_quotes: &Arc<DashMap<InstrumentId, QuoteTick>>,
         instruments: &Arc<DashMap<Ustr, InstrumentAny>>,
     ) {
-        use nautilus_model::enums::BookType;
-
         let instrument_id = deltas.instrument_id;
 
         // Get instrument for crossed orderbook resolution
@@ -2197,13 +2172,11 @@ impl DydxDataClient {
     fn handle_oracle_prices(
         oracle_prices: std::collections::HashMap<
             String,
-            crate::websocket::types::DydxOraclePriceMarket,
+            crate::websocket::messages::DydxOraclePriceMarket,
         >,
         instruments: &Arc<DashMap<Ustr, InstrumentAny>>,
         data_sender: &tokio::sync::mpsc::UnboundedSender<DataEvent>,
     ) {
-        use crate::types::DydxOraclePrice;
-
         let ts_init = get_atomic_clock_realtime().get_time_ns();
 
         for (symbol_str, oracle_market) in oracle_prices {
@@ -2295,7 +2268,7 @@ mod tests {
         identifiers::{ClientId, InstrumentId, Symbol, Venue},
         instruments::{CryptoPerpetual, Instrument, InstrumentAny},
         orderbook::OrderBook,
-        types::{Price, Quantity},
+        types::{Currency, Price, Quantity},
     };
     use rstest::rstest;
     use rust_decimal::Decimal;
@@ -2542,12 +2515,7 @@ mod tests {
         let bid_delta = OrderBookDelta::new(
             instrument_id,
             BookAction::Add,
-            nautilus_model::data::order::BookOrder::new(
-                nautilus_model::enums::OrderSide::Buy,
-                price,
-                size,
-                1,
-            ),
+            BookOrder::new(OrderSide::Buy, price, size, 1),
             0,
             1,
             bar_ts,
@@ -2556,12 +2524,7 @@ mod tests {
         let ask_delta = OrderBookDelta::new(
             instrument_id,
             BookAction::Add,
-            nautilus_model::data::order::BookOrder::new(
-                nautilus_model::enums::OrderSide::Sell,
-                Price::from("101.00"),
-                size,
-                1,
-            ),
+            BookOrder::new(OrderSide::Sell, Price::from("101.00"), size, 1),
             0,
             1,
             bar_ts,
@@ -2569,7 +2532,7 @@ mod tests {
         );
         let deltas = OrderBookDeltas::new(instrument_id, vec![bid_delta, ask_delta]);
 
-        let message = crate::websocket::messages::NautilusWsMessage::Deltas(Box::new(deltas));
+        let message = crate::websocket::enums::NautilusWsMessage::Deltas(Box::new(deltas));
 
         let incomplete_bars = Arc::new(DashMap::new());
         let ctx = WsMessageContext {
@@ -2638,7 +2601,7 @@ mod tests {
         );
 
         DydxDataClient::handle_ws_message(
-            crate::websocket::messages::NautilusWsMessage::Error(err),
+            crate::websocket::enums::NautilusWsMessage::Error(err),
             &ctx,
         );
     }
@@ -2661,7 +2624,7 @@ mod tests {
         };
         let bar_type = BarType::new(instrument_id, spec, AggregationSource::External);
 
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let start = Some(now - chrono::Duration::hours(10));
         let end = Some(now);
 
@@ -2686,7 +2649,7 @@ mod tests {
         setup_test_env();
 
         // Prepare a simple candles response served by a local Axum HTTP server.
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let candle = crate::http::models::Candle {
             started_at: now - chrono::Duration::minutes(1),
             ticker: "BTC-USD".to_string(),
@@ -2877,9 +2840,9 @@ mod tests {
         InstrumentAny::CryptoPerpetual(CryptoPerpetual::new(
             instrument_id,
             instrument_id.symbol,
-            nautilus_model::types::currency::Currency::BTC(),
-            nautilus_model::types::currency::Currency::USD(),
-            nautilus_model::types::currency::Currency::USD(),
+            Currency::BTC(),
+            Currency::USD(),
+            Currency::USD(),
             false,
             2,                                // price_precision
             8,                                // size_precision
@@ -2911,7 +2874,7 @@ mod tests {
         setup_test_env();
 
         let clock = get_atomic_clock_realtime();
-        let now = chrono::Utc::now();
+        let now = Utc::now();
 
         // Very large prices and sizes (edge cases).
         let candle = Candle {
@@ -2957,7 +2920,7 @@ mod tests {
         setup_test_env();
 
         let clock = get_atomic_clock_realtime();
-        let now = chrono::Utc::now();
+        let now = Utc::now();
 
         let candle = Candle {
             started_at: now,
@@ -3002,7 +2965,7 @@ mod tests {
         // Simulate bars with ts_event both before and after current_time_ns and
         // ensure only completed bars (ts_event < now) are retained.
         let clock = get_atomic_clock_realtime();
-        let now = chrono::Utc::now();
+        let now = Utc::now();
 
         // Use a dedicated data channel for this test and register it
         // before constructing the data client.
@@ -3791,7 +3754,7 @@ mod tests {
         let http_client = DydxHttpClient::default();
         let client = DydxDataClient::new(client_id, config, http_client, None).unwrap();
 
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let start = Some(now - chrono::Duration::hours(24));
         let end = Some(now);
 
@@ -3831,7 +3794,7 @@ mod tests {
         let http_client = DydxHttpClient::default();
         let client = DydxDataClient::new(client_id, config, http_client, None).unwrap();
 
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let start = Some(now - chrono::Duration::hours(24));
 
         let request = RequestInstruments::new(
@@ -3867,7 +3830,7 @@ mod tests {
         let http_client = DydxHttpClient::default();
         let client = DydxDataClient::new(client_id, config, http_client, None).unwrap();
 
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let end = Some(now);
 
         let request = RequestInstruments::new(
@@ -3975,7 +3938,7 @@ mod tests {
         let http_client = DydxHttpClient::default();
         let client = DydxDataClient::new(client_id, config, http_client, None).unwrap();
 
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let start = Some(now - chrono::Duration::hours(48));
         let end = Some(now - chrono::Duration::hours(24));
 
@@ -4441,7 +4404,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let created_at = chrono::Utc::now();
+        let created_at = Utc::now();
 
         let http_trade = crate::http::models::Trade {
             id: "trade-1".to_string(),
@@ -4492,7 +4455,7 @@ mod tests {
         client.instruments.insert(symbol_key, instrument);
 
         let request_id = UUID4::new();
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let start = Some(now - chrono::Duration::seconds(10));
         let end = Some(now + chrono::Duration::seconds(10));
         let limit = std::num::NonZeroUsize::new(100).unwrap();
@@ -4615,7 +4578,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let trade_before = crate::http::models::Trade {
             id: "before".to_string(),
             side: OrderSide::Buy,
@@ -4784,7 +4747,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let created_at = chrono::Utc::now();
+        let created_at = Utc::now();
         let http_trade = crate::http::models::Trade {
             id: "format-test".to_string(),
             side: OrderSide::Sell,
@@ -5960,7 +5923,7 @@ mod tests {
         client.instruments.insert(symbol_key, instrument);
 
         // Invalid date range: end is before start
-        let start = chrono::Utc::now();
+        let start = Utc::now();
         let end = start - chrono::Duration::hours(24); // End is 24 hours before start
 
         let request = RequestTrades::new(
@@ -6210,7 +6173,7 @@ mod tests {
         assert!(client.request_instrument(&req1).is_ok());
 
         // Test 2: Invalid date range
-        let start = chrono::Utc::now();
+        let start = Utc::now();
         let end = start - chrono::Duration::hours(1);
         let req2 = RequestTrades::new(
             instrument_id,
@@ -6507,8 +6470,8 @@ mod tests {
 
         let client = DydxDataClient::new(client_id, config, http_client, None).unwrap();
 
-        let start = Some(chrono::Utc::now() - chrono::Duration::days(1));
-        let end = Some(chrono::Utc::now());
+        let start = Some(Utc::now() - chrono::Duration::days(1));
+        let end = Some(Utc::now());
         let ts_init = get_atomic_clock_realtime().get_time_ns();
 
         let request = RequestInstruments::new(
@@ -6648,8 +6611,8 @@ mod tests {
         let client = DydxDataClient::new(client_id, config, http_client, None).unwrap();
 
         let request_id = UUID4::new();
-        let start = Some(chrono::Utc::now() - chrono::Duration::hours(1));
-        let end = Some(chrono::Utc::now());
+        let start = Some(Utc::now() - chrono::Duration::hours(1));
+        let end = Some(Utc::now());
         let ts_init = get_atomic_clock_realtime().get_time_ns();
 
         let request = RequestInstruments::new(
@@ -6860,8 +6823,8 @@ mod tests {
         client.instruments.insert(symbol_key, instrument);
 
         let request_id = UUID4::new();
-        let start = Some(chrono::Utc::now() - chrono::Duration::hours(1));
-        let end = Some(chrono::Utc::now());
+        let start = Some(Utc::now() - chrono::Duration::hours(1));
+        let end = Some(Utc::now());
         let ts_init = get_atomic_clock_realtime().get_time_ns();
 
         let request = RequestInstrument::new(
@@ -7033,7 +6996,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let created_at = chrono::Utc::now();
+        let created_at = Utc::now();
         let http_trades = vec![
             crate::http::models::Trade {
                 id: "trade-1".to_string(),
@@ -7125,7 +7088,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let created_at = chrono::Utc::now();
+        let created_at = Utc::now();
         let http_trade = crate::http::models::Trade {
             id: "instrument-id-test".to_string(),
             side: OrderSide::Buy,
@@ -7211,7 +7174,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let base_time = chrono::Utc::now();
+        let base_time = Utc::now();
         let http_trades = vec![
             crate::http::models::Trade {
                 id: "trade-oldest".to_string(),
@@ -7325,7 +7288,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let created_at = chrono::Utc::now();
+        let created_at = Utc::now();
         let http_trade = crate::http::models::Trade {
             id: "field-test".to_string(),
             side: OrderSide::Buy,
@@ -7432,7 +7395,7 @@ mod tests {
         let (sender, mut rx) = tokio::sync::mpsc::unbounded_channel::<DataEvent>();
         set_data_event_sender(sender);
 
-        let created_at = chrono::Utc::now();
+        let created_at = Utc::now();
         let http_trade = crate::http::models::Trade {
             id: "metadata-test".to_string(),
             side: OrderSide::Buy,
@@ -7633,7 +7596,7 @@ mod tests {
         };
         let bar_type = BarType::new(instrument_id, spec, AggregationSource::External);
 
-        let now = chrono::Utc::now();
+        let now = Utc::now();
         let start = Some(now);
         let end = Some(now - chrono::Duration::hours(1));
 

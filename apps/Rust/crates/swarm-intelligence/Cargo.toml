@@ -1,0 +1,115 @@
+[package]
+name = "swarm-intelligence"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Advanced swarm intelligence algorithms with combinatorial diversity fusion analysis"
+repository.workspace = true
+keywords = ["swarm", "optimization", "algorithms", "parallel", "intelligence"]
+categories = ["algorithms", "science", "mathematics", "concurrency"]
+
+[dependencies]
+# Core CDFA dependencies - leverage existing infrastructure
+cdfa-core = { path = "../cdfa-core" }
+cdfa-parallel = { path = "../cdfa-parallel" }
+cdfa-simd = { path = "../cdfa-simd", optional = true }
+cdfa-algorithms = { path = "../cdfa-algorithms" }
+
+# Mathematical foundations
+ndarray = { workspace = true }
+nalgebra = { workspace = true }
+num-traits = { workspace = true }
+num-complex = { workspace = true }
+statrs = { workspace = true }
+rand = { workspace = true }
+rand_distr = { workspace = true }
+
+# High-performance parallel computing
+rayon = { workspace = true }
+crossbeam = { workspace = true }
+parking_lot = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+
+# Lock-free structures and optimization
+dashmap = { workspace = true }
+atomic_float = { workspace = true }
+smallvec = { workspace = true }
+arrayvec = { workspace = true }
+ahash = { workspace = true }
+
+# Memory management
+memmap2 = { workspace = true }
+moka = { workspace = true }
+
+# SIMD acceleration
+wide = { workspace = true, optional = true }
+simba = { workspace = true, optional = true }
+
+# Serialization and config
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+config = { workspace = true }
+
+# Error handling and logging
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+
+# Performance monitoring
+metrics = { workspace = true, optional = true }
+criterion = { workspace = true, optional = true }
+
+# Thread management
+num_cpus = { workspace = true }
+threadpool = { workspace = true }
+core_affinity = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+proptest = { workspace = true }
+pretty_assertions = { workspace = true }
+approx = { workspace = true }
+tokio-test = { workspace = true }
+
+[features]
+default = ["parallel", "simd"]
+parallel = []
+simd = ["cdfa-simd", "wide", "simba"]
+gpu = []
+metrics = ["dep:metrics"]
+benchmarks = ["criterion"]
+
+[lib]
+name = "swarm_intelligence"
+path = "src/lib.rs"
+
+[[bench]]
+name = "swarm_benchmarks"
+harness = false
+required-features = ["benchmarks"]
+
+[[bench]]
+name = "algorithm_performance"
+harness = false
+required-features = ["benchmarks"]
+
+[[bench]]
+name = "cdfa_integration"
+harness = false
+required-features = ["benchmarks"]
+
+[[example]]
+name = "pso_trading"
+path = "examples/pso_trading.rs"
+
+[[example]]
+name = "multi_algorithm_fusion"
+path = "examples/multi_algorithm_fusion.rs"
+
+[[example]]
+name = "real_time_optimization"
+path = "examples/real_time_optimization.rs"

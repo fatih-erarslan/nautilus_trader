@@ -67,6 +67,14 @@ pub enum StrategyType {
     Genetic,
     /// Differential Evolution
     DifferentialEvolution,
+
+    // ============ ALIASES FOR COMPATIBILITY ============
+    /// Alias for WhaleOptimization
+    Whale,
+    /// Alias for DifferentialEvolution
+    Differential,
+    /// Alias for BeeColony
+    ArtificialBee,
     
     // ============ HYBRID ============
     /// Quantum-enhanced PSO
@@ -98,6 +106,9 @@ impl StrategyType {
             StrategyType::SocialSpider => "Spiders communicate via web vibrations",
             StrategyType::Genetic => "Natural selection favors fittest individuals",
             StrategyType::DifferentialEvolution => "Mutation and crossover evolve population",
+            StrategyType::Whale => "Whales encircle prey with bubble-net spiral",
+            StrategyType::Differential => "Mutation and crossover evolve population",
+            StrategyType::ArtificialBee => "Bees share food source info via waggle dance",
             StrategyType::QuantumPSO => "Quantum superposition enables parallel exploration",
             StrategyType::NeuralEvolution => "Neural networks evolve through generations",
             StrategyType::ChaosEnhanced => "Chaotic dynamics escape local optima",
@@ -123,6 +134,9 @@ impl StrategyType {
             StrategyType::SocialSpider => 0.5,
             StrategyType::Genetic => 0.6,
             StrategyType::DifferentialEvolution => 0.5,
+            StrategyType::Whale => 0.7,
+            StrategyType::Differential => 0.5,
+            StrategyType::ArtificialBee => 0.5,
             StrategyType::QuantumPSO => 0.8,
             StrategyType::ChaosEnhanced => 0.9,
             StrategyType::AdaptiveHybrid => 0.5,
@@ -138,6 +152,9 @@ pub struct StrategyConfig {
     pub strategy_type: StrategyType,
     /// Population size
     pub population_size: usize,
+    /// Swarm size (alias for population_size for compatibility)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub swarm_size: Option<usize>,
     /// Maximum iterations
     pub max_iterations: usize,
     /// Search space bounds
@@ -151,10 +168,18 @@ impl Default for StrategyConfig {
         Self {
             strategy_type: StrategyType::ParticleSwarm,
             population_size: 50,
+            swarm_size: None,
             max_iterations: 1000,
             bounds: vec![(-100.0, 100.0); 10],
             params: HashMap::new(),
         }
+    }
+}
+
+impl StrategyConfig {
+    /// Get effective population size (uses swarm_size if set, otherwise population_size)
+    pub fn effective_population_size(&self) -> usize {
+        self.swarm_size.unwrap_or(self.population_size)
     }
 }
 
@@ -163,12 +188,20 @@ impl Default for StrategyConfig {
 pub struct StrategyResult {
     /// Best solution found
     pub best_position: Vec<f64>,
+    /// Best solution (alias for best_position for compatibility)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub best_solution: Option<Vec<f64>>,
     /// Best fitness value
     pub best_fitness: f64,
     /// Convergence history
     pub convergence: Vec<f64>,
+    /// Whether the algorithm converged
+    pub converged: bool,
     /// Number of function evaluations
     pub evaluations: usize,
+    /// Function evaluations (alias for evaluations for compatibility)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub function_evaluations: Option<usize>,
     /// Iterations performed
     pub iterations: usize,
     /// Final population diversity
@@ -177,6 +210,18 @@ pub struct StrategyResult {
     pub strategy: StrategyType,
     /// Execution time in milliseconds
     pub execution_time_ms: u64,
+}
+
+impl StrategyResult {
+    /// Get best solution (uses best_solution if set, otherwise best_position)
+    pub fn get_best_solution(&self) -> &[f64] {
+        self.best_solution.as_deref().unwrap_or(&self.best_position)
+    }
+
+    /// Get function evaluations count (uses function_evaluations if set, otherwise evaluations)
+    pub fn get_function_evaluations(&self) -> usize {
+        self.function_evaluations.unwrap_or(self.evaluations)
+    }
 }
 
 /// Agent state for optimization
@@ -229,6 +274,17 @@ pub struct BiomimeticStrategy {
     evaluations: usize,
     convergence: Vec<f64>,
     lattice: Option<PBitLattice>,
+}
+
+impl std::fmt::Debug for BiomimeticStrategy {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("BiomimeticStrategy")
+            .field("iteration", &self.iteration)
+            .field("evaluations", &self.evaluations)
+            .field("global_best_fitness", &self.global_best_fitness)
+            .field("num_agents", &self.agents.len())
+            .finish()
+    }
 }
 
 impl BiomimeticStrategy {
@@ -289,11 +345,12 @@ impl BiomimeticStrategy {
             match self.config.strategy_type {
                 StrategyType::ParticleSwarm => self.step_pso(),
                 StrategyType::GreyWolf => self.step_grey_wolf(),
-                StrategyType::WhaleOptimization => self.step_whale(),
+                StrategyType::WhaleOptimization | StrategyType::Whale => self.step_whale(),
                 StrategyType::Firefly => self.step_firefly(),
                 StrategyType::Bat => self.step_bat(),
                 StrategyType::Cuckoo => self.step_cuckoo(),
-                StrategyType::DifferentialEvolution => self.step_de(),
+                StrategyType::DifferentialEvolution | StrategyType::Differential => self.step_de(),
+                StrategyType::BeeColony | StrategyType::ArtificialBee => self.step_pso(), // Use PSO for bee colony
                 StrategyType::BacterialForaging => self.step_bacterial(),
                 StrategyType::SalpSwarm => self.step_salp(),
                 StrategyType::QuantumPSO => self.step_quantum_pso(),
@@ -326,11 +383,25 @@ impl BiomimeticStrategy {
             }
         }
         
+        // Check convergence (less than 1% improvement in last 10% of iterations)
+        let converged = if self.convergence.len() >= 10 {
+            let recent_start = (self.convergence.len() as f64 * 0.9) as usize;
+            let improvement = (self.convergence[recent_start] - self.global_best_fitness).abs()
+                / (self.convergence[recent_start] + 1e-10);
+            improvement < 0.01
+        } else {
+            false
+        };
+
+        let best_pos = self.global_best.as_slice().to_vec();
         Ok(StrategyResult {
-            best_position: self.global_best.as_slice().to_vec(),
+            best_position: best_pos.clone(),
+            best_solution: Some(best_pos),
             best_fitness: self.global_best_fitness,
             convergence: self.convergence.clone(),
+            converged,
             evaluations: self.evaluations,
+            function_evaluations: Some(self.evaluations),
             iterations: self.iteration,
             diversity: self.compute_diversity(),
             strategy: self.config.strategy_type,

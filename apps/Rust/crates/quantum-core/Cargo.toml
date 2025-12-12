@@ -1,0 +1,79 @@
+[package]
+name = "quantum-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["TENGRI Trading Swarm <swarm@tengri.ai>"]
+description = "Quantum computing core framework for trading algorithms"
+license = "MIT OR Apache-2.0"
+keywords = ["quantum", "trading", "physics", "computation"]
+categories = ["algorithms", "mathematics", "science"]
+
+# Empty workspace table to exclude from parent workspace
+[workspace]
+
+[dependencies]
+# Core mathematical computing - explicit versions to avoid workspace conflicts
+num-complex = { version = "0.4.6", features = ["serde"] }
+num-traits = "0.2.19"
+nalgebra = "0.33.2"
+ndarray = "0.16.1"
+
+# Serialization and configuration
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+
+# Error handling
+anyhow = "1.0.89"
+thiserror = "1.0.64"
+
+# Concurrency and async
+tokio = { version = "1.40.0", features = ["full"] }
+async-trait = "0.1.82"
+rayon = { version = "1.10.0", optional = true }
+crossbeam = "0.8.4"
+
+# Performance optimization
+wide = { version = "0.7.26", optional = true }
+bytemuck = { version = "1.18.0", features = ["derive"] }
+
+# Random number generation
+rand = "0.8.5"
+rand_distr = "0.4.3"
+
+# Logging and monitoring
+tracing = "0.1.40"
+# metrics = "0.23.0"  # Temporarily disabled due to API changes
+
+# Time utilities
+chrono = { version = "0.4.38", features = ["serde"] }
+
+# UUID generation
+uuid = { version = "1.10.0", features = ["v4", "serde"] }
+
+# System information
+num_cpus = "1.0"
+
+# Memory optimization
+mimalloc = { version = "0.1", optional = true }
+
+# Optional CUDA support
+cudarc = { version = "0.12.1", features = ["f16"], optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+approx = "0.5"
+tokio-test = "0.4"
+
+[features]
+default = ["simd", "multi-threading"]
+simd = ["wide"]
+multi-threading = ["rayon"]
+cuda = ["cudarc"]
+optimized-memory = ["mimalloc"]
+benchmarking = []
+
+[lib]
+name = "quantum_core"
+crate-type = ["cdylib", "rlib"]
+
