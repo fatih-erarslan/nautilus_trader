@@ -40,6 +40,7 @@ export { stdpTools, stdpWolframCode, handleStdpTool } from "./stdp-tools.js";
 export { sgnnTools, sgnnWolframCode, handleSgnnTool } from "./sgnn-tools.js";
 export { orchestrationTools, orchestrationWolframCode, handleOrchestrationTool } from "./orchestration-tools.js";
 export { autopoieticTools, autopoieticWolframCode, handleAutopoieticTool } from "./autopoietic-tools.js";
+export { hyperwormTools, hyperwormWolframCode, handleHyperwormTool } from "./hyperworm-tools.js";
 
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { designThinkingTools } from "./design-thinking.js";
@@ -59,6 +60,7 @@ import { stdpTools } from "./stdp-tools.js";
 import { sgnnTools } from "./sgnn-tools.js";
 import { orchestrationTools } from "./orchestration-tools.js";
 import { autopoieticTools } from "./autopoietic-tools.js";
+import { hyperwormTools } from "./hyperworm-tools.js";
 
 /**
  * All enhanced tools combined - Complete Enterprise Pipeline + Cybernetic Agency + Swarm Intelligence + Vector DB + Cortex + STDP + SGNN + Orchestration + Autopoietic
@@ -81,6 +83,7 @@ export const enhancedTools: Tool[] = [
   ...sgnnTools,                // 21 tools - Event SGNN (spiking graph neural networks, <100μs latency)
   ...orchestrationTools,       // 18 tools - Agent Orchestration (agent, team, skill, expertise, behavior)
   ...autopoieticTools,         // 19 tools - Autopoietic Systems (autopoietic, drift, pbit, soc, emergence)
+  ...hyperwormTools,           // 20 tools - HyperWorm/OpenWorm (brain, connectome, HH, kuramoto, consciousness, STDP)
 ];
 
 /**
@@ -189,6 +192,12 @@ export const toolCategories = {
     tools: autopoieticTools.map(t => t.name),
     count: autopoieticTools.length,
   },
+  hyperworm: {
+    name: "HyperWorm/OpenWorm",
+    description: "C. elegans neural simulation: HyperbolicBrain, 302-neuron connectome, Hodgkin-Huxley, Kuramoto sync, IIT Phi, TripletSTDP, Active Inference",
+    tools: hyperwormTools.map(t => t.name),
+    count: hyperwormTools.length,
+  },
 };
 
 /**
@@ -296,6 +305,13 @@ export async function handleEnhancedTool(
   if (autopoieticPrefixes.some(prefix => name.startsWith(prefix))) {
     const { handleAutopoieticTool } = await import("./autopoietic-tools.js");
     const result = await handleAutopoieticTool(name, args, nativeModule);
+    return JSON.stringify(result);
+  }
+
+  // Route to hyperworm handler for hyperworm_ prefixed tools
+  if (name.startsWith("hyperworm_")) {
+    const { handleHyperwormTool } = await import("./hyperworm-tools.js");
+    const result = await handleHyperwormTool(name, args, nativeModule);
     return JSON.stringify(result);
   }
 

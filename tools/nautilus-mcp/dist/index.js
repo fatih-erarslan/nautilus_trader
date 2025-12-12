@@ -7057,18 +7057,18 @@ if (!native) {
   console.error("[Nautilus MCP] Warning: Native module not available, using JS fallback");
 }
 var fallback = {
-  indicator_sma: (prices, period) => {
-    const p = prices;
-    const n = period;
-    if (p.length < n || n === 0)
+  indicator_sma: (args) => {
+    const p = args.prices;
+    const n = args.period;
+    if (!p || p.length < n || n === 0)
       return { success: false, error: "Insufficient data for SMA" };
     const sum = p.slice(-n).reduce((a, b) => a + b, 0);
     return { success: true, value: sum / n };
   },
-  indicator_ema: (prices, period) => {
-    const p = prices;
-    const n = period;
-    if (p.length === 0 || n === 0)
+  indicator_ema: (args) => {
+    const p = args.prices;
+    const n = args.period;
+    if (!p || p.length === 0 || n === 0)
       return { success: false, error: "Insufficient data for EMA" };
     const multiplier = 2 / (n + 1);
     let ema = p[0];
@@ -7077,10 +7077,24 @@ var fallback = {
     }
     return { success: true, value: ema };
   },
-  indicator_rsi: (prices, period) => {
-    const p = prices;
-    const n = period;
-    if (p.length < n + 1)
+  indicator_tema: (args) => {
+    const p = args.prices;
+    const n = args.period;
+    if (!p || p.length === 0 || n === 0)
+      return { success: false, error: "Insufficient data for TEMA" };
+    const multiplier = 2 / (n + 1);
+    let ema1 = p[0], ema2 = p[0], ema3 = p[0];
+    for (let i = 1;i < p.length; i++) {
+      ema1 = (p[i] - ema1) * multiplier + ema1;
+      ema2 = (ema1 - ema2) * multiplier + ema2;
+      ema3 = (ema2 - ema3) * multiplier + ema3;
+    }
+    return { success: true, value: 3 * ema1 - 3 * ema2 + ema3 };
+  },
+  indicator_rsi: (args) => {
+    const p = args.prices;
+    const n = args.period;
+    if (!p || p.length < n + 1)
       return { success: false, error: "Insufficient data for RSI" };
     let gains = 0, losses = 0;
     for (let i = p.length - n;i < p.length; i++) {
@@ -7097,10 +7111,42 @@ var fallback = {
     const rs = avgGain / avgLoss;
     return { success: true, value: 100 - 100 / (1 + rs) };
   },
-  risk_var_parametric: (returns, confidence) => {
-    const r = returns;
-    const c = confidence;
-    if (r.length === 0)
+  indicator_macd: (args) => {
+    const p = args.prices;
+    const fast = args.fast || 12;
+    const slow = args.slow || 26;
+    const signal = args.signal || 9;
+    if (!p || p.length < slow)
+      return { success: false, error: "Insufficient data for MACD" };
+    const fastMult = 2 / (fast + 1);
+    const slowMult = 2 / (slow + 1);
+    const signalMult = 2 / (signal + 1);
+    let fastEma = p[0], slowEma = p[0], signalLine = 0, macdLine = 0;
+    for (let i = 0;i < p.length; i++) {
+      fastEma = (p[i] - fastEma) * fastMult + fastEma;
+      slowEma = (p[i] - slowEma) * slowMult + slowEma;
+      macdLine = fastEma - slowEma;
+      if (i >= slow)
+        signalLine = (macdLine - signalLine) * signalMult + signalLine;
+    }
+    return { success: true, data: JSON.stringify({ macd: macdLine, signal: signalLine, histogram: macdLine - signalLine }) };
+  },
+  indicator_bollinger: (args) => {
+    const p = args.prices;
+    const n = args.period;
+    const stdDev = args.std_dev || 2;
+    if (!p || p.length < n)
+      return { success: false, error: "Insufficient data for Bollinger" };
+    const recent = p.slice(-n);
+    const sma = recent.reduce((a, b) => a + b, 0) / n;
+    const variance = recent.reduce((sum, x) => sum + (x - sma) ** 2, 0) / n;
+    const std = Math.sqrt(variance);
+    return { success: true, data: JSON.stringify({ upper: sma + stdDev * std, middle: sma, lower: sma - stdDev * std, std }) };
+  },
+  risk_var_parametric: (args) => {
+    const r = args.returns;
+    const c = args.confidence;
+    if (!r || r.length === 0)
       return { success: false, error: "No returns" };
     const mean = r.reduce((a, b) => a + b, 0) / r.length;
     const variance = r.reduce((sum, x) => sum + (x - mean) ** 2, 0) / r.length;
@@ -7108,10 +7154,21 @@ var fallback = {
     const z = c === 0.99 ? 2.326 : c === 0.95 ? 1.645 : 1.282;
     return { success: true, value: -(mean - z * std) };
   },
-  portfolio_sharpe: (returns, rf) => {
-    const r = returns;
-    const riskFree = rf || 0;
-    if (r.length === 0)
+  risk_omega_ratio: (args) => {
+    const r = args.returns;
+    const threshold = args.threshold || 0;
+    if (!r || r.length === 0)
+      return { success: false, error: "No returns" };
+    const gains = r.reduce((sum, x) => sum + Math.max(x - threshold, 0), 0);
+    const losses = r.reduce((sum, x) => sum + Math.max(threshold - x, 0), 0);
+    if (losses === 0)
+      return { success: true, value: Infinity };
+    return { success: true, value: gains / losses };
+  },
+  portfolio_sharpe: (args) => {
+    const r = args.returns;
+    const riskFree = args.risk_free_rate || 0;
+    if (!r || r.length === 0)
       return { success: false, error: "No returns" };
     const mean = r.reduce((a, b) => a + b, 0) / r.length;
     const variance = r.reduce((sum, x) => sum + (x - mean) ** 2, 0) / r.length;
@@ -7120,37 +7177,37 @@ var fallback = {
       return { success: true, value: 0 };
     return { success: true, value: (mean - riskFree) / std };
   },
-  risk_kelly_criterion: (win_rate, win_loss_ratio) => {
-    const w = win_rate;
-    const wl = win_loss_ratio;
+  risk_kelly_criterion: (args) => {
+    const w = args.win_rate;
+    const wl = args.win_loss_ratio;
     if (w <= 0 || w >= 1 || wl <= 0)
       return { success: false, error: "Invalid parameters" };
     const kelly = (w * wl - (1 - w)) / wl;
-    return {
-      success: true,
-      data: JSON.stringify({
-        kelly_fraction: kelly,
-        half_kelly: kelly / 2,
-        quarter_kelly: kelly / 4
-      })
-    };
+    return { success: true, data: JSON.stringify({ kelly_fraction: kelly, half_kelly: kelly / 2, quarter_kelly: kelly / 4 }) };
   },
-  regime_pbit_state: (signal, volatility, temperature) => {
-    const s = signal;
-    const v = volatility;
-    const t = temperature;
-    const effectiveTemp = t * Math.max(v, 0.1);
+  regime_pbit_state: (args) => {
+    const s = args.market_signal;
+    const v = args.volatility;
+    const t = args.temperature;
+    const effectiveTemp = t * Math.max(v, 0.01);
     const probBullish = 1 / (1 + Math.exp(-s / effectiveTemp));
-    const state = probBullish > 0.6 ? "bullish" : probBullish < 0.4 ? "bearish" : "neutral";
-    return {
-      success: true,
-      data: JSON.stringify({
-        prob_bullish: probBullish,
-        prob_bearish: 1 - probBullish,
-        state,
-        temperature: effectiveTemp
-      })
-    };
+    const state = probBullish > 0.65 ? "bullish" : probBullish < 0.35 ? "bearish" : "neutral";
+    const entropy = probBullish > 0 && probBullish < 1 ? -probBullish * Math.log(probBullish) - (1 - probBullish) * Math.log(1 - probBullish) : 0;
+    return { success: true, data: JSON.stringify({ prob_bullish: probBullish, prob_bearish: 1 - probBullish, state, entropy, temperature: effectiveTemp }) };
+  },
+  risk_max_drawdown: (args) => {
+    const equity = args.equity_curve;
+    if (!equity || equity.length === 0)
+      return { success: false, error: "No equity data" };
+    let maxDd = 0, peak = equity[0];
+    for (const e of equity) {
+      if (e > peak)
+        peak = e;
+      const dd = (peak - e) / peak;
+      if (dd > maxDd)
+        maxDd = dd;
+    }
+    return { success: true, data: JSON.stringify({ max_drawdown: maxDd, max_drawdown_pct: maxDd * 100 }) };
   }
 };
 async function handleToolCall(name, args) {
@@ -7159,12 +7216,12 @@ async function handleToolCall(name, args) {
       const result = native[name](...Object.values(args));
       return JSON.stringify(result);
     } catch (e) {
-      return JSON.stringify({ success: false, error: `Native error: ${e}` });
+      console.error(`[Nautilus] Native call failed for ${name}: ${e}`);
     }
   }
   if (fallback[name]) {
     try {
-      const result = fallback[name](...Object.values(args));
+      const result = fallback[name](args);
       return JSON.stringify(result);
     } catch (e) {
       return JSON.stringify({ success: false, error: `Fallback error: ${e}` });
